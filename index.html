@@ -6,7 +6,7 @@
 
 <title>UFOs Worldwide // Control Room</title>
 
-<meta name="description" content="UFOs Worldwide is an independent research platform documenting unidentified aerial phenomena through structured case reports.">
+<meta name="description" content="UFOs Worldwide is an independent research platform documenting and analyzing unidentified aerial phenomena through structured case reporting and classification systems.">
 <meta name="author" content="John Carter">
 <link rel="icon" href="favicon.ico">
 
@@ -84,7 +84,9 @@ input, textarea {
   color: white;
 }
 
-textarea { height: 140px; }
+textarea {
+  height: 140px;
+}
 
 button {
   width: 100%;
@@ -131,7 +133,7 @@ footer {
 <div class="topbar">
   <div class="brand">UFOs WORLDWIDE</div>
   <h1>CONTROL ROOM</h1>
-  <div class="status">CASE INTELLIGENCE SYSTEM ACTIVE</div>
+  <div class="status">STRUCTURED FIELD INTELLIGENCE SYSTEM ACTIVE</div>
 </div>
 
 <div class="trustline">
@@ -140,22 +142,26 @@ Independent Research Platform // Public Case Logging System
 
 <div class="container">
 
+<!-- CASE SUBMISSION -->
 <div class="panel">
 <h3>CASE FILE SUBMISSION</h3>
-<div class="sub">Submit structured field reports.</div>
+<div class="sub">
+Submit structured field reports. Include observations, timing, and any references inside the report.
+</div>
 
 <form>
-<input type="text" name="case_name" placeholder="Case Name" required>
+<input type="text" name="case_name" placeholder="Case Name / Identifier" required>
 <input type="date" name="date" required>
 <input type="time" name="time" required>
 <input type="text" name="location" placeholder="Location" required>
 
-<textarea name="what_happened" placeholder="Describe what happened. Include links if needed." required></textarea>
+<textarea name="what_happened" placeholder="Describe what happened. Include links or references if available..." required></textarea>
 
 <button type="submit">Submit Case File</button>
 </form>
 </div>
 
+<!-- DATABASE -->
 <div class="panel">
 <h3>INTELLIGENCE ARCHIVE</h3>
 <div class="grid">
@@ -163,6 +169,7 @@ Independent Research Platform // Public Case Logging System
 </div>
 </div>
 
+<!-- SYSTEMS -->
 <div class="panel">
 <h3>FIELD SYSTEMS</h3>
 <div class="grid">
@@ -171,16 +178,31 @@ Independent Research Platform // Public Case Logging System
 </div>
 </div>
 
+<!-- KNOWLEDGE SYSTEM (STRUCTURED ARCHIVE) -->
 <div class="panel">
-<h3>FIELD ARCHIVE</h3>
+<h3>KNOWLEDGE SYSTEM // FIELD LIBRARY</h3>
+
 <div class="grid">
-<a class="card" href="https://www.amazon.com/dp/B0GV8NTDM9">Signals Log</a>
-<a class="card" href="https://www.amazon.com/dp/B0GVP2RJ2M">UFO Handbook</a>
-<a class="card" href="https://www.amazon.com/dp/B0C5P5SHXV">Research Vol I</a>
-<a class="card" href="https://www.amazon.com/dp/B0GTHY5D1V">
-Research Vol II<br/>
-<span style="opacity:0.7">MISIDENTIFIED</span>
+
+<a class="card" href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank">
+FRAMEWORK<br/>
+<span style="opacity:0.7">MISIDENTIFIED CLASSIFICATION SYSTEM</span>
 </a>
+
+<a class="card" href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank">
+IDENTIFICATION FIELD GUIDE & JOURNAL
+</a>
+
+<a class="card" href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank">
+PALE ARCHIVE I<br/>
+<span style="opacity:0.7">OMNIBUS FIELD COLLECTION</span>
+</a>
+
+<a class="card" href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank">
+PALE ARCHIVE II<br/>
+<span style="opacity:0.7">FREQUENCY FIELD ANALYSIS</span>
+</a>
+
 </div>
 </div>
 
