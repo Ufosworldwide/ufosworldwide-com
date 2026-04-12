@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>UFOs Worldwide // Intelligence Hub</title>
+<title>UFOs Worldwide // Control Room</title>
 
 <style>
   body {
@@ -11,30 +11,6 @@
     font-family: system-ui, Arial, sans-serif;
     background: radial-gradient(circle at top, #05070c, #0a1324, #05070c);
     color: #eaeaea;
-  }
-
-  /* BOOT */
-  #boot {
-    position: fixed;
-    inset: 0;
-    background: black;
-    color: #38bdf8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: monospace;
-    z-index: 9999;
-    animation: fadeOut 3s ease forwards;
-    animation-delay: 2.5s;
-  }
-
-  .boot-text {
-    font-size: 14px;
-    line-height: 1.6;
-  }
-
-  @keyframes fadeOut {
-    to { opacity: 0; visibility: hidden; }
   }
 
   /* HEADER */
@@ -99,7 +75,7 @@
     color: white;
   }
 
-  textarea { height: 120px; }
+  textarea { height: 130px; }
 
   button {
     width: 100%;
@@ -139,14 +115,6 @@
     border-color: #38bdf8;
   }
 
-  /* LIVE FEED */
-  #feed div {
-    font-size: 12px;
-    opacity: 0.85;
-    margin: 4px 0;
-    font-family: monospace;
-  }
-
   footer {
     text-align: center;
     font-size: 11px;
@@ -158,54 +126,52 @@
 
 <body>
 
-<!-- BOOT -->
-<div id="boot">
-  <div class="boot-text">
-    INITIALIZING UFOs WORLDWIDE INTELLIGENCE SYSTEM...<br/>
-    LOADING CASE FRAMEWORK...<br/>
-    SYNCING SIGNAL NETWORK...<br/><br/>
-    STATUS: ONLINE
-  </div>
-</div>
-
 <!-- HEADER -->
 <div class="topbar">
   <div class="brand">UFOs WORLDWIDE</div>
-  <h1>INTELLIGENCE HUB</h1>
-  <div class="status">LIVE CASE PROCESSING ACTIVE</div>
+  <h1>CONTROL ROOM</h1>
+  <div class="status">SIGNAL NETWORK ACTIVE // CASE SYSTEM ONLINE</div>
 </div>
 
 <div class="container">
 
-  <!-- SUBMISSION -->
+  <!-- CASE SUBMISSION -->
   <div class="panel">
     <h3>CASE FILE SUBMISSION</h3>
-    <div class="sub">All submissions generate structured intelligence entries</div>
+    <div class="sub">Submit structured field reports for analysis</div>
 
-    <form id="form">
+    <form>
 
-      <input type="text" id="name" placeholder="Identifier" required>
+      <input type="text" name="case_name" placeholder="Case Name / Identifier" required>
 
-      <input type="text" id="location" placeholder="Location / Coordinates">
+      <input type="date" name="date" required>
 
-      <select id="type">
-        <option>Light Anomaly</option>
-        <option>Structured Object</option>
-        <option>Audio Event</option>
-        <option>Unknown Phenomenon</option>
-      </select>
+      <input type="time" name="time" required>
 
-      <textarea id="message" placeholder="Full field report..." required></textarea>
+      <input type="text" name="location" placeholder="Location (City / Coordinates)" required>
 
-      <button type="submit">Generate Case File</button>
+      <input type="url" name="event_link" placeholder="Event / Source Link">
+
+      <input type="url" name="video_link" placeholder="Google Drive Video Link">
+
+      <textarea name="what_happened" placeholder="What happened? Full detailed report..." required></textarea>
+
+      <button type="submit">Submit Case File</button>
     </form>
+
+    <div class="sub">
+      NOTE: Use Google Drive “Anyone with link can view” for media.
+    </div>
   </div>
 
-  <!-- LIVE FEED -->
+  <!-- DATABASE LINK -->
   <div class="panel">
-    <h3>SIGNAL STREAM // LIVE CASE FEED</h3>
-    <div id="feed">
-      <div>● system ready for incoming case files...</div>
+    <h3>INTELLIGENCE ARCHIVE</h3>
+
+    <div class="grid">
+      <a class="card" href="database.html">
+        🗂 CASE DATABASE<br/>View All Reports
+      </a>
     </div>
   </div>
 
@@ -214,9 +180,17 @@
     <h3>FIELD SYSTEMS</h3>
 
     <div class="grid">
-      <a class="card" href="https://thornsignal.netlify.app/" target="_blank">🎮 Thorn Signal</a>
-      <a class="card" href="https://signalscopex11.netlify.app/" target="_blank">📡 SignalScope X11</a>
-      <a class="card" href="https://ether-listen.netlify.app/" target="_blank">🎧 Ether Listen</a>
+      <a class="card" href="https://thornsignal.netlify.app/" target="_blank">
+        🎮 Thorn Signal
+      </a>
+
+      <a class="card" href="https://signalscopex11.netlify.app/" target="_blank">
+        📡 SignalScope X11
+      </a>
+
+      <a class="card" href="https://ether-listen.netlify.app/" target="_blank">
+        🎧 Ether Listen
+      </a>
     </div>
   </div>
 
@@ -225,61 +199,54 @@
     <h3>FIELD ARCHIVE</h3>
 
     <div class="grid">
-      <a class="card" href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank">Signals Log</a>
-      <a class="card" href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank">UFO Handbook</a>
-      <a class="card" href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank">Research Vol I</a>
-      <a class="card" href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank">Research Vol II</a>
+      <a class="card" href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank">
+        Signals Log
+      </a>
+
+      <a class="card" href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank">
+        UFO Handbook
+      </a>
+
+      <a class="card" href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank">
+        Research Vol I
+      </a>
+
+      <a class="card" href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank">
+        Research Vol II
+      </a>
     </div>
   </div>
 
   <footer>
-    UFOs WORLDWIDE // INTELLIGENCE SYSTEM ACTIVE
+    UFOs WORLDWIDE // CONTROL SYSTEM ACTIVE
   </footer>
 
 </div>
 
 <script>
-// CASE ID SYSTEM
-let caseCount = 1;
+// SIMPLE LOCAL STORAGE INTAKE (CONNECTS TO DATABASE PAGE)
 
-function getTime(){
-  return new Date().toISOString().replace("T"," ").substring(0,19);
-}
-
-// FORM HANDLER (NO BACKEND REQUIRED FOR FEED DISPLAY)
-document.getElementById("form").addEventListener("submit", function(e){
+document.querySelector("form").addEventListener("submit", function(e){
   e.preventDefault();
 
-  const name = document.getElementById("name").value;
-  const location = document.getElementById("location").value;
-  const type = document.getElementById("type").value;
-  const message = document.getElementById("message").value;
+  const data = {
+    id: "CASE-" + Date.now(),
+    date: this.date.value,
+    time: this.time.value,
+    location: this.location.value,
+    type: "Field Report",
+    event: this.event_link.value,
+    video: this.video_link.value,
+    report: this.what_happened.value
+  };
 
-  const caseID = "CASE-" + String(caseCount).padStart(4,"0");
-  const time = getTime();
-
-  const entry = `
-● ${caseID} | ${time}
-TYPE: ${type}
-FROM: ${name}
-LOC: ${location || "UNKNOWN"}
-REPORT: ${message.substring(0,60)}...
-`;
-
-  const feed = document.getElementById("feed");
-
-  const div = document.createElement("div");
-  div.textContent = entry;
-
-  feed.prepend(div);
-
-  if(feed.children.length > 8){
-    feed.removeChild(feed.lastChild);
-  }
-
-  caseCount++;
+  const db = JSON.parse(localStorage.getItem("ufo_cases") || "[]");
+  db.push(data);
+  localStorage.setItem("ufo_cases", JSON.stringify(db));
 
   this.reset();
+
+  alert("Case File Submitted + Logged");
 });
 </script>
 
