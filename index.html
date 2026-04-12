@@ -26,16 +26,31 @@ body {
   padding:30px;
 }
 
+h1 {
+  font-family: monospace;
+  color:#7CFFB2;
+}
+
+h2 {
+  font-family: monospace;
+  color:#7CFFB2;
+  margin-top:40px;
+}
+
+p {
+  line-height:1.6;
+}
+
 .grid {
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
   gap:15px;
-  margin-top:25px;
+  margin-top:20px;
 }
 
 .card {
   border:1px solid rgba(255,255,255,0.1);
-  padding:18px;
+  padding:16px;
   border-radius:12px;
   cursor:pointer;
   transition:0.2s;
@@ -44,12 +59,6 @@ body {
 .card:hover {
   border-color:#7CFFB2;
   transform:translateY(-2px);
-}
-
-h2 {
-  font-family: monospace;
-  color:#7CFFB2;
-  margin-top:40px;
 }
 
 a {
@@ -73,44 +82,94 @@ a {
 <h1>UFOs Worldwide</h1>
 <p>Independent Research • Publication System • Public Submission Intake</p>
 
+<!-- NAV -->
 <div class="grid">
-  <div class="card" onclick="location.href='blog.html'">PUBLICATIONS ARCHIVE</div>
-  <div class="card" onclick="location.href='submit.html'">SUBMIT UFO REPORT</div>
-  <div class="card" onclick="document.getElementById('who').scrollIntoView({behavior:'smooth'})">WHO WE ARE</div>
+
+  <div class="card" onclick="location.href='blog.html'">
+    PUBLICATIONS ARCHIVE
+  </div>
+
+  <div class="card" onclick="location.href='submit.html'">
+    SUBMIT UFO REPORT
+  </div>
+
 </div>
 
-<h2 id="who">> WHO WE ARE</h2>
+<!-- WHO WE ARE -->
+<h2>> WHO WE ARE</h2>
 <p>
-UFOs Worldwide is an independent documentation system focused on aerial anomaly reports,
+UFOs Worldwide is an independent research and documentation system focused on aerial anomaly reports,
 structured observation, and public submission analysis.
 </p>
 
 <p>
-We are not affiliated with any government, military, or defense contractor.
+We operate independently with no affiliation to government or defense organizations.
 All material is based on independent research and publicly submitted data.
 </p>
 
-<h2>> RESEARCH BASIS</h2>
-<p>
-Our work includes sky observation logging, classification of known aerial objects,
-and structured review of anomalous footage submitted by the public.
-</p>
+<!-- SOCIAL FEED -->
+<h2>> LIVE TRANSMISSIONS</h2>
 
-<h2>> PUBLISHED WORK</h2>
-<p>
-Books available via Amazon:
-</p>
+<div class="grid">
 
-<ul>
-<li>UFO Identification Handbook</li>
-<li>Anomaly Classification Field Guide</li>
-<li>Sky Observation Logbook</li>
-</ul>
+  <div class="card" onclick="window.open('https://youtube.com/ufosworldwide','_blank')">
+    ▶ YOUTUBE NODE
+  </div>
 
+  <div class="card" onclick="window.open('https://instagram.com/ufosworldwide','_blank')">
+    📷 INSTAGRAM NODE
+  </div>
+
+  <div class="card" onclick="window.open('https://facebook.com/ufosworldwide','_blank')">
+    🌐 FACEBOOK NODE
+  </div>
+
+</div>
+
+<!-- AMAZON FIELD LIBRARY -->
+<h2>> FIELD LIBRARY // RESEARCH MATERIALS</h2>
+
+<div class="grid">
+
+  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0C5YT4YD1','_blank')">
+    FIELD GUIDE 01
+  </div>
+
+  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWRJK9TM','_blank')">
+    FIELD GUIDE 02
+  </div>
+
+  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWRDX5JY','_blank')">
+    FIELD GUIDE 03
+  </div>
+
+  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWRLPD9R','_blank')">
+    FIELD GUIDE 04
+  </div>
+
+  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWRBVBY5','_blank')">
+    FIELD GUIDE 05
+  </div>
+
+  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWR9VPZ5','_blank')">
+    FIELD GUIDE 06
+  </div>
+
+  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWMG57J3','_blank')">
+    FIELD GUIDE 07
+  </div>
+
+  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWMS8HKV','_blank')">
+    FIELD GUIDE 08
+  </div>
+
+</div>
+
+<!-- MISSION -->
 <h2>> MISSION</h2>
 <p>
 To document, structure, and analyze anomalous aerial reports through open submissions,
-independent research, and public archival systems.
+independent research, and archival publication systems.
 </p>
 
 </div>
