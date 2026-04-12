@@ -1,98 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>UFO OS // CONTROL NODE</title>
+<title>Signal Control Network // V2</title>
 
 <style>
-body {
-  margin:0;
-  background:#020403;
-  color:#7CFFB2;
-  font-family: monospace;
-}
+  body {
+    margin: 0;
+    font-family: system-ui, Arial;
+    background: radial-gradient(circle at center, #05070c, #0b1220);
+    color: #eaeaea;
+  }
 
-body::before {
-  content:"";
-  position:fixed;
-  inset:0;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.03),
-    rgba(255,255,255,0.03) 1px,
-    transparent 3px,
-    transparent 5px
-  );
-  pointer-events:none;
-}
+  header {
+    text-align: center;
+    padding: 35px 20px 10px;
+  }
 
-@keyframes flicker {
-  0%{opacity:0.92;}50%{opacity:1;}100%{opacity:0.95;}
-}
+  h1 {
+    margin: 0;
+    letter-spacing: 4px;
+    font-size: 24px;
+  }
 
-.container {
-  max-width:1000px;
-  margin:0 auto;
-  padding:30px;
-  animation:flicker 4s infinite;
-}
+  .status {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 8px;
+  }
 
-h1,h2 {
-  font-family: monospace;
-}
+  .pulse {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: #38bdf8;
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: blink 1.3s infinite;
+  }
 
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:12px;
-}
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
 
-.card {
-  border:1px solid rgba(124,255,178,0.3);
-  padding:14px;
-  cursor:pointer;
-  background:rgba(0,0,0,0.4);
-  transition:0.2s;
-}
+  .wrap {
+    max-width: 900px;
+    margin: auto;
+    padding: 15px;
+  }
 
-.card:hover {
-  border-color:#7CFFB2;
-  transform:scale(1.03);
-}
+  /* LIVE FEED */
+  .feed {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid #1f2937;
+    border-radius: 14px;
+    padding: 12px;
+    min-height: 120px;
+  }
+
+  .item {
+    padding: 8px 0;
+    border-bottom: 1px solid #1f2937;
+    font-size: 13px;
+  }
+
+  .time {
+    font-size: 11px;
+    opacity: 0.5;
+  }
+
+  /* MODULE GRID */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  @media(min-width: 768px){
+    .grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .card {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid #1f2937;
+    border-radius: 14px;
+    padding: 14px;
+    text-decoration: none;
+    color: white;
+  }
+
+  .card:hover {
+    border-color: #38bdf8;
+  }
+
+  .title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .desc {
+    font-size: 12px;
+    opacity: 0.7;
+  }
+
+  footer {
+    text-align: center;
+    padding: 25px;
+    font-size: 11px;
+    opacity: 0.5;
+  }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<header>
+  <h1>CONTROL NETWORK</h1>
+  <div class="status">
+    <span class="pulse"></span>V2 SIGNAL SYSTEM ACTIVE
+  </div>
+</header>
 
-<h1>UFOs WORLDWIDE // SYSTEM ONLINE</h1>
-<p>STATUS: ACTIVE • ARCHIVE READY • SUBMISSIONS ENABLED</p>
+<div class="wrap">
 
-<h2>> CONTROL NODE</h2>
+  <!-- LIVE FEED -->
+  <div class="feed" id="feed">
+    Initializing signal stream...
+  </div>
 
-<div class="grid">
-  <div class="card" onclick="location.href='blog.html'">PUBLIC ARCHIVE</div>
-  <div class="card" onclick="location.href='submit.html'">SUBMISSION PORTAL</div>
+  <!-- MODULES -->
+  <div class="grid">
+
+    <a class="card" href="https://thornsignal.netlify.app/" target="_blank">
+      <div class="title">🎮 Thorn Signal</div>
+      <div class="desc">Narrative field interface</div>
+    </a>
+
+    <a class="card" href="https://signalscopex11.netlify.app/" target="_blank">
+      <div class="title">📡 SignalScope X11</div>
+      <div class="desc">Pattern analysis system</div>
+    </a>
+
+    <a class="card" href="https://ether-listen.netlify.app/" target="_blank">
+      <div class="title">🎧 Ether Listen</div>
+      <div class="desc">Audio perception layer</div>
+    </a>
+
+    <a class="card" href="https://www.amazon.com" target="_blank">
+      <div class="title">📚 Archive</div>
+      <div class="desc">Books + field methodology</div>
+    </a>
+
+  </div>
+
 </div>
 
-<h2>> LIVE TRANSMISSIONS</h2>
+<footer>
+  SIGNAL NETWORK V2 // STANDBY MODE
+</footer>
 
-<div class="grid">
-  <div class="card" onclick="window.open('https://youtube.com/ufosworldwide','_blank')">YOUTUBE</div>
-  <div class="card" onclick="window.open('https://instagram.com/ufosworldwide','_blank')">INSTAGRAM</div>
-  <div class="card" onclick="window.open('https://facebook.com/ufosworldwide','_blank')">FACEBOOK</div>
-</div>
+<script>
+async function loadFeed() {
+  try {
+    const res = await fetch('./data/feed.json?cache=' + Date.now());
+    const data = await res.json();
 
-<h2>> FIELD LIBRARY</h2>
+    const feed = document.getElementById('feed');
+    feed.innerHTML = "";
 
-<div class="grid">
-  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GVP2RJ2M','_blank')">UFO FIELD GUIDE 01</div>
-  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0C5P5SHXV','_blank')">UFO FIELD GUIDE 02</div>
-</div>
+    data.slice().reverse().forEach(item => {
+      const div = document.createElement('div');
+      div.className = "item";
+      div.innerHTML = `
+        <div class="time">${item.time}</div>
+        <div>${item.message}</div>
+      `;
+      feed.appendChild(div);
+    });
 
-</div>
+  } catch (e) {
+    document.getElementById('feed').innerHTML =
+      "Signal stream offline — awaiting input nodes...";
+  }
+}
+
+loadFeed();
+setInterval(loadFeed, 7000);
+</script>
 
 </body>
 </html>
