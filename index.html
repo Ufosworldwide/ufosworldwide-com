@@ -1,212 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>UFOs Worldwide // SYSTEM NODE ACTIVE</title>
+<title>UFOs Worldwide // NODE ACTIVE</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@300;500&display=swap');
-
 body {
-  margin: 0;
-  background: #0b0f14;
-  color: #e6e6e6;
-  font-family: Inter, sans-serif;
+  margin:0;
+  background:#0b0f14;
+  color:#e6e6e6;
+  font-family: Arial, sans-serif;
 }
 
-/* TERMINAL HEADER */
 .terminal {
-  font-family: "JetBrains Mono", monospace;
-  background: rgba(0,0,0,0.6);
-  padding: 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  font-family: monospace;
+  color:#7CFFB2;
+  padding:20px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
 }
 
-.glow {
-  color: #7CFFB2;
-  text-shadow: 0 0 8px rgba(124,255,178,0.4);
-}
-
-/* LAYOUT */
 .container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 30px;
+  max-width:1000px;
+  margin:0 auto;
+  padding:30px;
 }
 
-/* GRID */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  margin-top: 30px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:15px;
+  margin-top:25px;
 }
 
-/* CARDS */
 .card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 18px;
-  border-radius: 14px;
-  transition: 0.2s ease;
-  cursor: pointer;
+  border:1px solid rgba(255,255,255,0.1);
+  padding:18px;
+  border-radius:12px;
+  cursor:pointer;
+  transition:0.2s;
 }
 
 .card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(124,255,178,0.4);
+  border-color:#7CFFB2;
+  transform:translateY(-2px);
 }
 
-.card h3 {
-  margin: 0 0 10px 0;
-  font-size: 14px;
-  letter-spacing: 1px;
-  font-family: "JetBrains Mono";
+h2 {
+  font-family: monospace;
+  color:#7CFFB2;
+  margin-top:40px;
 }
 
-.card p {
-  font-size: 13px;
-  opacity: 0.8;
-}
-
-/* HEADER TITLE */
-.title {
-  font-size: 28px;
-  margin: 0;
-}
-
-.subtitle {
-  opacity: 0.6;
-  margin-top: 5px;
-  font-size: 13px;
-}
-
-/* SECTION */
-.section {
-  margin-top: 40px;
-}
-
-.small {
-  font-size: 12px;
-  opacity: 0.5;
-  font-family: "JetBrains Mono";
-}
-
-/* BUTTON */
-.button {
-  margin-top: 10px;
-  display: inline-block;
-  padding: 8px 12px;
-  border: 1px solid rgba(124,255,178,0.4);
-  border-radius: 8px;
-  font-size: 12px;
-  color: #7CFFB2;
-  text-decoration: none;
+a {
+  color:#7CFFB2;
+  text-decoration:none;
 }
 </style>
 </head>
 
 <body>
 
-<!-- TERMINAL HEADER -->
 <div class="terminal">
-  <div class="glow">> SYSTEM ONLINE: UFOs WORLDWIDE NODE</div>
-  <div>> STATUS: ACTIVE | SECURITY: ENCRYPTED | LINKED TO DEPLOYMENT GRID</div>
-  <div>> INITIALIZING MODULE INTERFACE...</div>
+> SYSTEM INITIALIZED: UFOs WORLDWIDE NODE<br>
+> STATUS: ACTIVE<br>
+> INTEL ARCHIVE: READY<br>
+> SUBMISSION SYSTEM: ONLINE
 </div>
 
 <div class="container">
 
-  <!-- MAIN TITLE -->
-  <h1 class="title">UFOs Worldwide</h1>
-  <div class="subtitle">Hybrid Intelligence Hub // Terminal Interface + Modern Content System</div>
+<h1>UFOs Worldwide</h1>
+<p>Independent Research • Publication System • Public Submission Intake</p>
 
-  <!-- MODULE GRID -->
-  <div class="grid">
-
-    <div class="card" onclick="go('intel')">
-      <h3>INTEL FEED</h3>
-      <p>Live transmissions from social platforms and updates.</p>
-    </div>
-
-    <div class="card" onclick="go('publications')">
-      <h3>PUBLICATIONS</h3>
-      <p>Field reports, analysis logs, structured articles.</p>
-    </div>
-
-    <div class="card" onclick="go('tools')">
-      <h3>TOOLS LAB</h3>
-      <p>Experimental systems and interactive utilities.</p>
-    </div>
-
-    <div class="card" onclick="go('author')">
-      <h3>AUTHOR FILE</h3>
-      <p>Identity profile, books, and creative archive.</p>
-    </div>
-
-    <div class="card" onclick="go('ops')">
-      <h3>OPS / DEPLOYMENTS</h3>
-      <p>Affiliate pages and mission-based product funnels.</p>
-    </div>
-
-  </div>
-
-  <!-- DYNAMIC CONTENT -->
-  <div class="section" id="view">
-    <div class="small">> awaiting module selection...</div>
-  </div>
-
+<div class="grid">
+  <div class="card" onclick="location.href='blog.html'">PUBLICATIONS ARCHIVE</div>
+  <div class="card" onclick="location.href='submit.html'">SUBMIT UFO REPORT</div>
+  <div class="card" onclick="document.getElementById('who').scrollIntoView({behavior:'smooth'})">WHO WE ARE</div>
 </div>
 
-<script>
-const view = document.getElementById("view");
+<h2 id="who">> WHO WE ARE</h2>
+<p>
+UFOs Worldwide is an independent documentation system focused on aerial anomaly reports,
+structured observation, and public submission analysis.
+</p>
 
-function go(module) {
+<p>
+We are not affiliated with any government, military, or defense contractor.
+All material is based on independent research and publicly submitted data.
+</p>
 
-  if(module === "intel") {
-    view.innerHTML = `
-      <div class="small">> SIGNAL FEED ACTIVE</div>
-      <h2>Intel Feed</h2>
-      <p>Embed your Instagram, YouTube, or X posts here as “incoming transmissions”.</p>
-    `;
-  }
+<h2>> RESEARCH BASIS</h2>
+<p>
+Our work includes sky observation logging, classification of known aerial objects,
+and structured review of anomalous footage submitted by the public.
+</p>
 
-  if(module === "publications") {
-    view.innerHTML = `
-      <div class="small">> CLASSIFIED REPORTS ARCHIVE</div>
-      <h2>Publications</h2>
-      <p>Create structured articles here (Markdown or simple HTML posts).</p>
-      <a class="button" href="#">+ New Report</a>
-    `;
-  }
+<h2>> PUBLISHED WORK</h2>
+<p>
+Books available via Amazon:
+</p>
 
-  if(module === "tools") {
-    view.innerHTML = `
-      <div class="small">> TOOLS LAB INITIALIZED</div>
-      <h2>Tools Lab</h2>
-      <p>Build interactive experiments (signal analyzer, classifiers, generators).</p>
-    `;
-  }
+<ul>
+<li>UFO Identification Handbook</li>
+<li>Anomaly Classification Field Guide</li>
+<li>Sky Observation Logbook</li>
+</ul>
 
-  if(module === "author") {
-    view.innerHTML = `
-      <div class="small">> AUTHOR FILE LOADED</div>
-      <h2>Author Identity</h2>
-      <p>Bio, books, mission statement, timeline, and creative work archive.</p>
-    `;
-  }
+<h2>> MISSION</h2>
+<p>
+To document, structure, and analyze anomalous aerial reports through open submissions,
+independent research, and public archival systems.
+</p>
 
-  if(module === "ops") {
-    view.innerHTML = `
-      <div class="small">> OPS DEPLOYMENT SYSTEM</div>
-      <h2>Affiliate / Ops Pages</h2>
-      <p>Single-page “mission reports” for product funnels and monetization.</p>
-    `;
-  }
-
-}
-</script>
+</div>
 
 </body>
 </html>
