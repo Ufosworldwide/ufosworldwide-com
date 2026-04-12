@@ -3,77 +3,92 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>UAP Control Interface</title>
+<title>UAP Control Room</title>
 
 <style>
   body {
     margin: 0;
-    font-family: system-ui, Arial;
+    font-family: system-ui, Arial, sans-serif;
     background: radial-gradient(circle at center, #05070c, #0b1220);
     color: #eaeaea;
+  }
+
+  /* BOOT SCREEN */
+  #boot {
+    position: fixed;
+    inset: 0;
+    background: black;
+    color: #38bdf8;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    font-family: monospace;
+    z-index: 9999;
+    animation: fadeOut 3s ease forwards;
+    animation-delay: 2.5s;
   }
 
+  .boot-text {
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  @keyframes fadeOut {
+    to { opacity: 0; visibility: hidden; }
+  }
+
+  /* MAIN */
   .container {
-    width: 92%;
-    max-width: 700px;
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
     text-align: center;
   }
 
   h1 {
-    letter-spacing: 4px;
-    font-size: 26px;
-    margin-bottom: 6px;
+    letter-spacing: 3px;
+    margin-top: 20px;
   }
 
   .sub {
     opacity: 0.7;
     font-size: 13px;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
   }
 
   .panel {
     background: rgba(15, 23, 42, 0.85);
     border: 1px solid #1f2937;
-    border-radius: 16px;
-    padding: 18px;
-    margin-bottom: 16px;
+    border-radius: 14px;
+    padding: 15px;
+    margin: 15px 0;
   }
 
-  input, textarea {
+  input, textarea, select {
     width: 100%;
-    padding: 10px;
     margin-top: 10px;
+    padding: 10px;
     border-radius: 10px;
     border: 1px solid #333;
     background: #0b1220;
     color: white;
-    outline: none;
   }
 
-  textarea {
-    height: 120px;
-    resize: none;
-  }
+  textarea { height: 120px; }
 
   button {
-    margin-top: 12px;
     width: 100%;
     padding: 12px;
+    margin-top: 10px;
     border: none;
     border-radius: 10px;
     background: #38bdf8;
-    color: black;
     font-weight: bold;
     cursor: pointer;
   }
 
-  button:hover {
-    opacity: 0.85;
-  }
+  button:hover { opacity: 0.85; }
 
   .grid {
     display: grid;
@@ -81,10 +96,8 @@
     gap: 10px;
   }
 
-  @media(min-width: 700px){
-    .grid {
-      grid-template-columns: 1fr 1fr;
-    }
+  @media(min-width:700px){
+    .grid { grid-template-columns: 1fr 1fr; }
   }
 
   .card {
@@ -95,6 +108,7 @@
     text-decoration: none;
     color: white;
     font-size: 13px;
+    display: block;
   }
 
   .card:hover {
@@ -111,49 +125,125 @@
 
 <body>
 
+<!-- BOOT -->
+<div id="boot">
+  <div class="boot-text">
+    INITIALIZING CONTROL SYSTEM...<br/>
+    LOADING SIGNAL NETWORK...<br/>
+    SYNCING FIELD MODULES...<br/><br/>
+    STATUS: ONLINE
+  </div>
+</div>
+
 <div class="container">
 
-  <h1>UAP CONTROL INTERFACE</h1>
-  <div class="sub">Submission + Signal Network Hub</div>
+  <h1>CONTROL ROOM</h1>
+  <div class="sub">SIGNAL NETWORK ACTIVE</div>
 
-  <!-- SUBMISSION FORM -->
+  <!-- SUBMISSION -->
   <div class="panel">
+    <h3>SUBMISSION PORTAL</h3>
+
     <form action="https://formsubmit.co/uaptaskforce@gmail.com" method="POST">
 
-      <input type="text" name="name" placeholder="Your Name / Identifier" required>
+      <input type="text" name="name" placeholder="Identifier" required>
 
       <input type="text" name="location" placeholder="Location / Coordinates">
 
-      <textarea name="message" placeholder="Describe the sighting or signal report..." required></textarea>
+      <select name="type">
+        <option>Light Anomaly</option>
+        <option>Structured Object</option>
+        <option>Audio Event</option>
+        <option>Unknown Phenomenon</option>
+      </select>
 
-      <input type="hidden" name="_subject" value="New UAP Signal Submission">
+      <textarea name="message" placeholder="Field report..." required></textarea>
+
+      <input type="hidden" name="_subject" value="NEW CASE FILE SUBMITTED">
 
       <button type="submit">Submit Signal</button>
     </form>
   </div>
 
-  <!-- MODULE LINKS -->
-  <div class="grid">
+  <!-- LIVE FEED -->
+  <div class="panel">
+    <h3>SIGNAL STREAM // LIVE</h3>
+    <div id="feed">
+      <div>● waiting for incoming transmissions...</div>
+    </div>
+  </div>
 
-    <a class="card" href="https://thornsignal.netlify.app/" target="_blank">
-      🎮 Thorn Signal<br/>Narrative Field System
-    </a>
+  <!-- APPS -->
+  <div class="panel">
+    <h3>FIELD SYSTEMS</h3>
 
-    <a class="card" href="https://signalscopex11.netlify.app/" target="_blank">
-      📡 SignalScope X11<br/>Pattern Analysis System
-    </a>
+    <div class="grid">
+      <a class="card" href="https://thornsignal.netlify.app/" target="_blank">
+        🎮 Thorn Signal<br/>Narrative System
+      </a>
 
-    <a class="card" href="https://ether-listen.netlify.app/" target="_blank">
-      🎧 Ether Listen<br/>Audio Perception Layer
-    </a>
+      <a class="card" href="https://signalscopex11.netlify.app/" target="_blank">
+        📡 SignalScope X11<br/>Pattern Analysis
+      </a>
 
+      <a class="card" href="https://ether-listen.netlify.app/" target="_blank">
+        🎧 Ether Listen<br/>Audio Layer
+      </a>
+    </div>
+  </div>
+
+  <!-- BOOKS -->
+  <div class="panel">
+    <h3>FIELD ARCHIVE // KNOWLEDGE BASE</h3>
+
+    <div class="grid">
+      <a class="card" href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank">
+        SIGNALS<br/>Field Communication Log
+      </a>
+
+      <a class="card" href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank">
+        UFO FIELD HANDBOOK<br/>Identification Framework
+      </a>
+
+      <a class="card" href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank">
+        RESEARCH VOL I<br/>Observational Data
+      </a>
+
+      <a class="card" href="https://www.amazon.com/dp/B0C5V5L6F2" target="_blank">
+        RESEARCH VOL II<br/>Extended Analysis
+      </a>
+    </div>
   </div>
 
   <footer>
-    CONTROL NETWORK ACTIVE // FIELD INPUT ENABLED
+    CONTROL NETWORK ACTIVE // SYSTEM ONLINE
   </footer>
 
 </div>
+
+<script>
+const messages = [
+  "signal detected in low atmosphere...",
+  "pattern anomaly identified...",
+  "incoming field report queued...",
+  "sensor drift stabilizing...",
+  "unknown object classification pending..."
+];
+
+setInterval(() => {
+  const feed = document.getElementById("feed");
+  const msg = messages[Math.floor(Math.random()*messages.length)];
+
+  const div = document.createElement("div");
+  div.textContent = "● " + msg;
+
+  feed.prepend(div);
+
+  if(feed.children.length > 6){
+    feed.removeChild(feed.lastChild);
+  }
+}, 3500);
+</script>
 
 </body>
 </html>
