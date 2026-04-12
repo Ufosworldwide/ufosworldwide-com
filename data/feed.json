@@ -1,8 +1,8 @@
 [
   {
-  "time": "NOW",
-  "message": "Test signal detected from field input"
-}
+    "time": "NOW",
+    "message": "Test signal detected from field input"
+  },
   {
     "time": "LIVE",
     "message": "System online — control hub active"
