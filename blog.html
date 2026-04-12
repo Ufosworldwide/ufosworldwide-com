@@ -14,10 +14,15 @@ body {
   padding:40px;
 }
 
+h1 {
+  font-family: monospace;
+  color:#7CFFB2;
+}
+
 .card {
   border:1px solid rgba(255,255,255,0.1);
   padding:15px;
-  margin-bottom:15px;
+  margin:10px 0;
   border-radius:10px;
 }
 
@@ -26,24 +31,34 @@ a {
   text-decoration:none;
   font-family: monospace;
 }
-
-h1 {
-  font-family: monospace;
-  color:#7CFFB2;
-}
 </style>
 </head>
 
 <body>
 
 <h1>PUBLICATIONS ARCHIVE</h1>
+<p>> AUTO-GENERATED FIELD REPORT INDEX</p>
 
-<p>> CLASSIFIED FIELD REPORTS</p>
+<div id="posts">Loading archive...</div>
 
-<div class="card">
-  <h3>FIELD REPORT // TEMPLATE</h3>
-  <a href="/posts/template.html">OPEN</a>
-</div>
+<script>
+// SIMPLE AUTO INDEX (static-friendly approach)
+fetch('/posts/manifest.json')
+.then(r => r.json())
+.then(posts => {
+  const container = document.getElementById('posts');
+  container.innerHTML = '';
+
+  posts.forEach(p => {
+    container.innerHTML += `
+      <div class="card">
+        <div>${p.title}</div>
+        <a href="${p.file}">OPEN FILE</a>
+      </div>
+    `;
+  });
+});
+</script>
 
 </body>
 </html>
