@@ -2,63 +2,36 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>PUBLICATIONS ARCHIVE</title>
+<title>ARCHIVE NODE</title>
 
 <style>
 body {
-  background:#0b0f14;
-  color:#e6e6e6;
-  font-family: Arial;
-  max-width:900px;
-  margin:0 auto;
+  background:#050805;
+  color:#7CFFB2;
+  font-family: monospace;
   padding:40px;
 }
 
-h1 {
-  font-family: monospace;
-  color:#7CFFB2;
-}
-
 .card {
-  border:1px solid rgba(255,255,255,0.1);
-  padding:15px;
-  margin:10px 0;
-  border-radius:10px;
+  border:1px solid rgba(124,255,178,0.3);
+  padding:12px;
+  margin-bottom:10px;
+  background:rgba(0,0,0,0.4);
 }
 
-a {
-  color:#7CFFB2;
-  text-decoration:none;
-  font-family: monospace;
-}
+a { color:#7CFFB2; text-decoration:none; }
 </style>
 </head>
 
 <body>
 
-<h1>PUBLICATIONS ARCHIVE</h1>
-<p>> AUTO-GENERATED FIELD REPORT INDEX</p>
+<h1>PUBLIC ARCHIVE</h1>
 
-<div id="posts">Loading archive...</div>
+<p>> FIELD REPORT INDEX</p>
 
-<script>
-// SIMPLE AUTO INDEX (static-friendly approach)
-fetch('/posts/manifest.json')
-.then(r => r.json())
-.then(posts => {
-  const container = document.getElementById('posts');
-  container.innerHTML = '';
-
-  posts.forEach(p => {
-    container.innerHTML += `
-      <div class="card">
-        <div>${p.title}</div>
-        <a href="${p.file}">OPEN FILE</a>
-      </div>
-    `;
-  });
-});
-</script>
+<div class="card">
+  <a href="/posts/template.html">TEMPLATE REPORT</a>
+</div>
 
 </body>
 </html>
