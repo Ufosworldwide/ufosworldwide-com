@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
 <title>UFOs Worldwide // Control Room</title>
+
+<!-- SEO + TRUST SIGNALS -->
+<meta name="description" content="UFOs Worldwide is an independent research platform documenting and analyzing unidentified aerial phenomena through structured case reports and field systems.">
+<meta name="author" content="John Carter">
+<link rel="icon" href="favicon.ico">
 
 <style>
   body {
@@ -33,6 +39,13 @@
   .status {
     font-size: 12px;
     opacity: 0.6;
+  }
+
+  .trustline {
+    text-align: center;
+    font-size: 12px;
+    opacity: 0.5;
+    margin-bottom: 10px;
   }
 
   .container {
@@ -73,9 +86,7 @@
     color: white;
   }
 
-  textarea {
-    height: 140px;
-  }
+  textarea { height: 140px; }
 
   button {
     width: 100%;
@@ -86,10 +97,6 @@
     background: #38bdf8;
     font-weight: bold;
     cursor: pointer;
-  }
-
-  button:hover {
-    opacity: 0.85;
   }
 
   .grid {
@@ -112,26 +119,25 @@
     font-size: 13px;
   }
 
-  .card:hover {
-    border-color: #38bdf8;
-  }
-
   footer {
     text-align: center;
     font-size: 11px;
-    opacity: 0.4;
-    margin: 25px 0 10px;
+    opacity: 0.5;
+    margin: 30px 0 10px;
   }
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="topbar">
   <div class="brand">UFOs WORLDWIDE</div>
   <h1>CONTROL ROOM</h1>
   <div class="status">CASE INTELLIGENCE SYSTEM ACTIVE</div>
+</div>
+
+<div class="trustline">
+Independent Research Platform // Public Case Logging System
 </div>
 
 <div class="container">
@@ -140,76 +146,49 @@
   <div class="panel">
     <h3>CASE FILE SUBMISSION</h3>
     <div class="sub">
-      Submit structured field reports. Include all relevant details in the report body.
+      Submit structured field reports. Include all relevant details and any supporting links in your report.
     </div>
 
     <form>
-
       <input type="text" name="case_name" placeholder="Case Name / Identifier" required>
-
       <input type="date" name="date" required>
-
       <input type="time" name="time" required>
-
       <input type="text" name="location" placeholder="Location (City / Coordinates)" required>
 
-      <textarea name="what_happened" placeholder="What happened? Include details, observations, timing, and any links if available..." required></textarea>
+      <textarea name="what_happened" placeholder="Describe what happened in detail. Include any links, references, or media if available..." required></textarea>
 
       <button type="submit">Submit Case File</button>
     </form>
 
     <div class="sub">
-      Tip: Include any source links or references inside the report text above.
+      Tip: Include Google Drive or source links directly inside your report.
     </div>
   </div>
 
-  <!-- DATABASE LINK -->
+  <!-- DATABASE -->
   <div class="panel">
     <h3>INTELLIGENCE ARCHIVE</h3>
-
     <div class="grid">
-      <a class="card" href="database.html">
-        🗂 CASE DATABASE<br/>View All Reports
-      </a>
+      <a class="card" href="database.html">🗂 CASE DATABASE<br/>View Reports</a>
     </div>
   </div>
 
   <!-- SYSTEMS -->
   <div class="panel">
     <h3>FIELD SYSTEMS</h3>
-
     <div class="grid">
-      <a class="card" href="https://thornsignal.netlify.app/" target="_blank">
-        🎮 Thorn Signal
-      </a>
-
-      <a class="card" href="https://signalscopex11.netlify.app/" target="_blank">
-        📡 SignalScope X11
-      </a>
-
-      <a class="card" href="https://ether-listen.netlify.app/" target="_blank">
-        🎧 Ether Listen
-      </a>
+      <a class="card" href="https://signalscopex11.netlify.app/" target="_blank">📡 SignalScope X11</a>
+      <a class="card" href="https://ether-listen.netlify.app/" target="_blank">🎧 Ether Listen</a>
     </div>
   </div>
 
-  <!-- FIELD ARCHIVE -->
+  <!-- ARCHIVE -->
   <div class="panel">
     <h3>FIELD ARCHIVE</h3>
-
     <div class="grid">
-      <a class="card" href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank">
-        Signals Log
-      </a>
-
-      <a class="card" href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank">
-        UFO Handbook
-      </a>
-
-      <a class="card" href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank">
-        Research Vol I
-      </a>
-
+      <a class="card" href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank">Signals Log</a>
+      <a class="card" href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank">UFO Handbook</a>
+      <a class="card" href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank">Research Vol I</a>
       <a class="card" href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank">
         RESEARCH VOL II<br/>
         <span style="opacity:0.7">MISIDENTIFIED // FIELD CLASSIFICATION STUDIES</span>
@@ -217,8 +196,27 @@
     </div>
   </div>
 
+  <!-- TRUST NOTICE -->
+  <div class="panel">
+    <h3>NOTICE</h3>
+    <div class="sub">
+      This site is an independent research platform.  
+      If you have concerns or questions, please contact us directly before reporting the site.
+    </div>
+  </div>
+
   <footer>
-    UFOs WORLDWIDE // CONTROL SYSTEM ACTIVE
+    UFOs WORLDWIDE // CONTROL SYSTEM ACTIVE<br/><br/>
+
+    Operated by John Carter<br/>
+    Contact: uaptaskforce@gmail.com<br/>
+    Location: Canada<br/>
+    © 2026 UFOs Worldwide<br/><br/>
+
+    <a href="about.html">About</a> |
+    <a href="contact.html">Contact</a> |
+    <a href="privacy.html">Privacy</a> |
+    <a href="terms.html">Terms</a>
   </footer>
 
 </div>
@@ -240,7 +238,6 @@ document.querySelector("form").addEventListener("submit", function(e){
   localStorage.setItem("ufo_cases", JSON.stringify(db));
 
   this.reset();
-
   alert("Case File Submitted + Logged");
 });
 </script>
