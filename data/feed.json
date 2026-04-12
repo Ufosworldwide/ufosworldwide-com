@@ -1,14 +1,7 @@
 [
   {
-    "time": "NOW",
-    "message": "Test signal detected from field input"
-  },
-  {
-    "time": "LIVE",
-    "message": "System online — control hub active"
-  },
-  {
-    "time": "INIT",
-    "message": "Signal modules connected (manual mode)"
+    "time": "SUBSTACK",
+    "source": "Archive Node",
+    "message": "Latest posts will appear here via RSS integration (next step)"
   }
 ]
