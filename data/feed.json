@@ -1,0 +1,10 @@
+[
+  {
+    "time": "LIVE",
+    "message": "System online — control hub active"
+  },
+  {
+    "time": "INIT",
+    "message": "Signal modules connected (manual mode)"
+  }
+]
