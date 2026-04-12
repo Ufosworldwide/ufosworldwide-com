@@ -1,5 +1,9 @@
 [
   {
+  "time": "NOW",
+  "message": "Test signal detected from field input"
+}
+  {
     "time": "LIVE",
     "message": "System online — control hub active"
   },
@@ -8,7 +12,3 @@
     "message": "Signal modules connected (manual mode)"
   }
 ]
-{
-  "time": "NOW",
-  "message": "Test signal detected from field input"
-}
