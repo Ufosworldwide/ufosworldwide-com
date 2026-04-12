@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Signal Control Network // V2</title>
+<title>Control Room // Signal Network</title>
 
 <style>
   body {
     margin: 0;
-    font-family: system-ui, Arial;
+    font-family: system-ui, Arial, sans-serif;
     background: radial-gradient(circle at center, #05070c, #0b1220);
     color: #eaeaea;
   }
 
   header {
     text-align: center;
-    padding: 35px 20px 10px;
+    padding: 35px 20px 15px;
   }
 
   h1 {
     margin: 0;
-    letter-spacing: 4px;
     font-size: 24px;
+    letter-spacing: 4px;
   }
 
   .status {
@@ -51,7 +51,7 @@
     padding: 15px;
   }
 
-  /* LIVE FEED */
+  /* FEED */
   .feed {
     background: rgba(15, 23, 42, 0.85);
     border: 1px solid #1f2937;
@@ -61,17 +61,21 @@
   }
 
   .item {
-    padding: 8px 0;
+    padding: 10px 0;
     border-bottom: 1px solid #1f2937;
-    font-size: 13px;
   }
 
   .time {
     font-size: 11px;
-    opacity: 0.5;
+    opacity: 0.6;
+    margin-bottom: 3px;
   }
 
-  /* MODULE GRID */
+  .message {
+    font-size: 13px;
+  }
+
+  /* MODULES */
   .grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -119,9 +123,9 @@
 <body>
 
 <header>
-  <h1>CONTROL NETWORK</h1>
+  <h1>CONTROL ROOM</h1>
   <div class="status">
-    <span class="pulse"></span>V2 SIGNAL SYSTEM ACTIVE
+    <span class="pulse"></span>SIGNAL NETWORK ACTIVE
   </div>
 </header>
 
@@ -132,12 +136,12 @@
     Initializing signal stream...
   </div>
 
-  <!-- MODULES -->
+  <!-- MODULE LINKS -->
   <div class="grid">
 
     <a class="card" href="https://thornsignal.netlify.app/" target="_blank">
       <div class="title">🎮 Thorn Signal</div>
-      <div class="desc">Narrative field interface</div>
+      <div class="desc">Narrative field system</div>
     </a>
 
     <a class="card" href="https://signalscopex11.netlify.app/" target="_blank">
@@ -160,7 +164,7 @@
 </div>
 
 <footer>
-  SIGNAL NETWORK V2 // STANDBY MODE
+  SIGNAL NETWORK // LIVE FEED MODE
 </footer>
 
 <script>
@@ -175,10 +179,12 @@ async function loadFeed() {
     data.slice().reverse().forEach(item => {
       const div = document.createElement('div');
       div.className = "item";
+
       div.innerHTML = `
         <div class="time">${item.time}</div>
-        <div>${item.message}</div>
+        <div class="message">${item.message}</div>
       `;
+
       feed.appendChild(div);
     });
 
