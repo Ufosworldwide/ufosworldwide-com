@@ -3,174 +3,124 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>UFOs Worldwide // NODE ACTIVE</title>
+<title>UFOs Worldwide // CONTROL NODE</title>
 
 <style>
 body {
   margin:0;
-  background:#0b0f14;
-  color:#e6e6e6;
-  font-family: Arial, sans-serif;
+  background:#050805;
+  color:#7CFFB2;
+  font-family: monospace;
+  overflow-x:hidden;
 }
 
-.terminal {
-  font-family: monospace;
-  color:#7CFFB2;
-  padding:20px;
-  border-bottom:1px solid rgba(255,255,255,0.1);
+/* CRT EFFECT */
+body::before {
+  content:"";
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.02),
+    rgba(255,255,255,0.02) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events:none;
+}
+
+@keyframes flicker {
+  0% { opacity:0.95; }
+  50% { opacity:1; }
+  100% { opacity:0.97; }
 }
 
 .container {
   max-width:1000px;
   margin:0 auto;
   padding:30px;
+  animation:flicker 4s infinite;
 }
 
 h1 {
-  font-family: monospace;
-  color:#7CFFB2;
+  font-size:32px;
+  margin-bottom:5px;
 }
 
 h2 {
-  font-family: monospace;
-  color:#7CFFB2;
   margin-top:40px;
-}
-
-p {
-  line-height:1.6;
+  border-left:3px solid #7CFFB2;
+  padding-left:10px;
 }
 
 .grid {
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:15px;
-  margin-top:20px;
+  gap:12px;
+  margin-top:15px;
 }
 
 .card {
-  border:1px solid rgba(255,255,255,0.1);
-  padding:16px;
-  border-radius:12px;
+  border:1px solid rgba(124,255,178,0.3);
+  padding:14px;
   cursor:pointer;
   transition:0.2s;
+  background:rgba(0,0,0,0.4);
 }
 
 .card:hover {
   border-color:#7CFFB2;
-  transform:translateY(-2px);
+  transform:scale(1.02);
 }
 
 a {
   color:#7CFFB2;
   text-decoration:none;
 }
+
+.small {
+  opacity:0.7;
+  font-size:12px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="terminal">
-> SYSTEM INITIALIZED: UFOs WORLDWIDE NODE<br>
-> STATUS: ACTIVE<br>
-> INTEL ARCHIVE: READY<br>
-> SUBMISSION SYSTEM: ONLINE
-</div>
-
 <div class="container">
 
-<h1>UFOs Worldwide</h1>
-<p>Independent Research • Publication System • Public Submission Intake</p>
+<h1>UFOs WORLDWIDE // NODE ACTIVE</h1>
+<div class="small">STATUS: ONLINE • SIGNAL STABLE • ARCHIVE READY</div>
 
-<!-- NAV -->
+<h2>> CONTROL PANEL</h2>
+
 <div class="grid">
-
-  <div class="card" onclick="location.href='blog.html'">
-    PUBLICATIONS ARCHIVE
-  </div>
-
-  <div class="card" onclick="location.href='submit.html'">
-    SUBMIT UFO REPORT
-  </div>
-
+  <div class="card" onclick="location.href='blog.html'">PUBLIC ARCHIVE</div>
+  <div class="card" onclick="location.href='submit.html'">SUBMISSION PORTAL</div>
+  <div class="card" onclick="document.getElementById('who').scrollIntoView({behavior:'smooth'})">IDENTITY NODE</div>
 </div>
 
-<!-- WHO WE ARE -->
-<h2>> WHO WE ARE</h2>
+<h2 id="who">> SYSTEM IDENTITY</h2>
 <p>
-UFOs Worldwide is an independent research and documentation system focused on aerial anomaly reports,
-structured observation, and public submission analysis.
+Independent UFO research and documentation node focused on structured anomaly reporting,
+public submissions, and observational analysis.
 </p>
 
-<p>
-We operate independently with no affiliation to government or defense organizations.
-All material is based on independent research and publicly submitted data.
-</p>
-
-<!-- SOCIAL FEED -->
 <h2>> LIVE TRANSMISSIONS</h2>
 
 <div class="grid">
-
-  <div class="card" onclick="window.open('https://youtube.com/ufosworldwide','_blank')">
-    ▶ YOUTUBE NODE
-  </div>
-
-  <div class="card" onclick="window.open('https://instagram.com/ufosworldwide','_blank')">
-    📷 INSTAGRAM NODE
-  </div>
-
-  <div class="card" onclick="window.open('https://facebook.com/ufosworldwide','_blank')">
-    🌐 FACEBOOK NODE
-  </div>
-
+  <div class="card" onclick="window.open('https://youtube.com/ufosworldwide','_blank')">YOUTUBE</div>
+  <div class="card" onclick="window.open('https://instagram.com/ufosworldwide','_blank')">INSTAGRAM</div>
+  <div class="card" onclick="window.open('https://facebook.com/ufosworldwide','_blank')">FACEBOOK</div>
 </div>
 
-<!-- AMAZON FIELD LIBRARY -->
-<h2>> FIELD LIBRARY // RESEARCH MATERIALS</h2>
+<h2>> FIELD LIBRARY</h2>
 
 <div class="grid">
-
-  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0C5YT4YD1','_blank')">
-    FIELD GUIDE 01
-  </div>
-
-  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWRJK9TM','_blank')">
-    FIELD GUIDE 02
-  </div>
-
-  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWRDX5JY','_blank')">
-    FIELD GUIDE 03
-  </div>
-
-  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWRLPD9R','_blank')">
-    FIELD GUIDE 04
-  </div>
-
-  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWRBVBY5','_blank')">
-    FIELD GUIDE 05
-  </div>
-
-  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWR9VPZ5','_blank')">
-    FIELD GUIDE 06
-  </div>
-
-  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWMG57J3','_blank')">
-    FIELD GUIDE 07
-  </div>
-
-  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWMS8HKV','_blank')">
-    FIELD GUIDE 08
-  </div>
-
+  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0C5YT4YD1','_blank')">UFO GUIDE 01</div>
+  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWRJK9TM','_blank')">UFO GUIDE 02</div>
+  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWRDX5JY','_blank')">UFO GUIDE 03</div>
 </div>
-
-<!-- MISSION -->
-<h2>> MISSION</h2>
-<p>
-To document, structure, and analyze anomalous aerial reports through open submissions,
-independent research, and archival publication systems.
-</p>
 
 </div>
 
