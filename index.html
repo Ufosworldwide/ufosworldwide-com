@@ -4,35 +4,37 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>UFOs Worldwide // Control Room</title>
+<title>UFOs Worldwide // Control Dashboard</title>
 
-<meta name="description" content="UFOs Worldwide is an independent research platform documenting and analyzing unidentified aerial phenomena through structured case reporting and classification systems.">
+<meta name="description" content="UFOs Worldwide Control Dashboard — structured case logging system with classification framework and field intelligence layers.">
 <meta name="author" content="John Carter">
 <link rel="icon" href="favicon.ico">
 
 <style>
 body {
   margin: 0;
-  font-family: system-ui, Arial, sans-serif;
+  font-family: system-ui, Arial;
   background: radial-gradient(circle at top, #05070c, #0a1324, #05070c);
   color: #eaeaea;
 }
 
-.topbar {
+/* HEADER */
+header {
   text-align: center;
-  padding: 25px 10px 5px;
-}
-
-.brand {
-  font-size: 12px;
-  letter-spacing: 4px;
-  opacity: 0.6;
+  padding: 20px 10px 10px;
+  border-bottom: 1px solid rgba(56,189,248,0.15);
 }
 
 h1 {
   margin: 5px 0;
-  font-size: 26px;
-  letter-spacing: 5px;
+  font-size: 24px;
+  letter-spacing: 4px;
+}
+
+.brand {
+  font-size: 12px;
+  opacity: 0.6;
+  letter-spacing: 4px;
 }
 
 .status {
@@ -40,41 +42,40 @@ h1 {
   opacity: 0.6;
 }
 
-.trustline {
-  text-align: center;
+.trust {
   font-size: 12px;
-  opacity: 0.5;
-  margin-bottom: 10px;
+  opacity: 0.45;
+  margin-top: 5px;
 }
 
+/* LAYOUT */
 .container {
-  max-width: 950px;
+  max-width: 1100px;
   margin: auto;
   padding: 15px;
 }
 
-.panel {
-  background: rgba(15, 23, 42, 0.7);
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media(min-width: 800px){
+  .grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* CARDS */
+.card {
+  background: rgba(15, 23, 42, 0.75);
   border: 1px solid rgba(56,189,248,0.15);
-  border-radius: 16px;
-  padding: 16px;
-  margin: 14px 0;
+  border-radius: 14px;
+  padding: 14px;
+  color: white;
 }
 
-h3 {
-  margin: 0 0 10px;
-  font-size: 13px;
-  letter-spacing: 2px;
-  opacity: 0.8;
-}
-
-.sub {
-  font-size: 12px;
-  opacity: 0.6;
-  margin-bottom: 10px;
-}
-
-input, textarea {
+/* FORM */
+input, textarea, select {
   width: 100%;
   margin-top: 8px;
   padding: 10px;
@@ -84,9 +85,7 @@ input, textarea {
   color: white;
 }
 
-textarea {
-  height: 140px;
-}
+textarea { height: 120px; }
 
 button {
   width: 100%;
@@ -99,26 +98,15 @@ button {
   cursor: pointer;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
+/* SECTION */
+.section {
+  margin: 18px 0 8px;
+  font-size: 12px;
+  letter-spacing: 3px;
+  opacity: 0.5;
 }
 
-@media(min-width:700px){
-  .grid { grid-template-columns: 1fr 1fr; }
-}
-
-.card {
-  padding: 12px;
-  border-radius: 12px;
-  background: rgba(15,23,42,0.85);
-  border: 1px solid rgba(56,189,248,0.15);
-  text-decoration: none;
-  color: white;
-  font-size: 13px;
-}
-
+/* FOOTER */
 footer {
   text-align: center;
   font-size: 11px;
@@ -130,89 +118,101 @@ footer {
 
 <body>
 
-<div class="topbar">
-  <div class="brand">UFOs WORLDWIDE</div>
-  <h1>CONTROL ROOM</h1>
-  <div class="status">STRUCTURED FIELD INTELLIGENCE SYSTEM ACTIVE</div>
-</div>
-
-<div class="trustline">
-Independent Research Platform // Public Case Logging System
-</div>
+<header>
+<div class="brand">UFOs WORLDWIDE</div>
+<h1>CONTROL DASHBOARD</h1>
+<div class="status">FIELD INTELLIGENCE SYSTEM ACTIVE</div>
+<div class="trust">Independent Research Platform // Case Classification Network</div>
+</header>
 
 <div class="container">
 
-<!-- CASE SUBMISSION -->
-<div class="panel">
-<h3>CASE FILE SUBMISSION</h3>
-<div class="sub">
-Submit structured field reports. Include observations, timing, and any references inside the report.
-</div>
+<!-- CORE -->
+<div class="section">CORE SYSTEM</div>
+
+<div class="grid">
+
+<div class="card">
+
+<h3>CASE SUBMISSION</h3>
 
 <form>
-<input type="text" name="case_name" placeholder="Case Name / Identifier" required>
+<input type="text" name="case_name" placeholder="Case Name" required>
 <input type="date" name="date" required>
 <input type="time" name="time" required>
 <input type="text" name="location" placeholder="Location" required>
 
-<textarea name="what_happened" placeholder="Describe what happened. Include links or references if available..." required></textarea>
+<select name="case_type" required>
+<option value="">Select Case Type</option>
+<option value="LIGHT">Light / Visual Event</option>
+<option value="OBJECT">Object / Physical Encounter</option>
+<option value="COMPLEX">Complex / Multi-Witness Event</option>
+<option value="SIGNAL">Signal / Frequency Event</option>
+</select>
 
-<button type="submit">Submit Case File</button>
+<textarea name="what_happened" placeholder="Describe event..." required></textarea>
+
+<button type="submit">Log Case</button>
 </form>
+
 </div>
 
-<!-- DATABASE -->
-<div class="panel">
-<h3>INTELLIGENCE ARCHIVE</h3>
-<div class="grid">
-<a class="card" href="database.html">🗂 CASE DATABASE</a>
-</div>
+<a class="card" href="database.html">
+<h3>CASE DATABASE</h3>
+<p>Searchable field intelligence archive.</p>
+</a>
+
 </div>
 
 <!-- SYSTEMS -->
-<div class="panel">
-<h3>FIELD SYSTEMS</h3>
+<div class="section">FIELD SYSTEMS</div>
+
 <div class="grid">
-<a class="card" href="https://signalscopex11.netlify.app/" target="_blank">SignalScope X11</a>
-<a class="card" href="https://ether-listen.netlify.app/" target="_blank">Ether Listen</a>
-</div>
+
+<a class="card" href="https://signalscopex11.netlify.app/" target="_blank">
+<h3>SIGNAL SCOPE X11</h3>
+<p>Pattern detection + anomaly tracking.</p>
+</a>
+
+<a class="card" href="https://ether-listen.netlify.app/" target="_blank">
+<h3>ETHER LISTEN</h3>
+<p>Audio + signal perception layer.</p>
+</a>
+
 </div>
 
-<!-- KNOWLEDGE SYSTEM (STRUCTURED ARCHIVE) -->
-<div class="panel">
-<h3>KNOWLEDGE SYSTEM // FIELD LIBRARY</h3>
+<!-- KNOWLEDGE -->
+<div class="section">KNOWLEDGE FRAMEWORK</div>
 
 <div class="grid">
 
 <a class="card" href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank">
-FRAMEWORK<br/>
-<span style="opacity:0.7">MISIDENTIFIED CLASSIFICATION SYSTEM</span>
+<h3>UFO FRAMEWORK</h3>
+<p>Classification system for unidentified phenomena.</p>
 </a>
 
 <a class="card" href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank">
-IDENTIFICATION FIELD GUIDE & JOURNAL
+<h3>FIELD GUIDE & JOURNAL</h3>
+<p>Identification + structured reporting methods.</p>
 </a>
 
 <a class="card" href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank">
-PALE ARCHIVE I<br/>
-<span style="opacity:0.7">OMNIBUS FIELD COLLECTION</span>
+<h3>PALE ARCHIVE I</h3>
+<p>Omnibus field collection.</p>
 </a>
 
 <a class="card" href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank">
-PALE ARCHIVE II<br/>
-<span style="opacity:0.7">FREQUENCY FIELD ANALYSIS</span>
+<h3>PALE ARCHIVE II</h3>
+<p>Frequency + signal analysis system.</p>
 </a>
 
 </div>
+
 </div>
 
 <footer>
-UFOs WORLDWIDE // CONTROL SYSTEM ACTIVE<br/><br/>
-
-Operated by John Carter<br/>
-Contact: uaptaskforce@gmail.com<br/>
-Location: Canada<br/>
-© 2026 UFOs Worldwide<br/><br/>
+UFOs WORLDWIDE // CONTROL SYSTEM ACTIVE<br/>
+Operated by John Carter · Canada · uaptaskforce@gmail.com<br/><br/>
 
 <a href="about.html">About</a> |
 <a href="contact.html">Contact</a> |
@@ -220,17 +220,17 @@ Location: Canada<br/>
 <a href="terms.html">Terms</a>
 </footer>
 
-</div>
-
 <script>
 document.querySelector("form").addEventListener("submit", function(e){
 e.preventDefault();
 
 const data = {
 id: "CASE-" + Date.now(),
+name: this.case_name.value,
 date: this.date.value,
 time: this.time.value,
 location: this.location.value,
+type: this.case_type.value,
 report: this.what_happened.value
 };
 
@@ -239,7 +239,7 @@ db.push(data);
 localStorage.setItem("ufo_cases", JSON.stringify(db));
 
 this.reset();
-alert("Case Logged");
+alert("Case Logged + Classified");
 });
 </script>
 
