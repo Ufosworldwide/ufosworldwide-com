@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>UFOs Worldwide // Control Room</title>
+<title>UFOs Worldwide // Intelligence Hub</title>
 
 <style>
   body {
@@ -11,10 +11,9 @@
     font-family: system-ui, Arial, sans-serif;
     background: radial-gradient(circle at top, #05070c, #0a1324, #05070c);
     color: #eaeaea;
-    overflow-x: hidden;
   }
 
-  /* BOOT SCREEN */
+  /* BOOT */
   #boot {
     position: fixed;
     inset: 0;
@@ -32,7 +31,6 @@
   .boot-text {
     font-size: 14px;
     line-height: 1.6;
-    opacity: 0.9;
   }
 
   @keyframes fadeOut {
@@ -42,11 +40,11 @@
   /* HEADER */
   .topbar {
     text-align: center;
-    padding: 25px 10px 10px;
+    padding: 25px 10px 5px;
   }
 
   .brand {
-    font-size: 13px;
+    font-size: 12px;
     letter-spacing: 4px;
     opacity: 0.6;
   }
@@ -80,7 +78,7 @@
 
   h3 {
     margin: 0 0 10px;
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: 2px;
     opacity: 0.8;
   }
@@ -99,7 +97,6 @@
     border: 1px solid #1f2937;
     background: #0b1220;
     color: white;
-    outline: none;
   }
 
   textarea { height: 120px; }
@@ -115,18 +112,16 @@
     cursor: pointer;
   }
 
-  button:hover {
-    opacity: 0.85;
-  }
+  button:hover { opacity: 0.85; }
 
-  /* GRID SYSTEM */
+  /* GRID */
   .grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 10px;
   }
 
-  @media(min-width: 700px){
+  @media(min-width:700px){
     .grid { grid-template-columns: 1fr 1fr; }
   }
 
@@ -138,12 +133,10 @@
     text-decoration: none;
     color: white;
     font-size: 13px;
-    transition: 0.2s;
   }
 
   .card:hover {
     border-color: #38bdf8;
-    transform: translateY(-2px);
   }
 
   /* LIVE FEED */
@@ -151,6 +144,7 @@
     font-size: 12px;
     opacity: 0.85;
     margin: 4px 0;
+    font-family: monospace;
   }
 
   footer {
@@ -167,8 +161,8 @@
 <!-- BOOT -->
 <div id="boot">
   <div class="boot-text">
-    INITIALIZING UFOs WORLDWIDE SYSTEM...<br/>
-    LOADING CONTROL LAYERS...<br/>
+    INITIALIZING UFOs WORLDWIDE INTELLIGENCE SYSTEM...<br/>
+    LOADING CASE FRAMEWORK...<br/>
     SYNCING SIGNAL NETWORK...<br/><br/>
     STATUS: ONLINE
   </div>
@@ -177,117 +171,116 @@
 <!-- HEADER -->
 <div class="topbar">
   <div class="brand">UFOs WORLDWIDE</div>
-  <h1>CONTROL ROOM</h1>
-  <div class="status">SIGNAL NETWORK ACTIVE // LIVE MONITORING ENABLED</div>
+  <h1>INTELLIGENCE HUB</h1>
+  <div class="status">LIVE CASE PROCESSING ACTIVE</div>
 </div>
 
 <div class="container">
 
   <!-- SUBMISSION -->
   <div class="panel">
-    <h3>SUBMISSION PORTAL</h3>
-    <div class="sub">Field report intake system → sends to uaptaskforce@gmail.com</div>
+    <h3>CASE FILE SUBMISSION</h3>
+    <div class="sub">All submissions generate structured intelligence entries</div>
 
-    <form action="https://formsubmit.co/uaptaskforce@gmail.com" method="POST">
+    <form id="form">
 
-      <input type="text" name="identifier" placeholder="Identifier" required>
+      <input type="text" id="name" placeholder="Identifier" required>
 
-      <input type="text" name="location" placeholder="Location / Coordinates">
+      <input type="text" id="location" placeholder="Location / Coordinates">
 
-      <select name="type">
+      <select id="type">
         <option>Light Anomaly</option>
         <option>Structured Object</option>
         <option>Audio Event</option>
         <option>Unknown Phenomenon</option>
       </select>
 
-      <textarea name="message" placeholder="Full field report..." required></textarea>
+      <textarea id="message" placeholder="Full field report..." required></textarea>
 
-      <input type="hidden" name="_subject" value="NEW UFO FIELD CASE">
-
-      <button type="submit">Submit Signal</button>
+      <button type="submit">Generate Case File</button>
     </form>
   </div>
 
   <!-- LIVE FEED -->
   <div class="panel">
-    <h3>SIGNAL STREAM // LIVE</h3>
+    <h3>SIGNAL STREAM // LIVE CASE FEED</h3>
     <div id="feed">
-      <div>● awaiting incoming transmissions...</div>
+      <div>● system ready for incoming case files...</div>
     </div>
   </div>
 
-  <!-- SYSTEM MODULES -->
+  <!-- SYSTEMS -->
   <div class="panel">
     <h3>FIELD SYSTEMS</h3>
 
     <div class="grid">
-      <a class="card" href="https://thornsignal.netlify.app/" target="_blank">
-        🎮 Thorn Signal<br/>Narrative Field Engine
-      </a>
-
-      <a class="card" href="https://signalscopex11.netlify.app/" target="_blank">
-        📡 SignalScope X11<br/>Pattern Detection Layer
-      </a>
-
-      <a class="card" href="https://ether-listen.netlify.app/" target="_blank">
-        🎧 Ether Listen<br/>Audio Analysis Layer
-      </a>
+      <a class="card" href="https://thornsignal.netlify.app/" target="_blank">🎮 Thorn Signal</a>
+      <a class="card" href="https://signalscopex11.netlify.app/" target="_blank">📡 SignalScope X11</a>
+      <a class="card" href="https://ether-listen.netlify.app/" target="_blank">🎧 Ether Listen</a>
     </div>
   </div>
 
   <!-- ARCHIVE -->
   <div class="panel">
-    <h3>FIELD ARCHIVE // KNOWLEDGE BASE</h3>
-    <div class="sub">Operational reference materials</div>
+    <h3>FIELD ARCHIVE</h3>
 
     <div class="grid">
-      <a class="card" href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank">
-        SIGNALS<br/>Field Communication Log
-      </a>
-
-      <a class="card" href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank">
-        UFO FIELD HANDBOOK<br/>Identification Framework
-      </a>
-
-      <a class="card" href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank">
-        RESEARCH VOL I<br/>Observational Data Set
-      </a>
-
-      <a class="card" href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank">
-        RESEARCH VOL II<br/>Extended Analysis
-      </a>
+      <a class="card" href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank">Signals Log</a>
+      <a class="card" href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank">UFO Handbook</a>
+      <a class="card" href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank">Research Vol I</a>
+      <a class="card" href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank">Research Vol II</a>
     </div>
   </div>
 
   <footer>
-    UFOs WORLDWIDE SYSTEM // CONTINUOUS MONITORING ACTIVE
+    UFOs WORLDWIDE // INTELLIGENCE SYSTEM ACTIVE
   </footer>
 
 </div>
 
 <script>
-const messages = [
-  "signal detected in upper atmosphere...",
-  "pattern anomaly registered...",
-  "field report incoming...",
-  "sensor network stabilizing...",
-  "unknown object classification pending..."
-];
+// CASE ID SYSTEM
+let caseCount = 1;
 
-setInterval(() => {
+function getTime(){
+  return new Date().toISOString().replace("T"," ").substring(0,19);
+}
+
+// FORM HANDLER (NO BACKEND REQUIRED FOR FEED DISPLAY)
+document.getElementById("form").addEventListener("submit", function(e){
+  e.preventDefault();
+
+  const name = document.getElementById("name").value;
+  const location = document.getElementById("location").value;
+  const type = document.getElementById("type").value;
+  const message = document.getElementById("message").value;
+
+  const caseID = "CASE-" + String(caseCount).padStart(4,"0");
+  const time = getTime();
+
+  const entry = `
+● ${caseID} | ${time}
+TYPE: ${type}
+FROM: ${name}
+LOC: ${location || "UNKNOWN"}
+REPORT: ${message.substring(0,60)}...
+`;
+
   const feed = document.getElementById("feed");
-  const msg = messages[Math.floor(Math.random() * messages.length)];
 
   const div = document.createElement("div");
-  div.textContent = "● " + msg;
+  div.textContent = entry;
 
   feed.prepend(div);
 
-  if(feed.children.length > 6){
+  if(feed.children.length > 8){
     feed.removeChild(feed.lastChild);
   }
-}, 3000);
+
+  caseCount++;
+
+  this.reset();
+});
 </script>
 
 </body>
