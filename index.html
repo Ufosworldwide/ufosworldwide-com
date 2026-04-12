@@ -13,7 +13,6 @@
     color: #eaeaea;
   }
 
-  /* HEADER */
   .topbar {
     text-align: center;
     padding: 25px 10px 5px;
@@ -36,7 +35,6 @@
     opacity: 0.6;
   }
 
-  /* LAYOUT */
   .container {
     max-width: 950px;
     margin: auto;
@@ -65,7 +63,7 @@
     margin-bottom: 10px;
   }
 
-  input, textarea, select {
+  input, textarea {
     width: 100%;
     margin-top: 8px;
     padding: 10px;
@@ -75,7 +73,9 @@
     color: white;
   }
 
-  textarea { height: 130px; }
+  textarea {
+    height: 140px;
+  }
 
   button {
     width: 100%;
@@ -88,9 +88,10 @@
     cursor: pointer;
   }
 
-  button:hover { opacity: 0.85; }
+  button:hover {
+    opacity: 0.85;
+  }
 
-  /* GRID */
   .grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -130,15 +131,17 @@
 <div class="topbar">
   <div class="brand">UFOs WORLDWIDE</div>
   <h1>CONTROL ROOM</h1>
-  <div class="status">SIGNAL NETWORK ACTIVE // CASE SYSTEM ONLINE</div>
+  <div class="status">CASE INTELLIGENCE SYSTEM ACTIVE</div>
 </div>
 
 <div class="container">
 
-  <!-- CASE SUBMISSION -->
+  <!-- CASE FORM -->
   <div class="panel">
     <h3>CASE FILE SUBMISSION</h3>
-    <div class="sub">Submit structured field reports for analysis</div>
+    <div class="sub">
+      Submit structured field reports. Include all relevant details inside the report.
+    </div>
 
     <form>
 
@@ -150,17 +153,13 @@
 
       <input type="text" name="location" placeholder="Location (City / Coordinates)" required>
 
-      <input type="url" name="event_link" placeholder="Event / Source Link">
-
-      <input type="url" name="video_link" placeholder="Google Drive Video Link">
-
-      <textarea name="what_happened" placeholder="What happened? Full detailed report..." required></textarea>
+      <textarea name="what_happened" placeholder="What happened? Include full details, observations, timing, and any links if available..." required></textarea>
 
       <button type="submit">Submit Case File</button>
     </form>
 
     <div class="sub">
-      NOTE: Use Google Drive “Anyone with link can view” for media.
+      Tip: You can include any source links or video references inside the report box above.
     </div>
   </div>
 
@@ -199,21 +198,10 @@
     <h3>FIELD ARCHIVE</h3>
 
     <div class="grid">
-      <a class="card" href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank">
-        Signals Log
-      </a>
-
-      <a class="card" href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank">
-        UFO Handbook
-      </a>
-
-      <a class="card" href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank">
-        Research Vol I
-      </a>
-
-      <a class="card" href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank">
-        Research Vol II
-      </a>
+      <a class="card" href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank">Signals Log</a>
+      <a class="card" href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank">UFO Handbook</a>
+      <a class="card" href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank">Research Vol I</a>
+      <a class="card" href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank">Research Vol II</a>
     </div>
   </div>
 
@@ -224,8 +212,6 @@
 </div>
 
 <script>
-// SIMPLE LOCAL STORAGE INTAKE (CONNECTS TO DATABASE PAGE)
-
 document.querySelector("form").addEventListener("submit", function(e){
   e.preventDefault();
 
@@ -234,9 +220,6 @@ document.querySelector("form").addEventListener("submit", function(e){
     date: this.date.value,
     time: this.time.value,
     location: this.location.value,
-    type: "Field Report",
-    event: this.event_link.value,
-    video: this.video_link.value,
     report: this.what_happened.value
   };
 
