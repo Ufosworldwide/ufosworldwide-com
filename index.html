@@ -3,36 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>UFOs Worldwide // CONTROL NODE</title>
+<title>UFO OS // CONTROL NODE</title>
 
 <style>
 body {
   margin:0;
-  background:#050805;
+  background:#020403;
   color:#7CFFB2;
   font-family: monospace;
-  overflow-x:hidden;
 }
 
-/* CRT EFFECT */
 body::before {
   content:"";
   position:fixed;
-  top:0;left:0;right:0;bottom:0;
+  inset:0;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(255,255,255,0.02),
-    rgba(255,255,255,0.02) 1px,
-    transparent 1px,
-    transparent 3px
+    rgba(255,255,255,0.03),
+    rgba(255,255,255,0.03) 1px,
+    transparent 3px,
+    transparent 5px
   );
   pointer-events:none;
 }
 
 @keyframes flicker {
-  0% { opacity:0.95; }
-  50% { opacity:1; }
-  100% { opacity:0.97; }
+  0%{opacity:0.92;}50%{opacity:1;}100%{opacity:0.95;}
 }
 
 .container {
@@ -42,45 +38,27 @@ body::before {
   animation:flicker 4s infinite;
 }
 
-h1 {
-  font-size:32px;
-  margin-bottom:5px;
-}
-
-h2 {
-  margin-top:40px;
-  border-left:3px solid #7CFFB2;
-  padding-left:10px;
+h1,h2 {
+  font-family: monospace;
 }
 
 .grid {
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
   gap:12px;
-  margin-top:15px;
 }
 
 .card {
   border:1px solid rgba(124,255,178,0.3);
   padding:14px;
   cursor:pointer;
-  transition:0.2s;
   background:rgba(0,0,0,0.4);
+  transition:0.2s;
 }
 
 .card:hover {
   border-color:#7CFFB2;
-  transform:scale(1.02);
-}
-
-a {
-  color:#7CFFB2;
-  text-decoration:none;
-}
-
-.small {
-  opacity:0.7;
-  font-size:12px;
+  transform:scale(1.03);
 }
 </style>
 </head>
@@ -89,22 +67,15 @@ a {
 
 <div class="container">
 
-<h1>UFOs WORLDWIDE // NODE ACTIVE</h1>
-<div class="small">STATUS: ONLINE • SIGNAL STABLE • ARCHIVE READY</div>
+<h1>UFOs WORLDWIDE // SYSTEM ONLINE</h1>
+<p>STATUS: ACTIVE • ARCHIVE READY • SUBMISSIONS ENABLED</p>
 
-<h2>> CONTROL PANEL</h2>
+<h2>> CONTROL NODE</h2>
 
 <div class="grid">
   <div class="card" onclick="location.href='blog.html'">PUBLIC ARCHIVE</div>
   <div class="card" onclick="location.href='submit.html'">SUBMISSION PORTAL</div>
-  <div class="card" onclick="document.getElementById('who').scrollIntoView({behavior:'smooth'})">IDENTITY NODE</div>
 </div>
-
-<h2 id="who">> SYSTEM IDENTITY</h2>
-<p>
-Independent UFO research and documentation node focused on structured anomaly reporting,
-public submissions, and observational analysis.
-</p>
 
 <h2>> LIVE TRANSMISSIONS</h2>
 
@@ -117,9 +88,8 @@ public submissions, and observational analysis.
 <h2>> FIELD LIBRARY</h2>
 
 <div class="grid">
-  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0C5YT4YD1','_blank')">UFO GUIDE 01</div>
-  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWRJK9TM','_blank')">UFO GUIDE 02</div>
-  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GWRDX5JY','_blank')">UFO GUIDE 03</div>
+  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0GVP2RJ2M','_blank')">UFO FIELD GUIDE 01</div>
+  <div class="card" onclick="window.open('https://www.amazon.com/dp/B0C5P5SHXV','_blank')">UFO FIELD GUIDE 02</div>
 </div>
 
 </div>
