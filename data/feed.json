@@ -8,3 +8,7 @@
     "message": "Signal modules connected (manual mode)"
   }
 ]
+{
+  "time": "NOW",
+  "message": "Test signal detected from field input"
+}
