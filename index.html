@@ -3,117 +3,106 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Control Room // Signal Network</title>
+<title>UAP Control Interface</title>
 
 <style>
   body {
     margin: 0;
-    font-family: system-ui, Arial, sans-serif;
+    font-family: system-ui, Arial;
     background: radial-gradient(circle at center, #05070c, #0b1220);
     color: #eaeaea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
   }
 
-  header {
+  .container {
+    width: 92%;
+    max-width: 700px;
     text-align: center;
-    padding: 35px 20px 15px;
   }
 
   h1 {
-    margin: 0;
-    font-size: 24px;
     letter-spacing: 4px;
+    font-size: 26px;
+    margin-bottom: 6px;
   }
 
-  .status {
-    font-size: 12px;
+  .sub {
     opacity: 0.7;
-    margin-top: 8px;
+    font-size: 13px;
+    margin-bottom: 25px;
   }
 
-  .pulse {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    background: #38bdf8;
-    border-radius: 50%;
-    margin-right: 6px;
-    animation: blink 1.3s infinite;
-  }
-
-  @keyframes blink {
-    0%,100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
-
-  .wrap {
-    max-width: 900px;
-    margin: auto;
-    padding: 15px;
-  }
-
-  /* FEED */
-  .feed {
+  .panel {
     background: rgba(15, 23, 42, 0.85);
     border: 1px solid #1f2937;
-    border-radius: 14px;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    background: #0b1220;
+    color: white;
+    outline: none;
+  }
+
+  textarea {
+    height: 120px;
+    resize: none;
+  }
+
+  button {
+    margin-top: 12px;
+    width: 100%;
     padding: 12px;
-    min-height: 120px;
+    border: none;
+    border-radius: 10px;
+    background: #38bdf8;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
   }
 
-  .item {
-    padding: 10px 0;
-    border-bottom: 1px solid #1f2937;
+  button:hover {
+    opacity: 0.85;
   }
 
-  .time {
-    font-size: 11px;
-    opacity: 0.6;
-    margin-bottom: 3px;
-  }
-
-  .message {
-    font-size: 13px;
-  }
-
-  /* MODULES */
   .grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 12px;
-    margin-top: 18px;
+    gap: 10px;
   }
 
-  @media(min-width: 768px){
-    .grid { grid-template-columns: 1fr 1fr; }
+  @media(min-width: 700px){
+    .grid {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 
   .card {
     background: rgba(15, 23, 42, 0.8);
     border: 1px solid #1f2937;
-    border-radius: 14px;
-    padding: 14px;
+    padding: 12px;
+    border-radius: 12px;
     text-decoration: none;
     color: white;
+    font-size: 13px;
   }
 
   .card:hover {
     border-color: #38bdf8;
   }
 
-  .title {
-    font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 6px;
-  }
-
-  .desc {
-    font-size: 12px;
-    opacity: 0.7;
-  }
-
   footer {
-    text-align: center;
-    padding: 25px;
+    margin-top: 20px;
     font-size: 11px;
     opacity: 0.5;
   }
@@ -122,81 +111,49 @@
 
 <body>
 
-<header>
-  <h1>CONTROL ROOM</h1>
-  <div class="status">
-    <span class="pulse"></span>SIGNAL NETWORK ACTIVE
-  </div>
-</header>
+<div class="container">
 
-<div class="wrap">
+  <h1>UAP CONTROL INTERFACE</h1>
+  <div class="sub">Submission + Signal Network Hub</div>
 
-  <!-- LIVE FEED -->
-  <div class="feed" id="feed">
-    Initializing signal stream...
+  <!-- SUBMISSION FORM -->
+  <div class="panel">
+    <form action="https://formsubmit.co/uaptaskforce@gmail.com" method="POST">
+
+      <input type="text" name="name" placeholder="Your Name / Identifier" required>
+
+      <input type="text" name="location" placeholder="Location / Coordinates">
+
+      <textarea name="message" placeholder="Describe the sighting or signal report..." required></textarea>
+
+      <input type="hidden" name="_subject" value="New UAP Signal Submission">
+
+      <button type="submit">Submit Signal</button>
+    </form>
   </div>
 
   <!-- MODULE LINKS -->
   <div class="grid">
 
     <a class="card" href="https://thornsignal.netlify.app/" target="_blank">
-      <div class="title">🎮 Thorn Signal</div>
-      <div class="desc">Narrative field system</div>
+      🎮 Thorn Signal<br/>Narrative Field System
     </a>
 
     <a class="card" href="https://signalscopex11.netlify.app/" target="_blank">
-      <div class="title">📡 SignalScope X11</div>
-      <div class="desc">Pattern analysis system</div>
+      📡 SignalScope X11<br/>Pattern Analysis System
     </a>
 
     <a class="card" href="https://ether-listen.netlify.app/" target="_blank">
-      <div class="title">🎧 Ether Listen</div>
-      <div class="desc">Audio perception layer</div>
-    </a>
-
-    <a class="card" href="https://www.amazon.com" target="_blank">
-      <div class="title">📚 Archive</div>
-      <div class="desc">Books + field methodology</div>
+      🎧 Ether Listen<br/>Audio Perception Layer
     </a>
 
   </div>
 
+  <footer>
+    CONTROL NETWORK ACTIVE // FIELD INPUT ENABLED
+  </footer>
+
 </div>
-
-<footer>
-  SIGNAL NETWORK // LIVE FEED MODE
-</footer>
-
-<script>
-async function loadFeed() {
-  try {
-    const res = await fetch('./data/feed.json?cache=' + Date.now());
-    const data = await res.json();
-
-    const feed = document.getElementById('feed');
-    feed.innerHTML = "";
-
-    data.slice().reverse().forEach(item => {
-      const div = document.createElement('div');
-      div.className = "item";
-
-      div.innerHTML = `
-        <div class="time">${item.time}</div>
-        <div class="message">${item.message}</div>
-      `;
-
-      feed.appendChild(div);
-    });
-
-  } catch (e) {
-    document.getElementById('feed').innerHTML =
-      "Signal stream offline — awaiting input nodes...";
-  }
-}
-
-loadFeed();
-setInterval(loadFeed, 7000);
-</script>
 
 </body>
 </html>
