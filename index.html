@@ -3,14 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>UAP Control Room</title>
+<title>UFOs Worldwide // Control Room</title>
 
 <style>
   body {
     margin: 0;
     font-family: system-ui, Arial, sans-serif;
-    background: radial-gradient(circle at center, #05070c, #0b1220);
+    background: radial-gradient(circle at top, #05070c, #0a1324, #05070c);
     color: #eaeaea;
+    overflow-x: hidden;
   }
 
   /* BOOT SCREEN */
@@ -29,96 +30,134 @@
   }
 
   .boot-text {
-    text-align: left;
     font-size: 14px;
     line-height: 1.6;
+    opacity: 0.9;
   }
 
   @keyframes fadeOut {
     to { opacity: 0; visibility: hidden; }
   }
 
-  /* MAIN */
-  .container {
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
+  /* HEADER */
+  .topbar {
     text-align: center;
+    padding: 25px 10px 10px;
+  }
+
+  .brand {
+    font-size: 13px;
+    letter-spacing: 4px;
+    opacity: 0.6;
   }
 
   h1 {
-    letter-spacing: 3px;
-    margin-top: 20px;
+    margin: 5px 0;
+    font-size: 26px;
+    letter-spacing: 5px;
   }
 
-  .sub {
-    opacity: 0.7;
-    font-size: 13px;
-    margin-bottom: 15px;
+  .status {
+    font-size: 12px;
+    opacity: 0.6;
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 950px;
+    margin: auto;
+    padding: 15px;
   }
 
   .panel {
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid #1f2937;
-    border-radius: 14px;
-    padding: 15px;
-    margin: 15px 0;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(56,189,248,0.15);
+    border-radius: 16px;
+    padding: 16px;
+    margin: 14px 0;
+    backdrop-filter: blur(8px);
+  }
+
+  h3 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    letter-spacing: 2px;
+    opacity: 0.8;
+  }
+
+  .sub {
+    font-size: 12px;
+    opacity: 0.6;
+    margin-bottom: 10px;
   }
 
   input, textarea, select {
     width: 100%;
-    margin-top: 10px;
+    margin-top: 8px;
     padding: 10px;
     border-radius: 10px;
-    border: 1px solid #333;
+    border: 1px solid #1f2937;
     background: #0b1220;
     color: white;
+    outline: none;
   }
 
   textarea { height: 120px; }
 
   button {
     width: 100%;
-    padding: 12px;
     margin-top: 10px;
-    border: none;
+    padding: 12px;
     border-radius: 10px;
+    border: none;
     background: #38bdf8;
     font-weight: bold;
     cursor: pointer;
   }
 
-  button:hover { opacity: 0.85; }
+  button:hover {
+    opacity: 0.85;
+  }
 
+  /* GRID SYSTEM */
   .grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 10px;
   }
 
-  @media(min-width:700px){
+  @media(min-width: 700px){
     .grid { grid-template-columns: 1fr 1fr; }
   }
 
   .card {
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid #1f2937;
     padding: 12px;
     border-radius: 12px;
+    background: rgba(15,23,42,0.85);
+    border: 1px solid rgba(56,189,248,0.15);
     text-decoration: none;
     color: white;
     font-size: 13px;
-    display: block;
+    transition: 0.2s;
   }
 
   .card:hover {
     border-color: #38bdf8;
+    transform: translateY(-2px);
+  }
+
+  /* LIVE FEED */
+  #feed div {
+    font-size: 12px;
+    opacity: 0.85;
+    margin: 4px 0;
   }
 
   footer {
-    margin-top: 20px;
+    text-align: center;
     font-size: 11px;
-    opacity: 0.5;
+    opacity: 0.4;
+    margin: 25px 0 10px;
   }
 </style>
 </head>
@@ -128,25 +167,30 @@
 <!-- BOOT -->
 <div id="boot">
   <div class="boot-text">
-    INITIALIZING CONTROL SYSTEM...<br/>
-    LOADING SIGNAL NETWORK...<br/>
-    SYNCING FIELD MODULES...<br/><br/>
+    INITIALIZING UFOs WORLDWIDE SYSTEM...<br/>
+    LOADING CONTROL LAYERS...<br/>
+    SYNCING SIGNAL NETWORK...<br/><br/>
     STATUS: ONLINE
   </div>
 </div>
 
-<div class="container">
-
+<!-- HEADER -->
+<div class="topbar">
+  <div class="brand">UFOs WORLDWIDE</div>
   <h1>CONTROL ROOM</h1>
-  <div class="sub">SIGNAL NETWORK ACTIVE</div>
+  <div class="status">SIGNAL NETWORK ACTIVE // LIVE MONITORING ENABLED</div>
+</div>
+
+<div class="container">
 
   <!-- SUBMISSION -->
   <div class="panel">
     <h3>SUBMISSION PORTAL</h3>
+    <div class="sub">Field report intake system → sends to uaptaskforce@gmail.com</div>
 
     <form action="https://formsubmit.co/uaptaskforce@gmail.com" method="POST">
 
-      <input type="text" name="name" placeholder="Identifier" required>
+      <input type="text" name="identifier" placeholder="Identifier" required>
 
       <input type="text" name="location" placeholder="Location / Coordinates">
 
@@ -157,9 +201,9 @@
         <option>Unknown Phenomenon</option>
       </select>
 
-      <textarea name="message" placeholder="Field report..." required></textarea>
+      <textarea name="message" placeholder="Full field report..." required></textarea>
 
-      <input type="hidden" name="_subject" value="NEW CASE FILE SUBMITTED">
+      <input type="hidden" name="_subject" value="NEW UFO FIELD CASE">
 
       <button type="submit">Submit Signal</button>
     </form>
@@ -169,32 +213,33 @@
   <div class="panel">
     <h3>SIGNAL STREAM // LIVE</h3>
     <div id="feed">
-      <div>● waiting for incoming transmissions...</div>
+      <div>● awaiting incoming transmissions...</div>
     </div>
   </div>
 
-  <!-- APPS -->
+  <!-- SYSTEM MODULES -->
   <div class="panel">
     <h3>FIELD SYSTEMS</h3>
 
     <div class="grid">
       <a class="card" href="https://thornsignal.netlify.app/" target="_blank">
-        🎮 Thorn Signal<br/>Narrative System
+        🎮 Thorn Signal<br/>Narrative Field Engine
       </a>
 
       <a class="card" href="https://signalscopex11.netlify.app/" target="_blank">
-        📡 SignalScope X11<br/>Pattern Analysis
+        📡 SignalScope X11<br/>Pattern Detection Layer
       </a>
 
       <a class="card" href="https://ether-listen.netlify.app/" target="_blank">
-        🎧 Ether Listen<br/>Audio Layer
+        🎧 Ether Listen<br/>Audio Analysis Layer
       </a>
     </div>
   </div>
 
-  <!-- BOOKS -->
+  <!-- ARCHIVE -->
   <div class="panel">
     <h3>FIELD ARCHIVE // KNOWLEDGE BASE</h3>
+    <div class="sub">Operational reference materials</div>
 
     <div class="grid">
       <a class="card" href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank">
@@ -206,33 +251,33 @@
       </a>
 
       <a class="card" href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank">
-        RESEARCH VOL I<br/>Observational Data
+        RESEARCH VOL I<br/>Observational Data Set
       </a>
 
-      <a class="card" href="https://www.amazon.com/dp/B0C5V5L6F2" target="_blank">
+      <a class="card" href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank">
         RESEARCH VOL II<br/>Extended Analysis
       </a>
     </div>
   </div>
 
   <footer>
-    CONTROL NETWORK ACTIVE // SYSTEM ONLINE
+    UFOs WORLDWIDE SYSTEM // CONTINUOUS MONITORING ACTIVE
   </footer>
 
 </div>
 
 <script>
 const messages = [
-  "signal detected in low atmosphere...",
-  "pattern anomaly identified...",
-  "incoming field report queued...",
-  "sensor drift stabilizing...",
+  "signal detected in upper atmosphere...",
+  "pattern anomaly registered...",
+  "field report incoming...",
+  "sensor network stabilizing...",
   "unknown object classification pending..."
 ];
 
 setInterval(() => {
   const feed = document.getElementById("feed");
-  const msg = messages[Math.floor(Math.random()*messages.length)];
+  const msg = messages[Math.floor(Math.random() * messages.length)];
 
   const div = document.createElement("div");
   div.textContent = "● " + msg;
@@ -242,7 +287,7 @@ setInterval(() => {
   if(feed.children.length > 6){
     feed.removeChild(feed.lastChild);
   }
-}, 3500);
+}, 3000);
 </script>
 
 </body>
