@@ -5,14 +5,9 @@
     "date": "2026-04-12"
   },
   {
-    "title": "FIRST FIELD REPORT",
-    "file": "/posts/template.html",
-    "date": "2026-04-12"
-  }
-]
-[
-  {
     "title": "FIELD REPORT // TEMPLATE",
-    "file": "/posts/template.html"
+    "file": "/posts/template.html",
+    "date": "2026-04-12",
+    "status": "draft"
   }
 ]
