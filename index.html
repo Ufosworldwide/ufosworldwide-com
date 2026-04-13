@@ -2,364 +2,353 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>UFOs Worldwide • Control Dashboard</title>
-  <meta name="description" content="Next‑gen UFO case intelligence system. Real‑time field data, anomaly tracking, and classified archive.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>CLASSIFIED // UFO INTELLIGENCE TERMINAL</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      cursor: default;
     }
 
     body {
-      background: radial-gradient(circle at 10% 20%, #03050b, #000000);
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
-      color: #edf2ff;
-      line-height: 1.5;
-      padding: 0 1rem 2rem;
+      background: #0a0f0a;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Courier New', 'Fira Code', 'VT323', monospace;
+      padding: 2rem;
     }
 
-    /* Import Google Font (Inter) */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
-
-    /* smooth glassmorphic containers */
-    .glass-card {
-      background: rgba(15, 25, 45, 0.65);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(0, 255, 255, 0.2);
-      border-radius: 2rem;
-      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(0, 255, 255, 0.1) inset;
-      transition: all 0.2s ease;
+    /* CRT MONITOR BEZEL */
+    .monitor {
+      max-width: 1400px;
+      width: 100%;
+      background: #0c0e0c;
+      border-radius: 2rem 2rem 3rem 3rem;
+      box-shadow: 0 0 0 8px #2a2e2a, 0 0 0 12px #1a1e1a, 0 20px 40px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.5);
+      padding: 1.5rem;
+      position: relative;
     }
 
-    .glass-card:hover {
-      border-color: rgba(0, 230, 250, 0.6);
-      box-shadow: 0 25px 40px -14px rgba(0, 180, 255, 0.2);
+    /* SCREEN (CRT effect) */
+    .screen {
+      background: radial-gradient(circle at 30% 20%, #0b1f0b, #030803);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: inset 0 0 60px rgba(0,20,0,0.8), 0 0 0 2px #3a5a3a;
+      position: relative;
+      overflow-y: auto;
+      max-height: 85vh;
     }
 
-    header {
-      text-align: center;
-      padding: 2rem 1rem 1.5rem;
-      margin-bottom: 1rem;
+    /* scanlines */
+    .screen::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.03) 0px, rgba(0, 255, 0, 0.03) 2px, transparent 2px, transparent 6px);
+      pointer-events: none;
+      z-index: 2;
     }
 
-    .brand-badge {
+    /* flicker glow */
+    .screen::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 255, 0, 0.02);
+      box-shadow: 0 0 15px rgba(0,255,0,0.2);
+      pointer-events: none;
+      animation: flicker 8s infinite;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0.6; }
+      5% { opacity: 0.8; }
+      10% { opacity: 0.4; }
+      15% { opacity: 0.9; }
+      100% { opacity: 0.7; }
+    }
+
+    /* terminal text */
+    .terminal-text {
+      color: #2eff7a;
+      text-shadow: 0 0 3px #0f0;
+      font-size: 0.9rem;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Courier New', monospace;
+      letter-spacing: -1px;
+    }
+
+    .brand {
       font-size: 0.7rem;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-      font-weight: 500;
-      background: rgba(0, 255, 255, 0.15);
+      background: #0f1f0f;
       display: inline-block;
-      padding: 0.2rem 1rem;
-      border-radius: 40px;
-      backdrop-filter: blur(4px);
-      color: #7df9ff;
+      padding: 0.2rem 0.8rem;
+      border-left: 3px solid #2eff7a;
+      color: #9eff9e;
     }
 
     h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #ffffff, #7df9ff, #3a86ff);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      margin: 0.5rem 0 0.3rem;
-      text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      font-size: 2rem;
+      color: #7eff7e;
+      text-shadow: 0 0 8px #0f0;
+      margin: 0.5rem 0;
     }
 
-    .status-badge {
-      font-size: 0.75rem;
+    .status {
       font-family: monospace;
-      background: #0a0f1c;
+      font-size: 0.7rem;
+      color: #5f9;
+      background: #081c08;
       display: inline-block;
-      padding: 0.25rem 1rem;
-      border-radius: 30px;
-      border-left: 2px solid #0ff;
-      letter-spacing: 1px;
-    }
-
-    .container {
-      max-width: 1300px;
-      margin: 0 auto;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
     }
 
     .section-title {
+      margin: 1.5rem 0 1rem;
       font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 5px;
-      font-weight: 600;
-      margin: 2rem 0 1rem 0;
-      color: #8d9eff;
-      border-left: 3px solid #0ff;
-      padding-left: 12px;
+      letter-spacing: 2px;
+      color: #8eff8e;
+      border-bottom: 1px dashed #2e5e2e;
+      display: inline-block;
     }
 
-    /* GRID */
-    .dashboard-grid {
+    .grid {
       display: grid;
-      gap: 1.5rem;
+      gap: 1.2rem;
       grid-template-columns: 1fr;
     }
 
-    @media (min-width: 880px) {
-      .dashboard-grid {
+    @media (min-width: 850px) {
+      .grid {
         grid-template-columns: 1fr 1fr;
       }
     }
 
-    .card-link {
-      text-decoration: none;
-      display: block;
-      transition: transform 0.15s ease;
-    }
-    .card-link:hover {
-      transform: translateY(-4px);
-    }
-
-    .card-content {
-      padding: 1.5rem;
+    .card {
+      background: #0a120acc;
+      border: 1px solid #2a5a2a;
+      border-radius: 0.8rem;
+      padding: 1.2rem;
+      backdrop-filter: blur(2px);
+      transition: 0.1s linear;
     }
 
-    h3 {
-      font-size: 1.35rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.2px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .card-desc {
-      font-size: 0.85rem;
-      color: #bfd1ff;
-      line-height: 1.4;
-    }
-
-    /* FORM STYLES */
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 500;
-      display: block;
-      margin-bottom: 0.3rem;
-      color: #b0c4ff;
+    .card:hover {
+      border-color: #6eff6e;
+      box-shadow: 0 0 8px rgba(80,255,80,0.3);
     }
 
     input, select, textarea {
+      background: #051005;
+      border: 1px solid #2c5a2c;
+      color: #bfffbf;
+      font-family: monospace;
+      padding: 0.6rem;
+      border-radius: 0.4rem;
       width: 100%;
-      background: rgba(5, 10, 25, 0.8);
-      border: 1px solid #2a3b5c;
-      border-radius: 1rem;
-      padding: 0.75rem 1rem;
-      color: #f0f6ff;
-      font-size: 0.9rem;
-      transition: 0.2s;
-      font-family: inherit;
+      margin-top: 0.3rem;
+      font-size: 0.85rem;
     }
 
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: #3ec1ff;
-      box-shadow: 0 0 0 2px rgba(62, 193, 255, 0.3);
+      border-color: #0f0;
+      box-shadow: 0 0 6px #0f0;
     }
 
     button {
+      background: #0f2f0f;
+      border: 1px solid #5f9;
+      color: #bfffbf;
+      padding: 0.7rem;
       width: 100%;
-      background: linear-gradient(95deg, #0ff0c0, #0a7eff);
-      border: none;
-      padding: 0.85rem;
-      border-radius: 2rem;
-      font-weight: 700;
-      font-size: 0.9rem;
-      letter-spacing: 1px;
-      color: #010b1a;
+      font-family: monospace;
+      font-weight: bold;
+      margin-top: 0.8rem;
       cursor: pointer;
-      transition: 0.2s;
-      margin-top: 0.5rem;
-      box-shadow: 0 4px 12px rgba(0, 200, 255, 0.2);
+      transition: 0.1s;
+      border-radius: 0.4rem;
     }
 
     button:hover {
-      transform: scale(0.98);
-      background: linear-gradient(95deg, #6effe0, #2e93ff);
-      box-shadow: 0 6px 16px rgba(0, 210, 255, 0.4);
+      background: #1f4a1f;
+      text-shadow: 0 0 4px #0f0;
+      box-shadow: 0 0 6px #0f0;
     }
 
-    /* stats mini */
-    .stats-badge {
-      background: rgba(0, 255, 255, 0.1);
-      border-radius: 2rem;
-      padding: 0.25rem 0.9rem;
-      font-size: 0.7rem;
-      font-weight: 500;
-      display: inline-block;
+    .recent-box {
+      margin-top: 1rem;
+      background: #030b03;
+      padding: 0.6rem;
+      border-left: 2px solid #2eff7a;
     }
 
     footer {
-      margin-top: 4rem;
+      margin-top: 2rem;
       text-align: center;
-      font-size: 0.7rem;
-      border-top: 1px solid rgba(100, 150, 255, 0.2);
-      padding-top: 1.8rem;
-      color: #8e9ecc;
+      font-size: 0.65rem;
+      color: #4f8;
+      border-top: 1px solid #1e3a1e;
+      padding-top: 1rem;
     }
 
     .footer-links a {
-      color: #b5d0ff;
+      color: #7eff7e;
       text-decoration: none;
-      margin: 0 0.6rem;
-      font-weight: 500;
-    }
-    .footer-links a:hover {
-      color: #0ff;
-      text-decoration: underline;
+      margin: 0 0.5rem;
     }
 
-    /* recent cases row */
-    .recent-box {
-      margin-top: 1.2rem;
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 1.2rem;
-      padding: 0.8rem 1rem;
+    a {
+      color: #aaffaa;
+      text-decoration: none;
     }
-    .recent-title {
-      font-size: 0.7rem;
-      letter-spacing: 2px;
-      font-weight: 600;
+
+    .blink {
+      animation: blink 1.2s step-end infinite;
     }
-    .case-mini {
-      font-size: 0.75rem;
-      border-bottom: 1px dashed #2a4560;
-      padding: 0.4rem 0;
-      display: flex;
-      justify-content: space-between;
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .classified-stamp {
+      position: absolute;
+      bottom: 10px;
+      right: 20px;
+      font-size: 0.6rem;
+      color: #ff4444;
+      opacity: 0.5;
+      transform: rotate(-5deg);
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
+<div class="monitor">
+  <div class="screen">
+    <div class="terminal-text">
+      <div class="brand">🔒 // DEEP VAULT TERMINAL // SIGINT//CUI//NOFORN</div>
+      <h1>UFO CONTROL DASHBOARD</h1>
+      <div class="status">⚡ ACTIVE LINK: CLASSIFIED NETWORK ⚡ <span class="blink">●</span></div>
 
-<div class="container">
-  <header>
-    <div class="brand-badge">🔭 UFOs WORLDWIDE • SIGINT DIVISION</div>
-    <h1>CONTROL DASHBOARD</h1>
-    <div class="status-badge">⚡ FIELD INTELLIGENCE SYSTEM • QUANTUM ACTIVE</div>
-  </header>
-
-  <!-- CORE SYSTEM -->
-  <div class="section-title">⍟ CORE CASE MANAGEMENT</div>
-  <div class="dashboard-grid">
-    <!-- LEFT: Case submission form (glass) -->
-    <div class="glass-card">
-      <div class="card-content">
-        <h3>📡 NEW CASE LOG</h3>
-        <p class="card-desc">Submit structured sighting report — encrypted local archive</p>
-        <form id="caseForm">
-          <div class="form-group">
-            <label>📛 CASE NAME</label>
-            <input type="text" name="case_name" placeholder="e.g., Phoenix Lights Anomaly" required>
-          </div>
-          <div style="display: flex; gap: 10px;">
-            <div class="form-group" style="flex:1"><label>📅 DATE</label><input type="date" name="date" required></div>
-            <div class="form-group" style="flex:1"><label>⏱️ TIME</label><input type="time" name="time" required></div>
-          </div>
-          <div class="form-group"><label>📍 LOCATION</label><input type="text" name="location" placeholder="City, Region, Country" required></div>
-          <div class="form-group">
-            <label>🛸 CASE TYPE</label>
+      <!-- CORE -->
+      <div class="section-title">> CORE_SUBSYSTEM.exe</div>
+      <div class="grid">
+        <!-- FORM CARD -->
+        <div class="card">
+          <h3>📡 [ CASE_SUBMISSION ]</h3>
+          <p style="font-size:0.75rem;">Encrypted field report → uplink to VAULT</p>
+          <form id="caseForm">
+            <input type="text" name="case_name" placeholder="CASE_NAME" required>
+            <div style="display:flex; gap:8px;">
+              <input type="date" name="date" style="width:50%" required>
+              <input type="time" name="time" style="width:50%" required>
+            </div>
+            <input type="text" name="location" placeholder="LOCATION / COORD" required>
             <select name="case_type" required>
-              <option value="">— select classification —</option>
+              <option value="">SELECT CLASS</option>
               <option value="LIGHT">LIGHT / Visual Event</option>
               <option value="OBJECT">OBJECT / Physical Encounter</option>
-              <option value="COMPLEX">COMPLEX / Multi-Witness Event</option>
+              <option value="COMPLEX">COMPLEX / Multi-Witness</option>
               <option value="SIGNAL">SIGNAL / Frequency Event</option>
             </select>
+            <textarea name="what_happened" rows="3" placeholder="INCIDENT DESCRIPTION..."></textarea>
+            <button type="submit">✧ UPLOAD TO ARCHIVE & EMAIL ✧</button>
+          </form>
+        </div>
+
+        <!-- DATABASE CARD -->
+        <div class="card">
+          <h3>🗄️ [ CASE_DATABASE ]</h3>
+          <p>Local archive + searchable records</p>
+          <div id="liveStats" style="margin:12px 0;"><span class="status">⟳ LOADING CASES</span></div>
+          <a href="database.html"><button type="button" style="background:#0a1a0a;">🔍 OPEN DATABASE TERMINAL</button></a>
+          <div class="recent-box">
+            <div style="font-size:0.7rem;">⏳ LAST 3 ENTRIES</div>
+            <div id="recentList">— ∅ —</div>
           </div>
-          <div class="form-group"><label>📝 INCIDENT REPORT</label><textarea name="what_happened" placeholder="Describe trajectory, duration, effects..." required></textarea></div>
-          <button type="submit">✧ LOG CASE + CLASSIFY ✧</button>
-        </form>
-      </div>
-    </div>
-
-    <!-- RIGHT: Database access + stats -->
-    <div class="glass-card">
-      <div class="card-content">
-        <h3>🗄️ CASE DATABASE</h3>
-        <p class="card-desc">Searchable intelligence archive & retrieval system</p>
-        <div id="liveStats" style="margin: 12px 0 16px;">
-          <span class="stats-badge">📀 LOADING CASES...</span>
-        </div>
-        <a href="database.html" style="text-decoration:none; display:block;">
-          <button type="button" style="background: #1f2a48; color:white; box-shadow: none; margin-top:0;">🔍 OPEN FULL DATABASE →</button>
-        </a>
-        <!-- quick recent cases -->
-        <div class="recent-box" id="recentCasesPreview">
-          <div class="recent-title">⏳ LATEST FIELD ENTRIES</div>
-          <div id="recentList">— no cases logged —</div>
         </div>
       </div>
+
+      <!-- KNOWLEDGE SYSTEM -->
+      <div class="section-title">> KNOWLEDGE_LIBRARY</div>
+      <div class="grid">
+        <a href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank" class="card" style="text-decoration:none;"><h3>📖 FRAMEWORK</h3><p>MISIDENTIFIED CLASSIFICATION SYSTEM</p></a>
+        <a href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank" class="card" style="text-decoration:none;"><h3>📘 FIELD GUIDE & JOURNAL</h3></a>
+        <a href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank" class="card" style="text-decoration:none;"><h3>📕 PALE ARCHIVE I</h3><p>OMNIBUS FIELD COLLECTION</p></a>
+        <a href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank" class="card" style="text-decoration:none;"><h3>📗 PALE ARCHIVE II</h3><p>FREQUENCY FIELD ANALYSIS</p></a>
+      </div>
+
+      <footer>
+        UFOs WORLDWIDE // CONTROL SYSTEM ACTIVE — DEEP VAULT NETWORK<br/>
+        Operator: John Carter · Canada · uaptaskforce@gmail.com<br/>
+        <div class="footer-links">
+          <a href="about.html">[ABOUT]</a> |
+          <a href="contact.html">[CONTACT]</a> |
+          <a href="privacy.html">[PRIVACY]</a> |
+          <a href="terms.html">[TERMS]</a>
+        </div>
+      </footer>
+      <div class="classified-stamp">/// CLASSIFIED // LEVEL 4 // EYES ONLY ///</div>
     </div>
   </div>
-
-  <!-- FIELD SYSTEMS (external tools) -->
-  <div class="section-title">⚙️ FIELD SYSTEMS // ACTIVE MODULES</div>
-  <div class="dashboard-grid">
-    <a href="https://signalscopex11.netlify.app/" target="_blank" class="card-link">
-      <div class="glass-card"><div class="card-content"><h3>📡 SignalScope X11</h3><p class="card-desc">Pattern detection · anomaly signature tracking · real‑time spectral analysis</p></div></div>
-    </a>
-    <a href="https://ether-listen.netlify.app/" target="_blank" class="card-link">
-      <div class="glass-card"><div class="card-content"><h3>🎧 Ether Listen</h3><p class="card-desc">Audio perception layer · signal harmonics · EVP bridge</p></div></div>
-    </a>
-  </div>
-
-  <!-- KNOWLEDGE SYSTEM / PUBLICATIONS -->
-  <div class="section-title">📚 KNOWLEDGE SYSTEM // FIELD LIBRARY</div>
-  <div class="dashboard-grid">
-    <a href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank" class="card-link"><div class="glass-card"><div class="card-content"><h3>📖 FRAMEWORK</h3><p class="card-desc">MISIDENTIFIED CLASSIFICATION SYSTEM</p></div></div></a>
-    <a href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank" class="card-link"><div class="glass-card"><div class="card-content"><h3>📘 IDENTIFICATION FIELD GUIDE & JOURNAL</h3></div></div></a>
-    <a href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank" class="card-link"><div class="glass-card"><div class="card-content"><h3>📕 PALE ARCHIVE I</h3><p class="card-desc">OMNIBUS FIELD COLLECTION</p></div></div></a>
-    <a href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank" class="card-link"><div class="glass-card"><div class="card-content"><h3>📗 PALE ARCHIVE II</h3><p class="card-desc">FREQUENCY FIELD ANALYSIS</p></div></div></a>
-  </div>
-
-  <footer>
-    UFOs WORLDWIDE // CONTROL SYSTEM ACTIVE — QUANTUM VAULT<br/>
-    Operated by John Carter · Canada · uaptaskforce@gmail.com<br/>
-    <div class="footer-links">
-      <a href="about.html">About</a> |
-      <a href="contact.html">Contact</a> |
-      <a href="privacy.html">Privacy</a> |
-      <a href="terms.html">Terms</a>
-    </div>
-  </footer>
 </div>
 
 <script>
-  // Helper: update stats & recent cases preview on dashboard
-  function updateDashboardStats() {
+  // Load cases from localStorage & update stats
+  function updateUI() {
     const db = JSON.parse(localStorage.getItem("ufo_cases") || "[]");
     const statsSpan = document.getElementById("liveStats");
-    if (statsSpan) statsSpan.innerHTML = `<span class="stats-badge">📋 TOTAL CASES: ${db.length}</span>`;
-    const recentContainer = document.getElementById("recentList");
-    if (recentContainer) {
-      if (db.length === 0) {
-        recentContainer.innerHTML = "<div class='case-mini'>∅ No casefiles yet — submit first report</div>";
-        return;
-      }
-      const latest = [...db].reverse().slice(0, 3);
-      recentContainer.innerHTML = latest.map(c => `<div class="case-mini"><span>🔹 ${c.name || "Unnamed"} (${c.location || "unknown"})</span><span style="font-family:monospace;">${c.date || "—"}</span></div>`).join("");
+    if (statsSpan) statsSpan.innerHTML = `<span class="status">📀 TOTAL CASES: ${db.length}</span>`;
+    const recentDiv = document.getElementById("recentList");
+    if (recentDiv) {
+      if(db.length === 0) { recentDiv.innerHTML = "<span>— no casefiles —</span>"; return; }
+      const latest = [...db].reverse().slice(0,3);
+      recentDiv.innerHTML = latest.map(c => `<div style="font-size:0.7rem; border-bottom:1px dotted #1e4a1e;">🔹 ${c.name || "??"} (${c.location || "??"}) · ${c.date || "—"}</div>`).join("");
     }
   }
 
-  // form submit: store to localStorage
+  // Send email via FormSubmit (free, no backend)
+  async function sendEmail(data) {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("date", data.date);
+    formData.append("time", data.time);
+    formData.append("location", data.location);
+    formData.append("type", data.type);
+    formData.append("report", data.report);
+    formData.append("_subject", `UFO CASE LOG: ${data.name} (${data.date})`);
+    formData.append("_template", "table");
+
+    try {
+      const response = await fetch("https://formsubmit.co/ajax/uaptaskforce@gmail.com", {
+        method: "POST",
+        body: formData
+      });
+      if (response.ok) return true;
+      else return false;
+    } catch(err) { return false; }
+  }
+
+  // Form submit: save to localStorage + send email
   const form = document.getElementById("caseForm");
-  if (form) {
-    form.addEventListener("submit", function(e) {
+  if(form) {
+    form.addEventListener("submit", async function(e) {
       e.preventDefault();
       const newCase = {
         id: "CASE-" + Date.now(),
@@ -371,21 +360,25 @@
         report: this.what_happened.value.trim(),
         timestamp: new Date().toISOString()
       };
+      // save locally
       const cases = JSON.parse(localStorage.getItem("ufo_cases") || "[]");
       cases.push(newCase);
       localStorage.setItem("ufo_cases", JSON.stringify(cases));
+      
+      // send email
+      const emailSent = await sendEmail(newCase);
+      if(emailSent) {
+        alert("✅ CASE ARCHIVED & SECURE EMAIL SENT TO uaptaskforce@gmail.com");
+      } else {
+        alert("⚠️ Case saved locally but email failed. Check network (still logged).");
+      }
       this.reset();
-      alert("✅ Case Logged + Classified · Intelligence archived");
-      updateDashboardStats();
+      updateUI();
     });
   }
 
-  // initial stats
-  updateDashboardStats();
-
-  // listen for storage changes (if database page updates, but fine)
-  window.addEventListener("storage", function() { updateDashboardStats(); });
+  updateUI();
+  window.addEventListener("storage", updateUI);
 </script>
 </body>
 </html>
-```
