@@ -16,6 +16,7 @@
     a { color:#6f6; text-decoration:none; }
     .blink { animation: blink 1s step-end infinite; }
     @keyframes blink { 50% { opacity:0; } }
+    .warning { color:#fa8; font-size:0.7rem; margin-top:1rem; border-top:1px dashed #5a5; padding-top:0.5rem; }
   </style>
 </head>
 <body>
@@ -29,14 +30,17 @@
   </div>
   <div style="overflow-x:auto; margin-top:1rem;">
     <table id="caseTable">
-      <thead><tr><th>ID</th><th>Name</th><th>Date</th><th>Time</th><th>Location</th><th>Type</th><th>Report</th><th>Action</th></tr></thead>
+      <thead><tr><th>ID</th><th>Name</th><th>Date</th><th>Time</th><th>Location</th><th>Type</th><th>Report</th><th>Action</th></tr</thead>
       <tbody id="tableBody"></tbody>
     </table>
   </div>
   <div style="margin-top:1rem;"><a href="index.html">← BACK TO MAIN TERMINAL</a></div>
-  <div class="classified-stamp" style="margin-top:1rem; color:#a44;">/// LEVEL 4 ///</div>
+  <div class="warning">⚠️ DELETION REQUIRES CLEARANCE CODE — UNAUTHORIZED ATTEMPTS ARE LOGGED</div>
 </div></div>
 <script>
+  // ***** CHANGE THIS PASSWORD TO YOUR OWN *****
+  const ADMIN_PASSWORD = "VAULT2026";   // <-- set your secret clearance code
+
   function loadCases(filter = "") {
     const db = JSON.parse(localStorage.getItem("ufo_cases") || "[]");
     const filtered = db.filter(c => 
@@ -52,7 +56,7 @@
     }
     tbody.innerHTML = filtered.map((c, idx) => `
       <tr>
-        <td>${c.id || "??"}</td>
+        <td>${escapeHtml(c.id || "??")}</td>
         <td>${escapeHtml(c.name)}</td>
         <td>${c.date}</td>
         <td>${c.time}</td>
@@ -62,18 +66,45 @@
         <td><button class="delete-btn" data-id="${c.id}">DELETE</button></td>
       </tr>
     `).join("");
-    // attach delete events
+    
+    // attach password‑protected delete events
     document.querySelectorAll(".delete-btn").forEach(btn => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", async (e) => {
         const id = btn.getAttribute("data-id");
+        // Ask for clearance password
+        const pwd = prompt("⚠️ AUTHORIZED PERSONNEL ONLY\nEnter clearance code to delete this entry:");
+        if(pwd !== ADMIN_PASSWORD) {
+          alert("ACCESS DENIED. Deletion not permitted.");
+          return;
+        }
+        // Second confirmation before deleting
+        const confirmDel = confirm("Permanent deletion. Are you sure?");
+        if(!confirmDel) return;
+        
         let cases = JSON.parse(localStorage.getItem("ufo_cases") || "[]");
-        cases = cases.filter(c => c.id !== id);
-        localStorage.setItem("ufo_cases", JSON.stringify(cases));
+        const newCases = cases.filter(c => c.id !== id);
+        if(newCases.length === cases.length) {
+          alert("Entry not found.");
+          return;
+        }
+        localStorage.setItem("ufo_cases", JSON.stringify(newCases));
+        alert("Case permanently deleted from local vault.");
+        // refresh view with current filter
         loadCases(document.getElementById("searchInput").value.toLowerCase());
       });
     });
   }
-  function escapeHtml(str) { if(!str) return ""; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;});}
+  
+  function escapeHtml(str) { 
+    if(!str) return ""; 
+    return str.replace(/[&<>]/g, function(m){
+      if(m==='&') return '&amp;'; 
+      if(m==='<') return '&lt;'; 
+      if(m==='>') return '&gt;'; 
+      return m;
+    });
+  }
+  
   document.getElementById("searchInput")?.addEventListener("input", (e) => loadCases(e.target.value.toLowerCase()));
   document.getElementById("clearSearch")?.addEventListener("click", () => { document.getElementById("searchInput").value=""; loadCases(""); });
   document.getElementById("refreshBtn")?.addEventListener("click", () => loadCases(document.getElementById("searchInput").value.toLowerCase()));
