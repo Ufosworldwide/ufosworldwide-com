@@ -310,29 +310,65 @@
 </div>
 
 <script>
-  // Load cases from localStorage & update stats
-  function updateUI() {
+  // ---------- SEQUENTIAL CASE ID LOGIC ----------
+  // Get next case number (padded 4 digits, starting from 1)
+  function getNextCaseId() {
+    let nextId = localStorage.getItem("next_case_id");
+    if (nextId === null) {
+      // Initialize: scan existing cases for highest numeric ID
+      const cases = JSON.parse(localStorage.getItem("ufo_cases") || "[]");
+      let maxNumeric = 0;
+      for (let c of cases) {
+        // if ID is like "0001", "0012", or even "1234" (numeric string)
+        const match = c.id && c.id.match(/^(\d+)$/);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (num > maxNumeric) maxNumeric = num;
+        }
+      }
+      nextId = maxNumeric + 1;
+      // Ensure at least 1
+      if (nextId < 1) nextId = 1;
+      localStorage.setItem("next_case_id", nextId);
+    } else {
+      nextId = parseInt(nextId, 10);
+    }
+    // Pad with leading zeros to 4 digits
+    const padded = nextId.toString().padStart(4, '0');
+    return { numeric: nextId, padded: padded };
+  }
+
+  // After successfully saving a new case, increment the counter
+  function incrementNextCaseId() {
+    let next = parseInt(localStorage.getItem("next_case_id") || "1", 10);
+    next++;
+    localStorage.setItem("next_case_id", next);
+  }
+
+  // Helper: update dashboard stats & recent cases
+  function updateDashboardStats() {
     const db = JSON.parse(localStorage.getItem("ufo_cases") || "[]");
     const statsSpan = document.getElementById("liveStats");
     if (statsSpan) statsSpan.innerHTML = `<span class="status">📀 TOTAL CASES: ${db.length}</span>`;
     const recentDiv = document.getElementById("recentList");
     if (recentDiv) {
-      if(db.length === 0) { recentDiv.innerHTML = "<span>— no casefiles —</span>"; return; }
-      const latest = [...db].reverse().slice(0,3);
-      recentDiv.innerHTML = latest.map(c => `<div style="font-size:0.7rem; border-bottom:1px dotted #1e4a1e;">🔹 ${c.name || "??"} (${c.location || "??"}) · ${c.date || "—"}</div>`).join("");
+      if (db.length === 0) { recentDiv.innerHTML = "<span>— ∅ —</span>"; return; }
+      const latest = [...db].reverse().slice(0, 3);
+      recentDiv.innerHTML = latest.map(c => `<div style="font-size:0.7rem; border-bottom:1px dotted #1e4a1e;">🔹 ${c.id || "??"} | ${c.name || "??"} (${c.location || "??"}) · ${c.date || "—"}</div>`).join("");
     }
   }
 
-  // Send email via FormSubmit (free, no backend)
+  // Send email via FormSubmit
   async function sendEmail(data) {
     const formData = new FormData();
+    formData.append("case_id", data.id);
     formData.append("name", data.name);
     formData.append("date", data.date);
     formData.append("time", data.time);
     formData.append("location", data.location);
     formData.append("type", data.type);
     formData.append("report", data.report);
-    formData.append("_subject", `UFO CASE LOG: ${data.name} (${data.date})`);
+    formData.append("_subject", `UFO CASE #${data.id}: ${data.name} (${data.date})`);
     formData.append("_template", "table");
 
     try {
@@ -340,18 +376,21 @@
         method: "POST",
         body: formData
       });
-      if (response.ok) return true;
-      else return false;
+      return response.ok;
     } catch(err) { return false; }
   }
 
-  // Form submit: save to localStorage + send email
+  // Form submission
   const form = document.getElementById("caseForm");
-  if(form) {
+  if (form) {
     form.addEventListener("submit", async function(e) {
       e.preventDefault();
+      
+      // Get next sequential ID
+      const { numeric, padded } = getNextCaseId();
+      
       const newCase = {
-        id: "CASE-" + Date.now(),
+        id: padded,                // e.g., "0001", "0002", ..., "1000", "1001"
         name: this.case_name.value.trim(),
         date: this.date.value,
         time: this.time.value,
@@ -360,25 +399,31 @@
         report: this.what_happened.value.trim(),
         timestamp: new Date().toISOString()
       };
-      // save locally
+      
+      // Save locally
       const cases = JSON.parse(localStorage.getItem("ufo_cases") || "[]");
       cases.push(newCase);
       localStorage.setItem("ufo_cases", JSON.stringify(cases));
       
-      // send email
+      // Increment the counter for next case
+      incrementNextCaseId();
+      
+      // Send email
       const emailSent = await sendEmail(newCase);
-      if(emailSent) {
-        alert("✅ CASE ARCHIVED & SECURE EMAIL SENT TO uaptaskforce@gmail.com");
+      if (emailSent) {
+        alert(`✅ CASE #${padded} ARCHIVED & SECURE EMAIL SENT to uaptaskforce@gmail.com`);
       } else {
-        alert("⚠️ Case saved locally but email failed. Check network (still logged).");
+        alert(`⚠️ Case #${padded} saved locally but email failed. Check network.`);
       }
+      
       this.reset();
-      updateUI();
+      updateDashboardStats();
     });
   }
 
-  updateUI();
-  window.addEventListener("storage", updateUI);
+  // Initial load
+  updateDashboardStats();
+  window.addEventListener("storage", updateDashboardStats);
 </script>
 </body>
 </html>
