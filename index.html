@@ -1,429 +1,941 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>CLASSIFIED // UFO INTELLIGENCE TERMINAL</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      cursor: default;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFOs Worldwide — Anomaly Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    body {
-      background: #0a0f0a;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Courier New', 'Fira Code', 'VT323', monospace;
-      padding: 2rem;
-    }
+<style>
+  :root {
+    --black: #000000;
+    --off-black: #0a0a0a;
+    --panel: #0f0f0f;
+    --border: #1e1e1e;
+    --border-bright: #2a2a2a;
+    --white: #ffffff;
+    --off-white: #e8e8e8;
+    --dim: #888888;
+    --amber: #ff6b00;
+    --amber-dim: #cc5500;
+    --amber-glow: rgba(255, 107, 0, 0.15);
+    --red: #cc2200;
+    --yellow: #ffaa00;
+    --green: #00cc66;
+    --blue: #0088ff;
+    --mono: 'Share Tech Mono', monospace;
+    --display: 'Bebas Neue', sans-serif;
+    --body: 'Inter', sans-serif;
+  }
 
-    /* CRT MONITOR BEZEL */
-    .monitor {
-      max-width: 1400px;
-      width: 100%;
-      background: #0c0e0c;
-      border-radius: 2rem 2rem 3rem 3rem;
-      box-shadow: 0 0 0 8px #2a2e2a, 0 0 0 12px #1a1e1a, 0 20px 40px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.5);
-      padding: 1.5rem;
-      position: relative;
-    }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* SCREEN (CRT effect) */
-    .screen {
-      background: radial-gradient(circle at 30% 20%, #0b1f0b, #030803);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      box-shadow: inset 0 0 60px rgba(0,20,0,0.8), 0 0 0 2px #3a5a3a;
-      position: relative;
-      overflow-y: auto;
-      max-height: 85vh;
-    }
+  html { scroll-behavior: smooth; }
 
-    /* scanlines */
-    .screen::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.03) 0px, rgba(0, 255, 0, 0.03) 2px, transparent 2px, transparent 6px);
-      pointer-events: none;
-      z-index: 2;
-    }
+  body {
+    background: var(--black);
+    color: var(--off-white);
+    font-family: var(--body);
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-    /* flicker glow */
-    .screen::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 255, 0, 0.02);
-      box-shadow: 0 0 15px rgba(0,255,0,0.2);
-      pointer-events: none;
-      animation: flicker 8s infinite;
-    }
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
 
-    @keyframes flicker {
-      0% { opacity: 0.6; }
-      5% { opacity: 0.8; }
-      10% { opacity: 0.4; }
-      15% { opacity: 0.9; }
-      100% { opacity: 0.7; }
-    }
+  /* ─── HEADER ─── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+  }
 
-    /* terminal text */
-    .terminal-text {
-      color: #2eff7a;
-      text-shadow: 0 0 3px #0f0;
-      font-size: 0.9rem;
-    }
+  .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
 
-    h1, h2, h3 {
-      font-family: 'Courier New', monospace;
-      letter-spacing: -1px;
-    }
+  .logo-circle {
+    width: 64px;
+    height: 64px;
+    background: var(--black);
+    border: 1px solid var(--border-bright);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
 
-    .brand {
-      font-size: 0.7rem;
-      background: #0f1f0f;
-      display: inline-block;
-      padding: 0.2rem 0.8rem;
-      border-left: 3px solid #2eff7a;
-      color: #9eff9e;
-    }
+  .logo-circle svg {
+    width: 44px;
+    height: 26px;
+    fill: white;
+  }
 
-    h1 {
-      font-size: 2rem;
-      color: #7eff7e;
-      text-shadow: 0 0 8px #0f0;
-      margin: 0.5rem 0;
-    }
+  .header-text h1 {
+    font-family: var(--display);
+    font-size: 2rem;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    color: var(--white);
+  }
 
-    .status {
-      font-family: monospace;
-      font-size: 0.7rem;
-      color: #5f9;
-      background: #081c08;
-      display: inline-block;
-      padding: 0.2rem 0.8rem;
-      border-radius: 20px;
-    }
+  .header-text p {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--amber);
+    letter-spacing: 0.2em;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
 
-    .section-title {
-      margin: 1.5rem 0 1rem;
-      font-size: 0.7rem;
-      letter-spacing: 2px;
-      color: #8eff8e;
-      border-bottom: 1px dashed #2e5e2e;
-      display: inline-block;
-    }
+  .header-status {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--dim);
+    letter-spacing: 0.15em;
+  }
 
-    .grid {
-      display: grid;
-      gap: 1.2rem;
-      grid-template-columns: 1fr;
-    }
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
 
-    @media (min-width: 850px) {
-      .grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
 
-    .card {
-      background: #0a120acc;
-      border: 1px solid #2a5a2a;
-      border-radius: 0.8rem;
-      padding: 1.2rem;
-      backdrop-filter: blur(2px);
-      transition: 0.1s linear;
-    }
+  /* ─── BOOKS SECTION ─── */
+  .books-section {
+    padding: 32px 40px;
+    border-bottom: 1px solid var(--border);
+  }
 
-    .card:hover {
-      border-color: #6eff6e;
-      box-shadow: 0 0 8px rgba(80,255,80,0.3);
-    }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--amber);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
-    input, select, textarea {
-      background: #051005;
-      border: 1px solid #2c5a2c;
-      color: #bfffbf;
-      font-family: monospace;
-      padding: 0.6rem;
-      border-radius: 0.4rem;
-      width: 100%;
-      margin-top: 0.3rem;
-      font-size: 0.85rem;
-    }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
 
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #0f0;
-      box-shadow: 0 0 6px #0f0;
-    }
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
 
-    button {
-      background: #0f2f0f;
-      border: 1px solid #5f9;
-      color: #bfffbf;
-      padding: 0.7rem;
-      width: 100%;
-      font-family: monospace;
-      font-weight: bold;
-      margin-top: 0.8rem;
-      cursor: pointer;
-      transition: 0.1s;
-      border-radius: 0.4rem;
-    }
+  .book-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 18px;
+    transition: border-color 0.2s, background 0.2s;
+  }
 
-    button:hover {
-      background: #1f4a1f;
-      text-shadow: 0 0 4px #0f0;
-      box-shadow: 0 0 6px #0f0;
-    }
+  .book-card:hover {
+    border-color: var(--amber-dim);
+    background: var(--amber-glow);
+  }
 
-    .recent-box {
-      margin-top: 1rem;
-      background: #030b03;
-      padding: 0.6rem;
-      border-left: 2px solid #2eff7a;
-    }
+  .book-title {
+    font-family: var(--display);
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
 
-    footer {
-      margin-top: 2rem;
-      text-align: center;
-      font-size: 0.65rem;
-      color: #4f8;
-      border-top: 1px solid #1e3a1e;
-      padding-top: 1rem;
-    }
+  .book-author {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--dim);
+    letter-spacing: 0.15em;
+    margin-bottom: 14px;
+  }
 
-    .footer-links a {
-      color: #7eff7e;
-      text-decoration: none;
-      margin: 0 0.5rem;
-    }
+  .book-flags {
+    display: flex;
+    gap: 8px;
+  }
 
-    a {
-      color: #aaffaa;
-      text-decoration: none;
-    }
+  .flag-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
 
-    .blink {
-      animation: blink 1.2s step-end infinite;
-    }
+  .flag-link:hover { opacity: 1; }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
+  .flag-link span:first-child {
+    font-size: 1.3rem;
+    line-height: 1;
+  }
 
-    .classified-stamp {
-      position: absolute;
-      bottom: 10px;
-      right: 20px;
-      font-size: 0.6rem;
-      color: #ff4444;
-      opacity: 0.5;
-      transform: rotate(-5deg);
-      font-weight: bold;
-    }
-  </style>
+  .flag-label {
+    font-family: var(--mono);
+    font-size: 0.5rem;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+  }
+
+  /* ─── MAP SECTION ─── */
+  .map-section {
+    padding: 32px 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .map-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .control-btn {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    color: var(--dim);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .control-btn:hover, .control-btn.active {
+    color: var(--amber);
+    border-color: var(--amber-dim);
+  }
+
+  .map-wrapper {
+    position: relative;
+    height: 480px;
+    border: 1px solid var(--border);
+  }
+
+  #anomaly-map {
+    width: 100%;
+    height: 100%;
+    background: #050505;
+  }
+
+  .map-overlay-label {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 500;
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    color: var(--amber);
+    letter-spacing: 0.15em;
+    background: rgba(0,0,0,0.85);
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+  }
+
+  .map-legend {
+    display: flex;
+    gap: 20px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .hotspot-badge {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    color: var(--amber);
+    letter-spacing: 0.1em;
+    background: var(--amber-glow);
+    border: 1px solid var(--amber-dim);
+    padding: 4px 10px;
+  }
+
+  /* ─── CASES SECTION ─── */
+  .cases-section {
+    padding: 32px 40px 60px;
+  }
+
+  .cases-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .case-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .case-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    overflow: hidden;
+  }
+
+  .case-card:hover {
+    border-color: var(--border-bright);
+    border-left-color: var(--amber);
+  }
+
+  .case-card.multi-channel {
+    border-left-color: var(--amber);
+  }
+
+  .case-card.expanded {
+    border-left-color: var(--amber);
+  }
+
+  .case-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .case-date {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--amber);
+    letter-spacing: 0.1em;
+    min-width: 100px;
+  }
+
+  .case-status {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    padding: 3px 8px;
+    border: 1px solid;
+  }
+
+  .case-status.normal {
+    color: var(--green);
+    border-color: var(--green);
+    background: rgba(0,204,102,0.08);
+  }
+
+  .case-status.detected {
+    color: var(--yellow);
+    border-color: var(--yellow);
+    background: rgba(255,170,0,0.08);
+  }
+
+  .case-status.multi {
+    color: var(--amber);
+    border-color: var(--amber);
+    background: var(--amber-glow);
+  }
+
+  .case-summary {
+    font-size: 0.75rem;
+    color: var(--dim);
+    margin-left: auto;
+    font-family: var(--mono);
+    letter-spacing: 0.08em;
+  }
+
+  .case-expand-icon {
+    color: var(--dim);
+    font-size: 0.7rem;
+    transition: transform 0.2s;
+    margin-left: 8px;
+  }
+
+  .case-card.expanded .case-expand-icon {
+    transform: rotate(180deg);
+  }
+
+  .case-body {
+    display: none;
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .case-card.expanded .case-body {
+    display: block;
+  }
+
+  .feed-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .feed-stat-box {
+    background: var(--black);
+    border: 1px solid var(--border);
+    padding: 14px;
+  }
+
+  .feed-stat-name {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    color: var(--amber);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .feed-stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--dim);
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .feed-stat-row span:last-child {
+    color: var(--off-white);
+  }
+
+  .feed-stat-status {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    color: var(--yellow);
+    margin-top: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  .anomaly-list-label {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    color: var(--dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    margin-top: 4px;
+  }
+
+  .anomaly-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 0.62rem;
+  }
+
+  .anomaly-row:last-child { border-bottom: none; }
+
+  .anomaly-time {
+    color: var(--dim);
+    min-width: 160px;
+    letter-spacing: 0.05em;
+  }
+
+  .anomaly-source {
+    min-width: 100px;
+    letter-spacing: 0.08em;
+  }
+
+  .anomaly-source.usgs_seismic { color: var(--blue); }
+  .anomaly-source.kp_geomagnetic { color: var(--yellow); }
+  .anomaly-source.donki_solar { color: var(--amber); }
+  .anomaly-source.donki_cme { color: var(--red); }
+
+  .anomaly-label {
+    color: var(--off-white);
+    flex: 1;
+  }
+
+  .anomaly-score {
+    color: var(--dim);
+    text-align: right;
+    min-width: 60px;
+  }
+
+  .no-data {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    padding: 40px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+
+  .loading {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--amber);
+    letter-spacing: 0.2em;
+    padding: 40px;
+    text-align: center;
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Leaflet dark overrides */
+  .leaflet-container {
+    background: #050505 !important;
+    font-family: var(--mono) !important;
+  }
+
+  .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.7) saturate(0.5); }
+
+  .leaflet-popup-content-wrapper {
+    background: var(--panel) !important;
+    border: 1px solid var(--border-bright) !important;
+    border-radius: 0 !important;
+    color: var(--off-white) !important;
+    font-family: var(--mono) !important;
+    font-size: 0.65rem !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.8) !important;
+  }
+
+  .leaflet-popup-tip { background: var(--panel) !important; }
+
+  @media (max-width: 900px) {
+    header { padding: 20px; }
+    .books-section, .map-section, .cases-section { padding: 20px; }
+    .books-grid { grid-template-columns: repeat(2, 1fr); }
+    .feed-stats-grid { grid-template-columns: 1fr; }
+    .anomaly-time { min-width: 100px; font-size: 0.55rem; }
+  }
+</style>
 </head>
 <body>
-<div class="monitor">
-  <div class="screen">
-    <div class="terminal-text">
-      <div class="brand">🔒 // DEEP VAULT TERMINAL // SIGINT//CUI//NOFORN</div>
-      <h1>UFO CONTROL DASHBOARD</h1>
-      <div class="status">⚡ ACTIVE LINK: CLASSIFIED NETWORK ⚡ <span class="blink">●</span></div>
 
-      <!-- CORE -->
-      <div class="section-title">> CORE_SUBSYSTEM.exe</div>
-      <div class="grid">
-        <!-- FORM CARD -->
-        <div class="card">
-          <h3>📡 [ CASE_SUBMISSION ]</h3>
-          <p style="font-size:0.75rem;">Encrypted field report → uplink to VAULT</p>
-          <form id="caseForm">
-            <input type="text" name="case_name" placeholder="CASE_NAME" required>
-            <div style="display:flex; gap:8px;">
-              <input type="date" name="date" style="width:50%" required>
-              <input type="time" name="time" style="width:50%" required>
-            </div>
-            <input type="text" name="location" placeholder="LOCATION / COORD" required>
-            <select name="case_type" required>
-              <option value="">SELECT CLASS</option>
-              <option value="LIGHT">LIGHT / Visual Event</option>
-              <option value="OBJECT">OBJECT / Physical Encounter</option>
-              <option value="COMPLEX">COMPLEX / Multi-Witness</option>
-              <option value="SIGNAL">SIGNAL / Frequency Event</option>
-            </select>
-            <textarea name="what_happened" rows="3" placeholder="INCIDENT DESCRIPTION..."></textarea>
-            <button type="submit">✧ UPLOAD TO ARCHIVE & EMAIL ✧</button>
-          </form>
-        </div>
-
-        <!-- DATABASE CARD -->
-        <div class="card">
-          <h3>🗄️ [ CASE_DATABASE ]</h3>
-          <p>Local archive + searchable records</p>
-          <div id="liveStats" style="margin:12px 0;"><span class="status">⟳ LOADING CASES</span></div>
-          <a href="database.html"><button type="button" style="background:#0a1a0a;">🔍 OPEN DATABASE TERMINAL</button></a>
-          <div class="recent-box">
-            <div style="font-size:0.7rem;">⏳ LAST 3 ENTRIES</div>
-            <div id="recentList">— ∅ —</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- KNOWLEDGE SYSTEM -->
-      <div class="section-title">> KNOWLEDGE_LIBRARY</div>
-      <div class="grid">
-        <a href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank" class="card" style="text-decoration:none;"><h3>📖 FRAMEWORK</h3><p>MISIDENTIFIED CLASSIFICATION SYSTEM</p></a>
-        <a href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank" class="card" style="text-decoration:none;"><h3>📘 FIELD GUIDE & JOURNAL</h3></a>
-        <a href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank" class="card" style="text-decoration:none;"><h3>📕 PALE ARCHIVE I</h3><p>OMNIBUS FIELD COLLECTION</p></a>
-        <a href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank" class="card" style="text-decoration:none;"><h3>📗 PALE ARCHIVE II</h3><p>FREQUENCY FIELD ANALYSIS</p></a>
-      </div>
-
-      <footer>
-        UFOs WORLDWIDE // CONTROL SYSTEM ACTIVE — DEEP VAULT NETWORK<br/>
-        Operator: John Carter · Canada · uaptaskforce@gmail.com<br/>
-        <div class="footer-links">
-          <a href="about.html">[ABOUT]</a> |
-          <a href="contact.html">[CONTACT]</a> |
-          <a href="privacy.html">[PRIVACY]</a> |
-          <a href="terms.html">[TERMS]</a>
-        </div>
-      </footer>
-      <div class="classified-stamp">/// CLASSIFIED // LEVEL 4 // EYES ONLY ///</div>
+<!-- HEADER -->
+<header>
+  <div class="logo-container">
+    <div class="logo-circle">
+      <!-- UFO silhouette SVG matching brand logo -->
+      <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50" cy="35" rx="48" ry="14" fill="white"/>
+        <ellipse cx="50" cy="28" rx="28" ry="14" fill="white"/>
+        <ellipse cx="50" cy="22" rx="14" ry="8" fill="white"/>
+        <ellipse cx="50" cy="35" rx="48" ry="14" fill="black" opacity="0.3"/>
+        <rect x="20" y="38" width="6" height="3" rx="1" fill="black" opacity="0.6"/>
+        <rect x="47" y="40" width="6" height="3" rx="1" fill="black" opacity="0.6"/>
+        <rect x="74" y="38" width="6" height="3" rx="1" fill="black" opacity="0.6"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>UFOs Worldwide</h1>
+      <p>Anomaly Intelligence System — Live</p>
     </div>
   </div>
-</div>
+  <div class="header-status">
+    <div class="status-dot"></div>
+    <span id="last-updated">INITIALIZING...</span>
+  </div>
+</header>
+
+<!-- BOOKS -->
+<section class="books-section">
+  <div class="section-label">Published Works — John Carter</div>
+  <div class="books-grid">
+
+    <div class="book-card">
+      <div class="book-title">The UFO Handbook</div>
+      <div class="book-author">John Carter</div>
+      <div class="book-flags">
+        <a class="flag-link" href="https://www.amazon.com/dp/B0C5P5SHXV" target="_blank">
+          <span>🇺🇸</span><span class="flag-label">US</span>
+        </a>
+        <a class="flag-link" href="https://www.amazon.ca/dp/B0C5P5SHXV" target="_blank">
+          <span>🇨🇦</span><span class="flag-label">CA</span>
+        </a>
+        <a class="flag-link" href="https://www.amazon.co.uk/dp/B0C5P5SHXV" target="_blank">
+          <span>🇬🇧</span><span class="flag-label">UK</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-title">UFO Framework</div>
+      <div class="book-author">John Carter</div>
+      <div class="book-flags">
+        <a class="flag-link" href="https://www.amazon.com/dp/B0GVP2RJ2M" target="_blank">
+          <span>🇺🇸</span><span class="flag-label">US</span>
+        </a>
+        <a class="flag-link" href="https://www.amazon.ca/dp/B0GVP2RJ2M" target="_blank">
+          <span>🇨🇦</span><span class="flag-label">CA</span>
+        </a>
+        <a class="flag-link" href="https://www.amazon.co.uk/dp/B0GVP2RJ2M" target="_blank">
+          <span>🇬🇧</span><span class="flag-label">UK</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-title">Signals — Story One</div>
+      <div class="book-author">John Carter</div>
+      <div class="book-flags">
+        <a class="flag-link" href="https://www.amazon.com/dp/B0GTHY5D1V" target="_blank">
+          <span>🇺🇸</span><span class="flag-label">US</span>
+        </a>
+        <a class="flag-link" href="https://www.amazon.ca/dp/B0GTHY5D1V" target="_blank">
+          <span>🇨🇦</span><span class="flag-label">CA</span>
+        </a>
+        <a class="flag-link" href="https://www.amazon.co.uk/dp/B0GTHY5D1V" target="_blank">
+          <span>🇬🇧</span><span class="flag-label">UK</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-title">Frequency — Story Two</div>
+      <div class="book-author">John Carter</div>
+      <div class="book-flags">
+        <a class="flag-link" href="https://www.amazon.com/dp/B0GV8NTDM9" target="_blank">
+          <span>🇺🇸</span><span class="flag-label">US</span>
+        </a>
+        <a class="flag-link" href="https://www.amazon.ca/dp/B0GV8NTDM9" target="_blank">
+          <span>🇨🇦</span><span class="flag-label">CA</span>
+        </a>
+        <a class="flag-link" href="https://www.amazon.co.uk/dp/B0GV8NTDM9" target="_blank">
+          <span>🇬🇧</span><span class="flag-label">UK</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MAP -->
+<section class="map-section">
+  <div class="section-label">Global Anomaly Map</div>
+  <div class="map-controls">
+    <button class="control-btn active" onclick="filterPins('all', this)">All Sources</button>
+    <button class="control-btn" onclick="filterPins('usgs_seismic', this)">Seismic</button>
+    <button class="control-btn" onclick="filterPins('kp_geomagnetic', this)">Geomagnetic</button>
+    <button class="control-btn" onclick="filterPins('donki_solar', this)">Solar</button>
+    <button class="control-btn" onclick="filterPins('donki_cme', this)">CME</button>
+    <div class="hotspot-badge" id="hotspot-count">⬡ Loading hotspots...</div>
+  </div>
+  <div class="map-wrapper">
+    <div id="anomaly-map"></div>
+    <div class="map-overlay-label" id="pin-count-label">— PINS</div>
+  </div>
+  <div class="map-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#0088ff"></div>Seismic</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ffaa00"></div>Geomagnetic</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ff6b00"></div>Solar Flare</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#cc2200"></div>CME</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ff0055; box-shadow: 0 0 6px #ff0055"></div>Hotspot Cluster</div>
+  </div>
+</section>
+
+<!-- CASES -->
+<section class="cases-section">
+  <div class="section-label">Case Log — Daily Reports</div>
+  <div class="case-list" id="case-list">
+    <div class="loading">RETRIEVING CASE FILES...</div>
+  </div>
+</section>
 
 <script>
-  // ---------- SEQUENTIAL CASE ID LOGIC ----------
-  // Get next case number (padded 4 digits, starting from 1)
-  function getNextCaseId() {
-    let nextId = localStorage.getItem("next_case_id");
-    if (nextId === null) {
-      // Initialize: scan existing cases for highest numeric ID
-      const cases = JSON.parse(localStorage.getItem("ufo_cases") || "[]");
-      let maxNumeric = 0;
-      for (let c of cases) {
-        // if ID is like "0001", "0012", or even "1234" (numeric string)
-        const match = c.id && c.id.match(/^(\d+)$/);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          if (num > maxNumeric) maxNumeric = num;
-        }
-      }
-      nextId = maxNumeric + 1;
-      // Ensure at least 1
-      if (nextId < 1) nextId = 1;
-      localStorage.setItem("next_case_id", nextId);
-    } else {
-      nextId = parseInt(nextId, 10);
+// ─── CONFIG ───
+const API_BASE = window.location.origin;
+// If running locally point to your Vercel deployment:
+// const API_BASE = 'https://anomaly-dashboard-two.vercel.app';
+
+// ─── MAP INIT ───
+const map = L.map('anomaly-map', {
+  center: [20, 0],
+  zoom: 2,
+  zoomControl: true,
+  attributionControl: false
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 18
+}).addTo(map);
+
+let allPins = [];
+let allMarkers = [];
+let hotspotMarkers = [];
+
+const sourceColors = {
+  usgs_seismic: '#0088ff',
+  kp_geomagnetic: '#ffaa00',
+  donki_solar: '#ff6b00',
+  donki_cme: '#cc2200'
+};
+
+const severityRadius = {
+  extreme: 14,
+  major: 11,
+  significant: 8,
+  moderate: 6,
+  default: 5
+};
+
+function makeMarker(pin) {
+  const color = sourceColors[pin.source] || '#888';
+  const radius = severityRadius[pin.severity] || severityRadius.default;
+
+  const marker = L.circleMarker([pin.lat, pin.lng], {
+    radius,
+    fillColor: color,
+    color: color,
+    weight: 1,
+    opacity: 0.9,
+    fillOpacity: 0.6
+  });
+
+  marker.bindPopup(`
+    <div style="line-height:1.8">
+      <div style="color:${color};letter-spacing:0.1em;margin-bottom:6px">${(pin.source || '').toUpperCase().replace('_',' ')}</div>
+      <div>${pin.label || '—'}</div>
+      <div style="color:#888;margin-top:4px">${pin.date || ''}</div>
+      <div style="color:#888">Score: ${pin.anomaly_score?.toFixed(1) || '—'}</div>
+    </div>
+  `);
+
+  marker._sourceType = pin.source;
+  return marker;
+}
+
+function renderPins(pins) {
+  allMarkers.forEach(m => map.removeLayer(m));
+  allMarkers = [];
+  pins.forEach(pin => {
+    if (pin.lat && pin.lng) {
+      const m = makeMarker(pin);
+      m.addTo(map);
+      allMarkers.push(m);
     }
-    // Pad with leading zeros to 4 digits
-    const padded = nextId.toString().padStart(4, '0');
-    return { numeric: nextId, padded: padded };
-  }
+  });
+  document.getElementById('pin-count-label').textContent = `${allMarkers.length} PINS`;
+}
 
-  // After successfully saving a new case, increment the counter
-  function incrementNextCaseId() {
-    let next = parseInt(localStorage.getItem("next_case_id") || "1", 10);
-    next++;
-    localStorage.setItem("next_case_id", next);
-  }
+function filterPins(source, btn) {
+  document.querySelectorAll('.control-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = source === 'all' ? allPins : allPins.filter(p => p.source === source);
+  renderPins(filtered);
+}
 
-  // Helper: update dashboard stats & recent cases
-  function updateDashboardStats() {
-    const db = JSON.parse(localStorage.getItem("ufo_cases") || "[]");
-    const statsSpan = document.getElementById("liveStats");
-    if (statsSpan) statsSpan.innerHTML = `<span class="status">📀 TOTAL CASES: ${db.length}</span>`;
-    const recentDiv = document.getElementById("recentList");
-    if (recentDiv) {
-      if (db.length === 0) { recentDiv.innerHTML = "<span>— ∅ —</span>"; return; }
-      const latest = [...db].reverse().slice(0, 3);
-      recentDiv.innerHTML = latest.map(c => `<div style="font-size:0.7rem; border-bottom:1px dotted #1e4a1e;">🔹 ${c.id || "??"} | ${c.name || "??"} (${c.location || "??"}) · ${c.date || "—"}</div>`).join("");
-    }
-  }
+function renderHotspots(hotspots) {
+  hotspotMarkers.forEach(m => map.removeLayer(m));
+  hotspotMarkers = [];
 
-  // Send email via FormSubmit
-  async function sendEmail(data) {
-    const formData = new FormData();
-    formData.append("case_id", data.id);
-    formData.append("name", data.name);
-    formData.append("date", data.date);
-    formData.append("time", data.time);
-    formData.append("location", data.location);
-    formData.append("type", data.type);
-    formData.append("report", data.report);
-    formData.append("_subject", `UFO CASE #${data.id}: ${data.name} (${data.date})`);
-    formData.append("_template", "table");
-
-    try {
-      const response = await fetch("https://formsubmit.co/ajax/uaptaskforce@gmail.com", {
-        method: "POST",
-        body: formData
-      });
-      return response.ok;
-    } catch(err) { return false; }
-  }
-
-  // Form submission
-  const form = document.getElementById("caseForm");
-  if (form) {
-    form.addEventListener("submit", async function(e) {
-      e.preventDefault();
-      
-      // Get next sequential ID
-      const { numeric, padded } = getNextCaseId();
-      
-      const newCase = {
-        id: padded,                // e.g., "0001", "0002", ..., "1000", "1001"
-        name: this.case_name.value.trim(),
-        date: this.date.value,
-        time: this.time.value,
-        location: this.location.value.trim(),
-        type: this.case_type.value,
-        report: this.what_happened.value.trim(),
-        timestamp: new Date().toISOString()
-      };
-      
-      // Save locally
-      const cases = JSON.parse(localStorage.getItem("ufo_cases") || "[]");
-      cases.push(newCase);
-      localStorage.setItem("ufo_cases", JSON.stringify(cases));
-      
-      // Increment the counter for next case
-      incrementNextCaseId();
-      
-      // Send email
-      const emailSent = await sendEmail(newCase);
-      if (emailSent) {
-        alert(`✅ CASE #${padded} ARCHIVED & SECURE EMAIL SENT to uaptaskforce@gmail.com`);
-      } else {
-        alert(`⚠️ Case #${padded} saved locally but email failed. Check network.`);
-      }
-      
-      this.reset();
-      updateDashboardStats();
+  hotspots.forEach(h => {
+    const m = L.circleMarker([h.centroid.lat, h.centroid.lng], {
+      radius: Math.min(30, 10 + h.pin_count * 2),
+      fillColor: '#ff0055',
+      color: '#ff0055',
+      weight: 2,
+      opacity: 0.8,
+      fillOpacity: 0.15,
+      dashArray: '4 4'
     });
-  }
+    m.bindPopup(`
+      <div style="line-height:1.8">
+        <div style="color:#ff0055;letter-spacing:0.1em;margin-bottom:6px">⬡ HOTSPOT CLUSTER</div>
+        <div>${h.pin_count} events detected</div>
+        <div style="color:#888">${h.sources?.join(', ') || ''}</div>
+        <div style="color:#888">${h.date_range?.first} → ${h.date_range?.last}</div>
+      </div>
+    `);
+    m.addTo(map);
+    hotspotMarkers.push(m);
+  });
 
-  // Initial load
-  updateDashboardStats();
-  window.addEventListener("storage", updateDashboardStats);
+  document.getElementById('hotspot-count').textContent =
+    hotspots.length > 0
+      ? `⬡ ${hotspots.length} Hotspot${hotspots.length > 1 ? 's' : ''} Detected`
+      : '⬡ No Hotspots Yet';
+}
+
+async function loadMap() {
+  try {
+    const res = await fetch(`${API_BASE}/api/map-pins?days=30`);
+    const data = await res.json();
+    allPins = data.pins || [];
+    renderPins(allPins);
+    renderHotspots(data.hotspots || []);
+  } catch (e) {
+    console.error('Map load failed:', e);
+    document.getElementById('pin-count-label').textContent = 'MAP ERROR';
+  }
+}
+
+// ─── CASES ───
+function statusClass(status) {
+  if (!status) return 'normal';
+  if (status.includes('MULTI')) return 'multi';
+  if (status.includes('NORMAL')) return 'normal';
+  return 'detected';
+}
+
+function formatTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toUTCString().replace(' GMT', ' UTC');
+}
+
+function renderFeedStats(stats) {
+  if (!stats) return '';
+  const feeds = [
+    { key: 'kp_geomagnetic', label: 'KP GEOMAGNETIC', color: '#ffaa00' },
+    { key: 'usgs_seismic', label: 'USGS SEISMIC', color: '#0088ff' },
+    { key: 'donki_solar', label: 'DONKI SOLAR', color: '#ff6b00' }
+  ];
+
+  return `<div class="feed-stats-grid">${feeds.map(f => {
+    const s = stats[f.key];
+    if (!s) return `<div class="feed-stat-box"><div class="feed-stat-name" style="color:${f.color}">${f.label}</div><div style="font-family:var(--mono);font-size:0.6rem;color:var(--dim)">No activity this period</div></div>`;
+
+    const rows = Object.entries(s)
+      .filter(([k]) => k !== 'status')
+      .map(([k, v]) => `<div class="feed-stat-row"><span>${k.replace(/_/g,' ')}</span><span>${v}</span></div>`)
+      .join('');
+
+    return `<div class="feed-stat-box">
+      <div class="feed-stat-name" style="color:${f.color}">${f.label}</div>
+      ${rows}
+      <div class="feed-stat-status">${s.status || ''}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function renderAnomalies(anomalies) {
+  if (!anomalies || anomalies.length === 0) {
+    return '<div style="font-family:var(--mono);font-size:0.62rem;color:var(--dim);padding:12px 0">No anomalies flagged this period.</div>';
+  }
+  return `
+    <div class="anomaly-list-label">Anomaly Log — ${anomalies.length} Events</div>
+    ${anomalies.map(a => `
+      <div class="anomaly-row">
+        <div class="anomaly-time">${formatTime(a.time)}</div>
+        <div class="anomaly-source ${a.source}">${(a.source||'').replace('_',' ').toUpperCase()}</div>
+        <div class="anomaly-label">${a.label || '—'}</div>
+        <div class="anomaly-score">${a.anomaly_score?.toFixed(1) || '—'}/10</div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function toggleCase(card) {
+  card.classList.toggle('expanded');
+}
+
+async function loadCases() {
+  try {
+    const res = await fetch(`${API_BASE}/api/cases?limit=20`);
+    const data = await res.json();
+    const list = document.getElementById('case-list');
+
+    if (!data.cases || data.cases.length === 0) {
+      list.innerHTML = '<div class="no-data">NO CASE FILES ON RECORD — SYSTEM INITIALIZING</div>';
+      return;
+    }
+
+    document.getElementById('last-updated').textContent =
+      `LAST PULL: ${data.cases[0]?.date || 'UNKNOWN'}`;
+
+    list.innerHTML = data.cases.map((c, i) => {
+      const sc = statusClass(c.summary?.overall_status);
+      return `
+        <div class="case-card ${sc === 'multi' ? 'multi-channel' : ''}" onclick="this.classList.toggle('expanded')">
+          <div class="case-header">
+            <div class="case-date">${c.date || '—'}</div>
+            <div class="case-status ${sc}">${c.summary?.overall_status || 'UNKNOWN'}</div>
+            <div class="case-summary">${c.summary?.total_anomalies || 0} anomalies · ${c.summary?.feeds_active || 0} feeds</div>
+            <div class="case-expand-icon">▾</div>
+          </div>
+          <div class="case-body">
+            ${renderFeedStats(c.feed_stats)}
+            ${c.summary?.cross_channel_flags?.length > 0
+              ? `<div style="font-family:var(--mono);font-size:0.62rem;color:var(--amber);margin-bottom:12px;letter-spacing:0.08em">⚠ ${c.summary.cross_channel_flags.join(' · ')}</div>`
+              : ''}
+            ${renderAnomalies(c.anomalies)}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+  } catch (e) {
+    document.getElementById('case-list').innerHTML =
+      '<div class="no-data">UNABLE TO RETRIEVE CASE FILES</div>';
+    console.error('Cases load failed:', e);
+  }
+}
+
+// ─── INIT ───
+loadMap();
+loadCases();
 </script>
 </body>
 </html>
