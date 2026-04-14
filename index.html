@@ -846,19 +846,51 @@ function formatTime(iso) {
 function renderFeedStats(stats) {
   if (!stats) return '';
   const feeds = [
-    { key: 'kp_geomagnetic', label: 'KP GEOMAGNETIC', color: '#ffaa00' },
-    { key: 'usgs_seismic', label: 'USGS SEISMIC', color: '#0088ff' },
-    { key: 'donki_solar', label: 'DONKI SOLAR', color: '#ff6b00' }
+    {
+      key: 'kp_geomagnetic', label: 'KP GEOMAGNETIC', color: '#ffaa00',
+      fields: [
+        ['Readings captured', 'readings_captured'],
+        ['Peak Kp', 'peak_kp'],
+        ['Average Kp', 'average_kp'],
+        ['Storm-level readings', 'storm_level_readings']
+      ]
+    },
+    {
+      key: 'usgs_seismic', label: 'USGS SEISMIC', color: '#0088ff',
+      fields: [
+        ['Total events', 'total_events'],
+        ['Above M3.0', 'above_m3'],
+        ['Above M5.0', 'above_m5'],
+        ['Above M6.0', 'above_m6'],
+        ['Peak magnitude', 'peak_magnitude'],
+        ['Average magnitude', 'average_magnitude']
+      ]
+    },
+    {
+      key: 'donki_solar', label: 'DONKI SOLAR', color: '#ff6b00',
+      fields: [
+        ['Total flares', 'total_flares'],
+        ['M-class flares', 'm_class_flares'],
+        ['X-class flares', 'x_class_flares'],
+        ['CMEs detected', 'cmes_detected'],
+        ['Earth-directed CMEs', 'earth_directed_cmes']
+      ]
+    }
   ];
 
   return `<div class="feed-stats-grid">${feeds.map(f => {
     const s = stats[f.key];
-    if (!s) return `<div class="feed-stat-box"><div class="feed-stat-name" style="color:${f.color}">${f.label}</div><div style="font-family:var(--mono);font-size:0.6rem;color:var(--dim)">No activity this period</div></div>`;
+    if (!s) return `
+      <div class="feed-stat-box">
+        <div class="feed-stat-name" style="color:${f.color}">${f.label}</div>
+        <div style="font-family:var(--mono);font-size:0.6rem;color:var(--dim);margin-top:6px">No activity this period</div>
+      </div>`;
 
-    const rows = Object.entries(s)
-      .filter(([k]) => k !== 'status')
-      .map(([k, v]) => `<div class="feed-stat-row"><span>${k.replace(/_/g,' ')}</span><span>${v}</span></div>`)
-      .join('');
+    const rows = f.fields.map(([label, key]) =>
+      s[key] !== undefined && s[key] !== null
+        ? `<div class="feed-stat-row"><span>${label}</span><span>${s[key]}</span></div>`
+        : ''
+    ).join('');
 
     return `<div class="feed-stat-box">
       <div class="feed-stat-name" style="color:${f.color}">${f.label}</div>
@@ -868,20 +900,56 @@ function renderFeedStats(stats) {
   }).join('')}</div>`;
 }
 
+function severityColor(severity) {
+  return { extreme: '#cc2200', major: '#ff4400', significant: '#ffaa00', moderate: '#0088ff' }[severity] || '#888';
+}
+
 function renderAnomalies(anomalies) {
   if (!anomalies || anomalies.length === 0) {
     return '<div style="font-family:var(--mono);font-size:0.62rem;color:var(--dim);padding:12px 0">No anomalies flagged this period.</div>';
   }
+
   return `
-    <div class="anomaly-list-label">Anomaly Log — ${anomalies.length} Events</div>
-    ${anomalies.map(a => `
-      <div class="anomaly-row">
-        <div class="anomaly-time">${formatTime(a.time)}</div>
-        <div class="anomaly-source ${a.source}">${(a.source||'').replace('_',' ').toUpperCase()}</div>
-        <div class="anomaly-label">${a.label || '—'}</div>
-        <div class="anomaly-score">${a.anomaly_score?.toFixed(1) || '—'}/10</div>
-      </div>
-    `).join('')}
+    <div class="anomaly-list-label">Anomaly Log — ${anomalies.length} flagged events</div>
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:0.6rem">
+      <thead>
+        <tr style="border-bottom:1px solid var(--border)">
+          <th style="text-align:left;padding:6px 10px 6px 0;color:var(--dim);letter-spacing:0.12em;font-weight:400">UTC TIME</th>
+          <th style="text-align:left;padding:6px 10px;color:var(--dim);letter-spacing:0.12em;font-weight:400">SOURCE</th>
+          <th style="text-align:left;padding:6px 10px;color:var(--dim);letter-spacing:0.12em;font-weight:400">EVENT</th>
+          <th style="text-align:right;padding:6px 10px;color:var(--dim);letter-spacing:0.12em;font-weight:400">MAG/VAL</th>
+          <th style="text-align:right;padding:6px 10px;color:var(--dim);letter-spacing:0.12em;font-weight:400">DEPTH</th>
+          <th style="text-align:right;padding:6px 10px;color:var(--dim);letter-spacing:0.12em;font-weight:400">COORDS</th>
+          <th style="text-align:right;padding:6px 10px;color:var(--dim);letter-spacing:0.12em;font-weight:400">SEVERITY</th>
+          <th style="text-align:right;padding:6px 0 6px 10px;color:var(--dim);letter-spacing:0.12em;font-weight:400">SCORE</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${anomalies.map(a => {
+          const sc = severityColor(a.severity);
+          const coords = (a.lat !== null && a.lng !== null)
+            ? `${a.lat?.toFixed(3)}, ${a.lng?.toFixed(3)}`
+            : '—';
+          const depth = a.depth_km !== undefined ? `${Math.round(a.depth_km)} km` : '—';
+          const val = typeof a.value === 'number' ? `M${a.value}` : (a.value || '—');
+          return `
+            <tr style="border-bottom:1px solid var(--border);transition:background 0.15s" onmouseover="this.style.background='rgba(255,107,0,0.04)'" onmouseout="this.style.background=''">
+              <td style="padding:8px 10px 8px 0;color:var(--dim);white-space:nowrap">${formatTime(a.time)}</td>
+              <td style="padding:8px 10px;color:${sourceColors[a.source] || '#888'};letter-spacing:0.08em;white-space:nowrap">${(a.source||'').replace(/_/g,' ').toUpperCase()}</td>
+              <td style="padding:8px 10px;color:var(--off-white)">${a.label || '—'}</td>
+              <td style="padding:8px 10px;color:var(--white);text-align:right;font-weight:500">${val}</td>
+              <td style="padding:8px 10px;color:var(--dim);text-align:right">${depth}</td>
+              <td style="padding:8px 10px;color:var(--dim);text-align:right;white-space:nowrap">${coords}</td>
+              <td style="padding:8px 10px;text-align:right">
+                <span style="color:${sc};border:1px solid ${sc};padding:2px 6px;font-size:0.55rem;letter-spacing:0.1em">${(a.severity||'').toUpperCase()}</span>
+              </td>
+              <td style="padding:8px 0 8px 10px;color:${sc};text-align:right;font-weight:500">${a.anomaly_score?.toFixed(1) || '—'}</td>
+            </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    </div>
   `;
 }
 
@@ -905,18 +973,23 @@ async function loadCases() {
 
     list.innerHTML = data.cases.map((c, i) => {
       const sc = statusClass(c.summary?.overall_status);
+      const fromTime = c.pull_window?.from ? new Date(c.pull_window.from).toUTCString().replace(' GMT','') : '—';
+      const toTime = c.pull_window?.to ? new Date(c.pull_window.to).toUTCString().replace(' GMT','') : '—';
       return `
         <div class="case-card ${sc === 'multi' ? 'multi-channel' : ''}" onclick="this.classList.toggle('expanded')">
           <div class="case-header">
             <div class="case-date">${c.date || '—'}</div>
             <div class="case-status ${sc}">${c.summary?.overall_status || 'UNKNOWN'}</div>
-            <div class="case-summary">${c.summary?.total_anomalies || 0} anomalies · ${c.summary?.feeds_active || 0} feeds</div>
+            <div class="case-summary">${c.summary?.total_anomalies || 0} anomalies · ${c.summary?.feeds_active || 0} feeds active</div>
             <div class="case-expand-icon">▾</div>
           </div>
           <div class="case-body">
+            <div style="font-family:var(--mono);font-size:0.58rem;color:var(--dim);margin-bottom:16px;letter-spacing:0.08em">
+              PULL WINDOW &nbsp;·&nbsp; ${fromTime} → ${toTime}
+            </div>
             ${renderFeedStats(c.feed_stats)}
             ${c.summary?.cross_channel_flags?.length > 0
-              ? `<div style="font-family:var(--mono);font-size:0.62rem;color:var(--amber);margin-bottom:12px;letter-spacing:0.08em">⚠ ${c.summary.cross_channel_flags.join(' · ')}</div>`
+              ? `<div style="font-family:var(--mono);font-size:0.62rem;color:var(--amber);margin-bottom:12px;letter-spacing:0.08em;padding:8px;border:1px solid var(--amber-dim);background:var(--amber-glow)">⚠ ${c.summary.cross_channel_flags.join(' · ')}</div>`
               : ''}
             ${renderAnomalies(c.anomalies)}
           </div>
