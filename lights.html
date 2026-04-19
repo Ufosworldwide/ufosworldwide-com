@@ -995,7 +995,7 @@ function detectLocation() {
 
 
 // ── GOOGLE SHEETS ENDPOINT ─────────────────────────
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwT2e3gpcjyV3f2keheFftORNxUU5Ru_uObz70ErF-hif0mUs7lEtElV0K2V4QFSKmx/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzCRV599wN-OzdRRLAyUJi4cOOEInCBF3O49SPKWiE/exec';
 
 // ── FORM SUBMIT ────────────────────────────────────
 async function submitSighting() {
@@ -1038,12 +1038,28 @@ async function submitSighting() {
   btn.textContent = 'Transmitting…';
 
   try {
-    // Send to Google Sheets
-    await fetch(SHEETS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(sighting)
+    // Build URL with all fields as query params (GET works fine with Apps Script)
+    const params = new URLSearchParams({
+      name:        sighting.name,
+      email:       sighting.email,
+      date:        sighting.date,
+      time:        sighting.time,
+      location:    sighting.location,
+      colour:      sighting.colour,
+      duration:    sighting.duration,
+      behaviours:  sighting.behaviours.join(', '),
+      environment: sighting.environment.join(', '),
+      repeat:      sighting.repeat,
+      desc:        sighting.desc,
+      submitted:   sighting.submitted
+    });
+
+    // Use image ping — fires a GET, no CORS issue, no response needed
+    const ping = new Image();
+    ping.src = SHEETS_URL + '?' + params.toString();
+    await new Promise(resolve => {
+      ping.onload = ping.onerror = resolve;
+      setTimeout(resolve, 5000); // max 5s wait
     });
   } catch(err) {
     console.warn('Sheet sync error (data still saved locally):', err);
