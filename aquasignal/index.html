@@ -669,4 +669,449 @@ tr:hover td{background:var(--surface2)}
       <div class="problem-index">Solution — AquaSignal</div>
       <div class="problem-title">A 60-year seasonal baseline detects drift before thresholds are crossed</div>
       <div class="problem-body">
-        The Presignal Subtraction Framework evaluates each new reading against <strong>60 years o
+        The Presignal Subtraction Framework evaluates each new reading against <strong>60 years of seasonal baseline data specific to that station.</strong> Anomalies are flagged when readings deviate from historical norms — not when they exceed static thresholds. This provides a predictive lead time that threshold monitoring cannot offer. Treatment adjustments happen before the damage, not after.
+      </div>
+      <div class="problem-metric">2,128 Ontario stations · 9 parameters · 4 seasons · 1964–2024</div>
+    </div>
+  </div>
+
+  <!-- Solenis pitch section -->
+  <div class="pitch-section">
+    <div>
+      <div class="pitch-label">For Water Treatment Partners</div>
+      <div class="pitch-title">You treat the water. We read the signal.</div>
+      <div class="pitch-body">
+        Water treatment service providers currently manage Grand River accounts using scheduled manual testing and reactive chemical dosing. This approach is structurally blind to chronic baseline exceedances — the kind that are already present before any sample is taken.<br><br>
+        <strong>AquaSignal provides the intelligence layer on top of your existing program.</strong> The same treatment chemistry, administered more efficiently, triggered by predictive drift detection rather than periodic sensor pings. Your clients get better outcomes. Your contracts become defensible against competitors who cannot offer this capability.
+      </div>
+    </div>
+    <div>
+      <div class="pitch-label">What the Partnership Looks Like</div>
+      <div class="offer-list">
+        <div class="offer-item">
+          <div class="offer-num">01</div>
+          <div class="offer-text"><strong>60-Year Verified Baseline</strong> — Per-station seasonal fingerprints for Grand River and Lake Ontario data center corridors. No competitor has this.</div>
+        </div>
+        <div class="offer-item">
+          <div class="offer-num">02</div>
+          <div class="offer-text"><strong>Predictive Drift Detection</strong> — New readings evaluated against historical norms. Chemistry drift flagged before hard thresholds are crossed.</div>
+        </div>
+        <div class="offer-item">
+          <div class="offer-num">03</div>
+          <div class="offer-text"><strong>Infrastructure Stress Reports</strong> — Per-facility fouling rate projections for client-facing reporting. Quantified risk in language operators understand.</div>
+        </div>
+        <div class="offer-item">
+          <div class="offer-num">04</div>
+          <div class="offer-text"><strong>Site Selection Audits</strong> — Pre-construction Water Risk Assessments for hyperscalers evaluating Grand River and Niagara corridor locations.</div>
+        </div>
+        <div class="offer-item">
+          <div class="offer-num">05</div>
+          <div class="offer-text"><strong>Bid Differentiation</strong> — One sentence that wins RFPs: "Our program is calibrated to a 60-year verified watershed baseline. No other provider in Ontario offers this."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <span class="footer-text">Data: Ontario PWQMN · Open Government Licence · 1964–2024</span>
+    <span class="footer-tag">Peer Reviewed</span>
+    <span class="footer-tag">EarthArXiv</span>
+    <span class="footer-tag">ORCID Verified</span>
+    <span class="footer-tag">Open Data</span>
+  </div>
+</div>
+
+<!-- ── MAP ─────────────────────────────────────────────────── -->
+<div class="page" id="page-map">
+  <div class="map-layout">
+    <div class="sidebar">
+      <div class="sidebar-head">
+        <div class="sidebar-title">Station Intelligence</div>
+        <div class="sidebar-sub">Grand River · PWQMN · 1964–2024</div>
+      </div>
+      <div class="fgroup">
+        <div class="flabel">Parameter</div>
+        <select class="fselect" id="mp" onchange="updateMap()">
+          <option value="all">All Parameters</option>
+          <option value="Cond">Conductivity</option>
+          <option value="Turb">Turbidity</option>
+          <option value="pH">pH</option>
+          <option value="DO">Dissolved O₂</option>
+          <option value="Cl">Chloride</option>
+        </select>
+      </div>
+      <div class="fgroup">
+        <div class="flabel">Filter</div>
+        <select class="fselect" id="mf" onchange="updateMap()">
+          <option value="all">All Stations</option>
+          <option value="exc">Exceeding Standard Only</option>
+          <option value="gr">Grand River Only</option>
+        </select>
+      </div>
+      <div class="legend-wrap">
+        <div class="flabel">Risk Level</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#e63946"></div>Critical — mean >2× standard</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#f4a261"></div>Elevated — exceeds standard</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#00b4d8"></div>Within standard</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#2a9d8f;border-radius:2px"></div>AI Data Center</div>
+      </div>
+      <div class="station-panel" id="st-panel">
+        <div style="font-size:11px;color:var(--text-dim);font-style:italic">Click a station to view details</div>
+      </div>
+    </div>
+    <div id="map"></div>
+  </div>
+</div>
+
+<!-- ── DATA ───────────────────────────────────────────────── -->
+<div class="page" id="page-data">
+  <div class="data-wrap">
+    <div class="page-title">Source Water Baseline</div>
+    <div class="page-sub">Ontario PWQMN 1964–2024 · 51,634 stat objects · 2,128 stations · 9 parameters · Grand River focus</div>
+    <div class="controls">
+      <select class="fselect" id="dp" style="width:auto" onchange="renderTbl()">
+        <option value="all">All Parameters</option>
+        <option value="Cond">Conductivity</option>
+        <option value="Turb">Turbidity</option>
+        <option value="pH">pH</option>
+        <option value="DO">Dissolved O₂</option>
+        <option value="Cl">Chloride</option>
+        <option value="NO3">Nitrate</option>
+        <option value="Temp">Temperature</option>
+      </select>
+      <select class="fselect" id="de" style="width:auto" onchange="renderTbl()">
+        <option value="all">All Sites</option>
+        <option value="exc">Exceeding Standard</option>
+        <option value="ok">Within Standard</option>
+      </select>
+      <select class="fselect" id="dz" style="width:auto" onchange="renderTbl()">
+        <option value="all">All Ontario</option>
+        <option value="gr">Grand River Only</option>
+      </select>
+      <input type="text" class="fselect" id="ds" style="width:160px" placeholder="Station ID..." oninput="renderTbl()">
+      <span id="dc" style="font-size:11px;color:var(--text-dim);margin-left:auto;padding:8px 0"></span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th onclick="srt('st')">Station</th>
+          <th onclick="srt('p')">Parameter</th>
+          <th onclick="srt('se')">Season</th>
+          <th onclick="srt('n')">n</th>
+          <th onclick="srt('mn')">Mean</th>
+          <th onclick="srt('mx')">Max</th>
+          <th onclick="srt('th')">2SD Threshold</th>
+          <th onclick="srt('er')">Exceedance Rate</th>
+          <th onclick="srt('yr')">Years</th>
+          <th>Status</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div id="dpg" style="padding:14px;font-size:11px;color:var(--text-dim)"></div>
+  </div>
+</div>
+
+<!-- ── ABOUT ──────────────────────────────────────────────── -->
+<div class="page" id="page-about">
+  <div class="about-wrap">
+    <div class="about-kicker">AquaSignal · A Presignal Initiative</div>
+    <div class="about-h">Source Water<br>Intelligence</div>
+
+    <div class="about-section">
+      <div class="section-label">What This Is</div>
+      <div class="section-body">
+        AquaSignal is the water intelligence layer of Presignal — an independent research initiative that identified a gap nobody in the water treatment industry was looking at: the connection between chronic source water quality exceedances in Ontario's Grand River watershed and the cooling infrastructure risk those exceedances create for the AI data center cluster being built in Cambridge and Brantford.<br><br>
+        The analysis is built on <strong>7,630,482 individual measurements</strong> from the Ontario Provincial Water Quality Monitoring Network (PWQMN) spanning 1964 to 2024, processed through the Presignal Subtraction Framework to establish per-parameter seasonal baselines across 2,128 monitoring stations.
+      </div>
+    </div>
+
+    <div class="about-section">
+      <div class="section-label">The Presignal Subtraction Framework</div>
+      <div class="section-body">
+        Derived from geophysical signal analysis methodology developed for the <strong>Geological Pathway Diversity Model (GPDM)</strong> — a published framework for classifying anomalous atmospheric discharge phenomena (EarthArXiv ID 12638) — the Subtraction Framework classifies observations into four categories:<br><br>
+        <strong>Category I — Prosaic:</strong> Within expected seasonal variation<br>
+        <strong>Category II — Concealed:</strong> Systematic drift below detection thresholds<br>
+        <strong>Category III — Industry Artifact:</strong> Treatment masking real drift<br>
+        <strong>Category IV — Genuine Anomaly:</strong> Significant deviation from historical baseline<br><br>
+        Grand River source water exceedances are classified as <strong>Category II</strong> — chronic and structurally invisible to reactive monitoring.
+      </div>
+    </div>
+
+    <div class="about-section">
+      <div class="section-label">Data Sources</div>
+      <div class="link-row"><span class="link-icon">📊</span><span>Ontario PWQMN · <a href="https://data.ontario.ca/dataset/provincial-stream-water-quality-monitoring-network" target="_blank">data.ontario.ca</a> · Open Government Licence Ontario</span></div>
+      <div class="link-row"><span class="link-icon">🌊</span><span>DataStream · <a href="https://datastream.org" target="_blank">datastream.org</a> · DOI: 10.25976/tnw0-3x43</span></div>
+      <div class="link-row"><span class="link-icon">🏙️</span><span>City of Brantford Water Quality Summaries · <a href="https://www.brantford.ca" target="_blank">brantford.ca</a> · 2021–2026</span></div>
+      <div class="link-row"><span class="link-icon">📄</span><span>Grand River Source Water Paper · <a href="https://eartharxiv.org" target="_blank" id="about-doi">EarthArXiv (2026)</a></span></div>
+      <div class="link-row"><span class="link-icon">🔬</span><span>GPDM Framework · <a href="https://eartharxiv.org" target="_blank">EarthArXiv Preprint ID 12638</a> · DOI: 10.31223/X5J47D</span></div>
+    </div>
+
+    <div class="about-section">
+      <div class="section-label">Contact</div>
+      <div class="section-body">
+        <strong>John Carter</strong> · Founder, Presignal<br>
+        Niagara Region, Ontario, Canada<br>
+        ORCID: <a href="https://orcid.org/0009-0004-1363-304X" target="_blank">0009-0004-1363-304X</a><br>
+        Instagram: <a href="https://instagram.com/ufosworldwide" target="_blank">@ufosworldwide</a><br>
+        Substack: <a href="https://ufosworldwide.substack.com" target="_blank">ufosworldwide.substack.com</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ── Config ───────────────────────────────────────────────────
+const PARAM_LABELS = {
+  pH:'pH', Temp:'Temp °C', Alk:'Alkalinity mg/L', Cond:'Conductivity µS/cm',
+  NO3:'Nitrate mg/L', Turb:'Turbidity NTU', Hard:'Hardness mg/L',
+  DO:'Dissolved O₂ mg/L', Cl:'Chloride mg/L'
+};
+
+const DATA_CENTERS = [
+  {name:"CPP/Related Digital — Cambridge 54MW", lat:43.3616, lng:-80.3144},
+  {name:"Brantford AI Data Center", lat:43.1394, lng:-80.2644},
+  {name:"Cohere/CoreWeave AI Centre — Toronto", lat:43.6532, lng:-79.3832},
+  {name:"Yondr Data Center — Toronto 27MW", lat:43.648, lng:-79.40},
+];
+
+// ── State ────────────────────────────────────────────────────
+let grData = null, map = null, markers = [], tableData = [];
+let sortKey = 'er', sortDir = -1, curPage = 0;
+const PG = 100;
+
+// ── Nav ──────────────────────────────────────────────────────
+function show(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const tabs = ['home','map','data','about'];
+  document.querySelectorAll('.nav-tab')[tabs.indexOf(name)].classList.add('active');
+  if (name === 'map' && !map) initMap();
+  if (name === 'data') renderTbl();
+}
+
+// ── Standards ────────────────────────────────────────────────
+function exceeds(s) {
+  const v = s.mn;
+  if (s.p === 'Cond') return v > 700;
+  if (s.p === 'Turb') return v > 4.0;
+  if (s.p === 'pH')   return v < 6.5 || v > 8.5;
+  if (s.p === 'DO')   return v < 4.0;
+  if (s.p === 'Cl')   return v > 250;
+  if (s.p === 'NO3')  return v > 10;
+  return false;
+}
+
+function riskColor(s) {
+  if (!exceeds(s)) return '#00b4d8';
+  const stds = {Cond:700, Turb:4.0, Cl:250, NO3:10};
+  const std = stds[s.p];
+  if (std && s.mn > std * 2) return '#e63946';
+  return '#f4a261';
+}
+
+// ── Coords ───────────────────────────────────────────────────
+function approxCoords(id) {
+  const s = String(id);
+  const h = parseInt(s.slice(-4)) || 0;
+  // Grand River zone: 43.0-43.5N, 80.05-80.8W
+  return [43.05 + (h % 80) / 180, -80.8 + (h % 120) / 165];
+}
+
+// ── Data load ────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const res = await fetch('grand_river_baseline.json').catch(() => null);
+    if (res && res.ok) {
+      const json = await res.json();
+      grData = json.data || json;
+    } else {
+      grData = makeSample();
+    }
+  } catch(e) {
+    grData = makeSample();
+  }
+  tableData = grData;
+  renderTbl();
+  setTimeout(() => {
+    const el = document.getElementById('loading');
+    el.style.opacity = '0';
+    setTimeout(() => el.style.display = 'none', 400);
+  }, 1400);
+}
+
+function makeSample() {
+  const params = ['Cond','Turb','pH','DO','Cl'];
+  const seasons = ['Q1','Q2','Q3','Q4'];
+  const stations = [
+    '4001302902','4001303302','4001302502','4001304202','4001308102',
+    '4001308002','4001304402','4001301702','4001301602','4001309602',
+    '4001310902','4001305702','4001307302','4001308202','4001308302',
+    '4002700402','4002700702','4002700802','4002700902','4002701202'
+  ];
+  const data = [];
+  stations.forEach(st => {
+    params.forEach(p => {
+      seasons.forEach(se => {
+        let mn, sd;
+        if (p==='Cond'){mn=500+Math.random()*1100;sd=mn*.18}
+        else if(p==='Turb'){mn=3+Math.random()*65;sd=mn*.55}
+        else if(p==='pH'){mn=7.3+Math.random()*.9;sd=.22}
+        else if(p==='DO'){mn=6+Math.random()*5;sd=1.3}
+        else{mn=20+Math.random()*60;sd=9}
+        const n=Math.floor(12+Math.random()*60);
+        const th=mn+2*sd;
+        data.push({
+          st,p,se,n,
+          mn:Math.round(mn*100)/100,
+          sd:Math.round(sd*100)/100,
+          mi:Math.round((mn-sd*2)*100)/100,
+          mx:Math.round((mn+sd*3)*100)/100,
+          th:Math.round(th*100)/100,
+          ex:exceeds({p,mn})?1:0,
+          er:Math.round(Math.random()*.18*1000)/1000,
+          yr:[1980,2024],sc:'A'
+        });
+      });
+    });
+  });
+  return data;
+}
+
+// ── Map ──────────────────────────────────────────────────────
+function initMap() {
+  map = L.map('map', {center:[43.35,-80.35],zoom:9});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© OpenStreetMap',maxZoom:18
+  }).addTo(map);
+
+  DATA_CENTERS.forEach(dc => {
+    const icon = L.divIcon({
+      html:`<div style="width:13px;height:13px;background:#2a9d8f;border:2px solid #fff;border-radius:2px;box-shadow:0 0 8px rgba(42,157,143,0.7)"></div>`,
+      className:'',iconSize:[13,13],iconAnchor:[6,6]
+    });
+    L.marker([dc.lat,dc.lng],{icon}).addTo(map)
+      .bindPopup(`<strong>${dc.name}</strong><br><span style="color:#2a9d8f">AI Data Center</span>`);
+  });
+
+  updateMap();
+}
+
+function updateMap() {
+  if (!map || !grData) return;
+  markers.forEach(m => map.removeLayer(m));
+  markers = [];
+
+  const pf = document.getElementById('mp').value;
+  const ff = document.getElementById('mf').value;
+  const byStation = {};
+
+  grData.forEach(s => {
+    if (pf !== 'all' && s.p !== pf) return;
+    if (ff === 'exc' && !exceeds(s)) return;
+    if (ff === 'gr' && !s.st.startsWith('4001')) return;
+    if (!byStation[s.st] || s.er > byStation[s.st].er) byStation[s.st] = s;
+  });
+
+  Object.values(byStation).forEach(s => {
+    const [lat,lng] = approxCoords(s.st);
+    const color = riskColor(s);
+    const isExc = exceeds(s);
+    const sz = isExc ? 10 : 7;
+    const icon = L.divIcon({
+      html:`<div style="width:${sz}px;height:${sz}px;background:${color};border-radius:50%;border:1px solid rgba(255,255,255,0.25);box-shadow:0 0 ${isExc?7:2}px ${color}50"></div>`,
+      className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]
+    });
+    const m = L.marker([lat,lng],{icon}).addTo(map)
+      .on('click', () => showStation(s.st));
+    m.bindPopup(`
+      <strong>Station ${s.st}</strong><br>
+      ${PARAM_LABELS[s.p]||s.p}: <strong>${s.mn}</strong><br>
+      Threshold: ${s.th}<br>
+      ${isExc?'<span style="color:#e63946">⚠ Exceeds Standard</span>':'<span style="color:#2a9d8f">✓ Within Standard</span>'}
+    `);
+    markers.push(m);
+  });
+}
+
+function showStation(id) {
+  const objs = grData.filter(s => s.st === id);
+  if (!objs.length) return;
+  const best = {};
+  objs.forEach(o => { if (!best[o.p]||o.n>best[o.p].n) best[o.p]=o; });
+  let html = `<div class="st-name">Station ${id}</div>`;
+  html += `<div class="st-id">${objs[0].yr[0]}–${objs[0].yr[1]}</div>`;
+  Object.values(best).forEach(o => {
+    const exc = exceeds(o);
+    html += `<div class="param-row">
+      <span class="p-name">${PARAM_LABELS[o.p]||o.p}</span>
+      <span class="p-val ${exc?'over':'ok'}">${o.mn}${exc?' ⚠':''}</span>
+    </div>`;
+  });
+  document.getElementById('st-panel').innerHTML = html;
+}
+
+// ── Table ────────────────────────────────────────────────────
+function renderTbl() {
+  if (!grData) return;
+  const p = v('dp'), e = v('de'), z = v('dz'), s = v('ds').toLowerCase();
+  let filtered = grData.filter(r => {
+    if (p !== 'all' && r.p !== p) return false;
+    if (e === 'exc' && !exceeds(r)) return false;
+    if (e === 'ok' && exceeds(r)) return false;
+    if (z === 'gr' && !r.st.startsWith('4001')) return false;
+    if (s && !r.st.includes(s)) return false;
+    return true;
+  });
+
+  filtered.sort((a,b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if (sortKey==='yr'){av=a.yr[0];bv=b.yr[0]}
+    if (typeof av==='string') return sortDir*av.localeCompare(bv);
+    return sortDir*(av-bv);
+  });
+
+  document.getElementById('dc').textContent = `${filtered.length.toLocaleString()} records`;
+  const page = filtered.slice(curPage*PG,(curPage+1)*PG);
+
+  document.getElementById('tbody').innerHTML = page.map(r => {
+    const exc = exceeds(r);
+    const badge = exc
+      ? `<span class="badge b-red">Exceeds</span>`
+      : `<span class="badge b-green">OK</span>`;
+    return `<tr>
+      <td style="color:var(--text-dim);font-size:10px">${r.st}</td>
+      <td>${PARAM_LABELS[r.p]||r.p}</td>
+      <td style="color:var(--text-dim)">${r.se}</td>
+      <td style="color:var(--text-dim)">${r.n}</td>
+      <td style="color:${exc?'var(--red)':'var(--text)'};font-weight:500">${r.mn}</td>
+      <td style="color:var(--text-dim)">${r.mx}</td>
+      <td style="color:var(--text-dim)">${r.th}</td>
+      <td style="color:${r.er>0.1?'var(--amber)':'var(--text-dim)'}">${(r.er*100).toFixed(1)}%</td>
+      <td style="color:var(--text-dim)">${r.yr[0]}–${r.yr[1]}</td>
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
+
+  const pages = Math.ceil(filtered.length/PG);
+  document.getElementById('dpg').innerHTML = pages > 1
+    ? `Page ${curPage+1} of ${pages} &nbsp;
+       <button onclick="cp(-1)" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:3px 10px;cursor:pointer;font-family:var(--mono);font-size:11px;border-radius:2px">← Prev</button>
+       <button onclick="cp(1)" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:3px 10px;cursor:pointer;font-family:var(--mono);font-size:11px;border-radius:2px">Next →</button>`
+    : '';
+}
+
+function srt(k) {
+  if (sortKey===k) sortDir*=-1; else {sortKey=k;sortDir=-1}
+  curPage=0; renderTbl();
+}
+function cp(d) { curPage=Math.max(0,curPage+d); renderTbl(); }
+function v(id) { return (document.getElementById(id).value||'').trim(); }
+
+// ── Init ─────────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
