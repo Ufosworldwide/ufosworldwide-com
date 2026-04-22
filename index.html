@@ -427,7 +427,7 @@
 
   .feed-stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
     margin: 16px 0;
   }
@@ -597,6 +597,7 @@
   <div class="header-status">
     <div class="status-dot"></div>
     <span id="last-updated">INITIALIZING...</span>
+    <a href="https://docs.google.com/spreadsheets/d/1Rt55Hs_sErBOm3kHRARc9Xap0N0WlmzeDuucDZ2lFmk" target="_blank" style="font-family:var(--mono);font-size:0.58rem;color:var(--amber);letter-spacing:0.12em;text-decoration:none;border:1px solid var(--amber-dim);padding:4px 10px;margin-left:16px;background:var(--amber-glow)">⬡ DATA LOG</a>
   </div>
 </header>
 
@@ -681,6 +682,8 @@
     <button class="control-btn" onclick="filterPins('kp_geomagnetic', this)">Geomagnetic</button>
     <button class="control-btn" onclick="filterPins('donki_solar', this)">Solar</button>
     <button class="control-btn" onclick="filterPins('donki_cme', this)">CME</button>
+    <button class="control-btn" onclick="filterPins('solar_wind', this)">Solar Wind</button>
+    <button class="control-btn" onclick="filterPins('goes_xray', this)">X-Ray</button>
     <div class="hotspot-badge" id="hotspot-count">⬡ Loading hotspots...</div>
   </div>
   <div class="map-wrapper">
@@ -692,6 +695,10 @@
     <div class="legend-item"><div class="legend-dot" style="background:#ffaa00"></div>Geomagnetic</div>
     <div class="legend-item"><div class="legend-dot" style="background:#ff6b00"></div>Solar Flare</div>
     <div class="legend-item"><div class="legend-dot" style="background:#cc2200"></div>CME</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#00cc66"></div>Solar Wind</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ff4488"></div>X-Ray</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#aa88ff"></div>Schumann</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#00ddff"></div>TEC</div>
     <div class="legend-item"><div class="legend-dot" style="background:#ff0055; box-shadow: 0 0 6px #ff0055"></div>Hotspot Cluster</div>
   </div>
 </section>
@@ -728,7 +735,12 @@ const sourceColors = {
   usgs_seismic: '#0088ff',
   kp_geomagnetic: '#ffaa00',
   donki_solar: '#ff6b00',
-  donki_cme: '#cc2200'
+  donki_cme: '#cc2200',
+  solar_wind: '#00cc66',
+  f107_solar_flux: '#ffdd00',
+  goes_xray: '#ff4488',
+  schumann_proxy: '#aa88ff',
+  ionosphere_tec: '#00ddff'
 };
 
 const severityRadius = {
@@ -833,8 +845,9 @@ async function loadMap() {
 // ─── CASES ───
 function statusClass(status) {
   if (!status) return 'normal';
+  if (status.includes('PLANETARY CHAIN') || status.includes('CME CHAIN')) return 'multi';
   if (status.includes('MULTI')) return 'multi';
-  if (status.includes('NORMAL')) return 'normal';
+  if (status.includes('NORMAL') || status.includes('BASELINE')) return 'normal';
   return 'detected';
 }
 
@@ -874,6 +887,46 @@ function renderFeedStats(stats) {
         ['X-class flares', 'x_class_flares'],
         ['CMEs detected', 'cmes_detected'],
         ['Earth-directed CMEs', 'earth_directed_cmes']
+      ]
+    },
+    {
+      key: 'solar_wind', label: 'SOLAR WIND', color: '#00cc66',
+      fields: [
+        ['Speed km/s', 'speed_kms'],
+        ['Density p/cm³', 'density_pcm3'],
+        ['Bt nT', 'bt_nT'],
+        ['Bz nT', 'bz_nT'],
+        ['Geoeffective', 'geoeffective']
+      ]
+    },
+    {
+      key: 'f107_solar_flux', label: 'F10.7 SOLAR FLUX', color: '#ffdd00',
+      fields: [
+        ['Flux sfu', 'flux_sfu']
+      ]
+    },
+    {
+      key: 'goes_xray', label: 'GOES X-RAY', color: '#ff4488',
+      fields: [
+        ['Current class', 'current_class'],
+        ['Peak class 24h', 'peak_class_24h'],
+        ['Current flux', 'current_flux']
+      ]
+    },
+    {
+      key: 'schumann_proxy', label: 'SCHUMANN PROXY', color: '#aa88ff',
+      fields: [
+        ['Dst nT', 'dst_nT'],
+        ['Min Dst 12h', 'min_dst_12h'],
+        ['SR disturbance', 'sr_disturbance_likely']
+      ]
+    },
+    {
+      key: 'ionosphere_tec', label: 'IONOSPHERE TEC', color: '#00ddff',
+      fields: [
+        ['Bz nT', 'bz_nT'],
+        ['Bt nT', 'bt_nT'],
+        ['TEC disturbance', 'tec_disturbance']
       ]
     }
   ];
