@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFOs Worldwide — Light Sightings Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --black: #060608;
+    --deep: #0a0b10;
+    --void: #0f1018;
+    --orb-gold: #e8c96d;
+    --orb-amber: #f0a830;
+    --orb-white: #f5f0e8;
+    --orb-pale: #c8d8f0;
+    --orb-blue: #6090d8;
+    --text-primary: #e8e4dc;
+    --text-muted: #8a8880;
+    --text-faint: #4a4846;
+    --border: rgba(232, 201, 109, 0.15);
+    --border-strong: rgba(232, 201, 109, 0.35);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--text-primary);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── SKY CANVAS ── */
+  #sky {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px 40px;
+  }
+
+  .site-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--orb-gold);
+    opacity: 0.7;
+    margin-bottom: 32px;
+    animation: fadeUp 1.2s ease both;
+    animation-delay: 0.2s;
+  }
+
+  .hero-title {
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: clamp(38px, 8vw, 96px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--orb-white);
+    margin-bottom: 20px;
+    animation: fadeUp 1.2s ease both;
+    animation-delay: 0.4s;
+  }
+
+  .hero-title span {
+    display: block;
+    color: var(--orb-gold);
+    font-size: 0.45em;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    margin-top: 12px;
+  }
+
+  .hero-sub {
+    max-width: 560px;
+    font-size: 18px;
+    font-style: italic;
+    color: var(--text-muted);
+    margin-bottom: 48px;
+    animation: fadeUp 1.2s ease both;
+    animation-delay: 0.6s;
+  }
+
+  .scroll-cue {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    animation: pulse 2.5s ease infinite;
+    animation-delay: 2s;
+    cursor: pointer;
+  }
+
+  /* ── DIVIDER ── */
+  .section-divide {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 40px;
+    margin: 40px auto;
+    max-width: 900px;
+  }
+  .section-divide::before,
+  .section-divide::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+  }
+  .section-divide-icon {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--orb-gold);
+    box-shadow: 0 0 12px var(--orb-amber), 0 0 24px rgba(232, 201, 109, 0.3);
+    flex-shrink: 0;
+  }
+
+  /* ── FORM SECTION ── */
+  .form-section {
+    position: relative;
+    z-index: 10;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--orb-gold);
+    opacity: 0.6;
+    margin-bottom: 8px;
+  }
+
+  .section-heading {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(22px, 4vw, 34px);
+    font-weight: 600;
+    color: var(--orb-white);
+    margin-bottom: 12px;
+  }
+
+  .section-body {
+    font-size: 16px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 40px;
+    max-width: 520px;
+  }
+
+  /* ── FORM ── */
+  .report-form {
+    display: grid;
+    gap: 24px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--orb-gold);
+    opacity: 0.75;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-primary);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 16px;
+    font-weight: 300;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23e8c96d' opacity='0.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  .field select option {
+    background: #0f1018;
+    color: var(--text-primary);
+  }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color: var(--border-strong);
+    background: rgba(255,255,255,0.05);
+    box-shadow: 0 0 0 1px rgba(232, 201, 109, 0.15), 0 0 20px rgba(232, 201, 109, 0.05);
+  }
+
+  .field textarea {
+    resize: vertical;
+    min-height: 130px;
+    line-height: 1.6;
+  }
+
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: var(--text-faint);
+    font-style: italic;
+  }
+
+  /* ── CHECKBOX GROUP ── */
+  .checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    font-size: 14px;
+    color: var(--text-muted);
+    user-select: none;
+  }
+
+  .check-item:hover {
+    border-color: var(--border-strong);
+    background: rgba(232, 201, 109, 0.04);
+    color: var(--text-primary);
+  }
+
+  .check-item input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--orb-gold);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ── LOCATION ROW ── */
+  .location-detect {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  .location-detect .field { flex: 1; }
+  .detect-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--orb-gold);
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 13px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .detect-btn:hover {
+    background: rgba(232, 201, 109, 0.08);
+    border-color: var(--border-strong);
+  }
+  .detect-btn.detecting {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* ── SUBMIT ── */
+  .submit-btn {
+    width: 100%;
+    padding: 18px 32px;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--orb-gold);
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+    margin-top: 8px;
+  }
+
+  .submit-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(232, 201, 109, 0.08), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
+  .submit-btn:hover::before { transform: translateX(100%); }
+  .submit-btn:hover {
+    background: rgba(232, 201, 109, 0.06);
+    box-shadow: 0 0 24px rgba(232, 201, 109, 0.15);
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* ── SUCCESS ── */
+  .success-panel {
+    display: none;
+    text-align: center;
+    padding: 48px 32px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: rgba(232, 201, 109, 0.03);
+  }
+  .success-panel.visible { display: block; }
+  .success-orb {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff8e0, var(--orb-amber));
+    box-shadow: 0 0 30px var(--orb-gold), 0 0 60px rgba(232, 201, 109, 0.3);
+    margin: 0 auto 24px;
+    animation: orbPulse 2.5s ease infinite;
+  }
+  .success-title {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    color: var(--orb-white);
+    margin-bottom: 10px;
+  }
+  .success-sub {
+    font-size: 15px;
+    font-style: italic;
+    color: var(--text-muted);
+  }
+
+  /* ── ARCHIVE SECTION ── */
+  .archive-section {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .filter-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover,
+  .filter-btn.active {
+    border-color: var(--border-strong);
+    color: var(--orb-gold);
+    background: rgba(232, 201, 109, 0.05);
+  }
+
+  /* ── SIGHTING CARDS ── */
+  .sightings-grid {
+    display: grid;
+    gap: 20px;
+  }
+
+  .sighting-card {
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 28px 32px;
+    background: rgba(255,255,255,0.02);
+    transition: border-color 0.25s, background 0.25s;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .sighting-card:hover {
+    border-color: var(--border-strong);
+    background: rgba(232, 201, 109, 0.03);
+  }
+
+  .sighting-orb {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .orb-type-continuous {
+    background: radial-gradient(circle at 35% 35%, #fff8e0, #f0b830);
+    box-shadow: 0 0 16px rgba(240, 184, 48, 0.6);
+  }
+  .orb-type-episodic {
+    background: radial-gradient(circle at 35% 35%, #e8f0ff, #4080d0);
+    box-shadow: 0 0 16px rgba(64, 128, 208, 0.6);
+  }
+  .orb-type-pulsing {
+    background: radial-gradient(circle at 35% 35%, #ffe8f8, #c060a0);
+    box-shadow: 0 0 16px rgba(192, 96, 160, 0.6);
+    animation: orbPulse 2s ease infinite;
+  }
+  .orb-type-stationary {
+    background: radial-gradient(circle at 35% 35%, #e8ffe8, #40c080);
+    box-shadow: 0 0 16px rgba(64, 192, 128, 0.6);
+  }
+  .orb-type-multiple {
+    background: radial-gradient(circle at 35% 35%, #fff0e0, #e06820);
+    box-shadow: 0 0 16px rgba(224, 104, 32, 0.6);
+  }
+
+  .sighting-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 8px;
+    align-items: baseline;
+  }
+
+  .sighting-name {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--orb-white);
+  }
+
+  .sighting-location {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--orb-gold);
+    opacity: 0.7;
+  }
+
+  .sighting-datetime {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text-faint);
+    margin-left: auto;
+  }
+
+  .sighting-desc {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.65;
+    font-style: italic;
+  }
+
+  .sighting-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border: 1px solid rgba(232, 201, 109, 0.2);
+    border-radius: 2px;
+    color: var(--text-faint);
+  }
+
+  .no-sightings {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-faint);
+    font-style: italic;
+    font-size: 16px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+
+  /* ── SIGNAL PATTERNS ── */
+  .patterns-section {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 120px;
+  }
+
+  .patterns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .pattern-card {
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 24px;
+    background: rgba(255,255,255,0.015);
+    text-align: center;
+  }
+
+  .pattern-value {
+    font-family: 'Cinzel', serif;
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--orb-gold);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .pattern-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 32px 24px 48px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+  }
+
+  footer a {
+    color: var(--orb-gold);
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  footer a:hover { opacity: 1; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50%       { opacity: 0.7; }
+  }
+
+  @keyframes orbPulse {
+    0%, 100% { transform: scale(1);   opacity: 1; }
+    50%       { transform: scale(1.1); opacity: 0.85; }
+  }
+
+  @keyframes starTwinkle {
+    0%, 100% { opacity: 0.7; }
+    50%       { opacity: 0.2; }
+  }
+
+  /* ── UTILITY ── */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- Starfield Canvas -->
+<canvas id="sky"></canvas>
+
+<!-- ══════════════════════════════════════ HERO ══════════════════════════════════════ -->
+<section class="hero">
+  <p class="site-tag">UFOs Worldwide — Lights Field Archive</p>
+
+  <h1 class="hero-title">
+    What Did You See?
+    <span>Global Light Sighting Registry</span>
+  </h1>
+
+  <p class="hero-sub">
+    Something moved through the dark. You weren't imagining it. 
+    Add your sighting to the archive — and help us find the signal in the noise.
+  </p>
+
+  <p class="scroll-cue" onclick="document.getElementById('report').scrollIntoView({behavior:'smooth'})">
+    ↓ &nbsp; Report a Sighting
+  </p>
+</section>
+
+<div class="section-divide"><div class="section-divide-icon"></div></div>
+
+<!-- ══════════════════════════════════════ FORM ══════════════════════════════════════ -->
+<section class="form-section" id="report">
+  <p class="section-label">Submit a Report</p>
+  <h2 class="section-heading">Document Your Sighting</h2>
+  <p class="section-body">Every detail matters. Timestamps, coordinates, and behaviour patterns are how anomalies become data.</p>
+
+  <div id="formWrap">
+    <form class="report-form" id="sightingForm" onsubmit="return false;">
+
+      <!-- Name + Contact -->
+      <div class="form-row">
+        <div class="field">
+          <label for="sName">Your Name</label>
+          <input type="text" id="sName" placeholder="First name or alias" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="sEmail">Email (optional — for follow-up)</label>
+          <input type="email" id="sEmail" placeholder="kept private, never published">
+        </div>
+      </div>
+
+      <!-- Date + Time -->
+      <div class="form-row">
+        <div class="field">
+          <label for="sDate">Date of Sighting</label>
+          <input type="date" id="sDate">
+        </div>
+        <div class="field">
+          <label for="sTime">Approximate Time</label>
+          <input type="time" id="sTime">
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="field">
+        <label>Nearest Location</label>
+        <div class="location-detect">
+          <div class="field" style="gap:0">
+            <input type="text" id="sLocation" placeholder="City, region, or landmark — e.g. Hessdalen Valley, Norway">
+          </div>
+          <button class="detect-btn" id="detectBtn" type="button" onclick="detectLocation()">
+            ⊕ Detect
+          </button>
+        </div>
+      </div>
+
+      <!-- Orb / Light Type -->
+      <div class="field">
+        <label>Light Behaviour (select all that apply)</label>
+        <div class="checkbox-group">
+          <label class="check-item"><input type="checkbox" value="continuous"> Continuous glow</label>
+          <label class="check-item"><input type="checkbox" value="pulsing"> Pulsing / breathing</label>
+          <label class="check-item"><input type="checkbox" value="episodic"> Appeared and vanished</label>
+          <label class="check-item"><input type="checkbox" value="moving"> Moved in flight</label>
+          <label class="check-item"><input type="checkbox" value="stationary"> Stationary / hovering</label>
+          <label class="check-item"><input type="checkbox" value="multiple"> Multiple lights</label>
+          <label class="check-item"><input type="checkbox" value="formation"> Formation / pattern</label>
+          <label class="check-item"><input type="checkbox" value="colour-shift"> Colour-shifting</label>
+          <label class="check-item"><input type="checkbox" value="silent"> Completely silent</label>
+          <label class="check-item"><input type="checkbox" value="sound"> Sound / hum noticed</label>
+        </div>
+      </div>
+
+      <!-- Colour -->
+      <div class="field">
+        <label for="sColour">Dominant Colour</label>
+        <select id="sColour">
+          <option value="">— Select —</option>
+          <option>White / brilliant white</option>
+          <option>Amber / golden orange</option>
+          <option>Yellow</option>
+          <option>Blue / blue-white</option>
+          <option>Red / red-orange</option>
+          <option>Green</option>
+          <option>Purple / violet</option>
+          <option>Multi-colour</option>
+          <option>Other / uncertain</option>
+        </select>
+      </div>
+
+      <!-- Duration -->
+      <div class="field">
+        <label for="sDuration">Approximate Duration</label>
+        <select id="sDuration">
+          <option value="">— Select —</option>
+          <option>Under 30 seconds</option>
+          <option>30 seconds – 2 minutes</option>
+          <option>2 – 10 minutes</option>
+          <option>10 – 30 minutes</option>
+          <option>30+ minutes</option>
+          <option>Ongoing / unknown</option>
+        </select>
+      </div>
+
+      <!-- Description -->
+      <div class="field">
+        <label for="sDesc">Describe What You Saw</label>
+        <textarea id="sDesc" placeholder="Include any details you remember — altitude, distance, how it moved, how it ended, any feelings or physical sensations. Nothing is too small."></textarea>
+      </div>
+
+      <!-- Geological / Environmental -->
+      <div class="field">
+        <label>Environmental Context (if known)</label>
+        <div class="checkbox-group">
+          <label class="check-item"><input type="checkbox" value="near-water"> Near water / lake</label>
+          <label class="check-item"><input type="checkbox" value="mountainous"> Mountainous terrain</label>
+          <label class="check-item"><input type="checkbox" value="fault-zone"> Known fault zone</label>
+          <label class="check-item"><input type="checkbox" value="mining"> Mine / mining region</label>
+          <label class="check-item"><input type="checkbox" value="storm-prior"> Storm in prior 24h</label>
+          <label class="check-item"><input type="checkbox" value="clear-sky"> Clear sky / low humidity</label>
+        </div>
+      </div>
+
+      <!-- Repeat -->
+      <div class="field">
+        <label for="sRepeat">Has this happened before at this location?</label>
+        <select id="sRepeat">
+          <option value="">— Select —</option>
+          <option value="first">First time I've seen it</option>
+          <option value="personal-repeat">I've seen it here before</option>
+          <option value="local-legend">Locals report it regularly</option>
+          <option value="unknown">I don't know</option>
+        </select>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" type="button" onclick="submitSighting()">
+        Submit Sighting to the Archive
+      </button>
+    </form>
+  </div>
+
+  <div class="success-panel" id="successPanel">
+    <div class="success-orb"></div>
+    <p class="success-title">Sighting Recorded</p>
+    <p class="success-sub">Thank you. Your account has been added to the archive.<br>Every data point brings the pattern closer to the surface.</p>
+    <br>
+    <button class="detect-btn" style="margin:0 auto;display:block" onclick="resetForm()">Submit Another</button>
+  </div>
+</section>
+
+<div class="section-divide"><div class="section-divide-icon"></div></div>
+
+<!-- ══════════════════════════════════════ PATTERNS ══════════════════════════════════════ -->
+<section class="patterns-section" id="patterns">
+  <p class="section-label">Signal Detection</p>
+  <h2 class="section-heading">Emerging Patterns</h2>
+  <p class="section-body" style="margin-bottom:0">Live statistics drawn from submitted sightings. The signal speaks through repetition.</p>
+
+  <div class="patterns-grid" id="patternsGrid">
+    <!-- Populated by JS -->
+  </div>
+</section>
+
+<div class="section-divide"><div class="section-divide-icon"></div></div>
+
+<!-- ══════════════════════════════════════ ARCHIVE ══════════════════════════════════════ -->
+<section class="archive-section" id="archive">
+  <p class="section-label">Field Archive</p>
+  <h2 class="section-heading">Recent Sightings</h2>
+
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" data-filter="all" onclick="filterSightings(this)">All</button>
+    <button class="filter-btn" data-filter="pulsing" onclick="filterSightings(this)">Pulsing</button>
+    <button class="filter-btn" data-filter="episodic" onclick="filterSightings(this)">Episodic</button>
+    <button class="filter-btn" data-filter="continuous" onclick="filterSightings(this)">Continuous</button>
+    <button class="filter-btn" data-filter="multiple" onclick="filterSightings(this)">Multiple</button>
+    <button class="filter-btn" data-filter="formation" onclick="filterSightings(this)">Formation</button>
+    <button class="filter-btn" data-filter="near-water" onclick="filterSightings(this)">Near Water</button>
+    <button class="filter-btn" data-filter="fault-zone" onclick="filterSightings(this)">Fault Zone</button>
+  </div>
+
+  <div class="sightings-grid" id="sightingsGrid">
+    <!-- Populated by JS -->
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ FOOTER ══════════════════════════════════════ -->
+<footer>
+  <p>UFOs Worldwide &nbsp;·&nbsp; <a href="https://ufosworldwide.substack.com" target="_blank">Substack</a> &nbsp;·&nbsp; <a href="https://instagram.com/ufosworldwide" target="_blank">Instagram</a> &nbsp;·&nbsp; All submissions remain confidential</p>
+</footer>
+
+<!-- ══════════════════════════════════════ SCRIPTS ══════════════════════════════════════ -->
+<script>
+// ── STARFIELD ──────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('sky');
+  const ctx    = canvas.getContext('2d');
+
+  let stars = [];
+  let orbs  = [];
+  let W, H;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function makeStars(n) {
+    stars = [];
+    for (let i = 0; i < n; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 0.9 + 0.2,
+        a: Math.random(),
+        speed: Math.random() * 0.008 + 0.002,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  function makeOrbs() {
+    orbs = [
+      { x: W*0.12, y: H*0.28, r:  5, color: 'rgba(240,184,48,',  speed: 0.0009, phase: 0.0 },
+      { x: W*0.78, y: H*0.18, r:  3, color: 'rgba(96,144,216,',  speed: 0.0013, phase: 1.2 },
+      { x: W*0.55, y: H*0.65, r:  4, color: 'rgba(245,240,232,',  speed: 0.0007, phase: 2.4 },
+      { x: W*0.88, y: H*0.72, r:  2.5, color:'rgba(192,96,160,', speed: 0.0011, phase: 0.8 },
+      { x: W*0.32, y: H*0.82, r:  3.5, color:'rgba(64,192,128,', speed: 0.0010, phase: 3.1 },
+    ];
+  }
+
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // gradient sky
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#060608');
+    grad.addColorStop(0.5, '#0a0b12');
+    grad.addColorStop(1, '#0d0e16');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // stars
+    stars.forEach(s => {
+      const alpha = 0.2 + 0.8 * (0.5 + 0.5 * Math.sin(t * s.speed * 60 + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(245,240,232,${alpha * s.a})`;
+      ctx.fill();
+    });
+
+    // floating orbs
+    orbs.forEach(o => {
+      const pulse = 0.6 + 0.4 * Math.sin(t * o.speed * 60 + o.phase);
+      const bloom = o.r * (1 + 0.3 * pulse);
+
+      // outer glow
+      const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, bloom * 8);
+      g.addColorStop(0,   o.color + (0.35 * pulse) + ')');
+      g.addColorStop(0.4, o.color + (0.12 * pulse) + ')');
+      g.addColorStop(1,   o.color + '0)');
+      ctx.beginPath();
+      ctx.arc(o.x, o.y, bloom * 8, 0, Math.PI*2);
+      ctx.fillStyle = g;
+      ctx.fill();
+
+      // core
+      ctx.beginPath();
+      ctx.arc(o.x, o.y, bloom, 0, Math.PI*2);
+      ctx.fillStyle = o.color + (0.85 * pulse) + ')';
+      ctx.fill();
+    });
+
+    t++;
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); makeStars(220); makeOrbs(); });
+  resize(); makeStars(220); makeOrbs(); draw();
+})();
+
+
+// ── LOCAL STORAGE DATA LAYER ───────────────────────
+const STORAGE_KEY = 'ufow_lights_sightings';
+
+function getSightings() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  } catch(e) { return []; }
+}
+
+function saveSighting(s) {
+  const all = getSightings();
+  all.unshift(s);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all.slice(0, 500)));
+}
+
+
+// ── GEOLOCATION ────────────────────────────────────
+function detectLocation() {
+  const btn = document.getElementById('detectBtn');
+  const inp = document.getElementById('sLocation');
+  btn.textContent = '…detecting';
+  btn.classList.add('detecting');
+
+  if (!navigator.geolocation) {
+    inp.placeholder = 'Geolocation not supported — enter manually';
+    btn.textContent = '⊕ Detect';
+    btn.classList.remove('detecting');
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const {latitude: lat, longitude: lng} = pos.coords;
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
+        .then(r => r.json())
+        .then(d => {
+          const a = d.address;
+          const loc = [a.city||a.town||a.village||a.county, a.state||a.province, a.country]
+            .filter(Boolean).join(', ');
+          inp.value = loc || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        })
+        .catch(() => { inp.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`; })
+        .finally(() => { btn.textContent='⊕ Detect'; btn.classList.remove('detecting'); });
+    },
+    () => {
+      inp.placeholder = 'Permission denied — enter manually';
+      btn.textContent = '⊕ Detect';
+      btn.classList.remove('detecting');
+    }
+  );
+}
+
+
+// ── GOOGLE SHEETS ENDPOINT ─────────────────────────
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzCRV599wN-OzdRRLAyUJi4cOOEInCBF3O49SPKWiE/exec';
+
+// ── FORM SUBMIT ────────────────────────────────────
+async function submitSighting() {
+  const name     = document.getElementById('sName').value.trim() || 'Anonymous';
+  const email    = document.getElementById('sEmail').value.trim() || '';
+  const location = document.getElementById('sLocation').value.trim() || 'Location unknown';
+  const date     = document.getElementById('sDate').value;
+  const time     = document.getElementById('sTime').value;
+  const colour   = document.getElementById('sColour').value;
+  const duration = document.getElementById('sDuration').value;
+  const desc     = document.getElementById('sDesc').value.trim();
+  const repeat   = document.getElementById('sRepeat').value;
+
+  const allChecked = [...document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked')];
+  const behaviourValues = ['continuous','pulsing','episodic','moving','stationary','multiple','formation','colour-shift','silent','sound'];
+  const environmentValues = ['near-water','mountainous','fault-zone','mining','storm-prior','clear-sky'];
+
+  const behaviours  = allChecked.filter(c => behaviourValues.includes(c.value)).map(c => c.value);
+  const environment = allChecked.filter(c => environmentValues.includes(c.value)).map(c => c.value);
+
+  if (!desc) {
+    document.getElementById('sDesc').focus();
+    document.getElementById('sDesc').style.borderColor = 'rgba(240,80,60,0.5)';
+    setTimeout(() => document.getElementById('sDesc').style.borderColor = '', 2000);
+    return;
+  }
+
+  const sighting = {
+    id: Date.now(),
+    name, email, location,
+    date: date || new Date().toISOString().slice(0,10),
+    time: time || '??:??',
+    colour, duration, desc, behaviours, environment, repeat,
+    submitted: new Date().toISOString()
+  };
+
+  // Disable button, show sending state
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Transmitting…';
+
+  try {
+    // Build URL with all fields as query params (GET works fine with Apps Script)
+    const params = new URLSearchParams({
+      name:        sighting.name,
+      email:       sighting.email,
+      date:        sighting.date,
+      time:        sighting.time,
+      location:    sighting.location,
+      colour:      sighting.colour,
+      duration:    sighting.duration,
+      behaviours:  sighting.behaviours.join(', '),
+      environment: sighting.environment.join(', '),
+      repeat:      sighting.repeat,
+      desc:        sighting.desc,
+      submitted:   sighting.submitted
+    });
+
+    // Use image ping — fires a GET, no CORS issue, no response needed
+    const ping = new Image();
+    ping.src = SHEETS_URL + '?' + params.toString();
+    await new Promise(resolve => {
+      ping.onload = ping.onerror = resolve;
+      setTimeout(resolve, 5000); // max 5s wait
+    });
+  } catch(err) {
+    console.warn('Sheet sync error (data still saved locally):', err);
+  }
+
+  // Always save locally too as backup
+  saveSighting(sighting);
+
+  btn.disabled = false;
+  btn.textContent = 'Submit Sighting to the Archive';
+
+  document.getElementById('formWrap').classList.add('hidden');
+  document.getElementById('successPanel').classList.add('visible');
+  renderArchive();
+  renderPatterns();
+}
+
+function resetForm() {
+  document.getElementById('sightingForm').reset();
+  document.getElementById('formWrap').classList.remove('hidden');
+  document.getElementById('successPanel').classList.remove('visible');
+}
+
+
+// ── ORB STYLE BY TYPE ──────────────────────────────
+function orbClass(behaviours) {
+  if (!behaviours || behaviours.length === 0) return 'orb-type-continuous';
+  if (behaviours.includes('pulsing'))    return 'orb-type-pulsing';
+  if (behaviours.includes('episodic'))   return 'orb-type-episodic';
+  if (behaviours.includes('multiple') || behaviours.includes('formation')) return 'orb-type-multiple';
+  if (behaviours.includes('stationary')) return 'orb-type-stationary';
+  return 'orb-type-continuous';
+}
+
+
+// ── RENDER ARCHIVE ─────────────────────────────────
+let currentFilter = 'all';
+
+function filterSightings(btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = btn.dataset.filter;
+  renderArchive();
+}
+
+function renderArchive() {
+  const all = getSightings();
+  const grid = document.getElementById('sightingsGrid');
+
+  const filtered = currentFilter === 'all'
+    ? all
+    : all.filter(s =>
+        (s.behaviours||[]).includes(currentFilter) ||
+        (s.environment||[]).includes(currentFilter)
+      );
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="no-sightings">No sightings in the archive yet — be the first to submit a report.</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(s => {
+    const tags = [...(s.behaviours||[]), ...(s.environment||[])]
+      .slice(0,6)
+      .map(t => `<span class="tag">${t}</span>`).join('');
+    const dateStr = s.date ? new Date(s.date+'T12:00').toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'}) : '—';
+    return `
+      <article class="sighting-card">
+        <div class="sighting-orb ${orbClass(s.behaviours)}"></div>
+        <div>
+          <div class="sighting-meta">
+            <span class="sighting-name">${escHtml(s.name)}</span>
+            <span class="sighting-location">◎ ${escHtml(s.location)}</span>
+            <span class="sighting-datetime">${dateStr} &nbsp;${s.time}</span>
+          </div>
+          <p class="sighting-desc">${escHtml(s.desc)}</p>
+          ${tags ? `<div class="sighting-tags">${tags}</div>` : ''}
+        </div>
+      </article>`;
+  }).join('');
+}
+
+
+// ── RENDER PATTERNS ────────────────────────────────
+function renderPatterns() {
+  const all = getSightings();
+  const grid = document.getElementById('patternsGrid');
+
+  if (all.length === 0) {
+    grid.innerHTML = `<div class="no-sightings" style="grid-column:1/-1">Patterns will emerge as sightings accumulate.</div>`;
+    return;
+  }
+
+  // Frequency counts
+  const bCounts = {};
+  const eCounts = {};
+  let nearFault = 0;
+  let nearWater = 0;
+
+  all.forEach(s => {
+    (s.behaviours||[]).forEach(b => bCounts[b] = (bCounts[b]||0)+1);
+    (s.environment||[]).forEach(e => eCounts[e] = (eCounts[e]||0)+1);
+    if ((s.environment||[]).includes('fault-zone')) nearFault++;
+    if ((s.environment||[]).includes('near-water')) nearWater++;
+  });
+
+  const topBehaviour = Object.entries(bCounts).sort((a,b)=>b[1]-a[1])[0];
+  const pulsingPct   = Math.round(((bCounts['pulsing']||0) / all.length) * 100);
+  const repeatPct    = Math.round((all.filter(s => s.repeat === 'local-legend' || s.repeat === 'personal-repeat').length / all.length) * 100);
+
+  grid.innerHTML = `
+    <div class="pattern-card">
+      <div class="pattern-value">${all.length}</div>
+      <div class="pattern-label">Total Reports</div>
+    </div>
+    <div class="pattern-card">
+      <div class="pattern-value">${pulsingPct}%</div>
+      <div class="pattern-label">Report Pulsing Behaviour</div>
+    </div>
+    <div class="pattern-card">
+      <div class="pattern-value">${nearFault}</div>
+      <div class="pattern-label">Near Known Fault Zones</div>
+    </div>
+    <div class="pattern-card">
+      <div class="pattern-value">${nearWater}</div>
+      <div class="pattern-label">Near Water Bodies</div>
+    </div>
+    <div class="pattern-card">
+      <div class="pattern-value">${repeatPct}%</div>
+      <div class="pattern-label">Repeat / Local Legend Sites</div>
+    </div>
+    <div class="pattern-card">
+      <div class="pattern-value">${topBehaviour ? topBehaviour[0] : '—'}</div>
+      <div class="pattern-label">Most Reported Behaviour</div>
+    </div>
+  `;
+}
+
+
+// ── UTILITY ────────────────────────────────────────
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+
+// ── INIT ───────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Set today's date as default
+  document.getElementById('sDate').value = new Date().toISOString().slice(0,10);
+  renderArchive();
+  renderPatterns();
+});
+</script>
+
+<footer style="border-top:1px solid rgba(232,201,109,0.15);padding:20px 24px;text-align:center;">
+  <p style="font-family:'Space Mono',monospace;font-size:0.5rem;letter-spacing:0.2em;color:#4a4846;text-transform:uppercase;">© John Carter · Presignal Inc. · UFOs Worldwide · ufosworldwide.com · All Rights Reserved</p>
+</footer>
+
+</body>
+</html>
