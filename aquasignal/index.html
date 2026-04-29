@@ -24,6 +24,7 @@
   --text-bright:#1a2233;
   --mono:'Inter',sans-serif;
   --serif:'Fraunces',serif;
+  --sans:'Inter',sans-serif;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -35,6 +36,7 @@ body{
   font-size:14px;
   min-height:100vh;
   overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
 }
 
 /* Water ripple bg */
@@ -646,7 +648,7 @@ tr:hover td{background:#fff}
 <div class="page active" id="page-home">
 
   <div class="hero">
-    <div class="hero-tag">💧 Grand River Watershed · Ontario AI Data Center Corridor</div>
+    <div class="hero-tag">💧 Monitor Water · Save Lives · Prevent Failure · Presignal</div>
     <h1 class="hero-title">Monitor water.<br><em>Save lives.</em><br>Prevent failure.</h1>
     <p class="hero-sub" style="color:rgba(255,255,255,0.75)">The first autonomous water intelligence platform connecting 60 years of Ontario source water data to the people, facilities, and infrastructure that depend on it — with a 2–6 week predictive window before disaster strikes.</p>
     <div class="hero-actions">
@@ -896,6 +898,175 @@ tr:hover td{background:#fff}
     </div>
   </div>
 
+
+  <!-- ── HUMAN COST ─────────────────────────────────────────── -->
+  <div style="background:#fff;padding:56px 48px;border-bottom:1px solid #e2e8f0">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#dc2626;margin-bottom:10px">Who Is At Risk</div>
+    <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:900;color:#0f172a;letter-spacing:-1px;line-height:1.1;margin-bottom:12px">Water quality is a public health problem.<br>It happens to affect infrastructure too.</div>
+    <div style="font-size:14px;color:#64748b;line-height:1.75;max-width:700px;margin-bottom:36px">Every sector below has people inside it. When the water signal goes unmonitored, the cost is measured in hospital beds, equipment failures, and regulatory consequences — not just operational metrics.</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:36px">
+      <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:22px 18px;text-align:center">
+        <div style="font-size:32px;margin-bottom:10px">🏥</div>
+        <div style="font-size:11px;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Healthcare</div>
+        <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:#dc2626;line-height:1;margin-bottom:6px">354</div>
+        <div style="font-size:11px;color:#64748b;line-height:1.5">Legionella cases in Ontario annually · 76.6% hospitalized · 5–7% fatal</div>
+      </div>
+      <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:12px;padding:22px 18px;text-align:center">
+        <div style="font-size:32px;margin-bottom:10px">🏠</div>
+        <div style="font-size:11px;font-weight:700;color:#d97706;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Municipal residents</div>
+        <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:#d97706;line-height:1;margin-bottom:6px">97.6%</div>
+        <div style="font-size:11px;color:#64748b;line-height:1.5">Of Grand River stations chronically exceed Ontario drinking water standards</div>
+      </div>
+      <div style="background:#eff6ff;border:1px solid #bae6fd;border-radius:12px;padding:22px 18px;text-align:center">
+        <div style="font-size:32px;margin-bottom:10px">🖥️</div>
+        <div style="font-size:11px;font-weight:700;color:#0077b6;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">AI data centers</div>
+        <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:#0077b6;line-height:1;margin-bottom:6px">$150B</div>
+        <div style="font-size:11px;color:#64748b;line-height:1.5">In AI infrastructure projected for Ontario corridors · No mandatory water monitoring standard</div>
+      </div>
+      <div style="background:#f0fdf4;border:1px solid #a7f3d0;border-radius:12px;padding:22px 18px;text-align:center">
+        <div style="font-size:32px;margin-bottom:10px">🌾</div>
+        <div style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Agriculture</div>
+        <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:#059669;line-height:1;margin-bottom:6px">60yr</div>
+        <div style="font-size:11px;color:#64748b;line-height:1.5">Of runoff and nutrient loading data · No predictive early-warning system exists at field level</div>
+      </div>
+      <div style="background:#faf5ff;border:1px solid #d8b4fe;border-radius:12px;padding:22px 18px;text-align:center">
+        <div style="font-size:32px;margin-bottom:10px">🏭</div>
+        <div style="font-size:11px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Industrial</div>
+        <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:#7c3aed;line-height:1;margin-bottom:6px">∞</div>
+        <div style="font-size:11px;color:#64748b;line-height:1.5">Process water, cooling loops, boilers — every industrial system that touches water is a candidate</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DEVICE ──────────────────────────────────────────────── -->
+  <div style="background:#f5f7fa;padding:56px 48px;border-bottom:1px solid #e2e8f0">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#0077b6;margin-bottom:10px">The Device</div>
+    <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:900;color:#0f172a;letter-spacing:-1px;line-height:1.1;margin-bottom:12px">One node. One connection. Runs forever.</div>
+    <div style="font-size:14px;color:#64748b;line-height:1.75;max-width:700px;margin-bottom:32px">No SCADA modification. No regulatory approvals. Connects to existing client WiFi. Installs in 20 minutes. Signals its own replacement. A Solenis technician deploys it on a regular service call.</div>
+    <div style="display:flex;align-items:stretch;gap:0;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin-bottom:24px;background:#fff">
+      <div style="flex:1;padding:18px 14px;text-align:center;border-right:1px solid #e2e8f0"><div style="font-size:22px;margin-bottom:6px">💧</div><div style="font-size:11px;font-weight:700;color:#334155;margin-bottom:3px">Water contact</div><div style="font-size:10px;color:#94a3b8">Passive sensors</div></div>
+      <div style="flex:1;padding:18px 14px;text-align:center;border-right:1px solid #e2e8f0"><div style="font-size:22px;margin-bottom:6px">📶</div><div style="font-size:11px;font-weight:700;color:#334155;margin-bottom:3px">Client WiFi</div><div style="font-size:10px;color:#94a3b8">Existing network</div></div>
+      <div style="flex:1;padding:18px 14px;text-align:center;border-right:1px solid #e2e8f0"><div style="font-size:22px;margin-bottom:6px">☁️</div><div style="font-size:11px;font-weight:700;color:#334155;margin-bottom:3px">Encrypted upload</div><div style="font-size:10px;color:#94a3b8">Every 15–30 min</div></div>
+      <div style="flex:1;padding:18px 14px;text-align:center;border-right:1px solid #e2e8f0"><div style="font-size:22px;margin-bottom:6px">🧠</div><div style="font-size:11px;font-weight:700;color:#334155;margin-bottom:3px">Risk engine</div><div style="font-size:10px;color:#94a3b8">60-yr baseline</div></div>
+      <div style="flex:1;padding:18px 14px;text-align:center;border-right:1px solid #e2e8f0"><div style="font-size:22px;margin-bottom:6px">📲</div><div style="font-size:11px;font-weight:700;color:#334155;margin-bottom:3px">Alert issued</div><div style="font-size:10px;color:#94a3b8">Dashboard + SMS</div></div>
+      <div style="flex:1;padding:18px 14px;text-align:center"><div style="font-size:22px;margin-bottom:6px">🚐</div><div style="font-size:11px;font-weight:700;color:#334155;margin-bottom:3px">Dispatch only if needed</div><div style="font-size:10px;color:#94a3b8">No wasted visits</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">Install time</div><div style="font-size:15px;font-weight:700;color:#0f172a">20 minutes</div></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">Connection</div><div style="font-size:15px;font-weight:700;color:#0f172a">Client WiFi only</div></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">Reporting</div><div style="font-size:15px;font-weight:700;color:#0f172a">Every 15–30 min</div></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">Device lifespan</div><div style="font-size:15px;font-weight:700;color:#0f172a">4–6 years</div></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">Replacement</div><div style="font-size:15px;font-weight:700;color:#0f172a">Auto-dispatched</div></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">SCADA modification</div><div style="font-size:15px;font-weight:700;color:#0f172a">Not required</div></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">Regulatory approvals</div><div style="font-size:15px;font-weight:700;color:#0f172a">None required</div></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">Unit cost (retail)</div><div style="font-size:15px;font-weight:700;color:#0f172a">$80–$150</div></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">Unit cost (volume)</div><div style="font-size:15px;font-weight:700;color:#059669;font-size:15px">$35–$60</div></div>
+    </div>
+  </div>
+
+  <!-- ── APPLICATIONS ────────────────────────────────────────── -->
+  <div style="background:#fff;padding:56px 48px;border-bottom:1px solid #e2e8f0">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#0077b6;margin-bottom:10px">Applications</div>
+    <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:900;color:#0f172a;letter-spacing:-1px;line-height:1.1;margin-bottom:12px">One platform. Every water system on earth.</div>
+    <div style="font-size:14px;color:#64748b;line-height:1.75;max-width:700px;margin-bottom:32px">The same node. The same signal architecture. Different parameter thresholds. Different customer sectors. The possibilities are not a roadmap — they are a ceiling we have not found yet.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px;transition:all 0.2s">
+        <div style="font-size:30px;margin-bottom:12px">🏥</div>
+        <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px">Healthcare</div>
+        <div style="font-size:13px;color:#64748b;line-height:1.65;margin-bottom:12px">Legionella temperature windows flagged 14–21 days before outbreak probability rises. Infection control teams notified automatically. London 2025: 107 cases, 4 deaths. All preventable with two weeks notice.</div>
+        <div style="display:inline-block;padding:3px 10px;background:#eff6ff;color:#0077b6;font-size:10px;font-weight:700;border-radius:20px">Lives saved</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px">
+        <div style="font-size:30px;margin-bottom:12px">🖥️</div>
+        <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px">AI data centers</div>
+        <div style="font-size:13px;color:#64748b;line-height:1.65;margin-bottom:12px">Conductivity and turbidity drift detected before scaling damages heat exchangers. $150B in Ontario AI infrastructure at risk from water that nobody is watching. AquaSignal is the watch.</div>
+        <div style="display:inline-block;padding:3px 10px;background:#eff6ff;color:#0077b6;font-size:10px;font-weight:700;border-radius:20px">System protection</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px">
+        <div style="font-size:30px;margin-bottom:12px">🏛️</div>
+        <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px">Government / municipal</div>
+        <div style="font-size:13px;color:#64748b;line-height:1.65;margin-bottom:12px">Real-time exceedance tracking across entire watersheds. Public health dashboards. Regulatory reporting automated. Advance warning before contamination reaches the tap.</div>
+        <div style="display:inline-block;padding:3px 10px;background:#f0fdf4;color:#059669;font-size:10px;font-weight:700;border-radius:20px">Public protection</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px">
+        <div style="font-size:30px;margin-bottom:12px">🧪</div>
+        <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px">Chemical treatment</div>
+        <div style="font-size:13px;color:#64748b;line-height:1.65;margin-bottom:12px">pH-triggered dosing on signal, not schedule. Biocide dosed proportionally to what the water is doing. Chemical waste eliminated. Inventory monitored automatically — auto-PO fires before stock runs out.</div>
+        <div style="display:inline-block;padding:3px 10px;background:#fffbeb;color:#d97706;font-size:10px;font-weight:700;border-radius:20px">Cost reduction</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px">
+        <div style="font-size:30px;margin-bottom:12px">🌾</div>
+        <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px">Agriculture</div>
+        <div style="font-size:13px;color:#64748b;line-height:1.65;margin-bottom:12px">Irrigation chemistry and runoff monitored at field level. Nutrient loading tracked upstream before it becomes a bloom. Livestock water systems flagged before contamination events reach animals.</div>
+        <div style="display:inline-block;padding:3px 10px;background:#f0fdf4;color:#059669;font-size:10px;font-weight:700;border-radius:20px">Food security</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px">
+        <div style="font-size:30px;margin-bottom:12px">⚙️</div>
+        <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px">Industrial process water</div>
+        <div style="font-size:13px;color:#64748b;line-height:1.65;margin-bottom:12px">Cooling loops, boilers, chillers monitored continuously. Equipment failure predicted from water chemistry before mechanical failure occurs. UV lamp intensity, scale buildup, flow reduction — all tracked.</div>
+        <div style="display:inline-block;padding:3px 10px;background:#eff6ff;color:#0077b6;font-size:10px;font-weight:700;border-radius:20px">Uptime guaranteed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ROI ─────────────────────────────────────────────────── -->
+  <div style="background:#0f172a;padding:56px 48px;border-bottom:1px solid #1e293b">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#0096c7;margin-bottom:10px">Revenue Model</div>
+    <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.1;margin-bottom:12px">Royalty per active node.<br>The Solenis network effect.</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.75;max-width:700px;margin-bottom:32px">Every Solenis technician globally visits client facilities on regular schedules. One node per kit bag. One 20-minute installation per visit. Within 24 months the network spans every Solenis account on earth.</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px">
+      <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:20px 14px;text-align:center">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);margin-bottom:8px">Year 1</div>
+        <div style="font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:#fff;line-height:1">2,500</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px">nodes</div>
+        <div style="font-size:14px;font-weight:700;color:#6ee7b7;margin-top:8px">$337K/yr</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:4px">Ontario pilot</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:20px 14px;text-align:center">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);margin-bottom:8px">Year 2</div>
+        <div style="font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:#fff;line-height:1">15,000</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px">nodes</div>
+        <div style="font-size:14px;font-weight:700;color:#6ee7b7;margin-top:8px">$2.0M/yr</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:4px">Canada rollout</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:20px 14px;text-align:center">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);margin-bottom:8px">Year 3</div>
+        <div style="font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:#fff;line-height:1">50,000</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px">nodes</div>
+        <div style="font-size:14px;font-weight:700;color:#6ee7b7;margin-top:8px">$6.75M/yr</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:4px">US northeast + UK</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:20px 14px;text-align:center">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);margin-bottom:8px">Year 4</div>
+        <div style="font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:#fff;line-height:1">125,000</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px">nodes</div>
+        <div style="font-size:14px;font-weight:700;color:#6ee7b7;margin-top:8px">$16.9M/yr</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:4px">G7 markets</div>
+      </div>
+      <div style="background:rgba(0,150,199,0.15);border:1px solid rgba(0,150,199,0.3);border-radius:10px;padding:20px 14px;text-align:center">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7dd3fc;margin-bottom:8px">Year 5</div>
+        <div style="font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:#fff;line-height:1">250,000</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px">nodes</div>
+        <div style="font-size:14px;font-weight:700;color:#6ee7b7;margin-top:8px">$33.75M/yr</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:4px">Global · Every country</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:24px">
+      <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.6)">📍 One site</div>
+      <div style="color:rgba(255,255,255,0.3);font-size:18px">→</div>
+      <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.6)">🏙️ One city</div>
+      <div style="color:rgba(255,255,255,0.3);font-size:18px">→</div>
+      <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.6)">🗺️ One province</div>
+      <div style="color:rgba(255,255,255,0.3);font-size:18px">→</div>
+      <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.6)">🇨🇦 One country</div>
+      <div style="color:rgba(255,255,255,0.3);font-size:18px">→</div>
+      <div style="background:rgba(0,150,199,0.2);border:1px solid rgba(0,150,199,0.4);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;color:#7dd3fc">🌍 Every country</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:20px 24px;font-size:13px;color:rgba(255,255,255,0.6);line-height:1.75">
+      <strong style="color:#fff">Year 10 cumulative projection: $150M+</strong> · Based on 10% royalty per active node at volume pricing. Rinse and repeat in every city, every town, every province, every country. The network does not stop growing because water systems do not stop existing. · <span style="color:#6ee7b7">Submitted to Solenis April 25 2026 · Response pending</span>
+    </div>
+  </div>
+
   <div class="problems">
     <div class="problem-card">
       <div class="problem-index">Problem 01 — Conductivity</div>
@@ -1030,12 +1201,13 @@ tr:hover td{background:#fff}
     </div>
   </div>
 
-  <div class="footer-bar">
+  <div class="footer-bar" style="flex-wrap:wrap;gap:10px">
     <span class="footer-text">Data: Ontario PWQMN · Open Government Licence · 1964–2024</span>
     <span class="footer-tag">Peer Reviewed</span>
     <span class="footer-tag">2 Published Papers</span>
     <span class="footer-tag">ORCID Verified</span>
     <span class="footer-tag">Open Data</span>
+    <span style="margin-left:auto;font-size:10px;color:#94a3b8;font-style:italic">© 2026 Presignal Inc. · John Carter · ORCID 0009-0004-1363-304X · All framework methodology and device concepts protected under published prior art · DOI: 10.5281/zenodo.19653415 · DOI: 10.5281/zenodo.19695022</span>
   </div>
 </div>
 
