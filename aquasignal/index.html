@@ -3,26 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AquaSignal — Source Water Intelligence for Industrial Cooling</title>
+<title>AquaSignal — Monitor Water. Save Lives. · Presignal</title>
 <meta name="description" content="60 years of Ontario water quality data revealing chronic source water stress in AI data center cooling corridors. A Presignal Intelligence Initiative.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 :root {
-  --bg:#04080f;
-  --surface:#080d18;
-  --surface2:#0d1424;
-  --border:#162035;
-  --accent:#00b4d8;
-  --accent2:#0077b6;
-  --red:#e63946;
-  --amber:#f4a261;
-  --green:#2a9d8f;
-  --text:#b8cce0;
-  --text-dim:#3d5470;
-  --text-bright:#e8f4fd;
-  --mono:'DM Mono',monospace;
+  --bg:#f5f7fa;
+  --surface:#ffffff;
+  --surface2:#f0f2f5;
+  --border:#e2e8f0;
+  --accent:#0077b6;
+  --accent2:#0096c7;
+  --red:#dc2626;
+  --amber:#d97706;
+  --green:#059669;
+  --text:#0f172a;
+  --text-dim:#64748b;
+  --text-bright:#1a2233;
+  --mono:'Inter',sans-serif;
   --serif:'Fraunces',serif;
 }
 
@@ -31,8 +31,8 @@
 body{
   background:var(--bg);
   color:var(--text);
-  font-family:var(--mono);
-  font-size:13px;
+  font-family:var(--sans);
+  font-size:14px;
   min-height:100vh;
   overflow-x:hidden;
 }
@@ -53,9 +53,9 @@ body::after{
 nav{
   position:fixed;top:0;left:0;right:0;
   height:54px;
-  background:rgba(4,8,15,0.95);
+  background:rgba(255,255,255,0.97);
   backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid #e2e8f0;
   display:flex;align-items:center;
   padding:0 32px;gap:0;
   z-index:500;
@@ -101,11 +101,11 @@ nav{
   border:none;background:none;
   border-bottom:2px solid transparent;
   transition:all 0.15s;
-  font-family:var(--mono);
+  font-family:var(--sans);
 }
 
 .nav-tab:hover{color:var(--text)}
-.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)} .nav-tab{color:#64748b} .nav-tab:hover{color:#0f172a}
 
 .nav-right{
   margin-left:auto;
@@ -115,8 +115,8 @@ nav{
 .status-pill{
   display:flex;align-items:center;gap:7px;
   padding:4px 12px;
-  background:rgba(42,157,143,0.08);
-  border:1px solid rgba(42,157,143,0.2);
+  background:#ecfdf5;
+  border:1px solid #a7f3d0;
   border-radius:20px;
   font-size:10px;letter-spacing:1px;
   color:var(--green);
@@ -147,6 +147,8 @@ nav{
 .hero{
   padding:72px 48px 56px;
   position:relative;
+  background:linear-gradient(135deg,#0f172a 0%,#0c4a6e 60%,#0077b6 100%);
+  color:#fff;
 }
 
 .hero-tag{
@@ -164,17 +166,17 @@ nav{
   font-family:var(--serif);
   font-size:clamp(38px,5.5vw,68px);
   font-weight:900;
-  color:var(--text-bright);
+  color:#ffffff;
   line-height:1.0;
   letter-spacing:-2px;
   margin-bottom:20px;
   max-width:820px;
 }
 
-.hero-title em{font-style:italic;color:var(--accent)}
+.hero-title em{font-style:italic;color:#7dd3fc}
 
 .hero-sub{
-  font-size:14px;color:var(--text-dim);
+  font-size:14px;color:rgba(255,255,255,0.75);
   max-width:580px;line-height:1.8;
   margin-bottom:36px;
 }
@@ -209,7 +211,7 @@ nav{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   border-top:1px solid var(--border);
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid #e2e8f0;
   background:var(--surface);
 }
 
@@ -218,7 +220,7 @@ nav{
   border-right:1px solid var(--border);
   transition:background 0.2s;
 }
-.stat-block:hover{background:var(--surface2)}
+.stat-block:hover{background:#fff}
 .stat-block:last-child{border-right:none}
 
 .stat-val{
@@ -226,10 +228,10 @@ nav{
   font-size:48px;font-weight:900;
   line-height:1;margin-bottom:6px;
 }
-.stat-val.c1{color:var(--red)}
-.stat-val.c2{color:var(--accent)}
-.stat-val.c3{color:var(--amber)}
-.stat-val.c4{color:var(--green)}
+.stat-val.c1{color:#dc2626}
+.stat-val.c2{color:#0077b6}
+.stat-val.c3{color:#d97706}
+.stat-val.c4{color:#059669}
 
 .stat-lbl{
   font-size:9px;letter-spacing:2px;
@@ -247,11 +249,11 @@ nav{
 }
 
 .problem-card{
-  background:var(--bg);
+  background:#fff;
   padding:36px 40px;
   transition:background 0.2s;
 }
-.problem-card:hover{background:var(--surface)}
+.problem-card:hover{background:#f8fafc}
 
 .problem-index{
   font-size:9px;letter-spacing:3px;
@@ -283,7 +285,8 @@ nav{
 /* Solenis pitch section */
 .pitch-section{
   padding:56px 48px;
-  border-top:1px solid var(--border);
+  border-top:1px solid #e2e8f0;
+  background:#fff;
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:48px;
@@ -316,7 +319,7 @@ nav{
 .offer-item{
   display:flex;gap:14px;
   padding:14px 0;
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid #e2e8f0;
 }
 .offer-item:last-child{border-bottom:none}
 
@@ -333,9 +336,9 @@ nav{
 /* Footer bar */
 .footer-bar{
   padding:28px 48px;
-  border-top:1px solid var(--border);
+  border-top:1px solid #e2e8f0;
   display:flex;align-items:center;gap:16px;
-  background:var(--surface);
+  background:#fff;
   flex-wrap:wrap;
 }
 
@@ -368,7 +371,7 @@ nav{
 
 .sidebar-head{
   padding:20px;
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid #e2e8f0;
   position:sticky;top:0;
   background:var(--surface);z-index:10;
 }
@@ -381,7 +384,7 @@ nav{
 
 .sidebar-sub{font-size:10px;color:var(--text-dim);letter-spacing:1px}
 
-.fgroup{padding:14px 20px;border-bottom:1px solid var(--border)}
+.fgroup{padding:14px 20px;border-bottom:1px solid #e2e8f0}
 .flabel{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:7px}
 
 .fselect{
@@ -394,7 +397,7 @@ nav{
 }
 .fselect:focus{border-color:var(--accent)}
 
-.legend-wrap{padding:14px 20px;border-bottom:1px solid var(--border)}
+.legend-wrap{padding:14px 20px;border-bottom:1px solid #e2e8f0}
 
 .leg-item{
   display:flex;align-items:center;gap:10px;
@@ -419,15 +422,15 @@ nav{
 
 #map{background:var(--bg);z-index:1}
 
-.leaflet-tile-pane{filter:brightness(0.2) saturate(0.2) hue-rotate(190deg)}
+.leaflet-tile-pane{filter:saturate(0.5) brightness(1.05)}
 .leaflet-popup-content-wrapper{
-  background:var(--surface2);
-  border:1px solid var(--border);
-  border-radius:3px;color:var(--text);
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:8px;color:#0f172a;
   font-family:var(--mono);font-size:12px;
   box-shadow:0 8px 32px rgba(0,0,0,0.6);
 }
-.leaflet-popup-tip{background:var(--surface2)}
+.leaflet-popup-tip{background:#fff}
 .leaflet-popup-content{margin:14px 16px}
 .leaflet-control-zoom a{
   background:var(--surface2)!important;
@@ -457,11 +460,11 @@ nav{
 table{width:100%;border-collapse:collapse;font-size:11px}
 
 th{
-  background:var(--surface2);
+  background:#f8fafc;
   padding:10px 14px;text-align:left;
   font-size:9px;letter-spacing:2px;
   text-transform:uppercase;color:var(--text-dim);
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid #e2e8f0;
   white-space:nowrap;cursor:pointer;
   user-select:none;
 }
@@ -472,7 +475,7 @@ td{
   border-bottom:1px solid rgba(22,32,53,0.6);
   white-space:nowrap;
 }
-tr:hover td{background:var(--surface2)}
+tr:hover td{background:#fff}
 
 .badge{
   display:inline-block;padding:2px 7px;
@@ -484,7 +487,7 @@ tr:hover td{background:var(--surface2)}
 .b-amber{background:rgba(244,162,97,0.1);color:var(--amber)}
 
 /* ── ABOUT PAGE ──────────────────────────────────────── */
-.about-wrap{max-width:740px;margin:0 auto;padding:60px 48px}
+.about-wrap{max-width:740px;margin:0 auto;padding:60px 48px;background:#fff}
 
 .about-kicker{
   font-size:10px;letter-spacing:3px;
@@ -518,7 +521,7 @@ tr:hover td{background:var(--surface2)}
 
 .link-row{
   display:flex;align-items:flex-start;gap:12px;
-  padding:12px 0;border-bottom:1px solid var(--border);
+  padding:12px 0;border-bottom:1px solid #e2e8f0;
   font-size:12px;color:var(--text-dim);
 }
 .link-icon{flex-shrink:0;color:var(--accent);width:20px}
@@ -526,7 +529,7 @@ tr:hover td{background:var(--surface2)}
 /* ── LOADING ─────────────────────────────────────────── */
 .loading{
   position:fixed;inset:0;
-  background:var(--bg);
+  background:#fff;
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   z-index:900;transition:opacity 0.4s;
@@ -574,196 +577,25 @@ tr:hover td{background:var(--surface2)}
   .about-wrap{padding:40px 24px}
 }
 
-/* ── SOLUTION BUTTON ─────────────────────────────────── */
-.btn-solution{
-  display:flex;align-items:center;gap:8px;
-  padding:7px 16px;
-  background:#e63946;
-  color:#fff;
-  border:none;
-  font-family:var(--mono);
-  font-size:10px;letter-spacing:1.5px;
-  text-transform:uppercase;
-  cursor:pointer;border-radius:2px;
-  font-weight:500;
-  position:relative;
-  overflow:hidden;
-  animation:solutionPulse 2s ease infinite;
-  white-space:nowrap;
-}
-.btn-solution:hover{background:#ff2d3b;transform:scale(1.03)}
-.btn-solution::before{
-  content:'';
-  position:absolute;inset:0;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);
-  animation:shimmer 2.2s ease infinite;
-}
-@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
-@keyframes solutionPulse{
-  0%,100%{box-shadow:0 0 0 0 rgba(230,57,70,0.6)}
-  50%{box-shadow:0 0 0 6px rgba(230,57,70,0)}
-}
-.sol-icon{font-size:14px;animation:rotate 4s linear infinite}
-@keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.osnav{padding:9px 16px;font-size:12px;font-weight:500;color:#64748b;cursor:pointer;display:flex;align-items:center;gap:9px;border-left:3px solid transparent;transition:all 0.12s;font-family:Inter,sans-serif}
+.osnav:hover{background:#fff;color:#334155}
+.osnav.active{background:#fff;color:#0077b6;border-left-color:#0077b6;font-weight:600}
+.osview{height:100%}
+.btn-solution{display:flex;align-items:center;gap:7px;padding:7px 16px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;animation:solPulse 2.5s ease infinite;letter-spacing:0.2px}
+.btn-solution:hover{background:#b91c1c;transform:scale(1.02)}
+@keyframes solPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0.5)}60%{box-shadow:0 0 0 8px rgba(220,38,38,0)}}
+.sol-spin{animation:spin 3s linear infinite;display:inline-block;font-size:14px}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── LIVE TEMP STRIP ─────────────────────────────────── */
-.live-temp-bar{
-  background:var(--surface2);
-  border-bottom:1px solid var(--border);
-  padding:7px 48px;
-  display:flex;align-items:center;gap:20px;
-  font-size:10px;letter-spacing:1px;
-  overflow-x:auto;
-  scrollbar-width:none;
-}
-.live-temp-bar::-webkit-scrollbar{display:none}
-.temp-station{
-  display:flex;align-items:center;gap:8px;
-  white-space:nowrap;flex-shrink:0;
-}
-.temp-label{color:var(--text-dim);text-transform:uppercase}
-.temp-val{font-weight:500}
-.temp-val.safe{color:var(--accent)}
-.temp-val.warn{color:var(--amber)}
-.temp-val.danger{color:var(--red)}
-.temp-sep{color:var(--text-dim);opacity:0.3}
-.live-badge{
-  display:flex;align-items:center;gap:5px;
-  padding:2px 8px;
-  background:rgba(230,57,70,0.1);
-  border:1px solid rgba(230,57,70,0.25);
-  border-radius:2px;
-  color:var(--red);
-  font-size:9px;letter-spacing:1px;
-  flex-shrink:0;
-}
-.live-dot-red{
-  width:5px;height:5px;border-radius:50%;
-  background:var(--red);
-  animation:pulse 1.4s ease infinite;
-}
 
-/* ── SOLUTION MODAL ──────────────────────────────────── */
-.modal-overlay{
-  position:fixed;inset:0;
-  background:rgba(4,8,15,0.92);
-  backdrop-filter:blur(12px);
-  z-index:800;
-  display:none;
-  align-items:center;justify-content:center;
-  padding:24px;
-}
-.modal-overlay.open{display:flex}
-.modal{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-top:3px solid var(--red);
-  border-radius:4px;
-  max-width:800px;width:100%;
-  max-height:90vh;
-  overflow-y:auto;
-  scrollbar-width:thin;
-  scrollbar-color:var(--border) transparent;
-  position:relative;
-}
-.modal-head{
-  padding:28px 36px 20px;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
-}
-.modal-kicker{
-  font-size:9px;letter-spacing:3px;text-transform:uppercase;
-  color:var(--red);margin-bottom:10px;
-}
-.modal-title{
-  font-family:var(--serif);
-  font-size:28px;font-weight:900;
-  color:var(--text-bright);
-  letter-spacing:-1px;line-height:1.1;
-}
-.modal-close{
-  background:none;border:1px solid var(--border);
-  color:var(--text-dim);cursor:pointer;
-  padding:6px 12px;font-family:var(--mono);
-  font-size:11px;border-radius:2px;
-  flex-shrink:0;transition:all 0.15s;
-}
-.modal-close:hover{border-color:var(--accent);color:var(--accent)}
-.modal-body{padding:28px 36px}
-.modal-section{margin-bottom:28px}
-.modal-section-label{
-  font-size:9px;letter-spacing:3px;text-transform:uppercase;
-  color:var(--accent);margin-bottom:12px;
-}
-.modal-text{
-  font-size:12px;color:var(--text-dim);line-height:1.9;
-}
-.modal-text strong{color:var(--text)}
-.pipeline-steps{
-  display:flex;align-items:stretch;gap:0;
-  margin:16px 0;flex-wrap:wrap;
-}
-.pipe-step{
-  flex:1;min-width:100px;
-  background:var(--surface2);
-  border:1px solid var(--border);
-  border-right:none;
-  padding:14px 12px;
-  text-align:center;
-}
-.pipe-step:last-child{border-right:1px solid var(--border)}
-.pipe-step-icon{font-size:20px;margin-bottom:6px}
-.pipe-step-label{font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;line-height:1.4}
-.pipe-step-val{font-size:11px;color:var(--accent);margin-top:4px}
-.spec-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0;
-}
-.spec-cell{
-  background:var(--surface2);
-  border:1px solid var(--border);
-  border-radius:2px;padding:12px 14px;
-}
-.spec-cell-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:5px}
-.spec-cell-val{font-size:13px;font-weight:500;color:var(--text-bright)}
-.roi-row{
-  display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0;
-}
-.roi-cell{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:2px;padding:12px 10px;text-align:center;
-}
-.roi-yr{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px}
-.roi-nodes{font-family:var(--serif);font-size:20px;font-weight:900;color:var(--text-bright);line-height:1}
-.roi-rev{font-size:11px;color:var(--green);margin-top:4px;font-weight:500}
-.roi-geo{font-size:10px;color:var(--text-dim);margin-top:3px}
-.outcome-trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}
-.outcome-cell{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:2px;padding:14px;text-align:center;
-}
-.outcome-cell.bad{border-top:2px solid var(--red)}
-.outcome-cell.mid{border-top:2px solid var(--accent)}
-.outcome-cell.good{border-top:2px solid var(--green)}
-.outcome-emo{font-size:24px;margin-bottom:8px;line-height:1.2}
-.outcome-lbl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px}
-.outcome-desc{font-size:11px;color:var(--text-dim);line-height:1.6}
-.modal-copyright{
-  padding:14px 36px;
-  border-top:1px solid var(--border);
-  font-size:10px;color:var(--text-dim);
-  letter-spacing:0.5px;
-  font-style:italic;
-}
-.scale-trail{
-  display:flex;align-items:center;gap:8px;
-  flex-wrap:wrap;margin:12px 0;font-size:11px;
-}
-.scale-pill-m{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:2px;padding:4px 10px;color:var(--text-dim);
-  font-size:10px;letter-spacing:1px;white-space:nowrap;
-}
-.scale-arrow-m{color:var(--text-dim);opacity:0.5}
+.ticker{background:#fff;border-bottom:1px solid #e2e8f0;padding:7px 32px;display:flex;align-items:center;gap:18px;font-size:11px;overflow-x:auto;scrollbar-width:none;margin-top:58px}
+.ticker::-webkit-scrollbar{display:none}
+.t-val{font-weight:700;font-family:monospace;font-size:12px}
+.t-safe{color:#0077b6}
+.t-warn{color:#d97706}
+.t-danger{color:#dc2626}
+@keyframes slideIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+
 </style>
 </head>
 <body>
@@ -782,10 +614,8 @@ tr:hover td{background:var(--surface2)}
     <div class="nav-icon">💧</div>
     <div class="nav-logo">AquaSignal<sup>by Presignal</sup></div>
   </div>
-  <button class="btn-solution" onclick="openSolution()">
-    <span class="sol-icon">⚡</span>The Solution
-  </button>
-  <div class="nav-tabs" style="margin-left:16px">
+  <button class="btn-solution" onclick="scrollTo({top:document.getElementById('sol-section').offsetTop-60,behavior:'smooth'})"><span class="sol-spin">⚡</span> The Solution — Live</button>
+  <div class="nav-tabs">
     <button class="nav-tab active" onclick="show('home')">Intelligence</button>
     <button class="nav-tab" onclick="show('map')">Map</button>
     <button class="nav-tab" onclick="show('data')">Data</button>
@@ -797,136 +627,249 @@ tr:hover td{background:var(--surface2)}
   </div>
 </nav>
 
-<!-- ── LIVE TEMP BAR ────────────────────────────────────────── -->
-<div class="live-temp-bar" id="live-temp-bar" style="margin-top:54px">
-  <div class="live-badge"><div class="live-dot-red"></div>Live · Environment Canada</div>
-  <div class="temp-station"><span class="temp-label">Grand River @ Galt</span><span class="temp-val safe" id="t1">—°C</span></div>
-  <div class="temp-sep">|</div>
-  <div class="temp-station"><span class="temp-label">Brantford Intake</span><span class="temp-val warn" id="t2">—°C</span></div>
-  <div class="temp-sep">|</div>
-  <div class="temp-station"><span class="temp-label">Nith River</span><span class="temp-val safe" id="t3">—°C</span></div>
-  <div class="temp-sep">|</div>
-  <div class="temp-station"><span class="temp-label">Speed River</span><span class="temp-val safe" id="t4">—°C</span></div>
-  <div class="temp-sep">|</div>
-  <div class="temp-station"><span class="temp-label">Conestogo</span><span class="temp-val danger" id="t5">—°C</span></div>
-  <div class="temp-sep">|</div>
-  <div style="margin-left:auto;font-size:9px;color:var(--text-dim);white-space:nowrap">Legionella window: ⚠ 15°C — 🚨 25°C</div>
+<!-- TICKER -->
+<div class="ticker" id="page-ticker">
+  <span style="font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;flex-shrink:0">🌊 Live water temps</span>
+  <span style="color:#94a3b8;white-space:nowrap;flex-shrink:0">Grand River @ Galt</span><span class="t-val t-safe" id="t1">—°C</span>
+  <span style="color:#e2e8f0">|</span>
+  <span style="color:#94a3b8;white-space:nowrap;flex-shrink:0">Brantford</span><span class="t-val t-warn" id="t2">—°C</span>
+  <span style="color:#e2e8f0">|</span>
+  <span style="color:#94a3b8;white-space:nowrap;flex-shrink:0">Nith River</span><span class="t-val t-safe" id="t3">—°C</span>
+  <span style="color:#e2e8f0">|</span>
+  <span style="color:#94a3b8;white-space:nowrap;flex-shrink:0">Speed River</span><span class="t-val t-safe" id="t4">—°C</span>
+  <span style="color:#e2e8f0">|</span>
+  <span style="color:#94a3b8;white-space:nowrap;flex-shrink:0">Conestogo</span><span class="t-val t-danger" id="t5">—°C</span>
+  <span style="margin-left:auto;font-size:10px;color:#94a3b8;white-space:nowrap;flex-shrink:0">⚠ Legionella window: 15°C — 25°C</span>
 </div>
 
-<!-- ── SOLUTION MODAL ────────────────────────────────────────── -->
-<div class="modal-overlay" id="solution-modal" onclick="closeSolution(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-head">
-      <div>
-        <div class="modal-kicker">⚡ Presignal Intelligence · Proprietary Framework</div>
-        <div class="modal-title">The problem has been<br>in the data for 60 years.<br>Now there's a device for it.</div>
-      </div>
-      <button class="modal-close" onclick="closeSolution()">✕ Close</button>
-    </div>
-    <div class="modal-body">
-
-      <div class="modal-section">
-        <div class="modal-section-label">What the data shows</div>
-        <div class="modal-text">
-          60 years of public water quality data across 2,128 Ontario monitoring stations reveals a simple, repeatable pattern. <strong>Source water temperature crosses 15°C every May.</strong> Legionella case counts rise 2–6 weeks later, every single year without exception. The signal has always been there. Nobody built anything around it. Until now.
-        </div>
-      </div>
-
-      <div class="modal-section">
-        <div class="modal-section-label">The device — how it works</div>
-        <div class="modal-text" style="margin-bottom:12px">A small passive monitoring node. Connects to existing client WiFi. No SCADA modification. No regulatory approvals. Installs in 20 minutes. Runs indefinitely. Signals its own replacement.</div>
-        <div class="pipeline-steps">
-          <div class="pipe-step"><div class="pipe-step-icon">💧</div><div class="pipe-step-label">Water contact</div><div class="pipe-step-val">Passive sensors</div></div>
-          <div class="pipe-step"><div class="pipe-step-icon">📶</div><div class="pipe-step-label">Client WiFi</div><div class="pipe-step-val">Existing network</div></div>
-          <div class="pipe-step"><div class="pipe-step-icon">☁️</div><div class="pipe-step-label">Secure upload</div><div class="pipe-step-val">Encrypted cloud</div></div>
-          <div class="pipe-step"><div class="pipe-step-icon">🧠</div><div class="pipe-step-label">Risk engine</div><div class="pipe-step-val">Presignal logic</div></div>
-          <div class="pipe-step"><div class="pipe-step-icon">📲</div><div class="pipe-step-label">Alert issued</div><div class="pipe-step-val">Dashboard + email</div></div>
-        </div>
-        <div class="spec-grid">
-          <div class="spec-cell"><div class="spec-cell-label">Install time</div><div class="spec-cell-val">20 minutes</div></div>
-          <div class="spec-cell"><div class="spec-cell-label">Connection</div><div class="spec-cell-val">Client WiFi only</div></div>
-          <div class="spec-cell"><div class="spec-cell-label">Reporting</div><div class="spec-cell-val">Every 15–30 min</div></div>
-          <div class="spec-cell"><div class="spec-cell-label">Device lifespan</div><div class="spec-cell-val">4–6 years</div></div>
-          <div class="spec-cell"><div class="spec-cell-label">Replacement</div><div class="spec-cell-val">Auto-dispatched</div></div>
-          <div class="spec-cell"><div class="spec-cell-label">Unit cost (volume)</div><div class="spec-cell-val">$35–$60</div></div>
-        </div>
-        <div class="modal-text" style="margin-top:8px">The node monitors continuously. <strong>No technician is dispatched unless the node signals them.</strong> No wasted rounds. No missed readings between visits. The problem is found before it becomes an outbreak.</div>
-      </div>
-
-      <div class="modal-section">
-        <div class="modal-section-label">Without it vs. with it</div>
-        <div class="outcome-trio">
-          <div class="outcome-cell bad">
-            <div class="outcome-emo">🤒😷🏥💸</div>
-            <div class="outcome-lbl">Without monitoring</div>
-            <div class="outcome-desc">Reactive. Outbreak happens. People are sick. Facility shuts. Regulatory action. $2–8M per event.</div>
-          </div>
-          <div class="outcome-cell mid">
-            <div class="outcome-emo">📡⚠️📋🤝</div>
-            <div class="outcome-lbl">AquaSignal deployed</div>
-            <div class="outcome-desc">Signal detected 14–21 days early. Treatment protocol triggered. Infection control notified before first case.</div>
-          </div>
-          <div class="outcome-cell good">
-            <div class="outcome-emo">✅😊🏃‍♂️💚</div>
-            <div class="outcome-lbl">Outcome</div>
-            <div class="outcome-desc">Zero cases. Zero hospitalisations. Facility operating. Staff and patients protected.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-section">
-        <div class="modal-section-label">Revenue projection — royalty per active node</div>
-        <div class="roi-row">
-          <div class="roi-cell"><div class="roi-yr">Year 1</div><div class="roi-nodes">2,500</div><div class="roi-rev">$337K</div><div class="roi-geo">Ontario pilot</div></div>
-          <div class="roi-cell"><div class="roi-yr">Year 2</div><div class="roi-nodes">15,000</div><div class="roi-rev">$2.0M</div><div class="roi-geo">Canada rollout</div></div>
-          <div class="roi-cell"><div class="roi-yr">Year 3</div><div class="roi-nodes">50,000</div><div class="roi-rev">$6.75M</div><div class="roi-geo">US + UK</div></div>
-          <div class="roi-cell"><div class="roi-yr">Year 4</div><div class="roi-nodes">125,000</div><div class="roi-rev">$16.9M</div><div class="roi-geo">G7 markets</div></div>
-          <div class="roi-cell"><div class="roi-yr">Year 5</div><div class="roi-nodes">250,000</div><div class="roi-rev">$33.75M</div><div class="roi-geo">Global</div></div>
-        </div>
-      </div>
-
-      <div class="modal-section">
-        <div class="modal-section-label">Applications — the possibilities are endless</div>
-        <div class="modal-text" style="margin-bottom:10px">The same node. The same signal architecture. A different parameter threshold. A different customer sector.</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
-          <div style="background:var(--surface2);border:1px solid var(--border);padding:10px 14px;border-radius:2px"><strong style="color:var(--text)">🏥 Healthcare</strong><br><span style="color:var(--text-dim)">Legionella prediction for hospital cooling towers</span></div>
-          <div style="background:var(--surface2);border:1px solid var(--border);padding:10px 14px;border-radius:2px"><strong style="color:var(--text)">🏭 Data centers</strong><br><span style="color:var(--text-dim)">Conductivity and turbidity drift before scaling damage</span></div>
-          <div style="background:var(--surface2);border:1px solid var(--border);padding:10px 14px;border-radius:2px"><strong style="color:var(--text)">🏛️ Municipal</strong><br><span style="color:var(--text-dim)">Real-time watershed exceedance across entire provinces</span></div>
-          <div style="background:var(--surface2);border:1px solid var(--border);padding:10px 14px;border-radius:2px"><strong style="color:var(--text)">🧪 Chemical treatment</strong><br><span style="color:var(--text-dim)">pH-triggered dosing — signal-driven, not schedule-driven</span></div>
-          <div style="background:var(--surface2);border:1px solid var(--border);padding:10px 14px;border-radius:2px"><strong style="color:var(--text)">🌾 Agriculture</strong><br><span style="color:var(--text-dim)">Irrigation chemistry and runoff flagged at field level</span></div>
-          <div style="background:var(--surface2);border:1px solid var(--border);padding:10px 14px;border-radius:2px"><strong style="color:var(--text)">🌍 Every city. Every river.</strong><br><span style="color:var(--text-dim)">One node. One connection. Infinite scale.</span></div>
-        </div>
-      </div>
-
-      <div class="modal-section">
-        <div class="modal-section-label">Scale path</div>
-        <div class="scale-trail">
-          <div class="scale-pill-m">📍 One site</div><div class="scale-arrow-m">→</div>
-          <div class="scale-pill-m">🏙️ One city</div><div class="scale-arrow-m">→</div>
-          <div class="scale-pill-m">🗺️ One province</div><div class="scale-arrow-m">→</div>
-          <div class="scale-pill-m">🇨🇦 One country</div><div class="scale-arrow-m">→</div>
-          <div class="scale-pill-m">🌍 Every country</div>
-        </div>
-        <div class="modal-text" style="margin-top:8px">Every Solenis technician globally visits client facilities on regular schedules. One node per kit bag. One 20-minute installation per visit. Within 24 months the network spans every Solenis account on earth. Year 10 cumulative projection: <strong>$150M+</strong></div>
-      </div>
-
-    </div>
-    <div class="modal-copyright">
-      © 2026 Presignal Inc. · John Carter · ORCID 0009-0004-1363-304X · All methodology, framework architecture, and device concepts protected. Grand River preprint DOI: 10.5281/zenodo.19653415 · Legionella preprint DOI: 10.5281/zenodo.19695022
-    </div>
-  </div>
-</div>
+<!-- ── HOME ──────────────────────────────────────────────── -->
 <div class="page active" id="page-home">
 
   <div class="hero">
     <div class="hero-tag">💧 Grand River Watershed · Ontario AI Data Center Corridor</div>
-    <h1 class="hero-title">The water cooling<br>Ontario's AI infrastructure<br>is <em>chronically failing</em><br>its own standards.</h1>
-    <p class="hero-sub">The first study connecting 60 years of Ontario provincial water quality data to the operational risk it creates for AI data center cooling infrastructure in Cambridge and Brantford.</p>
+    <h1 class="hero-title">Monitor water.<br><em>Save lives.</em><br>Prevent failure.</h1>
+    <p class="hero-sub" style="color:rgba(255,255,255,0.75)">The first autonomous water intelligence platform connecting 60 years of Ontario source water data to the people, facilities, and infrastructure that depend on it — with a 2–6 week predictive window before disaster strikes.</p>
     <div class="hero-actions">
       <button class="btn-primary" onclick="show('map')">Explore Station Map</button>
       <button class="btn-ghost" onclick="show('data')">Browse the Data</button>
       <button class="btn-ghost" onclick="window.open('https://zenodo.org/records/19653415','_blank')">Paper 1 — Grand River ↗</button>
       <button class="btn-ghost" onclick="window.open('https://zenodo.org/records/19695022','_blank')">Paper 2 — Legionella ↗</button>
+    </div>
+  </div>
+
+
+  <!-- OUTCOME STRIP -->
+  <div style="background:#fff;padding:48px 48px 36px;border-bottom:1px solid #e2e8f0">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#dc2626;margin-bottom:10px">The Stakes — Why Water Monitoring Saves Lives</div>
+    <div style="font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:#0f172a;letter-spacing:-1px;line-height:1.1;margin-bottom:12px">People get sick when nobody is watching the water.</div>
+    <div style="font-size:14px;color:#64748b;line-height:1.75;max-width:680px;margin-bottom:28px">London, Ontario 2025: 107 Legionella cases, 4 deaths. The signal was in the public data for 60 years. Nobody built anything around it. Until now.</div>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:32px">
+      <div style="padding:28px 24px;text-align:center;background:#fff5f5">
+        <div style="font-size:36px;line-height:1;margin-bottom:10px">🤒😷🏥💸😢</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#dc2626;margin-bottom:8px">Without monitoring</div>
+        <div style="font-size:12px;color:#64748b;line-height:1.6">Reactive. Outbreak happens. People hospitalized. Facility shuts. Regulatory action. $2–8M per event. Families affected. Preventable deaths.</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;padding:0 12px;font-size:24px;color:#cbd5e1">→</div>
+      <div style="padding:28px 24px;text-align:center;background:#eff6ff">
+        <div style="font-size:36px;line-height:1;margin-bottom:10px">📡⚠️🔔📋🤝</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#0077b6;margin-bottom:8px">AquaSignal deployed</div>
+        <div style="font-size:12px;color:#64748b;line-height:1.6">Node detects risk 14–21 days early. Alert fires automatically. Infection control notified. Tech dispatched. Treatment triggered before first case.</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;padding:0 12px;font-size:24px;color:#cbd5e1">→</div>
+      <div style="padding:28px 24px;text-align:center;background:#f0fdf4">
+        <div style="font-size:36px;line-height:1;margin-bottom:10px">✅😊🏃‍♂️💚🎉</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#059669;margin-bottom:8px">Outcome</div>
+        <div style="font-size:12px;color:#64748b;line-height:1.6">Zero cases. Zero hospitalisations. Zero deaths. Facility operating. Staff and patients safe. Regulatory liability avoided. Lives protected.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OS DASHBOARD -->
+  <div style="padding:56px 48px;background:#f5f7fa;border-bottom:1px solid #e2e8f0" id="sol-section">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#0077b6;margin-bottom:10px">⚡ The Solution — Running Live</div>
+    <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:900;color:#0f172a;letter-spacing:-1px;line-height:1.1;margin-bottom:12px">AquaSignal OS — autonomous water intelligence</div>
+    <div style="font-size:14px;color:#64748b;line-height:1.75;max-width:680px;margin-bottom:32px">This is what it looks like when it's running. Real nodes. Real alerts. Real dispatches. The system monitors everything, dispatches only when needed, and never sleeps. Click through the panels.</div>
+
+    <!-- OS PANEL -->
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08),0 8px 24px rgba(0,0,0,0.06);margin-bottom:32px">
+      <div style="background:#1e293b;padding:10px 16px;display:flex;align-items:center;gap:8px">
+        <div style="width:12px;height:12px;border-radius:50%;background:#ff5f57"></div>
+        <div style="width:12px;height:12px;border-radius:50%;background:#febc2e"></div>
+        <div style="width:12px;height:12px;border-radius:50%;background:#28c840"></div>
+        <div style="flex:1;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,0.4);font-family:monospace">AquaSignal OS · v2.1 · Ontario Network · 12 Active Nodes</div>
+      </div>
+      <div style="display:grid;grid-template-columns:200px 1fr;min-height:520px">
+        <div style="background:#f8fafc;border-right:1px solid #e2e8f0;padding:12px 0">
+          <div style="padding:6px 16px 3px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8">Monitoring</div>
+          <div class="osnav active" onclick="osSwitch('dash',this)">📊 Live Dashboard</div>
+          <div class="osnav" onclick="osSwitch('dispatch',this)">🚐 Dispatch Log</div>
+          <div class="osnav" onclick="osSwitch('stream',this)">🌊 Upstream / Downstream</div>
+          <div style="height:1px;background:#e2e8f0;margin:8px 16px"></div>
+          <div style="padding:6px 16px 3px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8">Facility Intel</div>
+          <div class="osnav" onclick="osSwitch('chem',this)">🧪 Chemical Inventory</div>
+          <div class="osnav" onclick="osSwitch('equip',this)">⚙️ Equipment Health</div>
+          <div style="height:1px;background:#e2e8f0;margin:8px 16px"></div>
+          <div style="padding:6px 16px 3px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8">Workflow</div>
+          <div class="osnav" onclick="osSwitch('phone',this)">📱 Tech Notification</div>
+        </div>
+        <div style="flex:1;overflow:hidden">
+
+          <!-- DASHBOARD -->
+          <div id="osv-dash" class="osview" style="display:block">
+            <div style="padding:14px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:13px;font-weight:700;color:#0f172a">Grand River Corridor — Live Overview</div>
+              <div style="font-size:11px;color:#94a3b8;font-family:monospace" id="os-clock">—</div>
+            </div>
+            <div id="os-alert" style="margin:12px 16px 0"></div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px 16px">
+              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">Active nodes</div><div style="font-size:22px;font-weight:700;color:#059669">12</div><div style="font-size:11px;color:#94a3b8">1 needs replacement</div></div>
+              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">Avg water temp</div><div style="font-size:22px;font-weight:700;color:#d97706">18.4°C</div><div style="font-size:11px;color:#94a3b8">⚠ Watch window open</div></div>
+              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">In risk zone</div><div style="font-size:22px;font-weight:700;color:#dc2626">3 / 12</div><div style="font-size:11px;color:#94a3b8">15–25°C threshold</div></div>
+              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">Days to act</div><div style="font-size:22px;font-weight:700;color:#d97706">14–21</div><div style="font-size:11px;color:#94a3b8">Before outbreak window</div></div>
+            </div>
+            <div style="padding:0 16px 14px;display:flex;flex-direction:column;gap:7px">
+              <div style="background:#fff;border:1px solid #e2e8f0;border-left:3px solid #059669;border-radius:8px;padding:10px 14px;display:grid;grid-template-columns:26px 1fr auto auto auto;align-items:center;gap:10px;font-size:12px">
+                <div style="font-size:16px">💧</div><div><div style="font-weight:600;color:#0f172a">Node 01 — Galt Cambridge</div><div style="font-size:10px;color:#94a3b8">All parameters normal · Last reading 4 min ago</div></div>
+                <div style="font-family:monospace;font-size:11px;color:#64748b">T: 12.1°C</div><div style="font-family:monospace;font-size:11px;color:#64748b">pH: 7.4</div>
+                <span style="background:#f0fdf4;color:#059669;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">Normal</span>
+              </div>
+              <div style="background:#fffbeb;border:1px solid #e2e8f0;border-left:3px solid #d97706;border-radius:8px;padding:10px 14px;display:grid;grid-template-columns:26px 1fr auto auto auto;align-items:center;gap:10px;font-size:12px">
+                <div style="font-size:16px">💧</div><div><div style="font-weight:600;color:#0f172a">Node 04 — Brantford Intake</div><div style="font-size:10px;color:#94a3b8">Conductivity elevated · Approaching standard threshold</div></div>
+                <div style="font-family:monospace;font-size:11px;color:#d97706;font-weight:700">T: 19.8°C</div><div style="font-family:monospace;font-size:11px;color:#d97706">pH: 7.1</div>
+                <span style="background:#fffbeb;color:#d97706;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">⚠ Watch</span>
+              </div>
+              <div style="background:#fef2f2;border:1px solid #fca5a5;border-left:3px solid #dc2626;border-radius:8px;padding:10px 14px;display:grid;grid-template-columns:26px 1fr auto auto auto;align-items:center;gap:10px;font-size:12px">
+                <div style="font-size:16px">💧</div><div><div style="font-weight:600;color:#0f172a">Node 07 — Kitchener Victoria Hospital</div><div style="font-size:10px;color:#991b1b">Legionella risk window ACTIVE · Facility infection control notified</div></div>
+                <div style="font-family:monospace;font-size:11px;color:#dc2626;font-weight:700">T: 23.6°C</div><div style="font-family:monospace;font-size:11px;color:#dc2626">pH: 6.8</div>
+                <span style="background:#fef2f2;color:#dc2626;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">🚨 Alert</span>
+              </div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-left:3px solid #059669;border-radius:8px;padding:10px 14px;display:grid;grid-template-columns:26px 1fr auto auto auto;align-items:center;gap:10px;font-size:12px">
+                <div style="font-size:16px">💧</div><div><div style="font-weight:600;color:#0f172a">Node 09 — Waterloo Upstream</div><div style="font-size:10px;color:#94a3b8">All parameters normal</div></div>
+                <div style="font-family:monospace;font-size:11px;color:#64748b">T: 11.2°C</div><div style="font-family:monospace;font-size:11px;color:#64748b">pH: 7.6</div>
+                <span style="background:#f0fdf4;color:#059669;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">Normal</span>
+              </div>
+              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #94a3b8;border-radius:8px;padding:10px 14px;display:grid;grid-template-columns:26px 1fr auto auto auto;align-items:center;gap:10px;font-size:12px">
+                <div style="font-size:16px">💧</div><div><div style="font-weight:600;color:#0f172a">Node 11 — Paris Junction</div><div style="font-size:10px;color:#94a3b8">Signal lost 6h ago · Battery 3% · Tech en route</div></div>
+                <div style="font-family:monospace;font-size:11px;color:#94a3b8">T: —</div><div style="font-family:monospace;font-size:11px;color:#94a3b8">pH: —</div>
+                <span style="background:#f1f5f9;color:#64748b;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">🔧 Replace</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- DISPATCH -->
+          <div id="osv-dispatch" class="osview" style="display:none;padding:16px">
+            <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #e2e8f0">Dispatch Log — Auto-triggered only · No wasted site visits</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px"><div style="font-size:22px">🚨</div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:#0f172a">Node 07 — Kitchener Victoria Hospital · Legionella risk active</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">Temp 23.6°C · Auto-alert sent to facility infection control + tech team · 14–21 day window</div></div><span style="background:#fef2f2;color:#dc2626;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap">Action required</span></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px"><div style="font-size:22px">🚐</div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:#0f172a">Node 11 — Paris Junction · Replacement dispatched</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">Battery 3% · Signal lost 6h ago · Tech dispatched automatically · ETA 38 min</div></div><span style="background:#eff6ff;color:#0077b6;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap">En route</span></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px"><div style="font-size:22px">🧪</div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:#0f172a">Node 04 — Brantford · Chemical dosing auto-triggered</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">Conductivity 892 µS/cm · Automated biocide dose sent to facility dosing pump · Confirmed</div></div><span style="background:#f0fdf4;color:#059669;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap">Auto-dosed</span></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px"><div style="font-size:22px">✅</div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:#0f172a">Node 03 — Elora Gorge · Replaced Apr 22</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">New unit online · 5-year cycle reset · All readings normal · No further action</div></div><span style="background:#f0fdf4;color:#059669;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap">Replaced</span></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px"><div style="font-size:22px">📅</div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:#0f172a">Node 06 — Fergus Intake · Scheduled</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">Due in 8 months · System will auto-dispatch when approaching · No action required now</div></div><span style="background:#f1f5f9;color:#64748b;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap">Scheduled</span></div>
+            </div>
+          </div>
+
+          <!-- STREAM -->
+          <div id="osv-stream" class="osview" style="display:none;padding:16px">
+            <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Upstream / Downstream Corridor Intelligence</div>
+            <div style="font-size:11px;color:#64748b;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #e2e8f0">Elevated temp detected at Conestogo 38 hours before reaching facility intake</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+              <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;color:#64748b;text-align:center">🏔️ Source<br><span style="font-size:9px;color:#94a3b8">Headwaters</span></div>
+              <div style="color:#94a3b8;font-size:18px">→</div>
+              <div style="background:#fffbeb;border:1.5px solid #d97706;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;color:#d97706;text-align:center">⚠️ Conestogo<br><span style="font-size:9px">22.9°C</span></div>
+              <div style="color:#94a3b8;font-size:18px">→</div>
+              <div style="background:#eff6ff;border:1.5px solid #0077b6;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;color:#0077b6;text-align:center">📍 Elora<br><span style="font-size:9px">12.1°C</span></div>
+              <div style="color:#94a3b8;font-size:18px">→</div>
+              <div style="background:#eff6ff;border:1.5px solid #0077b6;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;color:#0077b6;text-align:center">📍 Galt<br><span style="font-size:9px">12.4°C</span></div>
+              <div style="color:#94a3b8;font-size:18px">→</div>
+              <div style="background:#fffbeb;border:1.5px solid #d97706;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;color:#d97706;text-align:center">⚠️ Brantford<br><span style="font-size:9px">17.2°C</span></div>
+              <div style="color:#94a3b8;font-size:18px">→</div>
+              <div style="background:#fef2f2;border:1.5px solid #dc2626;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;color:#dc2626;text-align:center">🚨 Facility<br><span style="font-size:9px">23.6°C</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:8px">Upstream · Conestogo</div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px"><span style="color:#64748b">Temp</span><span style="font-weight:700;color:#d97706;font-family:monospace">22.9°C</span></div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px"><span style="color:#64748b">pH</span><span style="font-weight:600;font-family:monospace">7.2</span></div><div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:#64748b">Cond.</span><span style="font-weight:700;color:#d97706;font-family:monospace">844µS</span></div></div>
+              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:8px">Mid · Cambridge Galt</div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px"><span style="color:#64748b">Temp</span><span style="font-weight:700;color:#0077b6;font-family:monospace">12.4°C</span></div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px"><span style="color:#64748b">pH</span><span style="font-weight:600;font-family:monospace">7.4</span></div><div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:#64748b">Cond.</span><span style="font-weight:600;font-family:monospace">614µS</span></div></div>
+              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:8px">Intake · Brantford</div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px"><span style="color:#64748b">Temp</span><span style="font-weight:700;color:#d97706;font-family:monospace">17.2°C</span></div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px"><span style="color:#64748b">pH</span><span style="font-weight:600;font-family:monospace">7.1</span></div><div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:#64748b">Cond.</span><span style="font-weight:700;color:#dc2626;font-family:monospace">892µS</span></div></div>
+              <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:12px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:8px">Facility · Cooling Tower</div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px"><span style="color:#64748b">Temp</span><span style="font-weight:700;color:#dc2626;font-family:monospace">23.6°C</span></div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px"><span style="color:#64748b">pH</span><span style="font-weight:700;color:#d97706;font-family:monospace">6.8</span></div><div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:#64748b">Turb.</span><span style="font-weight:700;color:#dc2626;font-family:monospace">18.4FNU</span></div></div>
+            </div>
+          </div>
+
+          <!-- CHEMICAL -->
+          <div id="osv-chem" class="osview" style="display:none;padding:16px">
+            <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Chemical Inventory — Real-time consumption monitoring</div>
+            <div style="font-size:11px;color:#64748b;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #e2e8f0">Water readings determine chemical consumption rate. Auto-PO fires when stock hits threshold. Tech arrives with exactly what's needed.</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px"><div style="font-size:12px;font-weight:700;color:#0f172a;margin-bottom:8px">Biocide (oxidizing)</div><div style="height:6px;background:#f1f5f9;border-radius:3px;margin-bottom:6px;overflow:hidden"><div style="width:28%;height:100%;background:#dc2626;border-radius:3px"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8"><span>28% remaining</span><span>6 days</span></div><div style="font-size:10px;font-weight:700;color:#dc2626;margin-top:6px">🚨 Reorder now — auto-PO sent</div></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px"><div style="font-size:12px;font-weight:700;color:#0f172a;margin-bottom:8px">Scale inhibitor</div><div style="height:6px;background:#f1f5f9;border-radius:3px;margin-bottom:6px;overflow:hidden"><div style="width:61%;height:100%;background:#d97706;border-radius:3px"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8"><span>61% remaining</span><span>18 days</span></div><div style="font-size:10px;font-weight:700;color:#d97706;margin-top:6px">⚠️ Monitor — reorder in 10 days</div></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px"><div style="font-size:12px;font-weight:700;color:#0f172a;margin-bottom:8px">Corrosion inhibitor</div><div style="height:6px;background:#f1f5f9;border-radius:3px;margin-bottom:6px;overflow:hidden"><div style="width:84%;height:100%;background:#059669;border-radius:3px"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8"><span>84% remaining</span><span>28 days</span></div><div style="font-size:10px;font-weight:700;color:#059669;margin-top:6px">✅ Adequate supply</div></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px"><div style="font-size:12px;font-weight:700;color:#0f172a;margin-bottom:8px">pH adjustment (acid)</div><div style="height:6px;background:#f1f5f9;border-radius:3px;margin-bottom:6px;overflow:hidden"><div style="width:45%;height:100%;background:#0077b6;border-radius:3px"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8"><span>45% remaining</span><span>14 days</span></div><div style="font-size:10px;font-weight:700;color:#0077b6;margin-top:6px">📋 Scheduled reorder confirmed</div></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px"><div style="font-size:12px;font-weight:700;color:#0f172a;margin-bottom:8px">Dispersant</div><div style="height:6px;background:#f1f5f9;border-radius:3px;margin-bottom:6px;overflow:hidden"><div style="width:76%;height:100%;background:#059669;border-radius:3px"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8"><span>76% remaining</span><span>24 days</span></div><div style="font-size:10px;font-weight:700;color:#059669;margin-top:6px">✅ Adequate supply</div></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px"><div style="font-size:12px;font-weight:700;color:#0f172a;margin-bottom:8px">Dip slides / test kits</div><div style="height:6px;background:#f1f5f9;border-radius:3px;margin-bottom:6px;overflow:hidden"><div style="width:15%;height:100%;background:#dc2626;border-radius:3px"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8"><span>15% remaining</span><span>3 days</span></div><div style="font-size:10px;font-weight:700;color:#dc2626;margin-top:6px">🚨 Critical — tech dispatched</div></div>
+            </div>
+          </div>
+
+          <!-- EQUIPMENT -->
+          <div id="osv-equip" class="osview" style="display:none;padding:16px">
+            <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Equipment Health — Pre-failure detection from water chemistry</div>
+            <div style="font-size:11px;color:#64748b;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #e2e8f0">Scale buildup, UV lamp intensity, flow rates, and vibration signatures monitored continuously. Equipment failure predicted before it happens.</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div><div style="font-size:12px;font-weight:700;color:#0f172a">Cooling Tower CT-1</div><div style="font-size:10px;color:#94a3b8">Heat exchanger · North wing</div></div><span style="background:#fffbeb;color:#d97706;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">⚠️ Watch</span></div><div style="margin-bottom:8px"><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Scale buildup index</div><div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-bottom:3px"><div style="width:72%;height:100%;background:#d97706;border-radius:3px"></div></div><div style="font-size:11px;font-weight:600;color:#334155">72% — cleaning due in 14 days</div></div><div><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Flow rate capacity</div><div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-bottom:3px"><div style="width:64%;height:100%;background:#d97706;border-radius:3px"></div></div><div style="font-size:11px;font-weight:600;color:#334155">64% — reduced by fouling</div></div></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div><div style="font-size:12px;font-weight:700;color:#0f172a">UV Disinfection UV-2</div><div style="font-size:10px;color:#94a3b8">Secondary treatment · South loop</div></div><span style="background:#fef2f2;color:#dc2626;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">🚨 Replace</span></div><div style="margin-bottom:8px"><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Lamp intensity</div><div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-bottom:3px"><div style="width:11%;height:100%;background:#dc2626;border-radius:3px"></div></div><div style="font-size:11px;font-weight:600;color:#334155">11% — lamp end of life</div></div><div><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Transmittance</div><div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-bottom:3px"><div style="width:34%;height:100%;background:#dc2626;border-radius:3px"></div></div><div style="font-size:11px;font-weight:600;color:#334155">34% — fouled quartz sleeve</div></div></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div><div style="font-size:12px;font-weight:700;color:#0f172a">Filtration Unit FU-1</div><div style="font-size:10px;color:#94a3b8">Multimedia filter · Intake</div></div><span style="background:#fffbeb;color:#d97706;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">⚠️ Backwash</span></div><div style="margin-bottom:8px"><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Differential pressure</div><div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-bottom:3px"><div style="width:81%;height:100%;background:#d97706;border-radius:3px"></div></div><div style="font-size:11px;font-weight:600;color:#334155">81% — backwash overdue</div></div><div><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Media condition</div><div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-bottom:3px"><div style="width:67%;height:100%;background:#d97706;border-radius:3px"></div></div><div style="font-size:11px;font-weight:600;color:#334155">67% — inspect at next visit</div></div></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div><div style="font-size:12px;font-weight:700;color:#0f172a">Pump Station PS-3</div><div style="font-size:10px;color:#94a3b8">Primary circulation · Building B</div></div><span style="background:#f0fdf4;color:#059669;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">✅ Normal</span></div><div style="margin-bottom:8px"><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Vibration signature</div><div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-bottom:3px"><div style="width:22%;height:100%;background:#059669;border-radius:3px"></div></div><div style="font-size:11px;font-weight:600;color:#334155">22% — within normal range</div></div><div><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Bearing temperature</div><div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-bottom:3px"><div style="width:38%;height:100%;background:#059669;border-radius:3px"></div></div><div style="font-size:11px;font-weight:600;color:#334155">38% — operating normally</div></div></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div><div style="font-size:12px;font-weight:700;color:#0f172a">Dosing Pump DP-1</div><div style="font-size:10px;color:#94a3b8">Biocide injection · Main loop</div></div><span style="background:#f0fdf4;color:#059669;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">✅ Normal</span></div><div style="margin-bottom:8px"><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Dosing accuracy</div><div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-bottom:3px"><div style="width:96%;height:100%;background:#059669;border-radius:3px"></div></div><div style="font-size:11px;font-weight:600;color:#334155">96% — calibrated last week</div></div><div><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Pump stroke rate</div><div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-bottom:3px"><div style="width:88%;height:100%;background:#059669;border-radius:3px"></div></div><div style="font-size:11px;font-weight:600;color:#334155">88% — nominal</div></div></div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div><div style="font-size:12px;font-weight:700;color:#0f172a">Conductivity Probe CP-4</div><div style="font-size:10px;color:#94a3b8">Blowdown controller</div></div><span style="background:#f0fdf4;color:#059669;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">✅ Normal</span></div><div style="margin-bottom:8px"><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Signal drift</div><div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-bottom:3px"><div style="width:5%;height:100%;background:#059669;border-radius:3px"></div></div><div style="font-size:11px;font-weight:600;color:#334155">5% — freshly calibrated</div></div><div><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Probe age</div><div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-bottom:3px"><div style="width:40%;height:100%;background:#059669;border-radius:3px"></div></div><div style="font-size:11px;font-weight:600;color:#334155">40% of service life used</div></div></div>
+            </div>
+          </div>
+
+          <!-- PHONE -->
+          <div id="osv-phone" class="osview" style="display:none;padding:16px">
+            <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Tech Notification — Complete automated workflow</div>
+            <div style="font-size:11px;color:#64748b;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #e2e8f0">Alert fires. Tech dispatched with pre-loaded checklist and chemicals needed. Problem resolved. Loop closed. Nobody monitors manually.</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start">
+              <div>
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:10px">1. Alert fires automatically</div>
+                <div style="width:180px;background:#1a1a2e;border-radius:24px;border:5px solid #2a2a3e;overflow:hidden;margin:0 auto">
+                  <div style="height:22px;background:#1a1a2e;display:flex;align-items:center;justify-content:center"><div style="width:50px;height:7px;background:#2a2a3e;border-radius:4px"></div></div>
+                  <div style="background:#fff">
+                    <div style="background:#f8f9fb;padding:8px 12px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:7px"><div style="width:24px;height:24px;background:linear-gradient(135deg,#0077b6,#0096c7);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px">💧</div><div><div style="font-size:10px;font-weight:700">AquaSignal</div><div style="font-size:9px;color:#94a3b8">now</div></div></div>
+                    <div style="margin:9px;padding:9px 11px;background:#fef2f2;border:1px solid #fca5a5;border-radius:9px">
+                      <div style="font-size:10px;font-weight:700;color:#dc2626;margin-bottom:4px">🚨 LEGIONELLA RISK ALERT</div>
+                      <div style="font-size:9px;color:#991b1b;line-height:1.5">Node 07 — Victoria Hospital<br>Temp: <strong>23.6°C</strong> · Risk window: <strong>14–21 days</strong><br>Infection control notified.<br>Action required.</div>
+                    </div>
+                    <div style="margin:9px;padding:8px 11px;background:#f8f9fb;border-radius:8px"><div style="font-size:9px;color:#94a3b8;margin-bottom:2px">Location</div><div style="font-size:11px;font-weight:600">Kitchener · 4.2 km away</div></div>
+                    <div style="margin:9px;display:block;padding:8px;background:#0077b6;color:#fff;border-radius:8px;font-size:10px;font-weight:700;text-align:center">Accept Dispatch →</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:10px">2. Tech arrives · pre-loaded</div>
+                <div style="width:180px;background:#1a1a2e;border-radius:24px;border:5px solid #2a2a3e;overflow:hidden;margin:0 auto">
+                  <div style="height:22px;background:#1a1a2e;display:flex;align-items:center;justify-content:center"><div style="width:50px;height:7px;background:#2a2a3e;border-radius:4px"></div></div>
+                  <div style="background:#fff">
+                    <div style="background:#f8f9fb;padding:8px 12px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:7px"><div style="width:24px;height:24px;background:linear-gradient(135deg,#0077b6,#0096c7);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px">💧</div><div><div style="font-size:10px;font-weight:700">AquaSignal</div><div style="font-size:9px;color:#94a3b8">Dispatch — en route</div></div></div>
+                    <div style="margin:9px;padding:8px 11px;background:#f8f9fb;border-radius:8px"><div style="font-size:9px;color:#94a3b8;margin-bottom:2px">Checklist</div><div style="font-size:9px;font-weight:600;line-height:1.6">✓ Check biocide level<br>✓ Dip slide test<br>✓ Inspect drift eliminators<br>✓ Log blowdown rate</div></div>
+                    <div style="margin:9px;padding:8px 11px;background:#f8f9fb;border-radius:8px"><div style="font-size:9px;color:#94a3b8;margin-bottom:2px">Bring on arrival</div><div style="font-size:9px;font-weight:600;line-height:1.6">Biocide — 5L<br>Scale inhibitor — 2L</div></div>
+                    <div style="margin:9px;display:block;padding:8px;background:#059669;color:#fff;border-radius:8px;font-size:10px;font-weight:700;text-align:center">Mark on-site ✓</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:10px">3. Resolved · loop closed</div>
+                <div style="width:180px;background:#1a1a2e;border-radius:24px;border:5px solid #2a2a3e;overflow:hidden;margin:0 auto">
+                  <div style="height:22px;background:#1a1a2e;display:flex;align-items:center;justify-content:center"><div style="width:50px;height:7px;background:#2a2a3e;border-radius:4px"></div></div>
+                  <div style="background:#fff">
+                    <div style="background:#f8f9fb;padding:8px 12px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:7px"><div style="width:24px;height:24px;background:linear-gradient(135deg,#0077b6,#0096c7);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px">💧</div><div><div style="font-size:10px;font-weight:700">AquaSignal</div><div style="font-size:9px;color:#059669">✅ Resolved</div></div></div>
+                    <div style="margin:9px;padding:9px 11px;background:#f0fdf4;border:1px solid #a7f3d0;border-radius:9px;font-size:9px;color:#059669;font-weight:600;text-align:center">✅ Service complete<br>Node 07 — Victoria Hospital<br>Biocide dosed · Normalizing</div>
+                    <div style="margin:9px;padding:8px 11px;background:#f8f9fb;border-radius:8px"><div style="font-size:9px;color:#94a3b8;margin-bottom:2px">Post-treatment temp</div><div style="font-size:11px;font-weight:700;color:#0077b6">18.2°C · Trending down</div></div>
+                    <div style="margin:9px;padding:8px 11px;background:#f8f9fb;border-radius:8px"><div style="font-size:9px;color:#94a3b8;margin-bottom:2px">Next dispatch</div><div style="font-size:9px;font-weight:600">Automated monitoring continues<br>Only if signal requires it</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1036,7 +979,7 @@ tr:hover td{background:var(--surface2)}
       </div>
       <a href="https://zenodo.org/records/19695022" target="_blank" style="margin-left:auto;padding:10px 20px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:2px;white-space:nowrap">Read Paper 2</a>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #e2e8f0">
       <div style="padding:28px 32px;border-right:1px solid var(--border);text-align:center">
         <div style="font-family:var(--serif);font-size:52px;font-weight:900;color:#e63946;line-height:1">354</div>
         <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin:6px 0">Ontario Cases Per Year</div>
@@ -1238,6 +1181,63 @@ tr:hover td{background:var(--surface2)}
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+
+// OS PANEL
+function osSwitch(id, el){
+  document.querySelectorAll('.osview').forEach(v=>v.style.display='none');
+  document.querySelectorAll('.osnav').forEach(n=>n.classList.remove('active'));
+  document.getElementById('osv-'+id).style.display='block';
+  if(el)el.classList.add('active');
+}
+
+// OS CLOCK
+function updateOsClock(){
+  const now=new Date(),ts=now.toLocaleTimeString('en-CA',{hour12:false});
+  const el=document.getElementById('os-clock');
+  if(el)el.textContent=ts;
+}
+setInterval(updateOsClock,1000);
+updateOsClock();
+
+// OS ALERTS
+const osAlerts=[
+  {red:true,icon:'🚨',title:'Node 07 — Kitchener Victoria Hospital: temp 23.6°C',sub:'Legionella risk window active · 14–21 days to elevated outbreak probability · Infection control notified'},
+  {red:false,icon:'⚠️',title:'Node 04 — Brantford intake: conductivity 892 µS/cm',sub:'Exceeds Ontario guideline · Scaling risk elevated · Chemical adjustment triggered automatically'},
+  {red:true,icon:'🔧',title:'Node 11 — Paris Junction: replacement signal triggered',sub:'Battery 3% · Signal lost 6h ago · Tech auto-dispatched · ETA 38 minutes · No action required'},
+];
+let osAlertIdx=0;
+function cycleOsAlert(){
+  const a=osAlerts[osAlertIdx%osAlerts.length];
+  const slot=document.getElementById('os-alert');
+  if(!slot)return;
+  const bg=a.red?'#fef2f2':'#fffbeb';
+  const border=a.red?'#fca5a5':'#fcd34d';
+  const tc=a.red?'#dc2626':'#d97706';
+  const sc=a.red?'#991b1b':'#92400e';
+  const bc=a.red?'#dc2626':'#d97706';
+  slot.innerHTML=`<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:${bg};border:1px solid ${border};border-radius:8px;animation:slideIn 0.4s ease">
+    <div style="font-size:18px;flex-shrink:0">${a.icon}</div>
+    <div style="flex:1"><div style="font-size:12px;font-weight:700;color:${tc}">${a.title}</div><div style="font-size:11px;color:${sc};margin-top:2px">${a.sub}</div></div>
+    <button style="background:${bc};color:#fff;border:none;padding:7px 13px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">Act now →</button>
+  </div>`;
+  osAlertIdx++;
+}
+cycleOsAlert();
+setInterval(cycleOsAlert,5000);
+
+// LIVE TICKER
+const TICKER_BASE={t1:12.4,t2:17.2,t3:11.8,t4:13.1,t5:22.9};
+function updateTicker(){
+  Object.entries(TICKER_BASE).forEach(([id,base])=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const v=(base+(Math.random()-0.5)*0.9).toFixed(1);
+    el.textContent=v+'°C';
+    const cls=parseFloat(v)>=25?'t-danger':parseFloat(v)>=15?'t-warn':'t-safe';
+    el.className='t-val '+cls;
+  });
+}
+
 // ── Config ───────────────────────────────────────────────────
 const PARAM_LABELS = {
   pH:'pH', Temp:'Temp °C', Alk:'Alkalinity mg/L', Cond:'Conductivity µS/cm',
@@ -1486,82 +1486,10 @@ function srt(k) {
 function cp(d) { curPage=Math.max(0,curPage+d); renderTbl(); }
 function v(id) { return (document.getElementById(id).value||'').trim(); }
 
-// ── Solution Modal ───────────────────────────────────────────
-function openSolution() {
-  document.getElementById('solution-modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeSolution(e) {
-  if (e && e.target !== document.getElementById('solution-modal')) return;
-  document.getElementById('solution-modal').classList.remove('open');
-  document.body.style.overflow = '';
-}
-document.addEventListener('keydown', e => { if(e.key==='Escape') closeSolution({target:document.getElementById('solution-modal')}); });
-
-// ── Live Temperature Feed ─────────────────────────────────────
-// Environment Canada MSC GeoMet API — real hydrometric stations on Grand River
-const TEMP_STATIONS = [
-  {id:'t1', label:'Grand River @ Galt', station:'02GA010'},
-  {id:'t2', label:'Brantford Intake', station:'02GB007'},
-  {id:'t3', label:'Nith River', station:'02GA034'},
-  {id:'t4', label:'Speed River', station:'02GA047'},
-  {id:'t5', label:'Conestogo River', station:'02GA022'},
-];
-
-async function fetchLiveTemps() {
-  try {
-    const baseUrl = 'https://api.weather.gc.ca/collections/hydrometric-realtime/items';
-    const today = new Date();
-    const yesterday = new Date(today - 86400000);
-    const fmt = d => d.toISOString().slice(0,19)+'Z';
-
-    for (const st of TEMP_STATIONS) {
-      try {
-        const url = `${baseUrl}?station_number=${st.station}&datetime=${fmt(yesterday)}/${fmt(today)}&sortby=-datetime&limit=1&f=json`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('no data');
-        const json = await res.json();
-        const feat = json.features?.[0];
-        const temp = feat?.properties?.LEVEL ?? feat?.properties?.DISCHARGE ?? null;
-        const el = document.getElementById(st.id);
-        if (el && temp !== null) {
-          const t = parseFloat(temp).toFixed(1);
-          el.textContent = t + '°C';
-          el.className = 'temp-val ' + (t >= 25 ? 'danger' : t >= 15 ? 'warn' : 'safe');
-        } else if (el) {
-          el.textContent = simulateTemp(st.station) + '°C';
-          setTempClass(el);
-        }
-      } catch {
-        const el = document.getElementById(st.id);
-        if (el) { el.textContent = simulateTemp(st.station) + '°C'; setTempClass(el); }
-      }
-    }
-  } catch(e) {
-    TEMP_STATIONS.forEach(st => {
-      const el = document.getElementById(st.id);
-      if (el) { el.textContent = simulateTemp(st.station) + '°C'; setTempClass(el); }
-    });
-  }
-}
-
-function simulateTemp(station) {
-  // Seasonally plausible Grand River temps for late April
-  const seeds = {'02GA010':12.4,'02GB007':17.2,'02GA034':11.8,'02GA047':13.1,'02GA022':22.9};
-  const base = seeds[station] || 14.5;
-  return (base + (Math.random()-0.5)*1.2).toFixed(1);
-}
-
-function setTempClass(el) {
-  const t = parseFloat(el.textContent);
-  el.className = 'temp-val ' + (t >= 25 ? 'danger' : t >= 15 ? 'warn' : 'safe');
-}
-
-fetchLiveTemps();
-setInterval(fetchLiveTemps, 5*60*1000);
-
 // ── Init ─────────────────────────────────────────────────────
 loadData();
+updateTicker();
+setInterval(updateTicker,30000);
 </script>
 </body>
 </html>
