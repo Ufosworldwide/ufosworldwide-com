@@ -33,12 +33,10 @@
     overflow-x: hidden;
   }
 
-  /* Header / Branding */
   .header { width: 100%; max-width: 600px; padding: 40px 20px 20px; text-align: center; }
   .brand { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 4px; color: var(--gold); text-shadow: 0 0 20px rgba(255, 209, 102, 0.3); line-height: 1; }
   .sub-brand { font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
 
-  /* Main Card */
   .main-card {
     background: var(--surface);
     width: calc(100% - 40px);
@@ -47,24 +45,22 @@
     border: 1px solid var(--border);
     padding: 30px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    margin-bottom: 30px;
+    margin-bottom: 20px;
   }
 
-  /* Sentry Section */
-  .sentry-section {
-    background: rgba(26, 45, 68, 0.4);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 30px;
+  /* NEW SENTRY STYLING */
+  .sentry-card {
+    background: #0a1018;
     width: calc(100% - 40px);
     max-width: 500px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-bottom: 30px;
   }
-  .sentry-title { color: var(--accent); font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-  .sentry-input { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 15px; border-radius: 12px; font-family: 'Nunito'; margin-bottom: 15px; resize: none; }
-  .sentry-result { padding: 15px; border-radius: 12px; margin-top: 15px; font-weight: bold; text-align: center; display: none; }
+  .sentry-input { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 12px; font-family: 'Nunito'; margin: 10px 0; resize: none; }
+  .sentry-res { padding: 12px; border-radius: 10px; margin-top: 10px; font-weight: bold; text-align: center; display: none; font-size: 0.9rem; }
 
-  /* Buttons */
   .btn-gen {
     width: 100%;
     padding: 20px;
@@ -78,9 +74,7 @@
     transition: 0.2s;
     box-shadow: 0 5px 15px rgba(0, 229, 255, 0.2);
   }
-  .btn-gen:active { transform: scale(0.98); }
 
-  /* Password Display Area */
   .display-box {
     margin-top: 25px;
     background: #000;
@@ -91,9 +85,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    overflow: hidden;
+    cursor: pointer;
   }
+
   #passwordOutput {
     font-family: 'Share Tech Mono', monospace;
     font-size: 1.4rem;
@@ -101,36 +95,17 @@
     word-break: break-all;
     text-align: center;
     filter: blur(8px);
-    transition: 0.3s;
-    user-select: none;
+    transition: 0.4s;
   }
-  #passwordOutput.unlocked { filter: blur(0); user-select: text; }
 
-  /* PIN Overlays */
-  .pin-area { margin-top: 20px; }
-  .pin-label { color: var(--muted); font-size: 0.85rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-  .pin-row { display: flex; gap: 10px; }
-  .pin-input {
-    flex: 1;
-    background: #000;
-    border: 1px solid var(--border);
-    color: var(--accent);
-    text-align: center;
-    font-size: 1.8rem;
-    padding: 10px;
-    border-radius: 12px;
-    letter-spacing: 5px;
-  }
-  .btn-pin { background: var(--border); border: none; color: white; padding: 0 20px; border-radius: 12px; cursor: pointer; font-weight: bold; }
+  #passwordOutput.revealed { filter: blur(0); }
 
-  /* Footer / Info */
+  .pin-area { margin-top: 20px; display: none; }
+  .pin-input { width: 100%; background: #000; border: 1px solid var(--border); color: var(--accent); text-align: center; font-size: 1.8rem; padding: 10px; border-radius: 12px; letter-spacing: 5px; margin-bottom: 10px; }
+
   .how-section { width: 100%; max-width: 800px; padding: 40px 20px; }
-  .how-section h2 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--gold); margin-bottom: 20px; text-align: center; }
-  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-  .step { background: var(--surface); padding: 25px; border-radius: 20px; border: 1px solid var(--border); }
-  .step-num { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: var(--border); line-height: 1; }
-  .step h3 { color: var(--accent); margin: 10px 0; }
-  .step p { color: var(--muted); font-size: 0.95rem; }
+  .step { background: var(--surface); padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 15px; }
+  .step h3 { color: var(--accent); margin-bottom: 5px; }
 
   .hidden { display: none; }
 </style>
@@ -145,125 +120,87 @@
 <div class="main-card">
   <button class="btn-gen" onclick="generateKey()">GENERATE NEW SHIELD</button>
   
-  <div class="display-box">
+  <div class="display-box" onclick="showPinArea()">
     <div id="passwordOutput">••••••••••••••••••••••••</div>
   </div>
 
-  <div id="authArea" class="pin-area hidden">
-    <div class="pin-label">Enter 4-Digit PIN to Reveal</div>
-    <div class="pin-row">
-      <input type="tel" id="pinInput" class="pin-input" maxlength="4" placeholder="····" inputmode="numeric">
-      <button class="btn-pin" onclick="verifyPin()">UNLOCK</button>
-    </div>
+  <div id="authArea" class="pin-area">
+    <input type="tel" id="pinInput" class="pin-input" maxlength="4" placeholder="••••" inputmode="numeric">
+    <button class="btn-gen" style="background:var(--accent2);" onclick="checkPin()">UNLOCK SHIELD</button>
   </div>
-
-  <button id="copyBtn" class="btn-gen hidden" style="margin-top:20px; background: var(--accent2);" onclick="copyToClipboard()">COPY TO CLIPBOARD</button>
 </div>
 
-<div class="sentry-section">
-  <div class="sentry-title">🛡️ SENTRY SCANNER</div>
-  <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 10px;">Paste a link, email, or file name to scan for Trojan traps.</p>
-  <textarea id="sentryInput" class="sentry-input" rows="3" placeholder="Paste suspicious text here..."></textarea>
-  <button class="btn-pin" style="width: 100%; padding: 15px;" onclick="scanForTrojans()">RUN SCAN</button>
-  <div id="sentryResult" class="sentry-result"></div>
+<div class="sentry-card">
+  <h3 style="color:var(--accent); font-family:'Bebas Neue'; letter-spacing:1px;">🛡️ SENTRY SCANNER</h3>
+  <p style="font-size:0.8rem; color:var(--muted);">Paste suspicious links or file names below:</p>
+  <textarea id="sentryIn" class="sentry-input" rows="2" placeholder="e.g. Urgent_Invoice.exe"></textarea>
+  <button class="btn-gen" style="font-size:0.9rem; padding:12px; background:var(--border); color:#fff;" onclick="scan()">SCAN FOR TROJANS</button>
+  <div id="sentryOut" class="sentry-res"></div>
 </div>
 
 <div class="how-section">
-  <h2>The Protocol</h2>
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">01</div>
-      <h3>Generate</h3>
-      <p>Create a high-entropy 24-character string that changes every 30 days to keep banks locked tight.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">02</div>
-      <h3>Sentry Scan</h3>
-      <p>Use the Sentry to analyze links. It spots the psychological traps and "Trojan" files before you click.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">03</div>
-      <h3>No Trace</h3>
-      <p>SafeKey™ runs entirely on your device. We never see your codes, and your data stays in your hands.</p>
-    </div>
+  <div class="step">
+    <h3>01. Generate</h3>
+    <p>Tap generate to create your unique 24-character monthly shield.</p>
+  </div>
+  <div class="step">
+    <h3>02. Sentry</h3>
+    <p>Use the Scanner to identify "Donkey" traps and malicious files.</p>
   </div>
 </div>
 
 <script>
-  let currentKey = "";
-  const CORRECT_PIN = "1234"; // Default PIN
+  let secretKey = "";
+  let masterPin = "1234";
 
   function generateKey() {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*";
-    let result = "";
-    const randomValues = new Uint32Array(24);
-    window.crypto.getRandomValues(randomValues);
-    for (let i = 0; i < 24; i++) {
-      result += chars.charAt(randomValues[i] % chars.length);
-    }
-    currentKey = result;
+    let res = "";
+    for (let i = 0; i < 24; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+    secretKey = res;
     document.getElementById('passwordOutput').innerText = "••••••••••••••••••••••••";
-    document.getElementById('passwordOutput').classList.remove('unlocked');
-    document.getElementById('authArea').classList.remove('hidden');
-    document.getElementById('copyBtn').classList.add('hidden');
+    document.getElementById('passwordOutput').classList.remove('revealed');
+    document.getElementById('authArea').style.display = "none";
+    alert("New Shield Generated. Tap the box to unlock.");
   }
 
-  function verifyPin() {
-    const input = document.getElementById('pinInput').value;
-    if (input === CORRECT_PIN) {
-      const output = document.getElementById('passwordOutput');
-      output.innerText = currentKey;
-      output.classList.add('unlocked');
-      document.getElementById('copyBtn').classList.remove('hidden');
-      document.getElementById('authArea').classList.add('hidden');
+  function showPinArea() {
+    if(!secretKey) { alert("Generate a shield first!"); return; }
+    document.getElementById('authArea').style.display = "block";
+  }
+
+  function checkPin() {
+    const val = document.getElementById('pinInput').value;
+    if(val === masterPin) {
+      const out = document.getElementById('passwordOutput');
+      out.innerText = secretKey;
+      out.classList.add('revealed');
+      document.getElementById('authArea').style.display = "none";
+      document.getElementById('pinInput').value = "";
     } else {
-      alert("Invalid PIN. Access Denied.");
+      alert("Access Denied.");
       document.getElementById('pinInput').value = "";
     }
   }
 
-  function copyToClipboard() {
-    navigator.clipboard.writeText(currentKey).then(() => {
-      alert("Shield Copied! Paste it into your secure application.");
-    });
-  }
+  function scan() {
+    const val = document.getElementById('sentryIn').value.toLowerCase();
+    const res = document.getElementById('sentryOut');
+    res.style.display = "block";
 
-  // --- SENTRY LOGIC ---
-  function scanForTrojans() {
-    const input = document.getElementById('sentryInput').value.toLowerCase();
-    const resultDiv = document.getElementById('sentryResult');
-    resultDiv.style.display = "block";
-    
-    // Trojan & Phish Red Flags
-    const highRiskExt = [".exe", ".zip", ".dmg", ".pkg", ".bat", ".scr", ".iso", ".vbs"];
-    const urgencyWords = ["urgent", "action required", "suspended", "unauthorized", "login", "overdue", "verification", "frozen"];
-    const linkTricks = ["bit.ly", "tinyurl", "t.co", "click here", "update now"];
+    const danger = [".exe", ".zip", ".bat", ".scr", "urgent", "suspended", "action required", "bit.ly"];
+    let match = danger.filter(word => val.includes(word));
 
-    let score = 0;
-    let findings = [];
-
-    highRiskExt.forEach(ext => { if (input.includes(ext)) { score += 5; findings.push("Hidden File Extension ("+ext+")"); } });
-    urgencyWords.forEach(word => { if (input.includes(word)) { score += 2; findings.push("Urgent Language"); } });
-    linkTricks.forEach(trick => { if (input.includes(trick)) { score += 3; findings.push("Shortened/Masked Link"); } });
-
-    if (score >= 5) {
-      resultDiv.style.background = "rgba(255, 68, 85, 0.2)";
-      resultDiv.style.color = "var(--danger)";
-      resultDiv.style.border = "1px solid var(--danger)";
-      resultDiv.innerHTML = "🛑 HIGH ALERT: Trojan Risk Detected!<br><span style='font-size:0.8rem; font-weight:normal;'>Detected: " + findings.join(", ") + "</span>";
-    } else if (score > 0) {
-      resultDiv.style.background = "rgba(255, 204, 0, 0.2)";
-      resultDiv.style.color = "var(--warning)";
-      resultDiv.style.border = "1px solid var(--warning)";
-      resultDiv.innerHTML = "⚠️ WARNING: Suspicious Patterns Found.<br><span style='font-size:0.8rem; font-weight:normal;'>Recommendation: Do not open on a bank computer.</span>";
+    if(match.length > 0) {
+      res.style.background = "rgba(255, 68, 85, 0.2)";
+      res.style.color = "#ff4455";
+      res.innerHTML = "🛑 TRAP DETECTED: " + match.join(", ");
     } else {
-      resultDiv.style.background = "rgba(0, 255, 136, 0.2)";
-      resultDiv.style.color = "var(--accent2)";
-      resultDiv.style.border = "1px solid var(--accent2)";
-      resultDiv.innerHTML = "✅ NO OBVIOUS TRAPS FOUND.<br><span style='font-size:0.8rem; font-weight:normal;'>Always verify the sender before clicking.</span>";
+      res.style.background = "rgba(0, 255, 136, 0.2)";
+      res.style.color = "#00ff88";
+      res.innerHTML = "✅ NO OBVIOUS TRAPS FOUND.";
     }
   }
 </script>
-
 </body>
 </html>
