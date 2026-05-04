@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafeKey™ + PhishGuard · Presignal Inc. · Security Intelligence</title>
+<meta name="description" content="Free AI-powered security suite. SafeKey™ generates unbreakable monthly passwords. PhishGuard™ catches phishing emails with AI.">
+
+<!-- Google Analytics GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-309487660"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-309487660');
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&family=Nunito:wght@400;600;700&family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ═══════════════════════════════════════════════
+     SHARED BASE
+  ═══════════════════════════════════════════════ */
+  :root {
+    --bg:      #080c10;
+    --surface: #0d1520;
+    --border:  #1a2d44;
+    --accent:  #00e5ff;
+    --accent2: #00ff88;
+    --danger:  #ff4455;
+    --text:    #c8dff0;
+    --muted:   #4a6b88;
+    --gold:    #ffd166;
+    /* phishguard extras */
+    --pg-accent:  #00ff88;
+    --pg-accent2: #ff3c5a;
+    --pg-accent3: #ffd700;
+    --pg-panel:   #0f1218;
+    --pg-border:  #1e2530;
+    --pg-text:    #e8eaf0;
+    --pg-muted:   #5a6478;
+    --pg-glow: 0 0 20px rgba(0,255,136,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.018) 2px, rgba(0,229,255,0.018) 4px);
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ═══════════════════════════════════════════════
+     SAFEKEY STYLES
+  ═══════════════════════════════════════════════ */
+  .prop-bar {
+    width: 100%;
+    background: linear-gradient(90deg, #04080d, #0a1520, #04080d);
+    border-bottom: 1px solid rgba(0,229,255,0.2);
+    padding: 9px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    flex-wrap: wrap;
+    gap: 4px;
+    text-transform: uppercase;
+  }
+  .prop-bar-center { color: var(--accent); letter-spacing: 3px; font-weight: bold; }
+
+  .hero {
+    width: 100%;
+    padding: 52px 24px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .shield-icon {
+    width: 88px; height: 88px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 18px var(--accent));
+    animation: sk-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes sk-pulse {
+    0%,100% { filter: drop-shadow(0 0 18px var(--accent)); }
+    50%      { filter: drop-shadow(0 0 32px var(--accent2)); }
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 12vw, 96px);
+    letter-spacing: 6px;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .tagline {
+    font-size: clamp(12px, 3vw, 17px);
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .story-banner {
+    margin: 40px auto 0;
+    max-width: 700px;
+    width: calc(100% - 48px);
+    background: linear-gradient(135deg, rgba(255,65,85,0.08), rgba(255,209,102,0.06));
+    border: 1px solid rgba(255,65,85,0.3);
+    border-left: 4px solid var(--danger);
+    border-radius: 12px;
+    padding: 24px 28px;
+  }
+
+  .story-banner h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--danger);
+    margin-bottom: 10px;
+  }
+
+  .story-banner p { font-size: 14px; line-height: 1.75; color: #a0b8cc; }
+  .story-banner .highlight { color: var(--gold); font-weight: 700; }
+
+  .card {
+    margin: 36px auto 0;
+    max-width: 560px;
+    width: calc(100% - 48px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+  }
+
+  .card-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .pw-box {
+    background: #050a0f;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    position: relative;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.3s;
+  }
+
+  .pw-box.revealed { border-color: var(--accent2); box-shadow: 0 0 20px rgba(0,255,136,0.1); }
+
+  .pw-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(15px, 4vw, 22px);
+    letter-spacing: 2px;
+    color: var(--accent2);
+    word-break: break-all;
+    text-align: center;
+    transition: filter 0.4s;
+    user-select: all;
+  }
+
+  .pw-text.locked { filter: blur(8px); color: var(--muted); pointer-events: none; user-select: none; }
+  .pw-placeholder { color: var(--muted); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
+
+  .lock-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(5,10,15,0.6);
+    border-radius: 11px;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .lock-overlay svg { opacity: 0.5; }
+
+  .btn-generate {
+    margin-top: 20px;
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #003d52, #005c3d);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    color: var(--accent);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-generate:hover { background: linear-gradient(135deg, #005c79, #007a52); box-shadow: 0 0 30px rgba(0,229,255,0.2); transform: translateY(-1px); }
+  .btn-generate:active { transform: translateY(1px); }
+
+  .btn-generate .btn-spark {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(0,229,255,0.15) 50%, transparent 100%);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+
+  .btn-generate:hover .btn-spark { transform: translateX(100%); }
+
+  .pin-section { margin-top: 24px; border-top: 1px solid var(--border); padding-top: 24px; }
+  .pin-label { font-size: 13px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+  .pin-row { display: flex; gap: 10px; }
+
+  .pin-input {
+    flex: 1;
+    padding: 14px 16px;
+    background: #050a0f;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 18px;
+    letter-spacing: 6px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.25s;
+    -webkit-text-security: disc;
+  }
+
+  .pin-input:focus { border-color: var(--accent); }
+  .pin-input.error { border-color: var(--danger); animation: shake 0.3s; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25%      { transform: translateX(-6px); }
+    75%      { transform: translateX(6px); }
+  }
+
+  .btn-pin {
+    padding: 14px 20px;
+    background: transparent;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    color: var(--accent);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-pin:hover { background: rgba(0,229,255,0.1); }
+  .pin-hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+  .copy-row { display: flex; gap: 10px; margin-top: 16px; }
+
+  .btn-copy, .btn-hide {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid;
+  }
+
+  .btn-copy { background: rgba(0,255,136,0.08); border-color: var(--accent2); color: var(--accent2); }
+  .btn-copy:hover { background: rgba(0,255,136,0.18); }
+  .btn-copy:disabled { opacity: 0.3; cursor: default; }
+  .btn-hide { background: rgba(255,65,85,0.08); border-color: var(--danger); color: var(--danger); }
+  .btn-hide:hover { background: rgba(255,65,85,0.18); }
+  .btn-hide:disabled { opacity: 0.3; cursor: default; }
+
+  .copy-toast { font-size: 12px; color: var(--accent2); text-align: center; margin-top: 8px; height: 18px; letter-spacing: 1px; }
+
+  .status-bar { display: flex; align-items: center; gap: 8px; justify-content: center; font-size: 12px; color: var(--muted); margin-top: 16px; letter-spacing: 1px; }
+
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent2); animation: sk-blink 2s infinite; }
+
+  @keyframes sk-blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+  .how-section { margin: 36px auto 0; max-width: 700px; width: calc(100% - 48px); }
+
+  .how-section h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .sk-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+  }
+
+  .step { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 18px; text-align: center; }
+  .step-num { font-family: 'Bebas Neue', sans-serif; font-size: 40px; color: var(--accent); line-height: 1; margin-bottom: 8px; }
+  .step h3 { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #ddf; margin-bottom: 6px; }
+  .step p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* SET PIN MODAL */
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(5,10,15,0.92); z-index: 1000; align-items: center; justify-content: center; padding: 24px; }
+  .modal-bg.open { display: flex; }
+
+  .modal { background: var(--surface); border: 1px solid var(--accent); border-radius: 20px; padding: 36px 32px; max-width: 420px; width: 100%; box-shadow: 0 0 60px rgba(0,229,255,0.15); }
+  .modal h2 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; color: var(--accent); margin-bottom: 10px; }
+  .modal p { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+
+  .modal input {
+    width: 100%;
+    padding: 14px;
+    background: #050a0f;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--accent2);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 22px;
+    letter-spacing: 8px;
+    text-align: center;
+    outline: none;
+    margin-bottom: 8px;
+    -webkit-text-security: disc;
+  }
+
+  .modal input:focus { border-color: var(--accent); }
+  .modal .modal-btns { display: flex; gap: 10px; margin-top: 16px; }
+
+  .modal .modal-btns button {
+    flex: 1; padding: 14px; border-radius: 10px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px;
+    cursor: pointer; border: 1px solid; transition: all 0.2s;
+  }
+
+  .btn-confirm { background: rgba(0,229,255,0.1); border-color: var(--accent) !important; color: var(--accent) !important; }
+  .btn-confirm:hover { background: rgba(0,229,255,0.2) !important; }
+  .btn-cancel { background: transparent; border-color: var(--muted) !important; color: var(--muted) !important; }
+  .modal-error { font-size: 12px; color: var(--danger); height: 16px; margin-bottom: 4px; }
+
+  /* ═══════════════════════════════════════════════
+     DIVIDER BETWEEN TOOLS
+  ═══════════════════════════════════════════════ */
+  .tool-divider {
+    width: calc(100% - 48px);
+    max-width: 900px;
+    margin: 56px auto 0;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .tool-divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--pg-border), transparent);
+  }
+
+  .tool-divider-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--pg-muted);
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 6px 14px;
+    border: 1px solid var(--pg-border);
+    border-radius: 20px;
+  }
+
+  /* ═══════════════════════════════════════════════
+     PHISHGUARD STYLES
+  ═══════════════════════════════════════════════ */
+  .pg-wrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* PG grid bg strip */
+  .pg-grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,136,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .pg-section {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 20px;
+  }
+
+  .pg-container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    width: calc(100% - 48px);
+  }
+
+  /* PG Header */
+  .pg-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    margin-top: 8px;
+  }
+
+  .pg-logo-icon {
+    width: 48px; height: 48px;
+    background: var(--pg-accent);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 0 30px rgba(0,255,136,0.4);
+    flex-shrink: 0;
+  }
+
+  .pg-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--pg-text);
+  }
+
+  .pg-header h2 span { color: var(--pg-accent); }
+
+  .pg-header p {
+    font-size: 12px;
+    color: var(--pg-muted);
+    font-family: 'Space Mono', monospace;
+    margin-top: 2px;
+  }
+
+  /* PG Tabs */
+  .pg-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 28px;
+    background: var(--pg-panel);
+    border: 1px solid var(--pg-border);
+    border-radius: 12px;
+    padding: 4px;
+  }
+
+  .pg-tab-btn {
+    flex: 1;
+    padding: 10px 14px;
+    border: none;
+    background: transparent;
+    color: var(--pg-muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .pg-tab-btn.active { background: var(--pg-accent); color: #000; box-shadow: 0 0 20px rgba(0,255,136,0.3); }
+  .pg-tab-btn:not(.active):hover { color: var(--pg-text); background: var(--pg-border); }
+
+  .pg-tab-pane { display: none; }
+  .pg-tab-pane.active { display: block; animation: pg-fadeUp 0.3s ease both; }
+
+  @keyframes pg-fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  /* PG section label */
+  .pg-section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--pg-muted);
+    margin-bottom: 10px;
+  }
+
+  /* PG Input area */
+  .pg-input-area {
+    background: var(--pg-panel);
+    border: 1px solid var(--pg-border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+
+  .pg-input-area:focus-within { border-color: rgba(0,255,136,0.4); box-shadow: var(--pg-glow); }
+
+  .pg-field-row { display: flex; gap: 12px; margin-bottom: 12px; align-items: center; }
+
+  .pg-field-row label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--pg-muted);
+    width: 56px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .pg-field-row input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--pg-border);
+    color: var(--pg-text);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    padding: 4px 0;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .pg-field-row input:focus { border-color: var(--pg-accent); }
+
+  textarea#pg-email-body {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--pg-text);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    resize: vertical;
+    min-height: 140px;
+    outline: none;
+    padding: 4px 0;
+  }
+
+  textarea#pg-email-body::placeholder { color: var(--pg-muted); }
+
+  .pg-btn-row { display: flex; gap: 12px; }
+
+  .pg-btn-analyze {
+    flex: 1;
+    padding: 14px 24px;
+    background: var(--pg-accent);
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    box-shadow: 0 0 20px rgba(0,255,136,0.2);
+  }
+
+  .pg-btn-analyze:hover { transform: translateY(-1px); box-shadow: 0 0 30px rgba(0,255,136,0.4); }
+  .pg-btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .pg-btn-clear {
+    padding: 14px 20px;
+    background: transparent;
+    color: var(--pg-muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--pg-border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .pg-btn-clear:hover { color: var(--pg-text); border-color: var(--pg-muted); }
+
+  /* PG Result */
+  #pg-result-panel { display: none; margin-top: 24px; animation: pg-fadeUp 0.4s ease both; }
+
+  .pg-verdict-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    border-radius: 14px 14px 0 0;
+    border: 1px solid var(--pg-border);
+    border-bottom: none;
+  }
+
+  .pg-verdict-header.safe   { background: rgba(0,255,136,0.07);  border-color: rgba(0,255,136,0.3); }
+  .pg-verdict-header.danger { background: rgba(255,60,90,0.07);   border-color: rgba(255,60,90,0.3); }
+  .pg-verdict-header.warning{ background: rgba(255,215,0,0.07);   border-color: rgba(255,215,0,0.3); }
+
+  .pg-verdict-icon { font-size: 36px; line-height: 1; }
+
+  .pg-verdict-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  .pg-verdict-header.safe   .pg-verdict-title { color: var(--pg-accent); }
+  .pg-verdict-header.danger .pg-verdict-title { color: var(--pg-accent2); }
+  .pg-verdict-header.warning .pg-verdict-title{ color: var(--pg-accent3); }
+
+  .pg-verdict-subtitle { font-size: 12px; color: var(--pg-muted); margin-top: 2px; font-family: 'Space Mono', monospace; }
+
+  .pg-score-wrap { margin-left: auto; text-align: right; flex-shrink: 0; }
+
+  .pg-score-num { font-family: 'Space Mono', monospace; font-size: 32px; font-weight: 700; line-height: 1; }
+  .pg-verdict-header.safe   .pg-score-num { color: var(--pg-accent); }
+  .pg-verdict-header.danger .pg-score-num { color: var(--pg-accent2); }
+  .pg-verdict-header.warning .pg-score-num{ color: var(--pg-accent3); }
+
+  .pg-score-label { font-size: 10px; color: var(--pg-muted); font-family: 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
+
+  .pg-verdict-body {
+    background: var(--pg-panel);
+    border: 1px solid var(--pg-border);
+    border-radius: 0 0 14px 14px;
+    padding: 20px 24px;
+  }
+
+  .pg-verdict-header.safe   ~ .pg-verdict-body { border-color: rgba(0,255,136,0.3); }
+  .pg-verdict-header.danger ~ .pg-verdict-body { border-color: rgba(255,60,90,0.3); }
+  .pg-verdict-header.warning ~ .pg-verdict-body{ border-color: rgba(255,215,0,0.3); }
+
+  .pg-signals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  @media (max-width: 600px) { .pg-signals-grid { grid-template-columns: 1fr; } }
+
+  .pg-signal-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 12px; background: var(--bg);
+    border-radius: 8px; border: 1px solid var(--pg-border);
+    font-size: 12px; line-height: 1.5;
+  }
+
+  .pg-signal-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .pg-signal-dot.red    { background: var(--pg-accent2); box-shadow: 0 0 8px rgba(255,60,90,0.5); }
+  .pg-signal-dot.yellow { background: var(--pg-accent3); box-shadow: 0 0 8px rgba(255,215,0,0.5); }
+  .pg-signal-dot.green  { background: var(--pg-accent);  box-shadow: 0 0 8px rgba(0,255,136,0.5); }
+
+  .pg-signal-text { color: var(--pg-text); flex: 1; }
+
+  .pg-analysis-text {
+    font-size: 13px; line-height: 1.8; color: #9ba3b5;
+    border-top: 1px solid var(--pg-border); padding-top: 16px; margin-top: 4px;
+    white-space: pre-wrap;
+  }
+
+  /* PG Loading */
+  .pg-loading-panel {
+    display: none; padding: 40px; text-align: center;
+    background: var(--pg-panel); border: 1px solid var(--pg-border);
+    border-radius: 14px; margin-top: 24px;
+  }
+
+  .pg-scanner-ring {
+    width: 60px; height: 60px; border: 3px solid var(--pg-border);
+    border-top-color: var(--pg-accent); border-radius: 50%;
+    animation: pg-spin 0.8s linear infinite; margin: 0 auto 16px;
+  }
+
+  @keyframes pg-spin { to { transform: rotate(360deg); } }
+
+  .pg-loading-panel p { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--pg-muted); letter-spacing: 1px; }
+  .pg-scan-status { color: var(--pg-accent); margin-top: 8px; font-size: 11px; }
+
+  /* PG Bookmarklet */
+  .pg-bm-card { background: var(--pg-panel); border: 1px solid var(--pg-border); border-radius: 16px; padding: 28px; margin-bottom: 16px; }
+  .pg-bm-card h3 { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; margin-bottom: 8px; color: var(--pg-text); }
+  .pg-bm-card p { font-size: 13px; color: var(--pg-muted); line-height: 1.7; margin-bottom: 16px; }
+  .pg-bm-card p strong { color: var(--pg-text); }
+
+  .pg-bookmarklet-link {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #1a2a40, #0f1a28);
+    border: 2px dashed var(--pg-accent); border-radius: 10px;
+    color: var(--pg-accent); font-family: 'Space Mono', monospace;
+    font-size: 13px; font-weight: 700; text-decoration: none;
+    cursor: grab; transition: all 0.2s;
+    animation: pg-pulse-border 2s ease-in-out infinite;
+    margin-bottom: 10px;
+  }
+
+  .pg-bookmarklet-link:hover { background: rgba(0,255,136,0.1); box-shadow: 0 0 30px rgba(0,255,136,0.2); }
+
+  @keyframes pg-pulse-border {
+    0%,100% { border-color: rgba(0,255,136,0.5); }
+    50% { border-color: rgba(0,255,136,1); box-shadow: 0 0 20px rgba(0,255,136,0.2); }
+  }
+
+  .pg-steps { counter-reset: pgstep; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+  .pg-steps li {
+    counter-increment: pgstep;
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 13px; color: var(--pg-muted); line-height: 1.6;
+  }
+
+  .pg-steps li::before {
+    content: counter(pgstep);
+    width: 24px; height: 24px; background: var(--pg-border);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace; font-size: 11px; color: var(--pg-accent);
+    flex-shrink: 0; font-weight: 700;
+  }
+
+  .pg-steps li strong { color: var(--pg-text); }
+
+  /* PG Signals legend */
+  .pg-signals-explainer { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 600px) { .pg-signals-explainer { grid-template-columns: 1fr; } }
+
+  .pg-signal-card { background: var(--pg-panel); border: 1px solid var(--pg-border); border-radius: 12px; padding: 16px; }
+  .pg-signal-card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; font-weight: 700; font-family: 'Syne', sans-serif; color: var(--pg-text); }
+  .pg-signal-card p { font-size: 12px; color: var(--pg-muted); line-height: 1.6; }
+
+  /* PG Error */
+  .pg-error-box {
+    display: none; background: rgba(255,60,90,0.08); border: 1px solid rgba(255,60,90,0.3);
+    border-radius: 10px; padding: 14px 18px; margin-top: 16px;
+    font-family: 'Space Mono', monospace; font-size: 12px; color: var(--pg-accent2);
+  }
+
+  .pg-api-notice {
+    background: rgba(255,215,0,0.06); border: 1px solid rgba(255,215,0,0.2);
+    border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
+    font-size: 12px; color: var(--pg-accent3); font-family: 'Space Mono', monospace;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+
+  /* ═══════════════════════════════════════════════
+     SHARED IP NOTICE + FOOTER
+  ═══════════════════════════════════════════════ */
+  .ip-notice {
+    margin: 56px auto 0;
+    max-width: 900px;
+    width: calc(100% - 48px);
+    background: linear-gradient(135deg, rgba(0,229,255,0.03), rgba(0,10,20,0.9));
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    border-radius: 16px;
+    padding: 36px 32px 28px;
+  }
+
+  .ip-notice-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px; letter-spacing: 5px; color: var(--muted);
+    text-align: center; margin-bottom: 28px; text-transform: uppercase;
+  }
+
+  .ip-notice-title span { color: var(--accent); }
+
+  .ip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px; margin-bottom: 28px; }
+
+  .ip-heading {
+    font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 3px;
+    color: var(--accent); margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px;
+  }
+
+  .ip-col p { font-size: 12px; color: var(--muted); line-height: 1.8; }
+  .ip-col p strong { color: var(--text); }
+
+  .ip-contact-box {
+    background: rgba(0,229,255,0.04); border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 10px; padding: 18px 22px; text-align: center; margin-top: 8px;
+  }
+
+  .ip-contact-label {
+    font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 4px;
+    color: var(--muted); margin-bottom: 10px; text-transform: uppercase;
+  }
+
+  .ip-contact-email { font-family: 'Share Tech Mono', monospace; font-size: 18px; color: var(--accent2); letter-spacing: 2px; }
+  .ip-contact-email a { color: var(--accent2); text-decoration: none; border-bottom: 1px solid rgba(0,255,136,0.3); padding-bottom: 2px; transition: border-color 0.2s; }
+  .ip-contact-email a:hover { border-color: var(--accent2); }
+  .ip-contact-name { margin-top: 6px; font-size: 13px; color: var(--muted); letter-spacing: 2px; }
+
+  footer {
+    margin: 40px auto 48px;
+    max-width: 700px;
+    width: calc(100% - 48px);
+    text-align: center;
+    border-top: 1px solid var(--border);
+    padding-top: 32px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  footer strong { color: var(--gold); }
+
+  .footer-legal {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 6px; font-family: 'Share Tech Mono', monospace;
+    font-size: 12px; color: #2e4a62; letter-spacing: 1px; margin: 14px 0 10px;
+  }
+
+  .footer-dot { color: var(--accent); opacity: 0.3; }
+
+  .footer-restricted { font-size: 10px; color: #1e3045; letter-spacing: 1px; line-height: 1.7; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     TOP BAR
+══════════════════════════════════════════ -->
+<div class="prop-bar">
+  <span>⚿ PROPRIETARY &amp; CONFIDENTIAL</span>
+  <span class="prop-bar-center">SafeKey™ + PhishGuard™ &nbsp;·&nbsp; Presignal Inc. &nbsp;·&nbsp; Patent Pending</span>
+  <span>© 2026 John Carter · All Rights Reserved</span>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SET PIN MODAL
+══════════════════════════════════════════ -->
+<div class="modal-bg" id="setPinModal">
+  <div class="modal">
+    <h2>🔐 Create Your PIN</h2>
+    <p>Choose a 4-digit PIN. You'll need this every time you want to reveal your password. <strong>Don't forget it!</strong> Write it on paper and keep it safe.</p>
+    <input type="tel" id="setPinA" maxlength="4" placeholder="····" inputmode="numeric" autocomplete="off">
+    <input type="tel" id="setPinB" maxlength="4" placeholder="Confirm PIN" inputmode="numeric" autocomplete="off">
+    <div class="modal-error" id="setPinError"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closePinModal()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmSetPin()">Set PIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ①  SAFEKEY
+══════════════════════════════════════════ -->
+<div class="hero">
+  <svg class="shield-icon" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M50 5 L90 22 L90 55 C90 78 72 97 50 105 C28 97 10 78 10 55 L10 22 Z"
+          fill="rgba(0,229,255,0.07)" stroke="#00e5ff" stroke-width="2.5"/>
+    <path d="M50 22 L72 32 L72 54 C72 67 62 78 50 83 C38 78 28 67 28 54 L28 32 Z"
+          fill="rgba(0,255,136,0.07)" stroke="#00ff88" stroke-width="1.5"/>
+    <circle cx="50" cy="52" r="10" fill="none" stroke="#00e5ff" stroke-width="2"/>
+    <line x1="50" y1="62" x2="50" y2="70" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="50" cy="52" r="3" fill="#00e5ff"/>
+  </svg>
+  <div class="logo">SafeKey</div>
+  <div class="tagline">Your free monthly password shield</div>
+</div>
+
+<div class="story-banner">
+  <h2>⚠ Why This Exists</h2>
+  <p>
+    A hardworking man named <span class="highlight">Rick</span> lost <span class="highlight">$100,000</span> because hackers got into his email, cloned his voice with AI, forwarded his phone calls without him knowing, and drained his entire line of credit. By the time anyone noticed, the money was gone.<br><br>
+    <strong>It started with a weak email password.</strong><br><br>
+    If Rick had changed his password every month — a strong one no one could guess — none of it would have happened. This app exists so that <span class="highlight">Rick's nightmare never happens to you.</span>
+  </p>
+</div>
+
+<div class="card">
+  <div class="card-label">🔑 Your Monthly Password</div>
+
+  <div class="pw-box" id="pwBox">
+    <span class="pw-placeholder" id="pwPlaceholder">Press Generate to create your password</span>
+    <span class="pw-text locked" id="pwText" style="display:none"></span>
+    <div class="lock-overlay" id="lockOverlay" style="display:none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4a6b88" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Enter PIN to reveal
+    </div>
+  </div>
+
+  <div class="copy-row">
+    <button class="btn-copy" id="btnCopy" disabled onclick="copyPassword()">📋 Copy Password</button>
+    <button class="btn-hide" id="btnHide" disabled onclick="hidePassword()">🔒 Hide Again</button>
+  </div>
+  <div class="copy-toast" id="copyToast"></div>
+
+  <button class="btn-generate" onclick="generatePassword()">
+    <div class="btn-spark"></div>
+    ⚡ Generate New Password
+  </button>
+
+  <div class="pin-section" id="pinSection" style="display:none">
+    <div class="pin-label">🔐 Enter PIN to Reveal</div>
+    <div class="pin-row">
+      <input class="pin-input" type="tel" id="pinInput" maxlength="4" placeholder="····" inputmode="numeric" autocomplete="off" onkeydown="if(event.key==='Enter') checkPin()">
+      <button class="btn-pin" onclick="checkPin()">Unlock</button>
+    </div>
+    <div class="pin-hint" id="pinHint">Enter your 4-digit PIN &nbsp;·&nbsp; <a href="#" style="color:var(--muted)" onclick="promptChangePIN(event)">Change PIN</a></div>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-dot"></div>
+    <span id="statusText">Ready — no password generated yet</span>
+  </div>
+</div>
+
+<div class="how-section">
+  <h2>How It Works</h2>
+  <div class="sk-steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Generate</h3>
+      <p>Click the button. A 24-character password is created using true randomness. No two are ever alike.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Unlock with PIN</h3>
+      <p>Your password is hidden. Enter your personal PIN to reveal it. No one peeking can see it.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Copy &amp; Paste</h3>
+      <p>Copy the password. Paste it into your email, bank, or government account password field.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3>Repeat Monthly</h3>
+      <p>Come back once a month. Generate a new one. Update your accounts. Stay protected forever.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     DIVIDER
+══════════════════════════════════════════ -->
+<div class="tool-divider">
+  <div class="tool-divider-line"></div>
+  <div class="tool-divider-badge">🎣 PhishGuard — AI Email Scanner</div>
+  <div class="tool-divider-line"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ②  PHISHGUARD
+══════════════════════════════════════════ -->
+<div class="pg-section">
+  <div class="pg-container">
+
+    <div class="pg-header">
+      <div class="pg-logo-icon">🎣</div>
+      <div>
+        <h2>Phish<span>Guard</span></h2>
+        <p>// AI-POWERED PHISHING DETECTION ENGINE v1.0</p>
+      </div>
+    </div>
+
+    <div class="pg-tabs">
+      <button class="pg-tab-btn active" onclick="pgSwitchTab('analyze')">⚡ Analyze Email</button>
+      <button class="pg-tab-btn" onclick="pgSwitchTab('bookmarklet')">🔖 Gmail Extension</button>
+      <button class="pg-tab-btn" onclick="pgSwitchTab('signals')">📡 Signal Guide</button>
+    </div>
+
+    <!-- ANALYZE TAB -->
+    <div class="pg-tab-pane active" id="pg-tab-analyze">
+
+      <div class="pg-api-notice">
+        ⚠ &nbsp;<span>Paste your Anthropic API key below to enable AI analysis. Free at <strong>console.anthropic.com</strong> — used locally, never stored.</span>
+      </div>
+
+      <div class="pg-input-area" style="margin-bottom:16px;">
+        <div class="pg-field-row" style="margin-bottom:0">
+          <label>API KEY</label>
+          <input type="password" id="pg-api-key" placeholder="sk-ant-..." />
+        </div>
+      </div>
+
+      <div class="pg-input-area">
+        <div class="pg-section-label">Email Details</div>
+        <div class="pg-field-row">
+          <label>FROM</label>
+          <input type="text" id="pg-email-from" placeholder="sender@example.com" />
+        </div>
+        <div class="pg-field-row">
+          <label>SUBJ</label>
+          <input type="text" id="pg-email-subject" placeholder="Your account requires immediate attention..." />
+        </div>
+        <div class="pg-field-row">
+          <label>LINKS</label>
+          <input type="text" id="pg-email-links" placeholder="https://... (paste any URLs found in email)" />
+        </div>
+        <div style="border-top:1px solid var(--pg-border);margin:16px 0 12px;"></div>
+        <div class="pg-section-label">Email Body</div>
+        <textarea id="pg-email-body" placeholder="Paste the full email body text here..."></textarea>
+      </div>
+
+      <div class="pg-btn-row">
+        <button class="pg-btn-analyze" id="pg-analyze-btn" onclick="pgAnalyzeEmail()">🔍 Scan for Phishing</button>
+        <button class="pg-btn-clear" onclick="pgClearAll()">Clear</button>
+      </div>
+
+      <div class="pg-error-box" id="pg-error-box"></div>
+
+      <div class="pg-loading-panel" id="pg-loading-panel">
+        <div class="pg-scanner-ring"></div>
+        <p>SCANNING EMAIL...</p>
+        <p class="pg-scan-status" id="pg-scan-status">Initializing AI analysis engine</p>
+      </div>
+
+      <div id="pg-result-panel"></div>
+    </div>
+
+    <!-- BOOKMARKLET TAB -->
+    <div class="pg-tab-pane" id="pg-tab-bookmarklet">
+      <div class="pg-bm-card">
+        <h3>🔖 One-Click Gmail Scanner</h3>
+        <p>Drag the button below to your bookmarks bar. While reading any email in Gmail, click it to instantly scan for phishing signals using AI.</p>
+        <a class="pg-bookmarklet-link" id="pg-bookmarklet-anchor" href="#" title="Drag to bookmarks bar">🎣 PhishGuard Scanner</a>
+        <p style="font-size:11px;color:var(--pg-muted);margin-bottom:16px;">← Drag this to your bookmarks bar</p>
+        <ol class="pg-steps">
+          <li><strong>Drag</strong> the button above to your browser's bookmarks/favorites bar.</li>
+          <li>Open <strong>Gmail</strong> and click any email to read it.</li>
+          <li>Click <strong>PhishGuard Scanner</strong> in your bookmarks bar.</li>
+          <li>Enter your Anthropic API key when prompted (saved for the session).</li>
+          <li>A <strong>floating overlay panel</strong> appears with the full AI verdict.</li>
+        </ol>
+      </div>
+      <div class="pg-bm-card" style="border-color:rgba(0,255,136,0.15);">
+        <h3 style="color:var(--pg-accent);">What it detects on Gmail</h3>
+        <p>The bookmarklet reads the visible email from Gmail's DOM and sends it to Claude AI — checking sender, subject, all links, and full body — producing a threat score, signal breakdown, and plain-English explanation.</p>
+      </div>
+    </div>
+
+    <!-- SIGNALS TAB -->
+    <div class="pg-tab-pane" id="pg-tab-signals">
+      <div class="pg-signals-explainer">
+        <div class="pg-signal-card">
+          <div class="pg-signal-card-head"><span style="color:var(--pg-accent2)">🔴</span> Sender Spoofing</div>
+          <p>Display name claims to be a known brand but the actual email domain doesn't match. e.g. "PayPal Security" &lt;noreply@pay-pal-security.net&gt;</p>
+        </div>
+        <div class="pg-signal-card">
+          <div class="pg-signal-card-head"><span style="color:var(--pg-accent2)">🔴</span> Urgency / Fear Tactics</div>
+          <p>"Your account will be closed in 24 hours", "Unauthorized login detected" — language designed to panic you into acting without thinking.</p>
+        </div>
+        <div class="pg-signal-card">
+          <div class="pg-signal-card-head"><span style="color:var(--pg-accent2)">🔴</span> Suspicious Links</div>
+          <p>URLs that mimic real sites using subdomains, typos, or shorteners. The link text says "paypal.com" but the href points elsewhere.</p>
+        </div>
+        <div class="pg-signal-card">
+          <div class="pg-signal-card-head"><span style="color:var(--pg-accent2)">🔴</span> Credential Request</div>
+          <p>Any email asking you to enter a password, SSN, credit card, or PIN via a link. Legitimate companies never request this by email.</p>
+        </div>
+        <div class="pg-signal-card">
+          <div class="pg-signal-card-head"><span style="color:var(--pg-accent3)">🟡</span> Grammar / Spelling Errors</div>
+          <p>Professional companies have editorial review. Multiple errors or awkward phrasing — especially combined with urgency — is a strong yellow flag.</p>
+        </div>
+        <div class="pg-signal-card">
+          <div class="pg-signal-card-head"><span style="color:var(--pg-accent3)">🟡</span> Impersonal Greeting</div>
+          <p>"Dear Customer" or "Dear User" — your bank knows your name. Impersonal greetings suggest a mass-blast phishing campaign.</p>
+        </div>
+        <div class="pg-signal-card">
+          <div class="pg-signal-card-head"><span style="color:var(--pg-accent3)">🟡</span> Unexpected Attachment</div>
+          <p>Unsolicited .zip, .exe, .doc, or PDF attachments labelled "invoice" or "receipt" you weren't expecting — often malware or credential harvesters.</p>
+        </div>
+        <div class="pg-signal-card">
+          <div class="pg-signal-card-head"><span style="color:var(--pg-accent)">🟢</span> Signs of Legitimacy</div>
+          <p>Correct sender domain, personalized greeting, no suspicious links, content matches a real action you took, no urgency or threats.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /pg-container -->
+</div><!-- /pg-section -->
+
+<!-- ══════════════════════════════════════════
+     IP NOTICE
+══════════════════════════════════════════ -->
+<div class="ip-notice">
+  <div class="ip-notice-title">⚖ <span>Intellectual Property &amp; Proprietary Rights</span> &nbsp;·&nbsp; Presignal Inc.</div>
+  <div class="ip-grid">
+    <div class="ip-col">
+      <div class="ip-heading">© Ownership</div>
+      <p>SafeKey™, PhishGuard™, and the underlying methodologies are the exclusive intellectual property of <strong>John Carter</strong> and <strong>Presignal Inc.</strong> The concepts, user experience, PIN-gated reveal system, monthly rotation methodology, and AI phishing detection interface are proprietary innovations originating in 2026. All rights reserved globally.</p>
+    </div>
+    <div class="ip-col">
+      <div class="ip-heading">📋 Licensing &amp; Acquisition</div>
+      <p>Commercial use, white-labeling, enterprise integration, or acquisition of SafeKey™ or PhishGuard™ must be arranged through a formal written agreement with <strong>Presignal Inc.</strong> Unauthorized reproduction or derivative products using this methodology without a license agreement is a violation of intellectual property law.</p>
+    </div>
+    <div class="ip-col">
+      <div class="ip-heading">🛡 Protection Notice</div>
+      <p>This software and its underlying methodology are protected under copyright law. <strong>Patent pending. Trademark pending: SafeKey™, PhishGuard™, Presignal™.</strong> Any entity seeking to build upon, integrate, or acquire this technology must establish a formal licensing or acquisition agreement with the author prior to any use.</p>
+    </div>
+  </div>
+  <div class="ip-contact-box">
+    <div class="ip-contact-label">Licensing · Acquisition · Partnership Inquiries</div>
+    <div class="ip-contact-email"><a href="mailto:jubecrew@gmail.com">jubecrew@gmail.com</a></div>
+    <div class="ip-contact-name">John Carter &nbsp;·&nbsp; Presignal Inc. &nbsp;·&nbsp; All Territories</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer>
+  <p><strong>SafeKey</strong> runs entirely on your device. Your passwords are never sent anywhere, stored on any server, or seen by anyone else — not even us.</p>
+  <br>
+  <p><strong>PhishGuard</strong> sends email content to the Anthropic API using only your own API key. No data is retained by Presignal.</p>
+  <br>
+  <p>Built because of Rick's nightmare, so yours never begins.</p>
+  <div class="footer-legal">
+    <span>© 2026 John Carter · Presignal Inc.</span>
+    <span class="footer-dot">·</span>
+    <span>SafeKey™ PhishGuard™ All Rights Reserved</span>
+    <span class="footer-dot">·</span>
+    <span>Patent Pending</span>
+    <span class="footer-dot">·</span>
+    <span>Trademark Pending</span>
+  </div>
+  <div class="footer-restricted">
+    Unauthorized commercial use or reproduction of the SafeKey or PhishGuard methodology, interface, or concept<br>
+    without a written license agreement from Presignal Inc. is strictly prohibited under applicable intellectual property law.
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════ -->
+<script>
+/* ─── SAFEKEY ─────────────────────────────────────────────────── */
+let currentPassword = '';
+let pinHash = localStorage.getItem('safekey_pin') || '';
+let revealed = false;
+
+function generatePassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%^&*-+=?';
+  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const lower = 'abcdefghjkmnpqrstuvwxyz';
+  const digits = '23456789';
+  const symbols = '!@#$%^&*-+=?';
+  const pick = (set) => { const v = new Uint32Array(1); crypto.getRandomValues(v); return set[v[0] % set.length]; };
+  const base = new Uint32Array(20);
+  crypto.getRandomValues(base);
+  let pw = Array.from(base).map(v => chars[v % chars.length]);
+  pw[0] = pick(upper); pw[5] = pick(lower); pw[11] = pick(digits); pw[17] = pick(symbols);
+  for (let i = pw.length - 1; i > 0; i--) {
+    const r = new Uint32Array(1); crypto.getRandomValues(r);
+    const j = r[0] % (i + 1); [pw[i], pw[j]] = [pw[j], pw[i]];
+  }
+  currentPassword = pw.join('');
+  revealed = false;
+  document.getElementById('pwPlaceholder').style.display = 'none';
+  const pwText = document.getElementById('pwText');
+  pwText.style.display = 'block';
+  pwText.textContent = currentPassword;
+  pwText.classList.add('locked');
+  document.getElementById('pwBox').classList.remove('revealed');
+  document.getElementById('lockOverlay').style.display = 'flex';
+  document.getElementById('btnCopy').disabled = true;
+  document.getElementById('btnHide').disabled = true;
+  document.getElementById('copyToast').textContent = '';
+  document.getElementById('statusText').textContent = 'New password generated — enter PIN to reveal';
+  gtag('event', 'safekey_generate', { event_category: 'SafeKey', event_label: 'Password Generated' });
+  if (!pinHash) { openSetPinModal(true); } else { showPinSection(); }
+}
+
+async function hashPin(pin) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode('safekey_salt_' + pin);
+  const hashBuf = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function checkPin() {
+  const input = document.getElementById('pinInput').value.trim();
+  const inputHash = await hashPin(input);
+  if (inputHash === pinHash) {
+    revealPassword();
+  } else {
+    const el = document.getElementById('pinInput');
+    el.classList.add('error'); el.value = '';
+    setTimeout(() => el.classList.remove('error'), 400);
+    document.getElementById('pinHint').textContent = '❌ Wrong PIN — try again';
+    setTimeout(() => {
+      document.getElementById('pinHint').innerHTML = "Enter your 4-digit PIN &nbsp;·&nbsp; <a href='#' style='color:var(--muted)' onclick='promptChangePIN(event)'>Change PIN</a>";
+    }, 2000);
+  }
+}
+
+function revealPassword() {
+  revealed = true;
+  document.getElementById('pwText').classList.remove('locked');
+  document.getElementById('pwBox').classList.add('revealed');
+  document.getElementById('lockOverlay').style.display = 'none';
+  document.getElementById('pinSection').style.display = 'none';
+  document.getElementById('btnCopy').disabled = false;
+  document.getElementById('btnHide').disabled = false;
+  document.getElementById('statusText').textContent = 'Password visible — copy it now, then hide it';
+  gtag('event', 'safekey_unlock', { event_category: 'SafeKey', event_label: 'PIN Unlocked' });
+}
+
+function hidePassword() {
+  revealed = false;
+  document.getElementById('pwText').classList.add('locked');
+  document.getElementById('pwBox').classList.remove('revealed');
+  document.getElementById('lockOverlay').style.display = 'flex';
+  document.getElementById('btnCopy').disabled = true;
+  document.getElementById('btnHide').disabled = true;
+  document.getElementById('pinInput').value = '';
+  showPinSection();
+  document.getElementById('statusText').textContent = 'Password hidden — enter PIN to reveal again';
+}
+
+async function copyPassword() {
+  if (!currentPassword || !revealed) return;
+  try {
+    await navigator.clipboard.writeText(currentPassword);
+    const t = document.getElementById('copyToast');
+    t.textContent = '✓ Copied! Paste it into your password field.';
+    setTimeout(() => { t.textContent = ''; }, 3000);
+    gtag('event', 'safekey_copy', { event_category: 'SafeKey', event_label: 'Password Copied' });
+  } catch(e) {
+    document.getElementById('copyToast').textContent = 'Select the password above and copy manually.';
+  }
+}
+
+function showPinSection() {
+  document.getElementById('pinSection').style.display = 'block';
+  document.getElementById('pinInput').value = '';
+  setTimeout(() => document.getElementById('pinInput').focus(), 50);
+}
+
+let afterPinCallback = null;
+
+function openSetPinModal(required) {
+  document.getElementById('setPinA').value = '';
+  document.getElementById('setPinB').value = '';
+  document.getElementById('setPinError').textContent = '';
+  document.getElementById('setPinModal').classList.add('open');
+  if (required) afterPinCallback = () => showPinSection();
+  setTimeout(() => document.getElementById('setPinA').focus(), 100);
+}
+
+function closePinModal() { document.getElementById('setPinModal').classList.remove('open'); }
+
+async function confirmSetPin() {
+  const a = document.getElementById('setPinA').value.trim();
+  const b = document.getElementById('setPinB').value.trim();
+  const err = document.getElementById('setPinError');
+  if (!/^\d{4}$/.test(a)) { err.textContent = 'PIN must be exactly 4 digits.'; return; }
+  if (a !== b) { err.textContent = 'PINs do not match.'; return; }
+  pinHash = await hashPin(a);
+  localStorage.setItem('safekey_pin', pinHash);
+  closePinModal();
+  if (afterPinCallback) { afterPinCallback(); afterPinCallback = null; }
+}
+
+function promptChangePIN(e) { e.preventDefault(); openSetPinModal(false); }
+
+document.getElementById('setPinA').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('setPinB').focus(); });
+document.getElementById('setPinB').addEventListener('keydown', e => { if (e.key === 'Enter') confirmSetPin(); });
+
+/* ─── PHISHGUARD ──────────────────────────────────────────────── */
+function pgSwitchTab(id) {
+  document.querySelectorAll('.pg-tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['analyze','bookmarklet','signals'][i] === id);
+  });
+  document.querySelectorAll('.pg-tab-pane').forEach(p => {
+    p.classList.toggle('active', p.id === 'pg-tab-' + id);
+  });
+}
+
+function pgClearAll() {
+  ['pg-email-from','pg-email-subject','pg-email-links','pg-email-body'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('pg-result-panel').style.display = 'none';
+  document.getElementById('pg-result-panel').innerHTML = '';
+  document.getElementById('pg-error-box').style.display = 'none';
+}
+
+const pgStatusMessages = [
+  'Parsing email headers...','Checking sender domain reputation...',
+  'Analyzing link patterns...','Detecting urgency language...',
+  'Running AI threat model...','Calculating risk score...','Generating verdict...'
+];
+
+let pgStatusInterval;
+function pgStartStatus() {
+  let i = 0;
+  document.getElementById('pg-scan-status').textContent = pgStatusMessages[0];
+  pgStatusInterval = setInterval(() => {
+    i = (i + 1) % pgStatusMessages.length;
+    document.getElementById('pg-scan-status').textContent = pgStatusMessages[i];
+  }, 900);
+}
+
+function pgStopStatus() { clearInterval(pgStatusInterval); }
+
+async function pgAnalyzeEmail() {
+  const apiKey  = document.getElementById('pg-api-key').value.trim();
+  const from    = document.getElementById('pg-email-from').value.trim();
+  const subject = document.getElementById('pg-email-subject').value.trim();
+  const links   = document.getElementById('pg-email-links').value.trim();
+  const body    = document.getElementById('pg-email-body').value.trim();
+
+  if (!apiKey) return pgShowError('Please enter your Anthropic API key above.');
+  if (!body && !from && !subject) return pgShowError('Please paste at least some email content to analyze.');
+
+  document.getElementById('pg-error-box').style.display = 'none';
+  document.getElementById('pg-result-panel').style.display = 'none';
+  document.getElementById('pg-loading-panel').style.display = 'block';
+  document.getElementById('pg-analyze-btn').disabled = true;
+  pgStartStatus();
+
+  const prompt = `You are a cybersecurity expert specializing in phishing detection. Analyze the following email and determine if it is a phishing attempt.
+
+EMAIL DATA:
+---
+FROM: ${from || '(not provided)'}
+SUBJECT: ${subject || '(not provided)'}
+LINKS FOUND: ${links || '(none provided)'}
+BODY:
+${body || '(not provided)'}
+---
+
+Respond ONLY with a JSON object in this exact format (no markdown, no explanation outside the JSON):
+{
+  "verdict": "PHISHING" | "SUSPICIOUS" | "SAFE",
+  "score": <integer 0-100, where 100 = definitely phishing>,
+  "confidence": "HIGH" | "MEDIUM" | "LOW",
+  "signals": [
+    { "level": "red" | "yellow" | "green", "text": "<short signal description, max 60 chars>" }
+  ],
+  "summary": "<2-3 sentence plain English explanation of why this email is or isn't suspicious. Be specific.>",
+  "recommendation": "<one clear action the user should take>"
+}
+
+Include 3-6 signals. Be specific and accurate.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.error) {
+      pgStopStatus();
+      document.getElementById('pg-loading-panel').style.display = 'none';
+      document.getElementById('pg-analyze-btn').disabled = false;
+      pgShowError('API Error: ' + data.error.message);
+      return;
+    }
+
+    const raw = data.content[0].text.trim();
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Could not parse AI response');
+    const result = JSON.parse(jsonMatch[0]);
+
+    pgStopStatus();
+    document.getElementById('pg-loading-panel').style.display = 'none';
+    document.getElementById('pg-analyze-btn').disabled = false;
+    gtag('event', 'phishguard_scan', { event_category: 'PhishGuard', event_label: result.verdict, value: result.score });
+    pgRenderResult(result);
+
+  } catch(e) {
+    pgStopStatus();
+    document.getElementById('pg-loading-panel').style.display = 'none';
+    document.getElementById('pg-analyze-btn').disabled = false;
+    gtag('event', 'phishguard_error', { event_category: 'PhishGuard', event_label: e.message });
+    pgShowError('Error: ' + e.message + '. Check your API key and try again.');
+  }
+}
+
+function pgRenderResult(r) {
+  const vc = r.verdict === 'PHISHING' ? 'danger' : r.verdict === 'SUSPICIOUS' ? 'warning' : 'safe';
+  const icon = r.verdict === 'PHISHING' ? '🚨' : r.verdict === 'SUSPICIOUS' ? '⚠️' : '✅';
+  const vt = r.verdict === 'PHISHING' ? 'PHISHING DETECTED' : r.verdict === 'SUSPICIOUS' ? 'SUSPICIOUS EMAIL' : 'APPEARS SAFE';
+
+  const sigsHtml = (r.signals || []).map(s => `
+    <div class="pg-signal-item">
+      <div class="pg-signal-dot ${s.level}"></div>
+      <div class="pg-signal-text">${pgEsc(s.text)}</div>
+    </div>`).join('');
+
+  const panel = document.getElementById('pg-result-panel');
+  panel.innerHTML = `
+    <div class="pg-verdict-header ${vc}">
+      <div class="pg-verdict-icon">${icon}</div>
+      <div>
+        <div class="pg-verdict-title">${vt}</div>
+        <div class="pg-verdict-subtitle">CONFIDENCE: ${r.confidence || 'HIGH'} &nbsp;·&nbsp; AI VERDICT</div>
+      </div>
+      <div class="pg-score-wrap">
+        <div class="pg-score-num">${r.score}</div>
+        <div class="pg-score-label">RISK SCORE /100</div>
+      </div>
+    </div>
+    <div class="pg-verdict-body">
+      <div class="pg-section-label" style="margin-bottom:12px;">Signal Breakdown</div>
+      <div class="pg-signals-grid">${sigsHtml}</div>
+      <div class="pg-analysis-text">${pgEsc(r.summary)}\n\n→ ${pgEsc(r.recommendation || '')}</div>
+    </div>`;
+  panel.style.display = 'block';
+}
+
+function pgShowError(msg) {
+  const el = document.getElementById('pg-error-box');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+function pgEsc(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ─── BOOKMARKLET ─────────────────────────────────────────────── */
+(function buildBookmarklet() {
+  const code = `(function(){
+  var k=sessionStorage.getItem('pg_key');
+  if(!k){k=prompt('PhishGuard: Enter your Anthropic API key (sk-ant-...):');if(!k)return;sessionStorage.setItem('pg_key',k);}
+  var old=document.getElementById('phishguard-overlay');if(old)old.remove();
+  var from='',subj='',body='',links=[];
+  try{
+    var f=document.querySelector('[data-legacy-thread-id] [email], .go, .yP, .zF');
+    if(f)from=f.getAttribute('email')||f.textContent||'';
+    var s=document.querySelector('h2.hP, .ha h2, [data-thread-perm-id] h2');
+    if(s)subj=s.textContent||'';
+    var b=document.querySelector('.a3s.aiL, .ii.gt .a3s, .nH .ii');
+    if(b){body=b.innerText||b.textContent||'';var as=b.querySelectorAll('a[href]');as.forEach(function(a){var h=a.getAttribute('href');if(h&&h.indexOf('http')===0&&links.indexOf(h)<0)links.push(h);});}
+    if(!body){body=document.body.innerText.substring(0,3000);}
+  }catch(e){}
+  var ov=document.createElement('div');
+  ov.id='phishguard-overlay';
+  ov.style.cssText='position:fixed;top:16px;right:16px;width:380px;max-height:80vh;overflow-y:auto;background:#0f1218;border:1px solid #1e2530;border-radius:16px;padding:20px;z-index:2147483647;font-family:system-ui,sans-serif;font-size:13px;color:#e8eaf0;box-shadow:0 20px 60px rgba(0,0,0,0.6);';
+  ov.innerHTML='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span style="font-size:22px;">🎣</span><strong style="font-size:16px;color:#00ff88;">PhishGuard</strong><button onclick="document.getElementById(\\\'phishguard-overlay\\\').remove()" style="margin-left:auto;background:none;border:none;color:#5a6478;font-size:18px;cursor:pointer;">×</button></div><p style="color:#5a6478;font-family:monospace;font-size:11px;margin-bottom:16px;">// SCANNING EMAIL...</p><div id="pg-spinner" style="text-align:center;padding:20px;"><div style="width:40px;height:40px;border:3px solid #1e2530;border-top-color:#00ff88;border-radius:50%;animation:pgspin 0.8s linear infinite;margin:0 auto 12px;"></div><p style="color:#5a6478;font-size:11px;font-family:monospace;">Contacting AI...</p></div><div id="pg-result"></div>';
+  var style=document.createElement('style');style.textContent='@keyframes pgspin{to{transform:rotate(360deg)}}';
+  ov.appendChild(style);document.body.appendChild(ov);
+  var prompt='Analyze this email for phishing. FROM: '+from+' SUBJECT: '+subj+' LINKS: '+links.slice(0,5).join(', ')+' BODY: '+body.substring(0,2000)+' Respond ONLY with JSON: {"verdict":"PHISHING"|"SUSPICIOUS"|"SAFE","score":0-100,"signals":[{"level":"red"|"yellow"|"green","text":"..."}],"summary":"...","recommendation":"..."}';
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:prompt}]})})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    document.getElementById('pg-spinner').style.display='none';
+    if(d.error){document.getElementById('pg-result').innerHTML='<p style="color:#ff3c5a;">Error: '+d.error.message+'</p>';return;}
+    try{
+      var raw=d.content[0].text;var m=raw.match(/\\{[\\s\\S]*\\}/);if(!m)throw new Error();
+      var r=JSON.parse(m[0]);
+      var vc=r.verdict==='PHISHING'?'#ff3c5a':r.verdict==='SUSPICIOUS'?'#ffd700':'#00ff88';
+      var vi=r.verdict==='PHISHING'?'🚨':r.verdict==='SUSPICIOUS'?'⚠️':'✅';
+      var sigs=(r.signals||[]).map(function(s){var dc=s.level==='red'?'#ff3c5a':s.level==='yellow'?'#ffd700':'#00ff88';return'<div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:#0a0c10;border-radius:6px;margin-bottom:6px;font-size:11px;"><span style="width:7px;height:7px;border-radius:50%;background:'+dc+';flex-shrink:0;margin-top:3px;"></span><span>'+s.text+'</span></div>';}).join('');
+      document.getElementById('pg-result').innerHTML='<div style="background:rgba(0,0,0,0.3);border:1px solid '+vc+';border-radius:10px;padding:14px;margin-bottom:12px;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;"><span style="font-size:24px;">'+vi+'</span><div><div style="color:'+vc+';font-weight:700;font-size:15px;">'+r.verdict+'</div><div style="color:#5a6478;font-size:10px;font-family:monospace;">RISK SCORE: '+r.score+'/100</div></div></div></div>'+sigs+'<div style="margin-top:12px;padding:12px;background:#0a0c10;border-radius:8px;font-size:12px;color:#9ba3b5;line-height:1.7;border:1px solid #1e2530;">'+(r.summary||'')+'<br><br><strong style="color:#e8eaf0;">→ '+(r.recommendation||'')+'</strong></div>';
+    }catch(e){document.getElementById('pg-result').innerHTML='<p style="color:#ff3c5a;">Could not parse AI response.</p>';}
+  })
+  .catch(function(){document.getElementById('pg-spinner').style.display='none';document.getElementById('pg-result').innerHTML='<p style="color:#ff3c5a;">Network error.</p>';});
+})();`;
+  document.getElementById('pg-bookmarklet-anchor').href = 'javascript:' + encodeURIComponent(code);
+})();
+
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.key === 'Enter') pgAnalyzeEmail();
+});
+</script>
+</body>
+</html>
