@@ -1,137 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Senior Shield | Presignal Inc.</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/561/561125.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafeKey™ — Your Monthly Password Shield · Presignal Inc.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10; --surface: #0d1520; --border: #1a2d44; --accent: #00e5ff;
+    --accent2: #00ff88; --danger: #ff4455; --text: #c8dff0; --muted: #4a6b88;
+    --gold: #ffd166; --warning: #ffcc00;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 50px; }
+  .header { width: 100%; max-width: 600px; padding: 40px 20px 10px; text-align: center; }
+  .brand { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 4px; color: var(--gold); line-height: 1; }
+  
+  /* SENTRY LEAD CARD */
+  .sentry-lead {
+    background: #0a1018; width: calc(100% - 40px); max-width: 500px;
+    border-radius: 25px; border: 2px solid var(--accent); padding: 25px;
+    margin-bottom: 20px; box-shadow: 0 0 30px rgba(0, 229, 255, 0.1);
+  }
+  .sentry-input { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 15px; border-radius: 12px; margin: 15px 0; resize: none; font-size: 1rem; }
+  
+  /* GENERATOR CARD */
+  .main-card {
+    background: var(--surface); width: calc(100% - 40px); max-width: 500px;
+    border-radius: 25px; border: 1px solid var(--border); padding: 25px;
+  }
+  .btn-action {
+    width: 100%; padding: 18px; border-radius: 12px; border: none; font-weight: 800;
+    font-size: 1.1rem; cursor: pointer; transition: 0.2s;
+  }
+  .btn-blue { background: linear-gradient(135deg, var(--accent), #00a8ff); color: #000; }
+  .btn-green { background: var(--accent2); color: #000; }
+  
+  .display-box { margin-top: 20px; background: #000; border: 2px dashed var(--border); border-radius: 15px; padding: 20px; text-align: center; cursor: pointer; }
+  #pwOut { font-family: 'Share Tech Mono', monospace; font-size: 1.4rem; color: var(--accent2); filter: blur(8px); transition: 0.4s; word-break: break-all; }
+  #pwOut.revealed { filter: blur(0); }
 
-    <style>
-        :root { --bg: #000; --gold: #ffff00; --green: #28a745; --blue: #007bff; --red: #dc3545; }
-        body { font-family: 'Helvetica', Arial, sans-serif; background: var(--bg); color: #fff; text-align: center; margin: 0; padding: 20px; touch-action: manipulation; }
-        .container { max-width: 500px; margin: auto; }
-        
-        /* Installation Prompts */
-        .banner { display: none; background: #1a1a1a; border: 2px solid var(--gold); padding: 20px; border-radius: 20px; margin-bottom: 20px; animation: slideDown 0.5s ease; }
-        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* UI Elements */
-        h1 { font-size: 2.5rem; color: var(--gold); margin-top: 50px; }
-        p { font-size: 1.2rem; color: #ccc; line-height: 1.5; }
-        .big-btn { width: 100%; padding: 25px; font-size: 1.6rem; font-weight: bold; border-radius: 20px; border: none; margin: 10px 0; cursor: pointer; transition: 0.1s; }
-        .btn-green { background: var(--green); color: white; }
-        .btn-blue { background: var(--blue); color: white; }
-        .btn-red { background: var(--red); color: white; font-size: 1.1rem; padding: 15px; }
-        
-        input[type="password"] { font-size: 3rem; width: 80%; padding: 15px; background: #111; border: 3px solid var(--gold); color: white; border-radius: 15px; text-align: center; margin-bottom: 20px; letter-spacing: 10px; }
-        #passBox { font-family: monospace; background: #111; border: 2px dashed var(--gold); padding: 25px; font-size: 1.7rem; word-break: break-all; margin: 20px 0; color: #0f0; border-radius: 10px; min-height: 60px; }
-        
-        .hidden { display: none; }
-    </style>
+  .res-box { padding: 15px; border-radius: 10px; margin-top: 15px; display: none; text-align: center; font-weight: bold; }
+</style>
 </head>
 <body>
 
-<div class="container">
-    <div id="installBanner" class="banner">
-        <p style="color:var(--gold); font-weight:bold; margin:0;">FREE SECURITY UPGRADE</p>
-        <p>Install the Shield to your device for 1-tap access.</p>
-        <button class="big-btn btn-green" id="installBtn">INSTALL NOW</button>
-    </div>
+<div class="header">
+  <div class="brand">SAFEKEY™</div>
+  <p style="color:var(--muted); font-family:'Share Tech Mono';">BY PRESIGNAL INC.</p>
+</div>
 
-    <div id="iosGuide" class="banner">
-        <p style="color:var(--gold); font-weight:bold; margin:0;">IPHONE DETECTED</p>
-        <p>Tap the <strong>Share</strong> button (box with arrow) and select <strong>'Add to Home Screen'</strong> to secure your phone.</p>
-    </div>
+<div class="sentry-lead">
+  <h3 style="color:var(--accent); font-family:'Bebas Neue'; font-size:1.8rem;">🛡️ PHASE 1: SENTRY SCAN</h3>
+  <p style="font-size:0.9rem; color:var(--muted);">Don't click yet. Paste the suspicious link or email text below to scan for Trojan traps.</p>
+  <textarea id="sIn" class="sentry-input" rows="3" placeholder="Paste link or text here..."></textarea>
+  <button class="btn-action btn-blue" onclick="doScan()">SCAN FOR TRAPS</button>
+  <div id="sOut" class="res-box"></div>
+</div>
 
-    <div id="auth">
-        <h1>SENIOR SHIELD</h1>
-        <p>Protecting the harder-earned.<br>Enter your 4-digit PIN.</p>
-        <input type="password" id="pin" maxlength="4" inputmode="numeric" placeholder="****">
-        <button class="big-btn btn-green" onclick="unlock()">UNLOCK APP</button>
-        <p style="font-size: 0.8rem; color: #444;">Presignal Inc. Security Framework</p>
-    </div>
-
-    <div id="app" class="hidden">
-        <p style="color:var(--gold);">SHIELD STATUS: ACTIVE</p>
-        <button class="big-btn btn-blue" onclick="generate(25)">GET BANK PASSWORD</button>
-        <button class="big-btn btn-blue" onclick="generate(100)">GET GOOGLE / EMAIL</button>
-
-        <div id="passBox">----</div>
-
-        <button id="copyBtn" class="big-btn btn-green hidden" onclick="copyText()">COPY PASSWORD</button>
-        
-        <div style="margin-top: 50px;">
-            <button class="big-btn btn-red" onclick="location.reload()">LOCK & EXIT</button>
-        </div>
-    </div>
+<div class="main-card">
+  <h3 style="color:var(--gold); font-family:'Bebas Neue'; font-size:1.8rem;">🗝️ PHASE 2: SHIELD GENERATOR</h3>
+  <p style="font-size:0.9rem; color:var(--muted); margin-bottom:15px;">Create your 24-character unhackable monthly key.</p>
+  <button class="btn-action btn-green" onclick="gen()">GENERATE SHIELD</button>
+  <div class="display-box" onclick="askPin()">
+    <div id="pwOut">••••••••••••••••••••••••</div>
+  </div>
+  <div id="pinArea" style="display:none; margin-top:15px;">
+    <input type="tel" id="pIn" style="width:100%; background:#000; color:var(--accent); text-align:center; font-size:1.8rem; padding:10px; border-radius:12px; border:1px solid var(--border); letter-spacing:5px;" maxlength="4" placeholder="••••">
+    <button class="btn-action btn-green" style="margin-top:10px;" onclick="check()">UNLOCK</button>
+  </div>
 </div>
 
 <script>
-    const MASTER_PIN = "1234"; // Tell Rick to use this for now
-    let deferredPrompt;
-
-    // --- INSTALLATION LOGIC ---
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        document.getElementById('installBanner').style.display = 'block';
-    });
-
-    document.getElementById('installBtn').addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') document.getElementById('installBanner').style.display = 'none';
-            deferredPrompt = null;
-        }
-    });
-
-    // iPhone Detection
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    const isStandalone = window.navigator.standalone === true;
-    if (isIOS && !isStandalone) {
-        document.getElementById('iosGuide').style.display = 'block';
+  let k = ""; 
+  function gen() {
+    let c = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*";
+    k = ""; for(let i=0; i<24; i++) k += c.charAt(Math.floor(Math.random()*c.length));
+    document.getElementById('pwOut').innerText = "••••••••••••••••••••••••";
+    document.getElementById('pwOut').classList.remove('revealed');
+    alert("Shield Generated. Tap the box to enter PIN.");
+  }
+  function askPin() { if(!k) return alert("Generate first!"); document.getElementById('pinArea').style.display="block"; }
+  function check() {
+    if(document.getElementById('pIn').value === "1234") {
+      document.getElementById('pwOut').innerText = k;
+      document.getElementById('pwOut').classList.add('revealed');
+      document.getElementById('pinArea').style.display="none";
+    } else { alert("Access Denied"); }
+  }
+  function doScan() {
+    const v = document.getElementById('sIn').value.toLowerCase();
+    const o = document.getElementById('sOut'); o.style.display = "block";
+    const bad = [".exe", ".zip", ".bat", "urgent", "suspended", "verify", "bit.ly"];
+    let hits = bad.filter(w => v.includes(w));
+    if(hits.length > 0) {
+      o.style.background = "rgba(255, 68, 85, 0.2)"; o.style.color = "#ff4455";
+      o.innerHTML = "🛑 TRAP DETECTED: " + hits.join(", ");
+    } else {
+      o.style.background = "rgba(0, 255, 136, 0.2)"; o.style.color = "#00ff88";
+      o.innerHTML = "✅ NO OBVIOUS TRAPS FOUND.";
     }
-
-    // --- APP LOGIC ---
-    function unlock() {
-        const val = document.getElementById('pin').value;
-        if(val === MASTER_PIN) {
-            document.getElementById('auth').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            // Hide install banners once unlocked to clean up UI
-            document.getElementById('installBanner').style.display = 'none';
-            document.getElementById('iosGuide').style.display = 'none';
-        } else {
-            alert("Wrong PIN. Try again.");
-            document.getElementById('pin').value = "";
-        }
-    }
-
-    function generate(len) {
-        const charset = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*";
-        let retVal = "";
-        const randomValues = new Uint32Array(len);
-        window.crypto.getRandomValues(randomValues);
-        for (let i = 0; i < len; ++i) {
-            retVal += charset.charAt(randomValues[i] % charset.length);
-        }
-        document.getElementById('passBox').innerText = retVal;
-        document.getElementById('copyBtn').classList.remove('hidden');
-    }
-
-    function copyText() {
-        const text = document.getElementById('passBox').innerText;
-        navigator.clipboard.writeText(text).then(() => {
-            alert("Password Copied! Go to your bank page and paste it now.");
-            setTimeout(() => { navigator.clipboard.writeText(""); }, 60000);
-        });
-    }
+  }
 </script>
-
 </body>
 </html>
