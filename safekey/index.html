@@ -17,6 +17,7 @@
     --text:    #c8dff0;
     --muted:   #4a6b88;
     --gold:    #ffd166;
+    --warning: #ffcc00;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,683 +33,237 @@
     overflow-x: hidden;
   }
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.018) 2px, rgba(0,229,255,0.018) 4px);
-    pointer-events: none;
-    z-index: 999;
-  }
+  /* Header / Branding */
+  .header { width: 100%; max-width: 600px; padding: 40px 20px 20px; text-align: center; }
+  .brand { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 4px; color: var(--gold); text-shadow: 0 0 20px rgba(255, 209, 102, 0.3); line-height: 1; }
+  .sub-brand { font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
 
-  /* ── PROPRIETARY TOP BAR ── */
-  .prop-bar {
-    width: 100%;
-    background: linear-gradient(90deg, #04080d, #0a1520, #04080d);
-    border-bottom: 1px solid rgba(0,229,255,0.2);
-    padding: 9px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    flex-wrap: wrap;
-    gap: 4px;
-    text-transform: uppercase;
-  }
-  .prop-bar-center {
-    color: var(--accent);
-    letter-spacing: 3px;
-    font-weight: bold;
-  }
-
-  /* ── HERO ── */
-  .hero {
-    width: 100%;
-    padding: 52px 24px 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .shield-icon {
-    width: 88px; height: 88px;
-    margin-bottom: 20px;
-    filter: drop-shadow(0 0 18px var(--accent));
-    animation: pulse 3s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%,100% { filter: drop-shadow(0 0 18px var(--accent)); }
-    50%      { filter: drop-shadow(0 0 32px var(--accent2)); }
-  }
-
-  .logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(52px, 12vw, 96px);
-    letter-spacing: 6px;
-    line-height: 1;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .tagline {
-    font-size: clamp(12px, 3vw, 17px);
-    color: var(--muted);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-top: 8px;
-  }
-
-  /* ── RICK'S STORY BANNER ── */
-  .story-banner {
-    margin: 40px auto 0;
-    max-width: 700px;
-    width: calc(100% - 48px);
-    background: linear-gradient(135deg, rgba(255,65,85,0.08), rgba(255,209,102,0.06));
-    border: 1px solid rgba(255,65,85,0.3);
-    border-left: 4px solid var(--danger);
-    border-radius: 12px;
-    padding: 24px 28px;
-  }
-
-  .story-banner h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 2px;
-    color: var(--danger);
-    margin-bottom: 10px;
-  }
-
-  .story-banner p { font-size: 14px; line-height: 1.75; color: #a0b8cc; }
-  .story-banner .highlight { color: var(--gold); font-weight: 700; }
-
-  /* ── MAIN CARD ── */
-  .card {
-    margin: 36px auto 0;
-    max-width: 560px;
-    width: calc(100% - 48px);
+  /* Main Card */
+  .main-card {
     background: var(--surface);
+    width: calc(100% - 40px);
+    max-width: 500px;
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    margin-bottom: 30px;
+  }
+
+  /* Sentry Section */
+  .sentry-section {
+    background: rgba(26, 45, 68, 0.4);
     border: 1px solid var(--border);
     border-radius: 20px;
-    padding: 36px 32px;
-    position: relative;
-    overflow: hidden;
+    padding: 20px;
+    margin-bottom: 30px;
+    width: calc(100% - 40px);
+    max-width: 500px;
   }
+  .sentry-title { color: var(--accent); font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+  .sentry-input { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 15px; border-radius: 12px; font-family: 'Nunito'; margin-bottom: 15px; resize: none; }
+  .sentry-result { padding: 15px; border-radius: 12px; margin-top: 15px; font-weight: bold; text-align: center; display: none; }
 
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+  /* Buttons */
+  .btn-gen {
+    width: 100%;
+    padding: 20px;
+    border-radius: 15px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), #00a8ff);
+    color: #000;
+    font-weight: 800;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 5px 15px rgba(0, 229, 255, 0.2);
   }
+  .btn-gen:active { transform: scale(0.98); }
 
-  .card-label {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 13px;
-    letter-spacing: 4px;
-    color: var(--muted);
-    margin-bottom: 20px;
-    text-transform: uppercase;
-  }
-
-  /* ── PASSWORD BOX ── */
-  .pw-box {
-    background: #050a0f;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px 22px;
-    position: relative;
+  /* Password Display Area */
+  .display-box {
+    margin-top: 25px;
+    background: #000;
+    border: 2px dashed var(--border);
+    border-radius: 15px;
+    padding: 20px;
     min-height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: border-color 0.3s;
-  }
-
-  .pw-box.revealed {
-    border-color: var(--accent2);
-    box-shadow: 0 0 20px rgba(0,255,136,0.1);
-  }
-
-  .pw-text {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(15px, 4vw, 22px);
-    letter-spacing: 2px;
-    color: var(--accent2);
-    word-break: break-all;
-    text-align: center;
-    transition: filter 0.4s;
-    user-select: all;
-  }
-
-  .pw-text.locked {
-    filter: blur(8px);
-    color: var(--muted);
-    pointer-events: none;
-    user-select: none;
-  }
-
-  .pw-placeholder { color: var(--muted); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
-
-  .lock-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(5,10,15,0.6);
-    border-radius: 11px;
-    flex-direction: column;
-    gap: 6px;
-    font-size: 13px;
-    color: var(--muted);
-    letter-spacing: 1px;
-  }
-
-  .lock-overlay svg { opacity: 0.5; }
-
-  /* ── GENERATE BUTTON ── */
-  .btn-generate {
-    margin-top: 20px;
-    width: 100%;
-    padding: 18px;
-    background: linear-gradient(135deg, #003d52, #005c3d);
-    border: 1px solid var(--accent);
-    border-radius: 12px;
-    color: var(--accent);
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 4px;
-    cursor: pointer;
-    transition: all 0.25s;
     position: relative;
     overflow: hidden;
   }
-
-  .btn-generate:hover {
-    background: linear-gradient(135deg, #005c79, #007a52);
-    box-shadow: 0 0 30px rgba(0,229,255,0.2);
-    transform: translateY(-1px);
+  #passwordOutput {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.4rem;
+    color: var(--accent2);
+    word-break: break-all;
+    text-align: center;
+    filter: blur(8px);
+    transition: 0.3s;
+    user-select: none;
   }
+  #passwordOutput.unlocked { filter: blur(0); user-select: text; }
 
-  .btn-generate:active { transform: translateY(1px); }
-
-  .btn-generate .btn-spark {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent 0%, rgba(0,229,255,0.15) 50%, transparent 100%);
-    transform: translateX(-100%);
-    transition: transform 0.5s;
-  }
-
-  .btn-generate:hover .btn-spark { transform: translateX(100%); }
-
-  /* ── PIN SECTION ── */
-  .pin-section {
-    margin-top: 24px;
-    border-top: 1px solid var(--border);
-    padding-top: 24px;
-  }
-
-  .pin-label {
-    font-size: 13px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-
+  /* PIN Overlays */
+  .pin-area { margin-top: 20px; }
+  .pin-label { color: var(--muted); font-size: 0.85rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
   .pin-row { display: flex; gap: 10px; }
-
   .pin-input {
     flex: 1;
-    padding: 14px 16px;
-    background: #050a0f;
+    background: #000;
     border: 1px solid var(--border);
-    border-radius: 10px;
     color: var(--accent);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 18px;
-    letter-spacing: 6px;
     text-align: center;
-    outline: none;
-    transition: border-color 0.25s;
-    -webkit-text-security: disc;
-  }
-
-  .pin-input:focus { border-color: var(--accent); }
-  .pin-input.error { border-color: var(--danger); animation: shake 0.3s; }
-
-  @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    25%      { transform: translateX(-6px); }
-    75%      { transform: translateX(6px); }
-  }
-
-  .btn-pin {
-    padding: 14px 20px;
-    background: transparent;
-    border: 1px solid var(--accent);
-    border-radius: 10px;
-    color: var(--accent);
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
-    letter-spacing: 2px;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .btn-pin:hover { background: rgba(0,229,255,0.1); }
-
-  .pin-hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
-
-  /* ── COPY ROW ── */
-  .copy-row { display: flex; gap: 10px; margin-top: 16px; }
-
-  .btn-copy, .btn-hide {
-    flex: 1;
-    padding: 12px;
-    border-radius: 10px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
-    letter-spacing: 2px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid;
-  }
-
-  .btn-copy { background: rgba(0,255,136,0.08); border-color: var(--accent2); color: var(--accent2); }
-  .btn-copy:hover { background: rgba(0,255,136,0.18); }
-  .btn-copy:disabled { opacity: 0.3; cursor: default; }
-
-  .btn-hide { background: rgba(255,65,85,0.08); border-color: var(--danger); color: var(--danger); }
-  .btn-hide:hover { background: rgba(255,65,85,0.18); }
-  .btn-hide:disabled { opacity: 0.3; cursor: default; }
-
-  .copy-toast {
-    font-size: 12px;
-    color: var(--accent2);
-    text-align: center;
-    margin-top: 8px;
-    height: 18px;
-    letter-spacing: 1px;
-  }
-
-  /* ── STATUS BAR ── */
-  .status-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: center;
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 16px;
-    letter-spacing: 1px;
-  }
-
-  .status-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--accent2);
-    animation: blink 2s infinite;
-  }
-
-  @keyframes blink {
-    0%,100% { opacity: 1; }
-    50%      { opacity: 0.2; }
-  }
-
-  /* ── HOW IT WORKS ── */
-  .how-section {
-    margin: 36px auto 0;
-    max-width: 700px;
-    width: calc(100% - 48px);
-  }
-
-  .how-section h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 4px;
-    color: var(--accent);
-    margin-bottom: 20px;
-    text-align: center;
-  }
-
-  .steps {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 16px;
-  }
-
-  .step {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px 18px;
-    text-align: center;
-  }
-
-  .step-num { font-family: 'Bebas Neue', sans-serif; font-size: 40px; color: var(--accent); line-height: 1; margin-bottom: 8px; }
-  .step h3 { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #ddf; margin-bottom: 6px; }
-  .step p { font-size: 12px; color: var(--muted); line-height: 1.6; }
-
-  /* ── IP NOTICE ── */
-  .ip-notice {
-    margin: 48px auto 0;
-    max-width: 900px;
-    width: calc(100% - 48px);
-    background: linear-gradient(135deg, rgba(0,229,255,0.03), rgba(0,10,20,0.9));
-    border: 1px solid var(--border);
-    border-top: 2px solid var(--accent);
-    border-radius: 16px;
-    padding: 36px 32px 28px;
-  }
-
-  .ip-notice-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 13px;
+    font-size: 1.8rem;
+    padding: 10px;
+    border-radius: 12px;
     letter-spacing: 5px;
-    color: var(--muted);
-    text-align: center;
-    margin-bottom: 28px;
-    text-transform: uppercase;
   }
+  .btn-pin { background: var(--border); border: none; color: white; padding: 0 20px; border-radius: 12px; cursor: pointer; font-weight: bold; }
 
-  .ip-notice-title span { color: var(--accent); }
+  /* Footer / Info */
+  .how-section { width: 100%; max-width: 800px; padding: 40px 20px; }
+  .how-section h2 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--gold); margin-bottom: 20px; text-align: center; }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+  .step { background: var(--surface); padding: 25px; border-radius: 20px; border: 1px solid var(--border); }
+  .step-num { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: var(--border); line-height: 1; }
+  .step h3 { color: var(--accent); margin: 10px 0; }
+  .step p { color: var(--muted); font-size: 0.95rem; }
 
-  .ip-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 28px;
-    margin-bottom: 28px;
-  }
-
-  .ip-col { }
-
-  .ip-heading {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 15px;
-    letter-spacing: 3px;
-    color: var(--accent);
-    margin-bottom: 10px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 6px;
-  }
-
-  .ip-col p { font-size: 12px; color: var(--muted); line-height: 1.8; }
-  .ip-col p strong { color: var(--text); }
-
-  .ip-contact-box {
-    background: rgba(0,229,255,0.04);
-    border: 1px solid rgba(0,229,255,0.2);
-    border-radius: 10px;
-    padding: 18px 22px;
-    text-align: center;
-    margin-top: 8px;
-  }
-
-  .ip-contact-box .ip-contact-label {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 13px;
-    letter-spacing: 4px;
-    color: var(--muted);
-    margin-bottom: 10px;
-    text-transform: uppercase;
-  }
-
-  .ip-contact-box .ip-contact-email {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 18px;
-    color: var(--accent2);
-    letter-spacing: 2px;
-  }
-
-  .ip-contact-box .ip-contact-email a {
-    color: var(--accent2);
-    text-decoration: none;
-    border-bottom: 1px solid rgba(0,255,136,0.3);
-    padding-bottom: 2px;
-    transition: border-color 0.2s;
-  }
-
-  .ip-contact-box .ip-contact-email a:hover { border-color: var(--accent2); }
-
-  .ip-contact-box .ip-contact-name {
-    margin-top: 6px;
-    font-size: 13px;
-    color: var(--muted);
-    letter-spacing: 2px;
-  }
-
-  /* ── FOOTER ── */
-  footer {
-    margin: 40px auto 48px;
-    max-width: 700px;
-    width: calc(100% - 48px);
-    text-align: center;
-    border-top: 1px solid var(--border);
-    padding-top: 32px;
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.8;
-  }
-
-  footer strong { color: var(--gold); }
-
-  .footer-legal {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
-    color: #2e4a62;
-    letter-spacing: 1px;
-    margin: 14px 0 10px;
-  }
-
-  .footer-dot { color: var(--accent); opacity: 0.3; }
-
-  .footer-restricted {
-    font-size: 10px;
-    color: #1e3045;
-    letter-spacing: 1px;
-    line-height: 1.7;
-    margin-top: 10px;
-  }
-
-  /* ── SET PIN MODAL ── */
-  .modal-bg {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(5,10,15,0.92);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
-
-  .modal-bg.open { display: flex; }
-
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--accent);
-    border-radius: 20px;
-    padding: 36px 32px;
-    max-width: 420px;
-    width: 100%;
-    box-shadow: 0 0 60px rgba(0,229,255,0.15);
-  }
-
-  .modal h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 3px;
-    color: var(--accent);
-    margin-bottom: 10px;
-  }
-
-  .modal p { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
-
-  .modal input {
-    width: 100%;
-    padding: 14px;
-    background: #050a0f;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--accent2);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 22px;
-    letter-spacing: 8px;
-    text-align: center;
-    outline: none;
-    margin-bottom: 8px;
-    -webkit-text-security: disc;
-  }
-
-  .modal input:focus { border-color: var(--accent); }
-
-  .modal .modal-btns { display: flex; gap: 10px; margin-top: 16px; }
-
-  .modal .modal-btns button {
-    flex: 1;
-    padding: 14px;
-    border-radius: 10px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 2px;
-    cursor: pointer;
-    border: 1px solid;
-    transition: all 0.2s;
-  }
-
-  .btn-confirm { background: rgba(0,229,255,0.1); border-color: var(--accent) !important; color: var(--accent) !important; }
-  .btn-confirm:hover { background: rgba(0,229,255,0.2) !important; }
-  .btn-cancel { background: transparent; border-color: var(--muted) !important; color: var(--muted) !important; }
-
-  .modal-error { font-size: 12px; color: var(--danger); height: 16px; margin-bottom: 4px; }
+  .hidden { display: none; }
 </style>
 </head>
 <body>
 
-<!-- ── PROPRIETARY TOP BAR ── -->
-<div class="prop-bar">
-  <span>⚿ PROPRIETARY &amp; CONFIDENTIAL</span>
-  <span class="prop-bar-center">SafeKey™ &nbsp;·&nbsp; Patent Pending &nbsp;·&nbsp; Presignal Inc.</span>
-  <span>© 2026 John Carter · All Rights Reserved</span>
+<div class="header">
+  <div class="brand">SAFEKEY™</div>
+  <div class="sub-brand">Powered by Presignal Inc.</div>
 </div>
 
-<!-- ── SET PIN MODAL ── -->
-<div class="modal-bg" id="setPinModal">
-  <div class="modal">
-    <h2>🔐 Create Your PIN</h2>
-    <p>Choose a 4-digit PIN. You'll need this every time you want to reveal your password. <strong>Don't forget it!</strong> Write it on paper and keep it safe.</p>
-    <input type="tel" id="setPinA" maxlength="4" placeholder="····" inputmode="numeric" autocomplete="off">
-    <input type="tel" id="setPinB" maxlength="4" placeholder="Confirm PIN" inputmode="numeric" autocomplete="off">
-    <div class="modal-error" id="setPinError"></div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closePinModal()">Cancel</button>
-      <button class="btn-confirm" onclick="confirmSetPin()">Set PIN</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── HERO ── -->
-<div class="hero">
-  <svg class="shield-icon" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M50 5 L90 22 L90 55 C90 78 72 97 50 105 C28 97 10 78 10 55 L10 22 Z"
-          fill="rgba(0,229,255,0.07)" stroke="#00e5ff" stroke-width="2.5"/>
-    <path d="M50 22 L72 32 L72 54 C72 67 62 78 50 83 C38 78 28 67 28 54 L28 32 Z"
-          fill="rgba(0,255,136,0.07)" stroke="#00ff88" stroke-width="1.5"/>
-    <circle cx="50" cy="52" r="10" fill="none" stroke="#00e5ff" stroke-width="2"/>
-    <line x1="50" y1="62" x2="50" y2="70" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="50" cy="52" r="3" fill="#00e5ff"/>
-  </svg>
-  <div class="logo">SafeKey</div>
-  <div class="tagline">Your free monthly password shield</div>
-</div>
-
-<!-- ── RICK'S STORY ── -->
-<div class="story-banner">
-  <h2>⚠ Why This Exists</h2>
-  <p>
-    A hardworking man named <span class="highlight">Rick</span> lost <span class="highlight">$100,000</span> because hackers got into his email, cloned his voice with AI, forwarded his phone calls without him knowing, and drained his entire line of credit. By the time anyone noticed, the money was gone.<br><br>
-    <strong>It started with a weak email password.</strong><br><br>
-    If Rick had changed his password every month — a strong one no one could guess — none of it would have happened. This app exists so that <span class="highlight">Rick's nightmare never happens to you.</span>
-  </p>
-</div>
-
-<!-- ── MAIN CARD ── -->
-<div class="card">
-  <div class="card-label">🔑 Your Monthly Password</div>
-
-  <div class="pw-box" id="pwBox">
-    <span class="pw-placeholder" id="pwPlaceholder">Press Generate to create your password</span>
-    <span class="pw-text locked" id="pwText" style="display:none"></span>
-    <div class="lock-overlay" id="lockOverlay" style="display:none">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4a6b88" stroke-width="2">
-        <rect x="3" y="11" width="18" height="11" rx="2"/>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
-      Enter PIN to reveal
-    </div>
+<div class="main-card">
+  <button class="btn-gen" onclick="generateKey()">GENERATE NEW SHIELD</button>
+  
+  <div class="display-box">
+    <div id="passwordOutput">••••••••••••••••••••••••</div>
   </div>
 
-  <div class="copy-row">
-    <button class="btn-copy" id="btnCopy" disabled onclick="copyPassword()">📋 Copy Password</button>
-    <button class="btn-hide" id="btnHide" disabled onclick="hidePassword()">🔒 Hide Again</button>
-  </div>
-  <div class="copy-toast" id="copyToast"></div>
-
-  <button class="btn-generate" onclick="generatePassword()">
-    <div class="btn-spark"></div>
-    ⚡ Generate New Password
-  </button>
-
-  <div class="pin-section" id="pinSection" style="display:none">
-    <div class="pin-label">🔐 Enter PIN to Reveal</div>
+  <div id="authArea" class="pin-area hidden">
+    <div class="pin-label">Enter 4-Digit PIN to Reveal</div>
     <div class="pin-row">
-      <input class="pin-input" type="tel" id="pinInput" maxlength="4" placeholder="····" inputmode="numeric" autocomplete="off" onkeydown="if(event.key==='Enter') checkPin()">
-      <button class="btn-pin" onclick="checkPin()">Unlock</button>
+      <input type="tel" id="pinInput" class="pin-input" maxlength="4" placeholder="····" inputmode="numeric">
+      <button class="btn-pin" onclick="verifyPin()">UNLOCK</button>
     </div>
-    <div class="pin-hint" id="pinHint">Enter your 4-digit PIN &nbsp;·&nbsp; <a href="#" style="color:var(--muted)" onclick="promptChangePIN(event)">Change PIN</a></div>
   </div>
 
-  <div class="status-bar">
-    <div class="status-dot"></div>
-    <span id="statusText">Ready — no password generated yet</span>
-  </div>
+  <button id="copyBtn" class="btn-gen hidden" style="margin-top:20px; background: var(--accent2);" onclick="copyToClipboard()">COPY TO CLIPBOARD</button>
 </div>
 
-<!-- ── HOW IT WORKS ── -->
+<div class="sentry-section">
+  <div class="sentry-title">🛡️ SENTRY SCANNER</div>
+  <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 10px;">Paste a link, email, or file name to scan for Trojan traps.</p>
+  <textarea id="sentryInput" class="sentry-input" rows="3" placeholder="Paste suspicious text here..."></textarea>
+  <button class="btn-pin" style="width: 100%; padding: 15px;" onclick="scanForTrojans()">RUN SCAN</button>
+  <div id="sentryResult" class="sentry-result"></div>
+</div>
+
 <div class="how-section">
-  <h2>How It Works</h2>
+  <h2>The Protocol</h2>
   <div class="steps">
     <div class="step">
-      <div class="step-num">1</div>
+      <div class="step-num">01</div>
       <h3>Generate</h3>
-      <p>Click the button. A 24-character password is created using true randomness. No two are ever alike.</p>
+      <p>Create a high-entropy 24-character string that changes every 30 days to keep banks locked tight.</p>
     </div>
     <div class="step">
-      <div class="step-num">2</div>
-      <h3>Unlock with PIN</h3>
-      <p>Your password is hidden. Enter your personal PIN to reveal it. No one peeking can see it.</p>
+      <div class="step-num">02</div>
+      <h3>Sentry Scan</h3>
+      <p>Use the Sentry to analyze links. It spots the psychological traps and "Trojan" files before you click.</p>
     </div>
     <div class="step">
-      <div class="step-num">3</div>
-      <h3>Copy &amp; Paste</h3>
-      <p>Copy the password. Paste it into your email, bank, or government account password field.</p>
+      <div class="step-num">03</div>
+      <h3>No Trace</h3>
+      <p>SafeKey™ runs entirely on your device. We never see your codes, and your data stays in your hands.</p>
     </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <h3>Repeat Monthly</h3>
-      <p>Come back once a month. Generate a new one. Update your accounts. Stay pro
+  </div>
+</div>
+
+<script>
+  let currentKey = "";
+  const CORRECT_PIN = "1234"; // Default PIN
+
+  function generateKey() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*";
+    let result = "";
+    const randomValues = new Uint32Array(24);
+    window.crypto.getRandomValues(randomValues);
+    for (let i = 0; i < 24; i++) {
+      result += chars.charAt(randomValues[i] % chars.length);
+    }
+    currentKey = result;
+    document.getElementById('passwordOutput').innerText = "••••••••••••••••••••••••";
+    document.getElementById('passwordOutput').classList.remove('unlocked');
+    document.getElementById('authArea').classList.remove('hidden');
+    document.getElementById('copyBtn').classList.add('hidden');
+  }
+
+  function verifyPin() {
+    const input = document.getElementById('pinInput').value;
+    if (input === CORRECT_PIN) {
+      const output = document.getElementById('passwordOutput');
+      output.innerText = currentKey;
+      output.classList.add('unlocked');
+      document.getElementById('copyBtn').classList.remove('hidden');
+      document.getElementById('authArea').classList.add('hidden');
+    } else {
+      alert("Invalid PIN. Access Denied.");
+      document.getElementById('pinInput').value = "";
+    }
+  }
+
+  function copyToClipboard() {
+    navigator.clipboard.writeText(currentKey).then(() => {
+      alert("Shield Copied! Paste it into your secure application.");
+    });
+  }
+
+  // --- SENTRY LOGIC ---
+  function scanForTrojans() {
+    const input = document.getElementById('sentryInput').value.toLowerCase();
+    const resultDiv = document.getElementById('sentryResult');
+    resultDiv.style.display = "block";
+    
+    // Trojan & Phish Red Flags
+    const highRiskExt = [".exe", ".zip", ".dmg", ".pkg", ".bat", ".scr", ".iso", ".vbs"];
+    const urgencyWords = ["urgent", "action required", "suspended", "unauthorized", "login", "overdue", "verification", "frozen"];
+    const linkTricks = ["bit.ly", "tinyurl", "t.co", "click here", "update now"];
+
+    let score = 0;
+    let findings = [];
+
+    highRiskExt.forEach(ext => { if (input.includes(ext)) { score += 5; findings.push("Hidden File Extension ("+ext+")"); } });
+    urgencyWords.forEach(word => { if (input.includes(word)) { score += 2; findings.push("Urgent Language"); } });
+    linkTricks.forEach(trick => { if (input.includes(trick)) { score += 3; findings.push("Shortened/Masked Link"); } });
+
+    if (score >= 5) {
+      resultDiv.style.background = "rgba(255, 68, 85, 0.2)";
+      resultDiv.style.color = "var(--danger)";
+      resultDiv.style.border = "1px solid var(--danger)";
+      resultDiv.innerHTML = "🛑 HIGH ALERT: Trojan Risk Detected!<br><span style='font-size:0.8rem; font-weight:normal;'>Detected: " + findings.join(", ") + "</span>";
+    } else if (score > 0) {
+      resultDiv.style.background = "rgba(255, 204, 0, 0.2)";
+      resultDiv.style.color = "var(--warning)";
+      resultDiv.style.border = "1px solid var(--warning)";
+      resultDiv.innerHTML = "⚠️ WARNING: Suspicious Patterns Found.<br><span style='font-size:0.8rem; font-weight:normal;'>Recommendation: Do not open on a bank computer.</span>";
+    } else {
+      resultDiv.style.background = "rgba(0, 255, 136, 0.2)";
+      resultDiv.style.color = "var(--accent2)";
+      resultDiv.style.border = "1px solid var(--accent2)";
+      resultDiv.innerHTML = "✅ NO OBVIOUS TRAPS FOUND.<br><span style='font-size:0.8rem; font-weight:normal;'>Always verify the sender before clicking.</span>";
+    }
+  }
+</script>
+
+</body>
+</html>
