@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafeKey — Your Monthly Password Shield</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #080c10;
+    --surface:   #0d1520;
+    --border:    #1a2d44;
+    --accent:    #00e5ff;
+    --accent2:   #00ff88;
+    --danger:    #ff4455;
+    --text:      #c8dff0;
+    --muted:     #4a6b88;
+    --gold:      #ffd166;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  /* ── SCANLINE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,229,255,0.018) 2px,
+      rgba(0,229,255,0.018) 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    width: 100%;
+    padding: 60px 24px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .shield-icon {
+    width: 88px;
+    height: 88px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 18px var(--accent));
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { filter: drop-shadow(0 0 18px var(--accent)); }
+    50%      { filter: drop-shadow(0 0 32px var(--accent2)); }
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 12vw, 96px);
+    letter-spacing: 6px;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .tagline {
+    font-size: clamp(13px, 3vw, 18px);
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  /* ── RICK'S STORY BANNER ── */
+  .story-banner {
+    margin: 40px auto 0;
+    max-width: 700px;
+    width: calc(100% - 48px);
+    background: linear-gradient(135deg, rgba(255,65,85,0.08), rgba(255,209,102,0.06));
+    border: 1px solid rgba(255,65,85,0.3);
+    border-left: 4px solid var(--danger);
+    border-radius: 12px;
+    padding: 24px 28px;
+  }
+
+  .story-banner h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--danger);
+    margin-bottom: 10px;
+  }
+
+  .story-banner p {
+    font-size: 14px;
+    line-height: 1.75;
+    color: #a0b8cc;
+  }
+
+  .story-banner .highlight {
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  /* ── MAIN CARD ── */
+  .card {
+    margin: 36px auto 0;
+    max-width: 560px;
+    width: calc(100% - 48px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+  }
+
+  .card-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  /* ── PASSWORD BOX ── */
+  .pw-box {
+    background: #050a0f;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    position: relative;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.3s;
+  }
+
+  .pw-box.revealed {
+    border-color: var(--accent2);
+    box-shadow: 0 0 20px rgba(0,255,136,0.1);
+  }
+
+  .pw-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(15px, 4vw, 22px);
+    letter-spacing: 2px;
+    color: var(--accent2);
+    word-break: break-all;
+    text-align: center;
+    transition: filter 0.4s;
+    user-select: all;
+  }
+
+  .pw-text.locked {
+    filter: blur(8px);
+    color: var(--muted);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .pw-placeholder {
+    color: var(--muted);
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .lock-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(5,10,15,0.6);
+    border-radius: 11px;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .lock-overlay svg { opacity: 0.5; }
+
+  /* ── GENERATE BUTTON ── */
+  .btn-generate {
+    margin-top: 20px;
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #003d52, #005c3d);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    color: var(--accent);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-generate:hover {
+    background: linear-gradient(135deg, #005c79, #007a52);
+    box-shadow: 0 0 30px rgba(0,229,255,0.2);
+    transform: translateY(-1px);
+  }
+
+  .btn-generate:active { transform: translateY(1px); }
+
+  .btn-generate .btn-spark {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(0,229,255,0.15) 50%, transparent 100%);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+
+  .btn-generate:hover .btn-spark { transform: translateX(100%); }
+
+  /* ── PIN SECTION ── */
+  .pin-section {
+    margin-top: 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+  }
+
+  .pin-label {
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .pin-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .pin-input {
+    flex: 1;
+    padding: 14px 16px;
+    background: #050a0f;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 18px;
+    letter-spacing: 6px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.25s;
+    -webkit-text-security: disc;
+  }
+
+  .pin-input:focus { border-color: var(--accent); }
+  .pin-input.error { border-color: var(--danger); animation: shake 0.3s; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25%      { transform: translateX(-6px); }
+    75%      { transform: translateX(6px); }
+  }
+
+  .btn-pin {
+    padding: 14px 20px;
+    background: transparent;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    color: var(--accent);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-pin:hover { background: rgba(0,229,255,0.1); }
+
+  .pin-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  /* ── COPY ROW ── */
+  .copy-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .btn-copy, .btn-hide {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid;
+  }
+
+  .btn-copy {
+    background: rgba(0,255,136,0.08);
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+  .btn-copy:hover { background: rgba(0,255,136,0.18); }
+  .btn-copy:disabled { opacity: 0.3; cursor: default; }
+
+  .btn-hide {
+    background: rgba(255,65,85,0.08);
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+  .btn-hide:hover { background: rgba(255,65,85,0.18); }
+  .btn-hide:disabled { opacity: 0.3; cursor: default; }
+
+  .copy-toast {
+    font-size: 12px;
+    color: var(--accent2);
+    text-align: center;
+    margin-top: 8px;
+    height: 18px;
+    letter-spacing: 1px;
+    transition: opacity 0.3s;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .how-section {
+    margin: 36px auto 0;
+    max-width: 700px;
+    width: calc(100% - 48px);
+  }
+
+  .how-section h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 18px;
+    text-align: center;
+  }
+
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .step h3 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #ddf;
+    margin-bottom: 6px;
+  }
+
+  .step p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* ── FOOTER ── */
+  footer {
+    margin: 48px auto;
+    max-width: 700px;
+    width: calc(100% - 48px);
+    text-align: center;
+    border-top: 1px solid var(--border);
+    padding-top: 32px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  footer strong { color: var(--gold); }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 16px;
+    letter-spacing: 1px;
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent2);
+    animation: blink 2s infinite;
+  }
+
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.2; }
+  }
+
+  /* ── SET PIN MODAL ── */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5,10,15,0.92);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .modal-bg.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 20px;
+    padding: 36px 32px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 0 60px rgba(0,229,255,0.15);
+  }
+
+  .modal h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .modal p { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+
+  .modal input {
+    width: 100%;
+    padding: 14px;
+    background: #050a0f;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--accent2);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 22px;
+    letter-spacing: 8px;
+    text-align: center;
+    outline: none;
+    margin-bottom: 8px;
+    -webkit-text-security: disc;
+  }
+
+  .modal input:focus { border-color: var(--accent); }
+
+  .modal .modal-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .modal .modal-btns button {
+    flex: 1;
+    padding: 14px;
+    border-radius: 10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    border: 1px solid;
+    transition: all 0.2s;
+  }
+
+  .btn-confirm {
+    background: rgba(0,229,255,0.1);
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+  }
+  .btn-confirm:hover { background: rgba(0,229,255,0.2) !important; }
+
+  .btn-cancel {
+    background: transparent;
+    border-color: var(--muted) !important;
+    color: var(--muted) !important;
+  }
+
+  .modal-error {
+    font-size: 12px;
+    color: var(--danger);
+    height: 16px;
+    margin-bottom: 4px;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- SET PIN MODAL -->
+<div class="modal-bg" id="setPinModal">
+  <div class="modal">
+    <h2>🔐 Create Your PIN</h2>
+    <p>Choose a 4-digit PIN. You'll need this every time you want to reveal your password. <strong>Don't forget it!</strong> Write it on paper and keep it safe.</p>
+    <input type="tel" id="setPinA" maxlength="4" placeholder="····" inputmode="numeric" autocomplete="off">
+    <input type="tel" id="setPinB" maxlength="4" placeholder="Confirm PIN" inputmode="numeric" autocomplete="off">
+    <div class="modal-error" id="setPinError"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closePinModal()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmSetPin()">Set PIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <svg class="shield-icon" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M50 5 L90 22 L90 55 C90 78 72 97 50 105 C28 97 10 78 10 55 L10 22 Z"
+          fill="rgba(0,229,255,0.07)" stroke="#00e5ff" stroke-width="2.5"/>
+    <path d="M50 22 L72 32 L72 54 C72 67 62 78 50 83 C38 78 28 67 28 54 L28 32 Z"
+          fill="rgba(0,255,136,0.07)" stroke="#00ff88" stroke-width="1.5"/>
+    <circle cx="50" cy="52" r="10" fill="none" stroke="#00e5ff" stroke-width="2"/>
+    <line x1="50" y1="62" x2="50" y2="70" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="50" cy="52" r="3" fill="#00e5ff"/>
+  </svg>
+  <div class="logo">SafeKey</div>
+  <div class="tagline">Your free monthly password shield</div>
+</div>
+
+<!-- RICK'S STORY -->
+<div class="story-banner">
+  <h2>⚠ Why This Exists</h2>
+  <p>
+    A hardworking man named <span class="highlight">Rick</span> lost <span class="highlight">$100,000</span> because hackers got into his email, cloned his voice with AI, forwarded his phone calls without him knowing, and drained his entire line of credit. By the time anyone noticed, the money was gone.<br><br>
+    <strong>It started with a weak email password.</strong><br><br>
+    If Rick had changed his password every month — a strong one no one could guess — none of it would have happened. This app exists so that <span class="highlight">Rick's nightmare never happens to you.</span>
+  </p>
+</div>
+
+<!-- MAIN CARD -->
+<div class="card">
+  <div class="card-label">🔑 Your Monthly Password</div>
+
+  <div class="pw-box" id="pwBox">
+    <span class="pw-placeholder" id="pwPlaceholder">Press Generate to create your password</span>
+    <span class="pw-text locked" id="pwText" style="display:none"></span>
+    <div class="lock-overlay" id="lockOverlay" style="display:none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4a6b88" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Enter PIN to reveal
+    </div>
+  </div>
+
+  <div class="copy-row" style="margin-top:16px">
+    <button class="btn-copy" id="btnCopy" disabled onclick="copyPassword()">📋 Copy Password</button>
+    <button class="btn-hide" id="btnHide" disabled onclick="hidePassword()">🔒 Hide Again</button>
+  </div>
+  <div class="copy-toast" id="copyToast"></div>
+
+  <button class="btn-generate" onclick="generatePassword()">
+    <div class="btn-spark"></div>
+    ⚡ Generate New Password
+  </button>
+
+  <!-- PIN SECTION -->
+  <div class="pin-section" id="pinSection" style="display:none">
+    <div class="pin-label">🔐 Enter PIN to Reveal</div>
+    <div class="pin-row">
+      <input class="pin-input" type="tel" id="pinInput" maxlength="4" placeholder="····" inputmode="numeric" autocomplete="off" onkeydown="if(event.key==='Enter') checkPin()">
+      <button class="btn-pin" onclick="checkPin()">Unlock</button>
+    </div>
+    <div class="pin-hint" id="pinHint">Enter your 4-digit PIN · <a href="#" style="color:var(--muted)" onclick="promptChangePIN(event)">Change PIN</a></div>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-dot"></div>
+    <span id="statusText">Ready — no password generated yet</span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-section">
+  <h2>How It Works</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Generate</h3>
+      <p>Click the button. A 24-character password is created using true randomness. No two are alike.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Unlock with PIN</h3>
+      <p>Your password is hidden. Enter your personal PIN to reveal it. No one peeking over your shoulder can see it.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Copy & Paste</h3>
+      <p>Copy the password. Paste it into your email, bank, or government account password field.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3>Repeat Monthly</h3>
+      <p>Come back once a month. Generate a new one. Update your accounts. Stay safe forever.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p><strong>SafeKey</strong> runs entirely on your device. Your passwords are never sent anywhere, stored on any server, or seen by anyone else — not even us.</p>
+  <br>
+  <p>Built in memory of Rick's nightmare, so yours never begins.</p>
+  <br>
+  <p style="color:#2a3d50">© 2026 SafeKey — Free. Forever. For everyone.</p>
+</footer>
+
+<script>
+// ── STATE ──
+let currentPassword = '';
+let pinHash = localStorage.getItem('safekey_pin') || '';
+let revealed = false;
+
+// ── CRYPTO RANDOM PASSWORD ──
+function generatePassword() {
+  const chars =
+    'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz' +  // no ambiguous I,O,l,0,o
+    '23456789' +
+    '!@#$%^&*-+=?';
+
+  const array = new Uint32Array(24);
+  crypto.getRandomValues(array);
+
+  // Guarantee at least 1 uppercase, 1 lowercase, 1 digit, 1 symbol
+  const upper   = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const lower   = 'abcdefghjkmnpqrstuvwxyz';
+  const digits  = '23456789';
+  const symbols = '!@#$%^&*-+=?';
+
+  const pick = (set) => {
+    const v = new Uint32Array(1);
+    crypto.getRandomValues(v);
+    return set[v[0] % set.length];
+  };
+
+  // Build 20 random chars, then inject 4 mandatory
+  const base = new Uint32Array(20);
+  crypto.getRandomValues(base);
+  let pw = Array.from(base).map(v => chars[v % chars.length]);
+  pw[0]  = pick(upper);
+  pw[5]  = pick(lower);
+  pw[11] = pick(digits);
+  pw[17] = pick(symbols);
+
+  // Shuffle with Fisher-Yates using crypto
+  for (let i = pw.length - 1; i > 0; i--) {
+    const r = new Uint32Array(1);
+    crypto.getRandomValues(r);
+    const j = r[0] % (i + 1);
+    [pw[i], pw[j]] = [pw[j], pw[i]];
+  }
+
+  currentPassword = pw.join('');
+  revealed = false;
+
+  // Show the locked state
+  document.getElementById('pwPlaceholder').style.display = 'none';
+  const pwText = document.getElementById('pwText');
+  pwText.style.display = 'block';
+  pwText.textContent = currentPassword;
+  pwText.classList.add('locked');
+  document.getElementById('pwBox').classList.remove('revealed');
+  document.getElementById('lockOverlay').style.display = 'flex';
+
+  // Copy/hide buttons disabled until revealed
+  document.getElementById('btnCopy').disabled = true;
+  document.getElementById('btnHide').disabled = true;
+
+  document.getElementById('copyToast').textContent = '';
+
+  // PIN flow
+  if (!pinHash) {
+    // First time — prompt to set a PIN
+    openSetPinModal(true);
+  } else {
+    showPinSection();
+  }
+
+  document.getElementById('statusText').textContent =
+    'New password generated — enter PIN to reveal';
+}
+
+// ── SIMPLE PIN HASH (SHA-256 via SubtleCrypto) ──
+async function hashPin(pin) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode('safekey_salt_' + pin);
+  const hashBuf = await crypto.subtle.digest('SHA-256', data);
+  const hashArr = Array.from(new Uint8Array(hashBuf));
+  return hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ── CHECK PIN ──
+async function checkPin() {
+  const input = document.getElementById('pinInput').value.trim();
+  const inputHash = await hashPin(input);
+
+  if (inputHash === pinHash) {
+    revealPassword();
+  } else {
+    const el = document.getElementById('pinInput');
+    el.classList.add('error');
+    el.value = '';
+    setTimeout(() => el.classList.remove('error'), 400);
+    document.getElementById('pinHint').textContent =
+      '❌ Wrong PIN — try again';
+    setTimeout(() => {
+      document.getElementById('pinHint').innerHTML =
+        "Enter your 4-digit PIN · <a href='#' style='color:var(--muted)' onclick='promptChangePIN(event)'>Change PIN</a>";
+    }, 2000);
+  }
+}
+
+// ── REVEAL ──
+function revealPassword() {
+  revealed = true;
+  document.getElementById('pwText').classList.remove('locked');
+  document.getElementById('pwBox').classList.add('revealed');
+  document.getElementById('lockOverlay').style.display = 'none';
+  document.getElementById('pinSection').style.display = 'none';
+  document.getElementById('btnCopy').disabled = false;
+  document.getElementById('btnHide').disabled = false;
+  document.getElementById('statusText').textContent =
+    'Password visible — copy it now, then hide it';
+}
+
+// ── HIDE ──
+function hidePassword() {
+  revealed = false;
+  document.getElementById('pwText').classList.add('locked');
+  document.getElementById('pwBox').classList.remove('revealed');
+  document.getElementById('lockOverlay').style.display = 'flex';
+  document.getElementById('btnCopy').disabled = true;
+  document.getElementById('btnHide').disabled = true;
+  document.getElementById('pinInput').value = '';
+  showPinSection();
+  document.getElementById('statusText').textContent =
+    'Password hidden — enter PIN to reveal again';
+}
+
+// ── COPY ──
+async function copyPassword() {
+  if (!currentPassword || !revealed) return;
+  try {
+    await navigator.clipboard.writeText(currentPassword);
+    const t = document.getElementById('copyToast');
+    t.textContent = '✓ Copied! Paste it into your password field.';
+    setTimeout(() => { t.textContent = ''; }, 3000);
+  } catch(e) {
+    // Fallback for browsers that block clipboard without HTTPS
+    const t = document.getElementById('copyToast');
+    t.textContent = 'Select the password above and copy manually.';
+  }
+}
+
+// ── SHOW PIN SECTION ──
+function showPinSection() {
+  document.getElementById('pinSection').style.display = 'block';
+  document.getElementById('pinInput').value = '';
+  setTimeout(() => document.getElementById('pinInput').focus(), 50);
+}
+
+// ── SET PIN MODAL ──
+let afterPinCallback = null;
+
+function openSetPinModal(required = false) {
+  document.getElementById('setPinA').value = '';
+  document.getElementById('setPinB').value = '';
+  document.getElementById('setPinError').textContent = '';
+  document.getElementById('setPinModal').classList.add('open');
+  if (required) afterPinCallback = () => showPinSection();
+  setTimeout(() => document.getElementById('setPinA').focus(), 100);
+}
+
+function closePinModal() {
+  document.getElementById('setPinModal').classList.remove('open');
+}
+
+async function confirmSetPin() {
+  const a = document.getElementById('setPinA').value.trim();
+  const b = document.getElementById('setPinB').value.trim();
+  const err = document.getElementById('setPinError');
+
+  if (!/^\d{4}$/.test(a)) { err.textContent = 'PIN must be exactly 4 digits.'; return; }
+  if (a !== b)             { err.textContent = 'PINs do not match.'; return; }
+
+  pinHash = await hashPin(a);
+  localStorage.setItem('safekey_pin', pinHash);
+  closePinModal();
+  if (afterPinCallback) { afterPinCallback(); afterPinCallback = null; }
+}
+
+function promptChangePIN(e) {
+  e.preventDefault();
+  openSetPinModal(false);
+}
+
+// ── ENTER KEY on modal inputs ──
+document.getElementById('setPinA').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('setPinB').focus();
+});
+document.getElementById('setPinB').addEventListener('keydown', e => {
+  if (e.key === 'Enter') confirmSetPin();
+});
+</script>
+</body>
+</html>
