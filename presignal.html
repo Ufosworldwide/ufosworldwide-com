@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H6L5Y9LZE0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-H6L5Y9LZE0');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="frequency" content="7.83Hz"> 
@@ -23,25 +31,19 @@
             font-family: 'Garamond', serif;
         }
 
-        /* THE LINEAGE SPINE - Cutting through the fog */
         .lineage-spine {
-            position: absolute;
-            width: 1px;
-            height: 100vh;
+            position: absolute; width: 1px; height: 100vh;
             background: linear-gradient(to bottom, transparent, rgba(255,170,0,0.4), transparent);
             z-index: 1;
         }
 
-        /* THE SPIRAL ENGINE - No Overlap, No Grid */
         .universal-spiral { 
             position: absolute; width: 95vmin; height: 95vmin; 
             animation: spiralRotate 80s linear infinite;
-            pointer-events: none; 
-            display: flex; justify-content: center; align-items: center;
+            pointer-events: none; display: flex; justify-content: center; align-items: center;
             z-index: 10;
         }
 
-        /* THE TRUNK - John Carter O'Driscoll */
         .center-beacon { 
             position: relative; width: 180px; height: 180px; 
             background: radial-gradient(circle, var(--gold) 0%, transparent 70%); 
@@ -51,15 +53,12 @@
             text-align: center; border: 1px solid rgba(255,170,0,0.3);
         }
 
-        /* THE FRUITS - DOI Records */
         .node { 
             position: absolute; text-decoration: none; color: var(--gold); 
             font-size: clamp(0.55rem, 1.4vmin, 0.85rem); opacity: 0.6; 
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
             pointer-events: auto; white-space: nowrap;
-            /* Branch line logic */
             border-left: 1px solid rgba(255,170,0,0.3); padding-left: 10px;
-            /* Phyllotaxis Transform */
             transform: rotate(var(--angle)) translateY(calc(-1 * var(--dist))) rotate(calc(-1 * var(--angle)));
         }
 
@@ -68,13 +67,13 @@
             transform: rotate(var(--angle)) translateY(calc(-1.1 * var(--dist))) rotate(calc(-1 * var(--angle))) scale(1.15); 
         }
 
-        /* THE GOLDEN ANGLE DISTRIBUTION (137.5°) */
+        /* PHYLLOTAXIS / GOLDEN ANGLE SEEDING */
         .n1 { --angle: 137.5deg; --dist: 20vmin; } 
         .n2 { --angle: 275.0deg; --dist: 28vmin; } 
         .n3 { --angle: 412.5deg; --dist: 36vmin; } 
         .n4 { --angle: 550.0deg; --dist: 42vmin; } 
         .n5 { --angle: 687.5deg; --dist: 46vmin; } 
-        .n6 { --angle: 825.0deg; --dist: 50vmin; } /* EARTHARXIV */
+        .n6 { --angle: 825.0deg; --dist: 50vmin; } 
         .n7 { --angle: 962.5deg; --dist: 46vmin; } 
         .n8 { --angle: 1100deg;  --dist: 42vmin; } 
         .n9 { --angle: 1237deg;  --dist: 36vmin; } 
@@ -84,7 +83,6 @@
         @keyframes spiralRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.05); opacity: 0.9; } }
 
-        /* THE BRAND PROMISE */
         .brand-promise {
             position: fixed; bottom: 20px; width: 100%; text-align: center;
             z-index: 2000; pointer-events: none;
