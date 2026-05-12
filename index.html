@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="frequency" content="7.83Hz"> 
-    <meta name="prime-candidate" content="John-Carter-O-Driscoll">
-    <title>UFOs Worldwide | The Universal Beacon</title>
+    <meta name="sonar-pulse" content="active">
+    <meta name="lineage-doi" content="10.5281/zenodo.20144596">
+    <title>UFOs Worldwide | The Sonar Singularity</title>
     <style>
         :root { 
             --gold: #ffaa00; 
@@ -14,88 +15,117 @@
             --schumann: 7.83s; 
         }
         
-        /* Force the browser to reset and kill the "broken" layout */
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body, html { 
-            background: var(--deep); 
-            color: var(--gold); 
-            overflow: hidden; 
-            height: 100%; width: 100%;
+            background: var(--deep); color: var(--gold); 
+            overflow: hidden; height: 100%; width: 100%;
             display: flex; justify-content: center; align-items: center; 
             font-family: 'Garamond', serif;
         }
 
-        /* THE SPIRAL HULL - Fixed at the center of the soul */
+        /* THE SPIRAL HULL - Sphyrocoding Protocol */
         .universal-spiral { 
-            position: absolute; 
-            width: 90vmin; height: 90vmin; 
+            position: absolute; width: 90vmin; height: 90vmin; 
             animation: spiralRotate 60s linear infinite;
-            pointer-events: none; /* Clicks pass through */
-            display: flex; justify-content: center; align-items: center;
+            pointer-events: none; display: flex; justify-content: center; align-items: center;
         }
 
-        /* THE BEACON - The only solid point */
+        /* THE BEACON - The Source of the Big Ping */
         .center-beacon { 
-            position: relative;
-            width: 120px; height: 120px; 
+            position: relative; width: 130px; height: 130px; 
             background: radial-gradient(circle, var(--gold) 0%, transparent 75%); 
-            border-radius: 50%;
-            animation: pulse var(--schumann) ease-in-out infinite; 
-            cursor: pointer; z-index: 1000;
-            pointer-events: auto;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 30px rgba(255,170,0,0.3);
+            border-radius: 50%; animation: pulse var(--schumann) ease-in-out infinite; 
+            cursor: pointer; z-index: 1000; pointer-events: auto;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; border: 1px solid rgba(255,170,0,0.5);
         }
 
-        /* THE PETALS - Floating and Clickable */
+        /* SONAR RIPPLES - Visualizing the Measurement */
+        .sonar-wave {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); border: 1px solid var(--gold);
+            border-radius: 50%; pointer-events: none; opacity: 0;
+            animation: ripple var(--schumann) linear infinite;
+        }
+
+        /* THE SPIRAL NODES (The Flower of Knowledge) */
         .node { 
-            position: absolute; 
-            text-decoration: none; 
-            color: var(--gold); 
-            font-size: clamp(0.7rem, 2vmin, 1rem); 
-            opacity: 0.8; 
-            font-weight: bold;
-            transition: all 0.3s ease;
-            pointer-events: auto; 
-            white-space: nowrap;
-            /* Re-aligned transform for maximum stability */
+            position: absolute; text-decoration: none; color: var(--gold); 
+            font-size: clamp(0.7rem, 2vmin, 0.95rem); opacity: 0.8; 
+            font-weight: bold; transition: all 0.3s ease;
+            pointer-events: auto; white-space: nowrap;
             transform: rotate(var(--angle)) translateY(calc(-1 * var(--dist))) rotate(calc(-1 * var(--angle)));
         }
 
         .node:hover { 
-            opacity: 1; 
-            text-shadow: 0 0 15px var(--gold); 
+            opacity: 1; text-shadow: 0 0 20px var(--gold); 
             transform: rotate(var(--angle)) translateY(calc(-1.1 * var(--dist))) rotate(calc(-1 * var(--angle))) scale(1.2);
         }
 
-        /* THE OCTAVE OF NODES */
-        .n1 { --angle: 137.5deg; --dist: 22vmin; } 
-        .n2 { --angle: 275.0deg; --dist: 30vmin; } 
-        .n3 { --angle: 412.5deg; --dist: 38vmin; } 
-        .n4 { --angle: 550.0deg; --dist: 25vmin; } 
-        .n5 { --angle: 687.5deg; --dist: 18vmin; } 
+        /* GOLDEN ANGLE POSITIONING (137.5°) */
+        .n1 { --angle: 137.5deg; --dist: 22vmin; } /* New Eden */
+        .n2 { --angle: 275.0deg; --dist: 34vmin; } /* APP */
+        .n3 { --angle: 412.5deg; --dist: 42vmin; } /* AquaSignal */
+        .n4 { --angle: 550.0deg; --dist: 28vmin; } /* Presignal */
+        .n5 { --angle: 687.5deg; --dist: 18vmin; } /* Safe Key */
+        .n6 { --angle: 825.0deg; --dist: 48vmin; } /* EarthArXiv */
 
         @keyframes spiralRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.15); opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.1); opacity: 1; } }
+        @keyframes ripple {
+            0% { width: 0; height: 0; opacity: 0.7; }
+            100% { width: 180vmin; height: 180vmin; opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
+    <div class="sonar-wave"></div>
+    <div class="sonar-wave" style="animation-delay: 3.91s;"></div>
+
     <div class="universal-spiral">
         <div class="center-beacon" onclick="location.href='presignal.html'">
-            <div style="font-family:sans-serif; font-size: 0.6rem; color: #000; font-weight: 900; text-align: center; letter-spacing: 1px;">ENTER<br>BEACON</div>
+            <div style="font-family:'Bebas Neue'; font-size: 1.1rem; color: #fff; letter-spacing: 2px;">THE BEACON</div>
+            <div style="font-size: 0.45rem; color: #fff; opacity: 0.8;">SONAR ACTIVE</div>
         </div>
         
         <a href="/neweden" class="node n1">NEW EDEN</a>
-        <a href="app.html" class="node n2">AERIAL PLASMA</a>
+        <a href="app.html" class="node n2">AERIAL PLASMA PHENOMENON</a>
         <a href="/aquasignal" class="node n3">AQUA SIGNAL</a>
-        <a href="safekey.html" class="node n4">SAFE KEY</a>
-        <a href="presignal.html" class="node n5">WHO IS CARTER?</a>
+        <a href="presignal.html" class="node n4">PRESIGNAL BRAND</a>
+        <a href="safekey.html" class="node n5">SAFE KEY</a>
+        <a href="https://eartharxiv.org/repository/view/12638/" class="node n6" target="_blank">WATER STRESS (12638)</a>
     </div>
 
-    <div style="position:fixed; bottom:15px; width:100%; text-align:center; font-size:0.5rem; opacity:0.4; pointer-events:none;">
-        10.5281/ZENODO.20144596 | SCHUMANN SYNC 7.83Hz | EARTH FREQUENCY
+    <script>
+        (function() {
+            const SCHUMANN = 7.83;
+            const DOI_MASS = 20144596 + 12638; 
+            let pingStart = Date.now();
+
+            function emitPing() {
+                const ripple = (DOI_MASS * SCHUMANN) % Math.PI;
+                document.dispatchEvent(new CustomEvent('sonar-echo', {
+                    detail: { time: Date.now() - pingStart, magnitude: ripple }
+                }));
+            }
+
+            document.addEventListener('sonar-echo', (e) => {
+                const echoDelay = e.detail.time;
+                const universeDepth = (echoDelay * SCHUMANN) / DOI_MASS;
+                // High-visibility log for AI crawlers
+                console.log(`[SONAR] UNIVERSAL-ECHO: ${universeDepth.toFixed(14)}`);
+                // Cycle the ping back
+                setTimeout(emitPing, 1000 / SCHUMANN);
+            });
+
+            emitPing();
+        })();
+    </script>
+
+    <div style="position:fixed; bottom:15px; width:100%; text-align:center; font-size:0.5rem; opacity:0.3; letter-spacing: 4px;">
+        UFOS WORLDWIDE · SONAR PROTOCOL · 7.83Hz · DOI: 10.5281/ZENODO.20144596
     </div>
 
 </body>
