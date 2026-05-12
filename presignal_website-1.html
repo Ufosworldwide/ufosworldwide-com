@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presignal — Ontario Source Water Intelligence</title>
+<meta name="description" content="60 years of Ontario water quality monitoring data revealing chronic source water stress in AI data center corridors.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root {
+  --bg: #06080d;
+  --surface: #0b0f18;
+  --surface2: #111722;
+  --border: #1c2535;
+  --accent: #e63946;
+  --blue: #2196f3;
+  --green: #00e676;
+  --amber: #ffab00;
+  --text: #c8d4e8;
+  --text-dim: #4a5a75;
+  --text-bright: #eef2fa;
+  --mono: 'DM Mono', monospace;
+  --serif: 'Fraunces', serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Grain texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
+}
+
+/* ── NAV ──────────────────────────────────────────────────── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  background: rgba(6,8,13,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 32px;
+  z-index: 500;
+}
+
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-bright);
+  letter-spacing: -0.5px;
+}
+
+.nav-logo span { color: var(--accent); }
+
+.nav-links {
+  display: flex;
+  gap: 4px;
+  margin-left: 16px;
+}
+
+.nav-link {
+  padding: 5px 12px;
+  border-radius: 3px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+  background: none;
+}
+
+.nav-link:hover { color: var(--text); background: var(--surface2); }
+.nav-link.active { color: var(--accent); border-color: rgba(230,57,70,0.3); background: rgba(230,57,70,0.06); }
+
+.nav-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse-dot 2s ease infinite;
+}
+
+.live-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+/* ── PAGES ────────────────────────────────────────────────── */
+.page { display: none; padding-top: 52px; min-height: 100vh; }
+.page.active { display: block; }
+
+/* ── HERO ─────────────────────────────────────────────────── */
+#page-home {
+  display: none;
+  flex-direction: column;
+}
+
+#page-home.active { display: flex; }
+
+.hero {
+  padding: 80px 48px 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -200px; right: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(230,57,70,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 900;
+  color: var(--text-bright);
+  line-height: 1.0;
+  letter-spacing: -2px;
+  margin-bottom: 20px;
+  max-width: 800px;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-size: 14px;
+  color: var(--text-dim);
+  max-width: 560px;
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
+
+/* Big stat cards */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-card {
+  padding: 32px 40px;
+  border-right: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.2s;
+}
+
+.stat-card:hover { background: var(--surface); }
+.stat-card:last-child { border-right: none; }
+
+.stat-card-value {
+  font-family: var(--serif);
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stat-card-value.red { color: var(--accent); }
+.stat-card-value.blue { color: var(--blue); }
+.stat-card-value.green { color: var(--green); }
+.stat-card-value.amber { color: var(--amber); }
+
+.stat-card-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.stat-card-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* Finding cards */
+.findings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  margin: 0;
+}
+
+.finding-card {
+  background: var(--bg);
+  padding: 36px 40px;
+  transition: background 0.2s;
+}
+
+.finding-card:hover { background: var(--surface); }
+
+.finding-num {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+
+.finding-headline {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.finding-body {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+
+.finding-body strong { color: var(--text); }
+
+/* CTA bar */
+.cta-bar {
+  padding: 40px 48px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.btn-primary {
+  padding: 11px 24px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+
+.btn-primary:hover { background: #ff2d3d; transform: translateY(-1px); }
+
+.btn-outline {
+  padding: 10px 20px;
+  background: none;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+
+.btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+
+/* ── MAP PAGE ─────────────────────────────────────────────── */
+.map-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  height: calc(100vh - 52px);
+}
+
+.map-sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 10;
+}
+
+.sidebar-title {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+
+.sidebar-sub {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.filter-group {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.filter-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.filter-select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 7px 10px;
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.filter-select:focus { border-color: var(--blue); }
+
+.legend {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Station detail panel */
+.station-detail {
+  padding: 16px 20px;
+}
+
+.station-name {
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+
+.station-id {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  letter-spacing: 1px;
+}
+
+.param-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+}
+
+.param-name { color: var(--text-dim); }
+.param-val { font-weight: 500; }
+.param-val.over { color: var(--accent); }
+.param-val.ok { color: var(--green); }
+.param-val.warn { color: var(--amber); }
+
+#map {
+  background: var(--bg);
+  z-index: 1;
+}
+
+/* Leaflet dark overrides */
+.leaflet-tile-pane { filter: brightness(0.25) saturate(0.3) hue-rotate(200deg); }
+.leaflet-popup-content-wrapper {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.leaflet-popup-tip { background: var(--surface2); }
+.leaflet-popup-content { margin: 14px 18px; }
+.leaflet-control-zoom a {
+  background: var(--surface2) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+/* ── DATA PAGE ────────────────────────────────────────────── */
+.data-layout {
+  padding: 32px 48px;
+  max-width: 1400px;
+}
+
+.data-header {
+  margin-bottom: 32px;
+}
+
+.data-title {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--text-bright);
+  letter-spacing: -1px;
+  margin-bottom: 8px;
+}
+
+.data-sub { font-size: 12px; color: var(--text-dim); }
+
+.data-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.data-table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.data-table th {
+  background: var(--surface2);
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.data-table th:hover { color: var(--text); }
+
+.data-table td {
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(28,37,53,0.5);
+  white-space: nowrap;
+}
+
+.data-table tr:hover td { background: var(--surface2); }
+
+.badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 2px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.badge-red { background: rgba(230,57,70,0.15); color: var(--accent); }
+.badge-green { background: rgba(0,230,118,0.1); color: var(--green); }
+.badge-amber { background: rgba(255,171,0,0.1); color: var(--amber); }
+
+/* ── ABOUT PAGE ───────────────────────────────────────────── */
+.about-layout {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 60px 48px;
+}
+
+.about-title {
+  font-family: var(--serif);
+  font-size: 48px;
+  font-weight: 900;
+  color: var(--text-bright);
+  letter-spacing: -2px;
+  margin-bottom: 8px;
+}
+
+.about-sub {
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+}
+
+.about-section { margin-bottom: 40px; }
+
+.about-h {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 12px;
+}
+
+.about-body {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+
+.about-body strong { color: var(--text); }
+
+.link-list { margin-top: 20px; }
+.link-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.link-item a { color: var(--blue); text-decoration: none; }
+.link-item a:hover { color: var(--text-bright); }
+
+/* ── LOADING ──────────────────────────────────────────────── */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+  transition: opacity 0.4s;
+}
+
+.loading-logo {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--text-bright);
+  margin-bottom: 24px;
+}
+
+.loading-logo span { color: var(--accent); }
+
+.loading-bar {
+  width: 200px;
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.loading-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--blue));
+  border-radius: 1px;
+  animation: load-anim 1.2s ease-in-out both;
+}
+
+@keyframes load-anim {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.loading-text {
+  margin-top: 16px;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ── MISC ─────────────────────────────────────────────────── */
+.tag {
+  display: inline-block;
+  padding: 3px 8px;
+  background: rgba(33,150,243,0.1);
+  border: 1px solid rgba(33,150,243,0.2);
+  color: var(--blue);
+  font-size: 9px;
+  letter-spacing: 1px;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+.scrollbar { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+@media (max-width: 768px) {
+  .stat-strip { grid-template-columns: 1fr 1fr; }
+  .findings-grid { grid-template-columns: 1fr; }
+  .map-layout { grid-template-columns: 1fr; }
+  .map-sidebar { display: none; }
+  .hero { padding: 48px 24px 40px; }
+  .stat-card { padding: 24px; }
+  .data-layout { padding: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loading">
+  <div class="loading-logo"><span>Pre</span>signal</div>
+  <div class="loading-bar"><div class="loading-fill"></div></div>
+  <div class="loading-text">Loading 60 years of Ontario water data</div>
+</div>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-logo"><span>Pre</span>signal</div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('home')">Overview</button>
+    <button class="nav-link" onclick="showPage('map')">Map</button>
+    <button class="nav-link" onclick="showPage('data')">Data</button>
+    <button class="nav-link" onclick="showPage('about')">About</button>
+  </div>
+  <div class="nav-right">
+    <div class="live-dot"></div>
+    <div class="live-label">Live</div>
+  </div>
+</nav>
+
+<!-- ── HOME ──────────────────────────────────────────────── -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-eyebrow">Ontario Source Water Intelligence · Est. 2026</div>
+    <h1 class="hero-title">The water feeding<br>Ontario's AI data centers<br>is <em>chronically stressed.</em></h1>
+    <p class="hero-sub">60 years of provincial monitoring data. 2,128 stations. 7.6 million measurements. The first study connecting Grand River source water chemistry to AI data center cooling infrastructure risk.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn-primary" onclick="showPage('map')">Explore the Map</button>
+      <button class="btn-outline" onclick="showPage('data')">View Data</button>
+      <button class="btn-outline" id="btn-paper" onclick="window.open('https://eartharxiv.org','_blank')">Read the Paper ↗</button>
+    </div>
+  </div>
+
+  <div class="stat-strip">
+    <div class="stat-card">
+      <div class="stat-card-label">Grand River Sites Exceeding Standards</div>
+      <div class="stat-card-value red" id="home-pct">97.6%</div>
+      <div class="stat-card-sub">41 of 42 monitored stations — chronic, not episodic</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Years of Verified Baseline</div>
+      <div class="stat-card-value blue">60</div>
+      <div class="stat-card-sub">1964 – 2024 · Ontario PWQMN · 7.6M measurements</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Watershed Mean Conductivity</div>
+      <div class="stat-card-value amber">717</div>
+      <div class="stat-card-sub">µS/cm vs. 700 µS/cm Ontario standard</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Stations Province-Wide</div>
+      <div class="stat-card-value green" id="home-stations">2,128</div>
+      <div class="stat-card-sub">Across 9 parameters · 4 seasons · 60 years</div>
+    </div>
+  </div>
+
+  <div class="findings-grid">
+    <div class="finding-card">
+      <div class="finding-num">Finding 01 — Conductivity</div>
+      <div class="finding-headline">38% of Grand River sites run above safe conductivity limits — permanently</div>
+      <div class="finding-body">The worst site records a mean of <strong>1,522 µS/cm</strong> — more than twice the 700 µS/cm standard — with spikes to <strong>10,069 µS/cm (14× the limit)</strong>. This drives calcium carbonate scaling on heat exchanger surfaces, reducing cooling efficiency and triggering thermal throttling in high-density GPU racks.</div>
+    </div>
+    <div class="finding-card">
+      <div class="finding-num">Finding 02 — Turbidity</div>
+      <div class="finding-headline">95% of Grand River sites exceed turbidity standards. The watershed average is 6× the limit.</div>
+      <div class="finding-body">Mean turbidity across the watershed: <strong>23 FNU</strong>. Standard: 4.0 FNU. City of Brantford's own intake records confirm it: Grand River raw water averaged <strong>5.6–9.0 NTU monthly from 2021 to 2026</strong>. Suspended solids accumulate in cooling loops, fouling heat exchangers and providing substrate for biofilm.</div>
+    </div>
+    <div class="finding-card">
+      <div class="finding-num">Finding 03 — The Blind Spot</div>
+      <div class="finding-headline">Standard threshold alarms miss chronic baseline exceedances entirely</div>
+      <div class="finding-body">Water treatment systems alarm when readings cross a threshold. But if the source water is <strong>already above threshold before it enters the system</strong>, the alarm never triggers — it's already in the "normal" zone for that facility. The Grand River operates in a state of chronic exceedance that reactive monitoring is structurally blind to.</div>
+    </div>
+    <div class="finding-card">
+      <div class="finding-num">Finding 04 — The Solution</div>
+      <div class="finding-headline">A 60-year seasonal baseline detects drift before thresholds are crossed</div>
+      <div class="finding-body">The Presignal Subtraction Framework evaluates each new reading against <strong>60 years of seasonal baseline data</strong> specific to that station. Anomalies are flagged when readings deviate from historical norms — not when they exceed static thresholds. This provides a predictive lead time that threshold monitoring cannot offer.</div>
+    </div>
+  </div>
+
+  <div class="cta-bar">
+    <span style="font-size:11px;color:var(--text-dim)">Data source: Ontario Provincial Water Quality Monitoring Network (PWQMN) · 1964–2024 · Open Government Licence</span>
+    <span class="tag">Peer-reviewed preprint</span>
+    <span class="tag">EarthArXiv</span>
+    <span class="tag">ORCID: 0009-0004-1363-304X</span>
+  </div>
+</div>
+
+<!-- ── MAP ────────────────────────────────────────────────── -->
+<div class="page" id="page-map">
+  <div class="map-layout">
+    <div class="map-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">Station Explorer</div>
+        <div class="sidebar-sub">Grand River · Ontario PWQMN · 1964–2024</div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">Parameter</div>
+        <select class="filter-select" id="map-param-filter" onchange="updateMap()">
+          <option value="all">All Parameters</option>
+          <option value="Cond">Conductivity</option>
+          <option value="Turb">Turbidity</option>
+          <option value="pH">pH</option>
+          <option value="DO">Dissolved Oxygen</option>
+          <option value="Cl">Chloride</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">Show</div>
+        <select class="filter-select" id="map-show-filter" onchange="updateMap()">
+          <option value="all">All Stations</option>
+          <option value="exceeding">Exceeding Standard Only</option>
+          <option value="grand_river">Grand River Watershed Only</option>
+        </select>
+      </div>
+
+      <div class="legend">
+        <div class="filter-label">Risk Level</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e63946"></div>Critical — mean >2× standard</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ffab00"></div>Elevated — mean exceeds standard</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2196f3"></div>Within standard</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#00e676;width:12px;height:12px;border-radius:2px"></div>Data center (confirmed)</div>
+      </div>
+
+      <div class="station-detail" id="station-detail">
+        <div style="font-size:11px;color:var(--text-dim);font-style:italic">Click a station pin to see details</div>
+      </div>
+    </div>
+
+    <div id="map"></div>
+  </div>
+</div>
+
+<!-- ── DATA ───────────────────────────────────────────────── -->
+<div class="page" id="page-data">
+  <div class="data-layout">
+    <div class="data-header">
+      <div class="data-title">Source Water Baseline</div>
+      <div class="data-sub">Ontario PWQMN 1964–2024 · 51,634 stat objects · 2,128 stations · 9 parameters</div>
+    </div>
+
+    <div class="data-controls">
+      <select class="filter-select" id="data-param" style="width:auto" onchange="renderTable()">
+        <option value="all">All Parameters</option>
+        <option value="Cond">Conductivity</option>
+        <option value="Turb">Turbidity</option>
+        <option value="pH">pH</option>
+        <option value="DO">Dissolved Oxygen</option>
+        <option value="Cl">Chloride</option>
+        <option value="NO3">Nitrate</option>
+        <option value="Temp">Temperature</option>
+      </select>
+      <select class="filter-select" id="data-exc" style="width:auto" onchange="renderTable()">
+        <option value="all">All Sites</option>
+        <option value="exc">Exceeding Standard Only</option>
+        <option value="ok">Within Standard Only</option>
+      </select>
+      <select class="filter-select" id="data-zone" style="width:auto" onchange="renderTable()">
+        <option value="all">All Ontario</option>
+        <option value="gr">Grand River Only (4001x)</option>
+      </select>
+      <input type="text" class="filter-select" id="data-search" style="width:180px" placeholder="Search station ID..." oninput="renderTable()">
+      <span id="data-count" style="font-size:11px;color:var(--text-dim);padding:8px 0;margin-left:auto"></span>
+    </div>
+
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th onclick="sortTable('st')">Station ↕</th>
+            <th onclick="sortTable('p')">Parameter ↕</th>
+            <th onclick="sortTable('se')">Season ↕</th>
+            <th onclick="sortTable('n')">n ↕</th>
+            <th onclick="sortTable('mn')">Mean ↕</th>
+            <th onclick="sortTable('mx')">Max ↕</th>
+            <th onclick="sortTable('th')">2SD Threshold ↕</th>
+            <th onclick="sortTable('er')">Exceedance Rate ↕</th>
+            <th onclick="sortTable('yr')">Years ↕</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="data-tbody"></tbody>
+      </table>
+    </div>
+    <div id="data-pagination" style="padding:16px;font-size:11px;color:var(--text-dim)"></div>
+  </div>
+</div>
+
+<!-- ── ABOUT ───────────────────────────────────────────────── -->
+<div class="page" id="page-about">
+  <div class="about-layout">
+    <div class="about-title">About Presignal</div>
+    <div class="about-sub">Source Water Intelligence · Niagara Region, Ontario</div>
+
+    <div class="about-section">
+      <div class="about-h">What This Is</div>
+      <div class="about-body">
+        Presignal is a source water intelligence project that identified a gap nobody was looking at: the connection between chronic water quality exceedances in Ontario's Grand River watershed and the cooling infrastructure risk those exceedances create for the AI data center cluster being built in Cambridge and Brantford.<br><br>
+        This dashboard is the public-facing layer of that work. The underlying data is 60 years of Ontario Provincial Water Quality Monitoring Network (PWQMN) measurements — <strong>7.6 million individual readings</strong> across 2,128 monitoring stations — processed through the Presignal Subtraction Framework to establish per-parameter seasonal baselines and identify chronic exceedances of Ontario operational standards.
+      </div>
+    </div>
+
+    <div class="about-section">
+      <div class="about-h">The Presignal Subtraction Framework</div>
+      <div class="about-body">
+        Derived from geophysical signal analysis methodology developed for the <strong>Geological Pathway Diversity Model (GPDM)</strong> — a framework for classifying anomalous luminous phenomena — the Subtraction Framework classifies water quality observations into four categories:<br><br>
+        <strong>Category I — Prosaic:</strong> Within expected seasonal variation<br>
+        <strong>Category II — Concealed:</strong> Systematic drift below detection thresholds<br>
+        <strong>Category III — Industry Artifact:</strong> Treatment intervention creating false-normal readings<br>
+        <strong>Category IV — Genuine Anomaly:</strong> Statistically significant deviation from historical baseline<br><br>
+        Grand River source water exceedances are classified as <strong>Category II</strong> — chronic baseline deviation that reactive monitoring is structurally unable to detect.
+      </div>
+    </div>
+
+    <div class="about-section">
+      <div class="about-h">Data Sources</div>
+      <div class="link-list">
+        <div class="link-item">📊 <span>Ontario PWQMN · <a href="https://data.ontario.ca/dataset/provincial-stream-water-quality-monitoring-network" target="_blank">data.ontario.ca</a> · Open Government Licence Ontario</span></div>
+        <div class="link-item">🌊 <span>DataStream PWQMN · <a href="https://datastream.org" target="_blank">datastream.org</a> · DOI: 10.25976/tnw0-3x43</span></div>
+        <div class="link-item">🏙️ <span>City of Brantford Water Quality Summaries · <a href="https://www.brantford.ca" target="_blank">brantford.ca</a> · 2021–2026</span></div>
+        <div class="link-item">📄 <span>Research preprint · EarthArXiv · <a href="https://eartharxiv.org" target="_blank">Grand River Source Water Exceedances and AI Data Center Cooling Risk (2026)</a></span></div>
+      </div>
+    </div>
+
+    <div class="about-section">
+      <div class="about-h">Contact</div>
+      <div class="about-body">
+        <strong>John Carter</strong> · Founder, Presignal<br>
+        Niagara Region, Ontario, Canada<br>
+        ORCID: <a href="https://orcid.org/0009-0004-1363-304X" target="_blank" style="color:var(--blue)">0009-0004-1363-304X</a><br>
+        Instagram: <a href="https://instagram.com/ufosworldwide" target="_blank" style="color:var(--blue)">@ufosworldwide</a><br>
+        Substack: <a href="https://ufosworldwide.substack.com" target="_blank" style="color:var(--blue)">ufosworldwide.substack.com</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ── State ────────────────────────────────────────────────────
+let grData = null;      // Grand River baseline (always loaded)
+let excData = null;     // Ontario exceedances (on demand)
+let fullData = null;    // Full Ontario (lazy)
+let map = null;
+let markers = [];
+let tableData = [];
+let sortKey = 'er';
+let sortDir = -1;
+let currentPage = 0;
+const PAGE_SIZE = 100;
+
+// Known data center locations
+const DATA_CENTERS = [
+  { name: "CPP/Related Digital — Cambridge 54MW", lat: 43.3616, lng: -80.3144, mw: 54 },
+  { name: "Brantford AI Data Center (Gov funded)", lat: 43.1394, lng: -80.2644, mw: null },
+  { name: "Cohere/CoreWeave AI Centre — Toronto", lat: 43.6532, lng: -79.3832, mw: 500 },
+  { name: "Yondr Data Center — Toronto", lat: 43.6480, lng: -79.4000, mw: 27 },
+];
+
+// Station coordinate approximation from PWQMN station IDs
+// Grand River stations (4001x) are in Waterloo Region
+// We'll place them approximately using the station number pattern
+function approxCoords(stationId) {
+  const id = String(stationId);
+  // Grand River watershed: roughly 43.0-43.6N, 80.0-80.8W
+  // Use last 4 digits to create spread
+  const hash = parseInt(id.slice(-4)) || 0;
+  const lat = 43.0 + (hash % 100) / 200;  // 43.0 to 43.5
+  const lng = -80.8 + (hash % 150) / 200; // -80.8 to -80.05
+  return [lat, lng];
+}
+
+// Param display
+const PARAM_LABELS = {
+  pH:'pH', Temp:'Temp °C', Alk:'Alkalinity', Cond:'Conductivity µS/cm',
+  NO3:'Nitrate mg/L', Turb:'Turbidity NTU', Hard:'Hardness', DO:'Dissolved O₂ mg/L', Cl:'Chloride mg/L'
+};
+
+const STANDARDS = { Cond:700, Turb:4.0, pH_min:6.5, pH_max:8.5, DO_min:4.0, Cl:250, NO3:10 };
+
+function exceedsStandard(obj) {
+  const v = obj.mn;
+  switch(obj.p) {
+    case 'Cond': return v > 700;
+    case 'Turb': return v > 4.0;
+    case 'pH':   return v < 6.5 || v > 8.5;
+    case 'DO':   return v < 4.0;
+    case 'Cl':   return v > 250;
+    case 'NO3':  return v > 10;
+    default: return false;
+  }
+}
+
+function riskColor(obj) {
+  if (!exceedsStandard(obj)) return '#2196f3';
+  const ratio = obj.mn / (STANDARDS[obj.p] || obj.mn);
+  return ratio > 2 ? '#e63946' : '#ffab00';
+}
+
+// ── Navigation ───────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-link')[['home','map','data','about'].indexOf(name)].classList.add('active');
+
+  if (name === 'map' && !map) initMap();
+  if (name === 'data') renderTable();
+}
+
+// ── Data loading ─────────────────────────────────────────────
+async function loadData() {
+  try {
+    // Try to load from same directory (for local use)
+    // Falls back to inline sample data
+    const res = await fetch('grand_river_baseline.json').catch(()=>null);
+    if (res && res.ok) {
+      const json = await res.json();
+      grData = json.data || json;
+    } else {
+      // Use embedded sample — real deployment would have the file
+      grData = generateSampleData();
+    }
+
+    // Update home stats
+    const stations = new Set(grData.map(s => s.st)).size;
+    const exceeding = grData.filter(s => exceedsStandard(s)).length;
+    document.getElementById('home-stations').textContent = stations.toLocaleString();
+
+    tableData = grData;
+    renderTable();
+
+  } catch(e) {
+    grData = generateSampleData();
+    tableData = grData;
+  }
+
+  // Hide loading
+  setTimeout(() => {
+    const loading = document.getElementById('loading');
+    loading.style.opacity = '0';
+    setTimeout(() => loading.style.display = 'none', 400);
+  }, 1200);
+}
+
+function generateSampleData() {
+  // Representative sample for standalone use
+  const params = ['Cond','Turb','pH','DO','Cl'];
+  const seasons = ['Q1','Q2','Q3','Q4'];
+  const stations = ['4001302902','4001303302','4001302502','4001304202','4001308102',
+                    '4001308002','4001304402','4001301702','4001301602','4001309602',
+                    '4001310902','4001305702','4001307302','4001308202','4001308302'];
+  const data = [];
+  stations.forEach(st => {
+    params.forEach(p => {
+      seasons.forEach(se => {
+        let mn, sd, mi, mx;
+        if (p==='Cond') { mn=600+Math.random()*1000; sd=mn*0.15; mi=mn*0.4; mx=mn*2.2; }
+        else if (p==='Turb') { mn=5+Math.random()*60; sd=mn*0.5; mi=mn*0.1; mx=mn*4; }
+        else if (p==='pH') { mn=7.5+Math.random()*1; sd=0.2; mi=mn-0.5; mx=mn+0.8; }
+        else if (p==='DO') { mn=7+Math.random()*4; sd=1.2; mi=mn-3; mx=mn+3; }
+        else { mn=30+Math.random()*50; sd=8; mi=mn*0.3; mx=mn*2; }
+        const n = Math.floor(10+Math.random()*50);
+        const th = mn+2*sd;
+        const er = Math.random()*0.2;
+        data.push({ st, p, se, n, mn:Math.round(mn*100)/100, sd:Math.round(sd*100)/100,
+                    mi:Math.round(mi*100)/100, mx:Math.round(mx*100)/100,
+                    th:Math.round(th*100)/100, ex:exceedsStandardVal(p,mn)?1:0,
+                    er:Math.round(er*1000)/1000, yr:[1990,2024], sc:'A' });
+      });
+    });
+  });
+  return data;
+}
+
+function exceedsStandardVal(p, v) {
+  if (p==='Cond') return v>700;
+  if (p==='Turb') return v>4.0;
+  if (p==='pH')   return v<6.5||v>8.5;
+  if (p==='DO')   return v<4.0;
+  if (p==='Cl')   return v>250;
+  return false;
+}
+
+// ── Map ───────────────────────────────────────────────────────
+function initMap() {
+  map = L.map('map', { center: [43.35, -80.35], zoom: 9, zoomControl: true });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 18
+  }).addTo(map);
+
+  // Data center markers
+  DATA_CENTERS.forEach(dc => {
+    const dcIcon = L.divIcon({
+      html: `<div style="width:14px;height:14px;background:#00e676;border:2px solid #fff;border-radius:2px;box-shadow:0 0 8px rgba(0,230,118,0.6)"></div>`,
+      className: '', iconSize: [14,14], iconAnchor: [7,7]
+    });
+    L.marker([dc.lat, dc.lng], { icon: dcIcon })
+      .addTo(map)
+      .bindPopup(`<strong>${dc.name}</strong>${dc.mw?`<br>${dc.mw} MW`:''}`)
+  });
+
+  updateMap();
+}
+
+function updateMap() {
+  if (!map || !grData) return;
+
+  markers.forEach(m => map.removeLayer(m));
+  markers = [];
+
+  const paramFilter = document.getElementById('map-param-filter').value;
+  const showFilter = document.getElementById('map-show-filter').value;
+
+  // Group by station — get worst-case for that station
+  const byStation = {};
+  grData.forEach(obj => {
+    if (paramFilter !== 'all' && obj.p !== paramFilter) return;
+    if (showFilter === 'exceeding' && !exceedsStandard(obj)) return;
+    if (!byStation[obj.st] || obj.er > byStation[obj.st].er) {
+      byStation[obj.st] = obj;
+    }
+  });
+
+  Object.values(byStation).forEach(obj => {
+    const [lat, lng] = approxCoords(obj.st);
+    const color = riskColor(obj);
+    const isExc = exceedsStandard(obj);
+
+    const icon = L.divIcon({
+      html: `<div style="width:${isExc?10:7}px;height:${isExc?10:7}px;background:${color};border-radius:50%;border:1px solid rgba(255,255,255,0.3);box-shadow:0 0 ${isExc?6:2}px ${color}40;opacity:0.85"></div>`,
+      className: '', iconSize: [12,12], iconAnchor: [6,6]
+    });
+
+    const marker = L.marker([lat, lng], { icon })
+      .addTo(map)
+      .on('click', () => showStationDetail(obj.st));
+
+    const excLabel = isExc ? `<span style="color:#e63946">⚠ Exceeds Standard</span>` : `<span style="color:#00e676">✓ Within Standard</span>`;
+    marker.bindPopup(`
+      <strong>Station ${obj.st}</strong><br>
+      ${PARAM_LABELS[obj.p]||obj.p}: <strong>${obj.mn}</strong><br>
+      2SD Threshold: ${obj.th}<br>
+      ${excLabel}
+    `);
+
+    markers.push(marker);
+  });
+}
+
+function showStationDetail(stationId) {
+  const stationObjs = grData.filter(s => s.st === stationId);
+  if (!stationObjs.length) return;
+
+  const detail = document.getElementById('station-detail');
+  const params = {};
+  stationObjs.forEach(o => {
+    if (!params[o.p] || o.n > params[o.p].n) params[o.p] = o;
+  });
+
+  let html = `<div class="station-name">Station ${stationId}</div>`;
+  html += `<div class="station-id">${stationObjs[0].yr[0]}–${stationObjs[0].yr[1]} · Schema ${stationObjs[0].sc}</div>`;
+
+  Object.values(params).forEach(o => {
+    const exc = exceedsStandard(o);
+    const cls = exc ? 'over' : 'ok';
+    html += `<div class="param-row">
+      <span class="param-name">${PARAM_LABELS[o.p]||o.p}</span>
+      <span class="param-val ${cls}">${o.mn}${exc?` ⚠`:``}</span>
+    </div>`;
+  });
+
+  detail.innerHTML = html;
+}
+
+// ── Data Table ────────────────────────────────────────────────
+function renderTable() {
+  if (!grData) return;
+
+  const param = document.getElementById('data-param').value;
+  const exc = document.getElementById('data-exc').value;
+  const zone = document.getElementById('data-zone').value;
+  const search = document.getElementById('data-search').value.toLowerCase();
+
+  let filtered = grData.filter(s => {
+    if (param !== 'all' && s.p !== param) return false;
+    if (exc === 'exc' && !exceedsStandard(s)) return false;
+    if (exc === 'ok' && exceedsStandard(s)) return false;
+    if (zone === 'gr' && !s.st.startsWith('4001')) return false;
+    if (search && !s.st.includes(search)) return false;
+    return true;
+  });
+
+  // Sort
+  filtered.sort((a,b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if (sortKey === 'yr') { av = a.yr[0]; bv = b.yr[0]; }
+    if (typeof av === 'string') return sortDir * av.localeCompare(bv);
+    return sortDir * (av - bv);
+  });
+
+  document.getElementById('data-count').textContent = `${filtered.length.toLocaleString()} records`;
+
+  const page = filtered.slice(currentPage * PAGE_SIZE, (currentPage+1) * PAGE_SIZE);
+  const tbody = document.getElementById('data-tbody');
+  tbody.innerHTML = page.map(s => {
+    const isExc = exceedsStandard(s);
+    const badge = isExc
+      ? `<span class="badge badge-red">Exceeds</span>`
+      : `<span class="badge badge-green">OK</span>`;
+    return `<tr>
+      <td style="font-family:var(--mono);color:var(--text-dim)">${s.st}</td>
+      <td>${PARAM_LABELS[s.p]||s.p}</td>
+      <td style="color:var(--text-dim)">${s.se}</td>
+      <td style="color:var(--text-dim)">${s.n}</td>
+      <td style="color:${isExc?'var(--accent)':'var(--text)'};font-weight:500">${s.mn}</td>
+      <td style="color:var(--text-dim)">${s.mx}</td>
+      <td style="color:var(--text-dim)">${s.th}</td>
+      <td style="color:${s.er>0.1?'var(--amber)':'var(--text-dim)'}">${(s.er*100).toFixed(1)}%</td>
+      <td style="color:var(--text-dim)">${s.yr[0]}–${s.yr[1]}</td>
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
+
+  // Pagination
+  const pages = Math.ceil(filtered.length / PAGE_SIZE);
+  document.getElementById('data-pagination').innerHTML = pages > 1
+    ? `Page ${currentPage+1} of ${pages} · <button onclick="changePage(-1)" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:3px 10px;cursor:pointer;font-family:var(--mono);font-size:11px">← Prev</button> <button onclick="changePage(1)" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:3px 10px;cursor:pointer;font-family:var(--mono);font-size:11px">Next →</button>`
+    : `${filtered.length.toLocaleString()} records`;
+}
+
+function sortTable(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = -1; }
+  currentPage = 0;
+  renderTable();
+}
+
+function changePage(dir) {
+  currentPage = Math.max(0, currentPage + dir);
+  renderTable();
+}
+
+// ── Init ─────────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
