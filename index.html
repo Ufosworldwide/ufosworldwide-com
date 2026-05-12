@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="earth-frequency" content="7.83Hz">
+    <meta name="prime-candidate" content="Phi-Pi-Spiral">
+    <title>UFOs Worldwide | The Universal Beacon</title>
+    <style>
+        :root { --gold: #ffaa00; --deep: #050505; --phi: 1.618; }
+        body { background: var(--deep); color: var(--gold); margin: 0; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Garamond', serif; }
+
+        .flower-container { position: relative; width: 600px; height: 600px; animation: spiralRotate 55s linear infinite; }
+
+        .center-beacon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: radial-gradient(circle, var(--gold) 0%, transparent 70%); animation: pulse 7.83s ease-in-out infinite; cursor: pointer; z-index: 10; }
+
+        .asset-link { position: absolute; text-decoration: none; color: var(--gold); font-size: 0.9rem; opacity: 0; animation: bloom 2s forwards; transition: all 0.3s ease; white-space: nowrap; }
+        .asset-link:hover { text-shadow: 0 0 15px var(--gold); transform: scale(1.1); font-weight: bold; }
+
+        /* The Phyllotaxis Math: x = r*cos(theta), y = r*sin(theta) */
+        /* Nodes are positioned using the Golden Angle (137.5 degrees) */
+        .n1 { top: 20%; left: 65%; animation-delay: 0.5s; } /* Aerial Plasma */
+        .n2 { top: 40%; left: 80%; animation-delay: 1.0s; } /* New Eden */
+        .n3 { top: 70%; left: 60%; animation-delay: 1.5s; } /* Safe Key */
+        .n4 { top: 80%; left: 30%; animation-delay: 2.0s; } /* Aqua Signal */
+        .n5 { top: 50%; left: 15%; animation-delay: 2.5s; } /* Lights */
+        .n6 { top: 25%; left: 25%; animation-delay: 3.0s; } /* John Carter */
+
+        @keyframes spiralRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; } 50% { transform: translate(-50%, -50%) scale(1.618); opacity: 1; } }
+        @keyframes bloom { to { opacity: 0.8; } }
+    </style>
+</head>
+<body>
+    <div class="flower-container">
+        <div class="center-beacon" onclick="location.href='presignal.html'"></div>
+        
+        <a href="app.html" class="asset-link n1">AERIAL PLASMA PHENOMENON</a>
+        <a href="NewEden/index.html" class="asset-link n2">NEW EDEN: THE MESSAGE</a>
+        <a href="safekey.html" class="asset-link n3">SAFE KEY: SEC OPS</a>
+        <a href="aquasignal/index.html" class="asset-link n4">AQUA SIGNAL: WATER</a>
+        <a href="lights.html" class="asset-link n5">SUBMIT SIGHTING</a>
+        <a href="presignal.html" class="asset-link n6">WHO IS JOHN CARTER?</a>
+    </div>
+</body>
+</html>
