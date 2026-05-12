@@ -13,7 +13,7 @@
 
     <style>
         :root { 
-            --gold: #ff6b00; /* Amber shift for APP */
+            --gold: #ff6b00; 
             --deep: #030303; 
             --phi: 1.61803398875; 
             --schumann: 7.83s;
@@ -30,12 +30,14 @@
         #spiral-interface {
             height: 100vh; width: 100vw;
             display: flex; justify-content: center; align-items: center;
-            transition: opacity 1s ease;
+            position: fixed; top: 0; left: 0; z-index: 1000;
+            background: var(--deep);
         }
 
         .universal-spiral { 
             position: relative; width: 85vmin; height: 85vmin; 
             animation: spiralRotate 55s linear infinite; 
+            pointer-events: none; /* FIX: Clicks pass through container */
         }
 
         .center-beacon { 
@@ -45,60 +47,70 @@
             background: radial-gradient(circle, rgba(255,107,0,0.8) 0%, transparent 70%); 
             border-radius: 50%;
             animation: pulse var(--schumann) ease-in-out infinite; 
-            cursor: pointer; z-index: 100;
+            cursor: pointer; z-index: 1001;
+            pointer-events: auto; /* FIX: Beacon is clickable */
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
         .node { 
             position: absolute; text-decoration: none; color: var(--gold); 
             font-size: 0.7rem; opacity: 0.6; font-family: var(--mono);
-            animation: bloom 3s forwards;
             top: 50%; left: 50%;
+            pointer-events: auto; /* FIX: Petals are clickable */
             transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(-1 * var(--dist))) rotate(calc(-1 * var(--angle)));
         }
 
-        /* --- THE INTELLIGENCE HULL (MAP & DATA) --- */
+        /* --- THE DASHBOARD HULL (Full Original Logic) --- */
         #data-hull {
-            display: none; /* Hidden until Beacon is clicked */
-            padding: 40px;
-            background: var(--deep);
-            border-top: 1px solid #1e1e1e;
+            display: none; 
+            padding: 20px;
+            background: #000;
         }
 
-        .map-wrapper { height: 500px; border: 1px solid #1e1e1e; margin-bottom: 40px; }
-        #anomaly-map { width: 100%; height: 100%; filter: invert(1) hue-rotate(180deg) brightness(0.6); }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #1e1e1e; padding-bottom: 20px; margin-bottom: 20px; }
+        
+        .map-container { height: 500px; border: 1px solid #1e1e1e; position: relative; margin-bottom: 20px; }
+        #anomaly-map { width: 100%; height: 100%; filter: invert(1) hue-rotate(180deg) brightness(0.5); }
 
-        /* Existing Case Log styles preserved from your original file */
-        .case-card { background: #0f0f0f; border: 1px solid #1e1e1e; margin-bottom: 2px; padding: 15px; cursor: pointer; }
-        .case-status.multi { color: var(--gold); border: 1px solid var(--gold); padding: 2px 5px; font-size: 0.6rem; }
+        .case-card { 
+            background: #0a0a0a; border: 1px solid #1e1e1e; 
+            padding: 15px; margin-bottom: 10px; font-family: var(--mono);
+            font-size: 0.8rem;
+        }
 
         @keyframes spiralRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; } 50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; } }
-        @keyframes bloom { to { opacity: 0.8; } }
+        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.2); } }
     </style>
 </head>
 <body>
 
     <section id="spiral-interface">
         <div class="universal-spiral">
-            <div class="center-beacon" title="ENGAGE INTELLIGENCE FEED" onclick="engageFeed()"></div>
-            
-            <a href="index.html" class="node" style="--angle:137.5deg; --dist:25%;">RETURN TO BEACON</a>
-            <a href="lights.html" class="node" style="--angle:275deg; --dist:35%;">SUBMIT SIGHTING</a>
+            <div class="center-beacon" onclick="engageFeed()">
+                <span style="font-family:'Bebas Neue'; font-size: 1.5rem; color: #fff;">ENGAGE</span>
+                <span style="font-size: 0.5rem; color: #fff;">INTELLIGENCE</span>
+            </div>
+            <a href="index.html" class="node" style="--angle:137.5deg; --dist:25%;">HOME BEACON</a>
+            <a href="lights.html" class="node" style="--angle:275deg; --dist:35%;">SUBMIT DATA</a>
             <a href="NewEden/index.html" class="node" style="--angle:412.5deg; --dist:42%;">NEW EDEN</a>
-            <a href="presignal.html" class="node" style="--angle:550deg; --dist:38%;">WHO IS CARTER?</a>
         </div>
     </section>
 
     <section id="data-hull">
-        <h2 style="font-family:'Bebas Neue'; font-size: 3rem; letter-spacing: 0.1em;">AERIAL PLASMA PHENOMENON</h2>
-        <div style="font-family:var(--mono); font-size: 0.6rem; color: #888; margin-bottom: 20px;">[LIVE INTELLIGENCE FEED] [SCHUMANN SYNC ACTIVE]</div>
-        
-        <div class="map-wrapper">
+        <div class="dashboard-header">
+            <div>
+                <h1 style="font-family:'Bebas Neue'; font-size: 2.5rem; margin: 0;">ANOMALY INTELLIGENCE DASHBOARD</h1>
+                <div style="font-family:var(--mono); font-size: 0.6rem;">[SYSTEM STATUS: OPTIMAL] [SCHUMANN SYNC: 7.83Hz]</div>
+            </div>
+            <button onclick="location.reload()" style="background:none; border:1px solid var(--gold); color:var(--gold); font-family:var(--mono); cursor:pointer;">RESET VIEW</button>
+        </div>
+
+        <div class="map-container">
             <div id="anomaly-map"></div>
         </div>
 
-        <div id="case-list">
-            <div style="font-family:var(--mono); color: var(--gold); text-align: center;">SYNCING WITH GLOBAL MONITORING NETWORK...</div>
+        <div id="case-log-container">
+            <div style="text-align:center; padding: 50px; font-family:var(--mono);">INITIALIZING API DATA FETCH...</div>
         </div>
     </section>
 
@@ -108,45 +120,41 @@
         function engageFeed() {
             document.getElementById('spiral-interface').style.display = 'none';
             document.getElementById('data-hull').style.display = 'block';
-            window.scrollTo(0,0);
-            loadMap();
-            loadCases();
+            initMap();
+            fetchData();
         }
 
-        /* --- PRESERVED MECHANICAL ENGINE (Your Original Logic) --- */
         let map;
-        function loadMap() {
+        function initMap() {
             if (map) return;
             map = L.map('anomaly-map').setView([20, 0], 2);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-            // Re-integrate your specific marker/hotspot logic here...
+            
             fetch(`${API_BASE}/api/map-pins?days=30`)
-                .then(res => res.json())
-                .then(data => renderPins(data.pins));
+                .then(r => r.json())
+                .then(data => {
+                    data.pins.forEach(p => {
+                        if(p.lat && p.lng) {
+                            L.circleMarker([p.lat, p.lng], {radius: 5, color: '#ff6b00'}).addTo(map);
+                        }
+                    });
+                });
         }
 
-        function renderPins(pins) {
-            pins.forEach(pin => {
-                if (pin.lat && pin.lng) {
-                    L.circleMarker([pin.lat, pin.lng], {
-                        radius: 6, fillColor: '#ff6b00', color: '#ff6b00', weight: 1, fillOpacity: 0.6
-                    }).addTo(map).bindPopup(pin.label);
-                }
-            });
-        }
-
-        async function loadCases() {
+        async function fetchData() {
+            const container = document.getElementById('case-log-container');
             try {
-                const res = await fetch(`${API_BASE}/api/cases?limit=20`);
+                const res = await fetch(`${API_BASE}/api/cases?limit=25`);
                 const data = await res.json();
-                const list = document.getElementById('case-list');
-                list.innerHTML = data.cases.map(c => `
+                container.innerHTML = data.cases.map(c => `
                     <div class="case-card">
-                        <div style="font-family:var(--mono); font-size: 0.7rem; color: var(--gold);">${c.date}</div>
-                        <div style="font-family:var(--mono); font-size: 0.6rem; color: #888;">${c.summary?.overall_status}</div>
+                        <div style="color:#fff; margin-bottom: 5px;">${c.date} | ${c.location || 'Unknown'}</div>
+                        <div style="color:#888;">${c.summary?.overall_status || 'Analyzing...'}</div>
                     </div>
                 `).join('');
-            } catch (e) { console.error('Data fail', e); }
+            } catch(e) {
+                container.innerHTML = "DATA STREAM INTERRUPTED";
+            }
         }
     </script>
 </body>
