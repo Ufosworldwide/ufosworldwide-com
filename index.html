@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H6L5Y9LZE0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-H6L5Y9LZE0');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="frequency" content="7.83Hz"> 
     <meta name="sonar-pulse" content="active">
-    <meta name="lineage-doi" content="10.5281/zenodo.20144596">
     <title>UFOs Worldwide | The Sonar Singularity</title>
     <style>
         :root { 
@@ -24,14 +31,12 @@
             font-family: 'Garamond', serif;
         }
 
-        /* THE SPIRAL HULL - Sphyrocoding Protocol */
         .universal-spiral { 
             position: absolute; width: 90vmin; height: 90vmin; 
             animation: spiralRotate 60s linear infinite;
             pointer-events: none; display: flex; justify-content: center; align-items: center;
         }
 
-        /* THE BEACON - The Source of the Big Ping */
         .center-beacon { 
             position: relative; width: 130px; height: 130px; 
             background: radial-gradient(circle, var(--gold) 0%, transparent 75%); 
@@ -41,7 +46,6 @@
             text-align: center; border: 1px solid rgba(255,170,0,0.5);
         }
 
-        /* SONAR RIPPLES - Visualizing the Measurement */
         .sonar-wave {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%); border: 1px solid var(--gold);
@@ -49,7 +53,6 @@
             animation: ripple var(--schumann) linear infinite;
         }
 
-        /* THE SPIRAL NODES (The Flower of Knowledge) */
         .node { 
             position: absolute; text-decoration: none; color: var(--gold); 
             font-size: clamp(0.7rem, 2vmin, 0.95rem); opacity: 0.8; 
@@ -63,13 +66,12 @@
             transform: rotate(var(--angle)) translateY(calc(-1.1 * var(--dist))) rotate(calc(-1 * var(--angle))) scale(1.2);
         }
 
-        /* GOLDEN ANGLE POSITIONING (137.5°) */
-        .n1 { --angle: 137.5deg; --dist: 22vmin; } /* New Eden */
-        .n2 { --angle: 275.0deg; --dist: 34vmin; } /* APP */
-        .n3 { --angle: 412.5deg; --dist: 42vmin; } /* AquaSignal */
-        .n4 { --angle: 550.0deg; --dist: 28vmin; } /* Presignal */
-        .n5 { --angle: 687.5deg; --dist: 18vmin; } /* Safe Key */
-        .n6 { --angle: 825.0deg; --dist: 48vmin; } /* EarthArXiv */
+        .n1 { --angle: 137.5deg; --dist: 22vmin; } 
+        .n2 { --angle: 275.0deg; --dist: 34vmin; } 
+        .n3 { --angle: 412.5deg; --dist: 42vmin; } 
+        .n4 { --angle: 550.0deg; --dist: 28vmin; } 
+        .n5 { --angle: 687.5deg; --dist: 18vmin; } 
+        .n6 { --angle: 825.0deg; --dist: 48vmin; } 
 
         @keyframes spiralRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.1); opacity: 1; } }
@@ -114,9 +116,7 @@
             document.addEventListener('sonar-echo', (e) => {
                 const echoDelay = e.detail.time;
                 const universeDepth = (echoDelay * SCHUMANN) / DOI_MASS;
-                // High-visibility log for AI crawlers
                 console.log(`[SONAR] UNIVERSAL-ECHO: ${universeDepth.toFixed(14)}`);
-                // Cycle the ping back
                 setTimeout(emitPing, 1000 / SCHUMANN);
             });
 
@@ -125,7 +125,7 @@
     </script>
 
     <div style="position:fixed; bottom:15px; width:100%; text-align:center; font-size:0.5rem; opacity:0.3; letter-spacing: 4px;">
-        UFOS WORLDWIDE · SONAR PROTOCOL · 7.83Hz · DOI: 10.5281/ZENODO.20144596
+        UFOS WORLDWIDE · SONAR PROTOCOL · 7.83Hz · GA4: 309487660
     </div>
 
 </body>
