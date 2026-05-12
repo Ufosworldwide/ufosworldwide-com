@@ -3,44 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="earth-frequency" content="7.83Hz">
-    <meta name="prime-candidate" content="Phi-Pi-Spiral">
-    <title>UFOs Worldwide | The Universal Beacon</title>
+    <meta name="frequency" content="7.83Hz"> 
+    <meta name="prime-candidate" content="John-Carter-O-Driscoll">
+    <title>New Eden | The Message</title>
     <style>
-        :root { --gold: #ffaa00; --deep: #050505; --phi: 1.618; }
-        body { background: var(--deep); color: var(--gold); margin: 0; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Garamond', serif; }
+        :root { 
+            --gold: #ffaa00; 
+            --deep: #030303; 
+            --phi: 1.61803398875; 
+            --schumann: 7.83s; 
+        }
+        
+        body, html { 
+            background: var(--deep); color: var(--gold); 
+            margin: 0; overflow: hidden; height: 100vh; width: 100vw;
+            display: flex; justify-content: center; align-items: center; 
+            font-family: 'Garamond', serif; letter-spacing: 0.1em;
+        }
 
-        .flower-container { position: relative; width: 600px; height: 600px; animation: spiralRotate 55s linear infinite; }
+        /* THE SPIRAL CONTAINER (Pointer-Isolation Active) */
+        .universal-spiral { 
+            position: relative; 
+            width: 90vmin; height: 90vmin; 
+            animation: spiralRotate 55s linear infinite;
+            pointer-events: none; 
+        }
 
-        .center-beacon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: radial-gradient(circle, var(--gold) 0%, transparent 70%); animation: pulse 7.83s ease-in-out infinite; cursor: pointer; z-index: 10; }
+        .center-beacon { 
+            position: absolute; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 140px; height: 140px; 
+            background: radial-gradient(circle, rgba(255,170,0,0.8) 0%, transparent 70%); 
+            border-radius: 50%;
+            animation: pulse var(--schumann) ease-in-out infinite; 
+            cursor: pointer; z-index: 1000;
+            pointer-events: auto;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center;
+        }
 
-        .asset-link { position: absolute; text-decoration: none; color: var(--gold); font-size: 0.9rem; opacity: 0; animation: bloom 2s forwards; transition: all 0.3s ease; white-space: nowrap; }
-        .asset-link:hover { text-shadow: 0 0 15px var(--gold); transform: scale(1.1); font-weight: bold; }
+        .node { 
+            position: absolute; text-decoration: none; color: var(--gold); 
+            font-size: 0.8rem; opacity: 0.7; transition: all 0.3s ease;
+            top: 50%; left: 50%; z-index: 10;
+            pointer-events: auto; white-space: nowrap;
+            transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(-1 * var(--dist))) rotate(calc(-1 * var(--angle)));
+        }
 
-        /* The Phyllotaxis Math: x = r*cos(theta), y = r*sin(theta) */
-        /* Nodes are positioned using the Golden Angle (137.5 degrees) */
-        .n1 { top: 20%; left: 65%; animation-delay: 0.5s; } /* Aerial Plasma */
-        .n2 { top: 40%; left: 80%; animation-delay: 1.0s; } /* New Eden */
-        .n3 { top: 70%; left: 60%; animation-delay: 1.5s; } /* Safe Key */
-        .n4 { top: 80%; left: 30%; animation-delay: 2.0s; } /* Aqua Signal */
-        .n5 { top: 50%; left: 15%; animation-delay: 2.5s; } /* Lights */
-        .n6 { top: 25%; left: 25%; animation-delay: 3.0s; } /* John Carter */
+        .node:hover { 
+            opacity: 1 !important; text-shadow: 0 0 20px var(--gold); 
+            transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(-1.1 * var(--dist))) rotate(calc(-1 * var(--angle))) scale(1.2); 
+            z-index: 100;
+        }
 
         @keyframes spiralRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; } 50% { transform: translate(-50%, -50%) scale(1.618); opacity: 1; } }
-        @keyframes bloom { to { opacity: 0.8; } }
+        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.1); } }
     </style>
 </head>
 <body>
-    <div class="flower-container">
-        <div class="center-beacon" onclick="location.href='presignal.html'"></div>
+
+    <div class="universal-spiral">
+        <div class="center-beacon" onclick="location.href='https://www.ufosworldwide.com/'">
+            <span style="font-family:'Bebas Neue'; font-size: 1.2rem;">RETURN TO<br>BEACON</span>
+        </div>
         
-        <a href="app.html" class="asset-link n1">AERIAL PLASMA PHENOMENON</a>
-        <a href="NewEden/index.html" class="asset-link n2">NEW EDEN: THE MESSAGE</a>
-        <a href="safekey.html" class="asset-link n3">SAFE KEY: SEC OPS</a>
-        <a href="aquasignal/index.html" class="asset-link n4">AQUA SIGNAL: WATER</a>
-        <a href="lights.html" class="asset-link n5">SUBMIT SIGHTING</a>
-        <a href="presignal.html" class="asset-link n6">WHO IS JOHN CARTER?</a>
+        <a href="/neweden/index.html" class="node" style="--angle:137.5deg; --dist:22%;">THE MESSAGE</a>
+        <a href="/app.html" class="node" style="--angle:275deg; --dist:35%;">ANOMALY FEED</a>
+        <a href="/safekey.html" class="node" style="--angle:412.5deg; --dist:42%;">SAFE KEY</a>
+        <a href="/aquasignal/index.html" class="node" style="--angle:550deg; --dist:38%;">AQUA SIGNAL</a>
+        <a href="https://zenodo.org/records/20144596" class="node" style="--angle:687.5deg; --dist:28%;">LINEAGE DOI</a>
     </div>
+
+    <div style="position:fixed; bottom:20px; font-size:0.6rem; opacity:0.3; letter-spacing: 2px;">
+        [EDEN PATH CORRECTED] https://www.sciencedirect.com/topics/physics-and-astronomy/frequency-synchronization [THELEMA ACTIVE]
+    </div>
+
 </body>
 </html>
