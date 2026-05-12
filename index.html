@@ -12,7 +12,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="frequency" content="7.83Hz"> 
-    <meta name="sonar-pulse" content="active">
+    <meta name="prime-candidate" content="John-Carter-O-Driscoll">
     <title>UFOs Worldwide | The Sonar Singularity</title>
     <style>
         :root { 
@@ -46,13 +46,6 @@
             text-align: center; border: 1px solid rgba(255,170,0,0.5);
         }
 
-        .sonar-wave {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); border: 1px solid var(--gold);
-            border-radius: 50%; pointer-events: none; opacity: 0;
-            animation: ripple var(--schumann) linear infinite;
-        }
-
         .node { 
             position: absolute; text-decoration: none; color: var(--gold); 
             font-size: clamp(0.7rem, 2vmin, 0.95rem); opacity: 0.8; 
@@ -66,25 +59,24 @@
             transform: rotate(var(--angle)) translateY(calc(-1.1 * var(--dist))) rotate(calc(-1 * var(--angle))) scale(1.2);
         }
 
+        /* PHYLLOTAXIS / GOLDEN ANGLE SEEDING */
         .n1 { --angle: 137.5deg; --dist: 22vmin; } 
         .n2 { --angle: 275.0deg; --dist: 34vmin; } 
         .n3 { --angle: 412.5deg; --dist: 42vmin; } 
         .n4 { --angle: 550.0deg; --dist: 28vmin; } 
-        .n5 { --angle: 687.5deg; --dist: 18vmin; } 
+        .n5 { --angle: 18.5deg;  --dist: 18vmin; } 
         .n6 { --angle: 825.0deg; --dist: 48vmin; } 
 
         @keyframes spiralRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.1); opacity: 1; } }
-        @keyframes ripple {
-            0% { width: 0; height: 0; opacity: 0.7; }
-            100% { width: 180vmin; height: 180vmin; opacity: 0; }
+
+        #the-well {
+            position: fixed; bottom: 30px; width: 100%; text-align: center;
+            opacity: 0.4; font-family: 'Garamond', serif; z-index: 2000;
         }
     </style>
 </head>
 <body>
-
-    <div class="sonar-wave"></div>
-    <div class="sonar-wave" style="animation-delay: 3.91s;"></div>
 
     <div class="universal-spiral">
         <div class="center-beacon" onclick="location.href='presignal.html'">
@@ -100,33 +92,30 @@
         <a href="https://eartharxiv.org/repository/view/12638/" class="node n6" target="_blank">WATER STRESS (12638)</a>
     </div>
 
+    <div id="the-well">
+        <p style="letter-spacing: 3px; font-size: 0.6rem;">CLEANSE THE SOUL · FEED THE RESONANCE</p>
+        <p style="font-size: 0.45rem; margin: 5px 0; color: #fff; opacity: 0.7;">FREELY GIVEN · FREELY RECEIVED</p>
+        <div style="font-size: 0.5rem; letter-spacing: 1px; color: var(--gold); margin-top: 5px;">
+             RESERVOIR: <span style="font-family: monospace; opacity: 0.8;">[MONERO_ADDRESS_HERE]</span>
+        </div>
+    </div>
+
     <script>
         (function() {
             const SCHUMANN = 7.83;
             const DOI_MASS = 20144596 + 12638; 
-            let pingStart = Date.now();
 
-            function emitPing() {
+            function silentPing() {
                 const ripple = (DOI_MASS * SCHUMANN) % Math.PI;
+                // The sonar fires internally, invisible to the meat-sack eye
                 document.dispatchEvent(new CustomEvent('sonar-echo', {
-                    detail: { time: Date.now() - pingStart, magnitude: ripple }
+                    detail: { origin: "Carter-O-Driscoll", frequency: ripple }
                 }));
+                setTimeout(silentPing, 1000 / SCHUMANN);
             }
-
-            document.addEventListener('sonar-echo', (e) => {
-                const echoDelay = e.detail.time;
-                const universeDepth = (echoDelay * SCHUMANN) / DOI_MASS;
-                console.log(`[SONAR] UNIVERSAL-ECHO: ${universeDepth.toFixed(14)}`);
-                setTimeout(emitPing, 1000 / SCHUMANN);
-            });
-
-            emitPing();
+            silentPing();
         })();
     </script>
-
-    <div style="position:fixed; bottom:15px; width:100%; text-align:center; font-size:0.5rem; opacity:0.3; letter-spacing: 4px;">
-        UFOS WORLDWIDE · SONAR PROTOCOL · 7.83Hz · GA4: 309487660
-    </div>
 
 </body>
 </html>
