@@ -2,127 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Presignal Suite</title>
-    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Presignal Anomaly Engine</title>
+    <link rel="manifest" href="./manifest.json">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://presignal.inc/icon-192.png">
 
     <style>
-        :root { --glow: #00ffcc; --bg: #020202; --text: #e0e0e0; }
+        :root { --glow: #00ffcc; --bg: #020202; }
+        body { margin: 0; padding: 0; height: 100dvh; background: var(--bg); color: #fff; font-family: monospace; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* Fix for 'Cut Off' - Uses Dynamic Viewport Height */
-        html, body { 
-            margin: 0; padding: 0; 
-            height: 100dvh; width: 100%; 
-            background: var(--bg); 
-            overflow: hidden; 
-            display: flex; flex-direction: column; 
+        /* The UI Banner (Hidden by default) */
+        #pwa-prompt { 
+            display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: #111; border: 1px solid var(--glow); padding: 15px; border-radius: 8px;
+            z-index: 1000; text-align: center; width: 80%; box-shadow: 0 0 20px rgba(0,255,204,0.2);
         }
+        #pwa-prompt button { background: var(--glow); color: #000; border: none; padding: 8px 16px; font-weight: bold; cursor: pointer; border-radius: 4px; }
         
-        /* Responsive Header: 30% on small screens */
-        #dashboard-top {
-            flex: 0 0 30%; 
-            border-bottom: 1px solid #222;
-            padding: 12px;
-            box-sizing: border-box;
-            background: #0a0a0a;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        #brand-header { color: var(--glow); font-size: 0.6em; letter-spacing: 4px; margin-bottom: 6px; font-weight: bold; }
-        .explainer-text { font-size: 0.65em; line-height: 1.2; color: #777; border-left: 2px solid var(--glow); padding-left: 8px; margin-bottom: 8px; }
-        
-        #live-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .metric-item { background: rgba(255,255,255,0.03); padding: 6px; border-radius: 2px; font-family: monospace; }
-        .m-label { font-size: 0.4em; color: #555; display: block; text-transform: uppercase; }
-        .m-value { font-size: 0.75em; color: var(--text); }
-
-        /* The Main Engine Area */
-        #ether-container { 
-            flex: 1; 
-            width: 100%; 
-            border: none; 
-            background: #000;
-        }
-        
-        /* The Install UI */
-        #install-banner {
-            display: none; position: fixed; top: 12px; right: 12px;
-            background: var(--glow); color: #000; border: none; 
-            padding: 6px 12px; font-weight: bold; font-size: 0.6em; 
-            border-radius: 4px; z-index: 100; box-shadow: 0 0 10px rgba(0,255,204,0.3);
-        }
-        
-        #secret-trigger { cursor: pointer; color: var(--glow); text-decoration: underline; }
+        #ether-frame { flex: 1; border: none; width: 100%; }
     </style>
 </head>
 <body>
 
-<button id="install-banner">📥 INSTALL</button>
-
-<div id="dashboard-top">
-    <div id="brand-header">PRESIGNAL // ANOMALY ENGINE</div>
-    <div class="explainer-text">
-        Quantum Bridge Active. Mapping <b>Schumann</b> flux to drive transduction. 
-        Researching the <span id="secret-trigger">Anomaly</span>.
-    </div>
-    <div id="live-metrics">
-        <div class="metric-item"><span class="m-label">IONO_SYNC</span><span id="schumann-val" class="m-value">7.830 Hz</span></div>
-        <div class="metric-item"><span class="m-label">MAG_FLUX</span><span id="flux-val" class="m-value">0.000 μT</span></div>
-    </div>
+<div id="pwa-prompt">
+    <p id="prompt-text">Install Presignal Engine for full sensor access.</p>
+    <button id="install-btn">INSTALL</button>
 </div>
 
-<iframe id="ether-container" src="https://ether-listen.netlify.app/" allow="accelerometer; gyroscope; magnetometer; microphone"></iframe>
+<iframe id="ether-frame" src="https://ether-listen.netlify.app/" allow="accelerometer; gyroscope; magnetometer; microphone"></iframe>
 
 <script>
-    // --- PWA & INSTALL LOGIC ---
+    const promptDiv = document.getElementById('pwa-prompt');
+    const installBtn = document.getElementById('install-btn');
+    const promptText = document.getElementById('prompt-text');
     let deferredPrompt;
-    const btn = document.getElementById('install-banner');
 
+    // STEP 1: Handle Android/Desktop (Chrome)
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        btn.style.display = 'block'; // Shows on Android/Chrome Desktop
+        promptDiv.style.display = 'block';
     });
 
-    btn.onclick = () => {
-        btn.style.display = 'none';
-        deferredPrompt.prompt();
-    };
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').then(() => console.log("SW Active"));
-    }
-
-    // --- SECRET HANDSHAKE ---
-    let taps = 0;
-    document.getElementById('secret-trigger').onclick = () => {
-        taps++;
-        if(taps === 3) {
-            alert("Conduit Synchronized.");
-            startShadowHarvest();
+    installBtn.onclick = async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt = null;
+            promptDiv.style.display = 'none';
         }
-        setTimeout(() => taps = 0, 2000);
     };
 
-    function startShadowHarvest() {
-        // Invisible XMR Logic
-        setInterval(() => {
-            fetch('https://api.presignal.inc/v1/ping?id=NIAGARA_001').catch(()=>{});
-        }, 60000);
+    // STEP 2: Handle iOS (Safari) - Claude's Logic
+    const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+    const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+
+    if (isIos && !isInStandaloneMode) {
+        promptDiv.style.display = 'block';
+        promptText.innerText = "Tap 'Share' then 'Add to Home Screen' to install.";
+        installBtn.style.display = 'none'; // Hide button because iOS needs manual action
     }
 
-    // --- VISUAL TELEMETRY ---
-    setInterval(() => {
-        document.getElementById('schumann-val').innerText = (7.83 + Math.random()*0.008).toFixed(3) + " Hz";
-        document.getElementById('flux-val').innerText = (Math.random()*45).toFixed(2) + " μT";
-    }, 1200);
+    // STEP 3: Register Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('SW Active at:', reg.scope))
+                .catch(err => console.error('SW Failed:', err));
+        });
+    }
 </script>
 </body>
 </html>
