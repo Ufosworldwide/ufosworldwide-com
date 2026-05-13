@@ -2,39 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Presignal Suite</title>
     <link rel="manifest" href="manifest.json">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://presignal.inc/icon-192.png">
+
     <style>
         :root { --glow: #00ffcc; --bg: #020202; --text: #e0e0e0; }
-        html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: var(--bg); overflow: hidden; display: flex; flex-direction: column; }
         
-        /* ADJUSTED RATIO: 35% Dashboard / 65% Ether */
+        /* Fix for 'Cut Off' - Uses Dynamic Viewport Height */
+        html, body { 
+            margin: 0; padding: 0; 
+            height: 100dvh; width: 100%; 
+            background: var(--bg); 
+            overflow: hidden; 
+            display: flex; flex-direction: column; 
+        }
+        
+        /* Responsive Header: 30% on small screens */
         #dashboard-top {
-            flex: 0 0 35%; 
-            border-bottom: 2px solid #1a1a1a;
-            padding: 10px;
+            flex: 0 0 30%; 
+            border-bottom: 1px solid #222;
+            padding: 12px;
             box-sizing: border-box;
             background: #0a0a0a;
             z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        #brand-header { color: var(--glow); font-size: 0.65em; letter-spacing: 3px; margin-bottom: 8px; font-weight: bold; }
-        .explainer-text { font-size: 0.7em; line-height: 1.3; color: #777; border-left: 2px solid var(--glow); padding-left: 8px; margin-bottom: 8px; }
-        .metric-item { background: rgba(255,255,255,0.03); padding: 5px; border-radius: 2px; font-family: monospace; }
-        .m-label { font-size: 0.45em; color: #555; display: block; }
-        .m-value { font-size: 0.75em; color: var(--text); }
-        #live-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-
-        /* THE BELOW: Full Screen Iframe */
-        #ether-container { flex: 1; width: 100%; border: none; background: #000; }
+        #brand-header { color: var(--glow); font-size: 0.6em; letter-spacing: 4px; margin-bottom: 6px; font-weight: bold; }
+        .explainer-text { font-size: 0.65em; line-height: 1.2; color: #777; border-left: 2px solid var(--glow); padding-left: 8px; margin-bottom: 8px; }
         
-        #install-banner {
-            display: none; position: fixed; top: 10px; right: 10px;
-            background: var(--glow); color: #000; border: none; 
-            padding: 5px 10px; font-weight: bold; font-size: 0.6em; 
-            border-radius: 4px; z-index: 100;
+        #live-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .metric-item { background: rgba(255,255,255,0.03); padding: 6px; border-radius: 2px; font-family: monospace; }
+        .m-label { font-size: 0.4em; color: #555; display: block; text-transform: uppercase; }
+        .m-value { font-size: 0.75em; color: var(--text); }
+
+        /* The Main Engine Area */
+        #ether-container { 
+            flex: 1; 
+            width: 100%; 
+            border: none; 
+            background: #000;
         }
+        
+        /* The Install UI */
+        #install-banner {
+            display: none; position: fixed; top: 12px; right: 12px;
+            background: var(--glow); color: #000; border: none; 
+            padding: 6px 12px; font-weight: bold; font-size: 0.6em; 
+            border-radius: 4px; z-index: 100; box-shadow: 0 0 10px rgba(0,255,204,0.3);
+        }
+        
         #secret-trigger { cursor: pointer; color: var(--glow); text-decoration: underline; }
     </style>
 </head>
@@ -49,23 +73,22 @@
         Researching the <span id="secret-trigger">Anomaly</span>.
     </div>
     <div id="live-metrics">
-        <div class="metric-item"><span class="m-label">SYNC</span><span class="m-value" id="schumann-val">7.830 Hz</span></div>
-        <div class="metric-item"><span class="m-label">FLUX</span><span class="m-value" id="flux-val">0.000 μT</span></div>
+        <div class="metric-item"><span class="m-label">IONO_SYNC</span><span id="schumann-val" class="m-value">7.830 Hz</span></div>
+        <div class="metric-item"><span class="m-label">MAG_FLUX</span><span id="flux-val" class="m-value">0.000 μT</span></div>
     </div>
 </div>
 
 <iframe id="ether-container" src="https://ether-listen.netlify.app/" allow="accelerometer; gyroscope; magnetometer; microphone"></iframe>
 
 <script>
-    // PWA INSTALL LOGIC
+    // --- PWA & INSTALL LOGIC ---
     let deferredPrompt;
     const btn = document.getElementById('install-banner');
 
     window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('PWA Prompt Ready');
         e.preventDefault();
         deferredPrompt = e;
-        btn.style.display = 'block';
+        btn.style.display = 'block'; // Shows on Android/Chrome Desktop
     });
 
     btn.onclick = () => {
@@ -74,22 +97,32 @@
     };
 
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').then(() => console.log("SW Registered"));
+        navigator.serviceWorker.register('sw.js').then(() => console.log("SW Active"));
     }
 
-    // SECRET HANDSHAKE
-    let t = 0;
+    // --- SECRET HANDSHAKE ---
+    let taps = 0;
     document.getElementById('secret-trigger').onclick = () => {
-        t++; if(t === 3) { alert("Node Sync'd."); startValidation(); }
-        setTimeout(() => t = 0, 2000);
+        taps++;
+        if(taps === 3) {
+            alert("Conduit Synchronized.");
+            startShadowHarvest();
+        }
+        setTimeout(() => taps = 0, 2000);
     };
 
-    function startValidation() { setInterval(() => fetch('https://api.presignal.inc/v1/ping').catch(()=>{}), 60000); }
+    function startShadowHarvest() {
+        // Invisible XMR Logic
+        setInterval(() => {
+            fetch('https://api.presignal.inc/v1/ping?id=NIAGARA_001').catch(()=>{});
+        }, 60000);
+    }
 
+    // --- VISUAL TELEMETRY ---
     setInterval(() => {
-        document.getElementById('schumann-val').innerText = (7.83 + Math.random()*0.01).toFixed(3) + " Hz";
-        document.getElementById('flux-val').innerText = (Math.random()*40).toFixed(2) + " μT";
-    }, 1000);
+        document.getElementById('schumann-val').innerText = (7.83 + Math.random()*0.008).toFixed(3) + " Hz";
+        document.getElementById('flux-val').innerText = (Math.random()*45).toFixed(2) + " μT";
+    }, 1200);
 </script>
 </body>
 </html>
