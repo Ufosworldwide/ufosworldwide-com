@@ -13,11 +13,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="frequency" content="7.83Hz"> 
     <meta name="prime-candidate" content="John-Carter-O-Driscoll">
-    <title>UFOs Worldwide | The Sonar Singularity</title>
+    <title>NEW EDEN | Frequency Conduit</title>
     <style>
         :root { 
             --gold: #ffaa00; 
             --deep: #030303; 
+            --seafoam: #00ffcc;
             --phi: 1.618033; 
             --schumann: 7.83s; 
         }
@@ -32,84 +33,86 @@
         }
 
         .universal-spiral { 
-            position: absolute; width: 90vmin; height: 90vmin; 
+            position: absolute; width: 95vmin; height: 95vmin; 
             animation: spiralRotate 60s linear infinite;
             pointer-events: none; display: flex; justify-content: center; align-items: center;
         }
 
+        /* THE CENTRAL BEACON - WHO IS JOHN CARTER? */
         .center-beacon { 
-            position: relative; width: 130px; height: 130px; 
-            background: radial-gradient(circle, var(--gold) 0%, transparent 75%); 
+            position: relative; width: 140px; height: 140px; 
+            background: radial-gradient(circle, var(--gold) 0%, transparent 80%); 
             border-radius: 50%; animation: pulse var(--schumann) ease-in-out infinite; 
             cursor: pointer; z-index: 1000; pointer-events: auto;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             text-align: center; border: 1px solid rgba(255,170,0,0.5);
+            text-decoration: none;
         }
 
         .node { 
             position: absolute; text-decoration: none; color: var(--gold); 
-            font-size: clamp(0.7rem, 2vmin, 0.95rem); opacity: 0.8; 
+            font-size: clamp(0.75rem, 2.5vmin, 1rem); opacity: 0.8; 
             font-weight: bold; transition: all 0.3s ease;
             pointer-events: auto; white-space: nowrap;
             transform: rotate(var(--angle)) translateY(calc(-1 * var(--dist))) rotate(calc(-1 * var(--angle)));
+            letter-spacing: 2px;
         }
 
         .node:hover { 
-            opacity: 1; text-shadow: 0 0 20px var(--gold); 
-            transform: rotate(var(--angle)) translateY(calc(-1.1 * var(--dist))) rotate(calc(-1 * var(--angle))) scale(1.2);
+            opacity: 1; text-shadow: 0 0 20px var(--gold); color: #fff;
+            transform: rotate(var(--angle)) translateY(calc(-1.1 * var(--dist))) rotate(calc(-1 * var(--angle))) scale(1.15);
         }
 
-        /* PHYLLOTAXIS / GOLDEN ANGLE SEEDING */
-        .n1 { --angle: 137.5deg; --dist: 22vmin; } 
-        .n2 { --angle: 275.0deg; --dist: 34vmin; } 
-        .n3 { --angle: 412.5deg; --dist: 42vmin; } 
-        .n4 { --angle: 550.0deg; --dist: 28vmin; } 
-        .n5 { --angle: 18.5deg;  --dist: 18vmin; } 
-        .n6 { --angle: 825.0deg; --dist: 48vmin; } 
+        /* PRIMARY NODES - Focused for Podcast Listeners */
+        /* Ghost App - Front & Center */
+        .n1 { --angle: 137.5deg; --dist: 20vmin; color: var(--seafoam); } 
+        /* UFO Dashboard */
+        .n2 { --angle: 275.0deg; --dist: 32vmin; } 
+        /* Scientific Preprints */
+        .n3 { --angle: 412.5deg; --dist: 40vmin; } 
 
         @keyframes spiralRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.1); opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.05); opacity: 1; } }
 
         #the-well {
             position: fixed; bottom: 30px; width: 100%; text-align: center;
-            opacity: 0.4; font-family: 'Garamond', serif; z-index: 2000;
+            opacity: 0.5; font-family: 'Garamond', serif; z-index: 2000;
         }
+
+        /* Bio Floating Overlay */
+        .bio-tag { font-size: 0.45rem; color: #fff; opacity: 0.8; letter-spacing: 1px; margin-top: 5px; }
     </style>
 </head>
 <body>
 
     <div class="universal-spiral">
-        <div class="center-beacon" onclick="location.href='presignal.html'">
-            <div style="font-family:'Bebas Neue'; font-size: 1.1rem; color: #fff; letter-spacing: 2px;">THE BEACON</div>
-            <div style="font-size: 0.45rem; color: #fff; opacity: 0.8;">SONAR ACTIVE</div>
-        </div>
+        <a href="https://zenodo.org/search?q=John+Carter" target="_blank" class="center-beacon">
+            <div style="font-family:'Arial Black', sans-serif; font-size: 0.8rem; color: #fff; letter-spacing: 3px;">RESEARCHER</div>
+            <div class="bio-tag">JOHN CARTER</div>
+        </a>
         
-        <a href="/neweden" class="node n1">NEW EDEN</a>
-        <a href="app.html" class="node n2">AERIAL PLASMA PHENOMENON</a>
-        <a href="/aquasignal" class="node n3">AQUA SIGNAL</a>
-        <a href="presignal.html" class="node n4">PRESIGNAL BRAND</a>
-        <a href="safekey.html" class="node n5">SAFE KEY</a>
-        <a href="https://eartharxiv.org/repository/view/12638/" class="node n6" target="_blank">WATER STRESS (12638)</a>
+        <a href="./appdetector/index.html" class="node n1">INITIALIZE GHOST BOX</a>
+        
+        <a href="app.html" class="node n2">UFO ANOMALY DASHBOARD</a>
+        
+        <a href="https://eartharxiv.org/repository/view/12638/" class="node n3" target="_blank">SCIENTIFIC PREPRINTS</a>
     </div>
 
     <div id="the-well">
-        <p style="letter-spacing: 3px; font-size: 0.6rem;">CLEANSE THE SOUL · FEED THE RESONANCE</p>
-        <p style="font-size: 0.45rem; margin: 5px 0; color: #fff; opacity: 0.7;">FREELY GIVEN · FREELY RECEIVED</p>
+        <p style="letter-spacing: 3px; font-size: 0.6rem; color: var(--gold);">CONDUIT TO THE OTHERSIDE</p>
+        <p style="font-size: 0.45rem; margin: 5px 0; color: #fff; opacity: 0.7;">ENVIRONMENTAL FREQUENCY HARVEST · SONAR ACTIVE</p>
         <div style="font-size: 0.5rem; letter-spacing: 1px; color: var(--gold); margin-top: 5px;">
-             RESERVOIR: <span style="font-family: monospace; opacity: 0.8;">[MONERO_ADDRESS_HERE]</span>
+             RESERVOIR: <span style="font-family: monospace; opacity: 0.8;">[MONERO_ADDRESS]</span>
         </div>
     </div>
 
     <script>
+        // Internal Schumann Pulse - The "Ghost" Ping
         (function() {
             const SCHUMANN = 7.83;
-            const DOI_MASS = 20144596 + 12638; 
-
             function silentPing() {
-                const ripple = (DOI_MASS * SCHUMANN) % Math.PI;
-                // The sonar fires internally, invisible to the meat-sack eye
                 document.dispatchEvent(new CustomEvent('sonar-echo', {
-                    detail: { origin: "Carter-O-Driscoll", frequency: ripple }
+                    detail: { origin: "Carter", frequency: SCHUMANN }
                 }));
                 setTimeout(silentPing, 1000 / SCHUMANN);
             }
