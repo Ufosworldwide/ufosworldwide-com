@@ -32,13 +32,32 @@
             font-family: 'Garamond', serif;
         }
 
+        /* FAST LANE ICONS (TOP CORNERS) */
+        .fast-lane {
+            position: fixed; top: 20px; z-index: 3000;
+            text-decoration: none; font-size: 3rem;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            cursor: pointer;
+            filter: drop-shadow(0 0 10px rgba(255,170,0,0.2));
+        }
+        .fast-lane:hover { transform: scale(1.2); filter: drop-shadow(0 0 20px var(--gold)); }
+        
+        #ghost-lane { left: 20px; }
+        #alien-lane { right: 20px; }
+
+        .lane-label { 
+            display: block; font-size: 0.6rem; text-align: center; 
+            color: var(--gold); letter-spacing: 2px; margin-top: -5px;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        /* SPIRAL SYSTEM */
         .universal-spiral { 
             position: absolute; width: 95vmin; height: 95vmin; 
             animation: spiralRotate 120s linear infinite;
             pointer-events: none; display: flex; justify-content: center; align-items: center;
         }
 
-        /* THE CENTRAL BEACON - PRESIGNAL HUB */
         .center-beacon { 
             position: relative; width: 150px; height: 150px; 
             background: radial-gradient(circle, var(--gold) 0%, transparent 80%); 
@@ -65,8 +84,7 @@
             transform: rotate(var(--angle)) translateY(calc(-1.1 * var(--dist))) rotate(calc(-1 * var(--angle))) scale(1.15);
         }
 
-        /* PHYLLOTAXIS NODES */
-        .n-ghost { --angle: 137.5deg; --dist: 26vmin; color: var(--seafoam); border-bottom: 1px solid var(--seafoam); padding-bottom: 5px; } 
+        .n-ghost { --angle: 137.5deg; --dist: 26vmin; color: var(--seafoam); } 
         .n-ufo { --angle: 275.0deg; --dist: 38vmin; } 
 
         @keyframes spiralRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -83,6 +101,42 @@
 </head>
 <body>
 
+    <a href="https://www.ufosworldwide.com/appdetector/" class="fast-lane" id="ghost-lane">
+        👻<span class="lane-label">GHOSTS</span>
+    </a>
+
+    <a href="app.html" class="fast-lane" id="alien-lane">
+        🛸<span class="lane-label">ALIENS</span>
+    </a>
+
     <div class="universal-spiral">
         <a href="https://www.ufosworldwide.com/presignal" class="center-beacon">
-            <div class="beacon-label">PRESIGNAL
+            <div class="beacon-label">PRESIGNAL</div>
+            <div class="bio-tag">JOHN CARTER</div>
+            <div style="font-size: 0.4rem; color: var(--gold); margin-top: 5px; opacity: 0.7;">WATER SOURCE INTEL</div>
+        </a>
+        
+        <a href="https://www.ufosworldwide.com/appdetector/" class="node n-ghost">INITIALIZE GHOST BOX</a>
+        <a href="app.html" class="node n-ufo">UFO ANOMALY DASHBOARD</a>
+    </div>
+
+    <div id="footer-conduit">
+        <p style="letter-spacing: 4px; font-size: 0.6rem; color: var(--gold);">CONDUIT TO THE OTHERSIDE</p>
+        <p style="font-size: 0.45rem; margin: 6px 0; color: #fff; opacity: 0.7;">ENVIRONMENTAL FREQUENCY HARVEST · SONAR ACTIVE</p>
+    </div>
+
+    <script>
+        (function() {
+            const SCHUMANN = 7.83;
+            function silentPing() {
+                document.dispatchEvent(new CustomEvent('sonar-echo', {
+                    detail: { origin: "Carter-Presignal", frequency: SCHUMANN }
+                }));
+                setTimeout(silentPing, 1000 / SCHUMANN);
+            }
+            silentPing();
+        })();
+    </script>
+
+</body>
+</html>
