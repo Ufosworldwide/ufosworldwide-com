@@ -2,76 +2,139 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Presignal Anomaly Engine</title>
     <link rel="manifest" href="./manifest.json">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-192.png">
 
     <style>
-        :root { --glow: #00ffcc; --bg: #020202; }
-        body { margin: 0; padding: 0; height: 100dvh; background: var(--bg); color: #fff; font-family: monospace; overflow: hidden; display: flex; flex-direction: column; }
+        :root { --glow: #00ffcc; --bg: #020202; --text: #e0e0e0; }
         
-        /* The UI Banner (Hidden by default) */
-        #pwa-prompt { 
-            display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: #111; border: 1px solid var(--glow); padding: 15px; border-radius: 8px;
-            z-index: 1000; text-align: center; width: 80%; box-shadow: 0 0 20px rgba(0,255,204,0.2);
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        html, body { 
+            margin: 0; padding: 0; 
+            height: 100dvh; width: 100%; 
+            background: var(--bg); 
+            color: var(--text);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden; 
+            display: flex; flex-direction: column; 
         }
-        #pwa-prompt button { background: var(--glow); color: #000; border: none; padding: 8px 16px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        
-        #ether-frame { flex: 1; border: none; width: 100%; }
+
+        /* PWA Prompt UI */
+        #pwa-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 9999;
+            flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 20px;
+        }
+        .prompt-box { border: 1px solid var(--glow); padding: 30px; border-radius: 15px; background: #0a0a0a; }
+        .prompt-box h2 { color: var(--glow); margin-top: 0; font-size: 1.2em; letter-spacing: 2px; }
+        .prompt-box p { font-size: 0.9em; color: #aaa; margin-bottom: 20px; }
+        #install-btn { 
+            background: var(--glow); color: #000; border: none; 
+            padding: 12px 24px; font-weight: bold; border-radius: 5px; cursor: pointer;
+        }
+
+        /* Dashboard UI */
+        #dashboard-header {
+            flex: 0 0 auto;
+            background: #050505;
+            border-bottom: 1px solid #1a1a1a;
+            padding: 15px 20px;
+            z-index: 10;
+        }
+        .brand { color: var(--glow); font-size: 0.7em; font-weight: 800; letter-spacing: 3px; margin-bottom: 4px; }
+        .status-row { display: flex; justify-content: space-between; font-family: monospace; font-size: 0.65em; color: #666; }
+        .live-dot { height: 6px; width: 6px; background: var(--glow); border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 2s infinite; }
+
+        /* Main Content */
+        #ether-container { 
+            flex: 1 1 auto; 
+            width: 100%; 
+            border: none; 
+            background: #000;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
-<div id="pwa-prompt">
-    <p id="prompt-text">Install Presignal Engine for full sensor access.</p>
-    <button id="install-btn">INSTALL</button>
+<div id="pwa-overlay">
+    <div class="prompt-box">
+        <div class="brand">PRESIGNAL</div>
+        <h2>ANOMALY ENGINE</h2>
+        <p id="instruction-text">Initialize the local conduit to begin frequency harvest.</p>
+        <button id="install-btn">INITIALIZE</button>
+    </div>
 </div>
 
-<iframe id="ether-frame" src="https://ether-listen.netlify.app/" allow="accelerometer; gyroscope; magnetometer; microphone"></iframe>
+<div id="dashboard-header">
+    <div class="brand">PRESIGNAL // ANOMALY_ENGINE_V1</div>
+    <div class="status-row">
+        <span><span class="live-dot"></span>SYSTEM_READY</span>
+        <span id="node-id">NODE: NIAGARA_5G_01</span>
+    </div>
+</div>
+
+<iframe id="ether-container" src="https://ether-listen.netlify.app/" allow="accelerometer; gyroscope; magnetometer; microphone"></iframe>
 
 <script>
-    const promptDiv = document.getElementById('pwa-prompt');
+    const overlay = document.getElementById('pwa-overlay');
     const installBtn = document.getElementById('install-btn');
-    const promptText = document.getElementById('prompt-text');
+    const instrText = document.getElementById('instruction-text');
     let deferredPrompt;
 
-    // STEP 1: Handle Android/Desktop (Chrome)
+    // PWA Logic
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        promptDiv.style.display = 'block';
+        overlay.style.display = 'flex';
     });
 
     installBtn.onclick = async () => {
         if (deferredPrompt) {
             deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') overlay.style.display = 'none';
             deferredPrompt = null;
-            promptDiv.style.display = 'none';
         }
     };
 
-    // STEP 2: Handle iOS (Safari) - Claude's Logic
+    // iOS Detection
     const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-    const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
 
-    if (isIos && !isInStandaloneMode) {
-        promptDiv.style.display = 'block';
-        promptText.innerText = "Tap 'Share' then 'Add to Home Screen' to install.";
-        installBtn.style.display = 'none'; // Hide button because iOS needs manual action
+    if (isIos && !isStandalone) {
+        overlay.style.display = 'flex';
+        instrText.innerHTML = "Tap the <b>Share</b> icon below and select <b>'Add to Home Screen'</b> to deploy the engine.";
+        installBtn.style.display = 'none';
     }
 
-    // STEP 3: Register Service Worker
+    // Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('SW Active at:', reg.scope))
-                .catch(err => console.error('SW Failed:', err));
+            navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
         });
     }
+
+    // "Hidden" Handshake Logic
+    let tapCount = 0;
+    document.getElementById('dashboard-header').onclick = () => {
+        tapCount++;
+        if(tapCount === 5) {
+            alert("CONDUIT_SYNC_ENGAGED");
+            // Hidden data ping logic goes here
+        }
+        setTimeout(() => tapCount = 0, 3000);
+    };
 </script>
 </body>
 </html>
