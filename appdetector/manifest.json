@@ -1,7 +1,6 @@
 {
   "name": "Presignal Anomaly Engine",
-  "short_name": "Anomaly",
-  "description": "Quantum Transduction & Environmental Analysis Suite",
+  "short_name": "Presignal",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#020202",
@@ -10,7 +9,8 @@
     {
       "src": "https://presignal.inc/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "https://presignal.inc/icon-512.png",
