@@ -38,20 +38,22 @@
             pointer-events: none; display: flex; justify-content: center; align-items: center;
         }
 
-        /* THE CENTRAL BEACON - WHO IS JOHN CARTER? */
+        /* CENTRAL BEACON: ORCID RESEARCH HUB */
         .center-beacon { 
-            position: relative; width: 140px; height: 140px; 
+            position: relative; width: 145px; height: 145px; 
             background: radial-gradient(circle, var(--gold) 0%, transparent 80%); 
             border-radius: 50%; animation: pulse var(--schumann) ease-in-out infinite; 
             cursor: pointer; z-index: 1000; pointer-events: auto;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; border: 1px solid rgba(255,170,0,0.4);
+            text-align: center; border: 1px solid rgba(255,170,0,0.3);
             text-decoration: none;
+            transition: transform 0.3s ease;
         }
+        .center-beacon:hover { transform: scale(1.05); }
 
         .node { 
             position: absolute; text-decoration: none; color: var(--gold); 
-            font-size: clamp(0.7rem, 2.2vmin, 0.9rem); opacity: 0.8; 
+            font-size: clamp(0.7rem, 2.2vmin, 0.9rem); opacity: 0.7; 
             font-weight: bold; transition: all 0.4s ease;
             pointer-events: auto; white-space: nowrap;
             transform: rotate(var(--angle)) translateY(calc(-1 * var(--dist))) rotate(calc(-1 * var(--angle)));
@@ -63,38 +65,40 @@
             transform: rotate(var(--angle)) translateY(calc(-1.1 * var(--dist))) rotate(calc(-1 * var(--angle))) scale(1.1);
         }
 
-        /* TACTICAL NODES */
-        .n-ghost { --angle: 137.5deg; --dist: 22vmin; color: var(--seafoam); border-bottom: 1px solid var(--seafoam); padding-bottom: 5px; } 
-        .n-ufo { --angle: 275.0deg; --dist: 34vmin; } 
-        .n-science { --angle: 412.5deg; --dist: 44vmin; } 
+        /* TACTICAL PORTALS */
+        .n-ghost { --angle: 137.5deg; --dist: 24vmin; color: var(--seafoam); border-bottom: 1px solid var(--seafoam); padding-bottom: 4px; } 
+        .n-ufo { --angle: 275.0deg; --dist: 36vmin; } 
+        .n-science { --angle: 412.5deg; --dist: 46vmin; } 
 
         @keyframes spiralRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.08); opacity: 0.9; } }
 
-        #the-well {
+        #footer-conduit {
             position: fixed; bottom: 30px; width: 100%; text-align: center;
             opacity: 0.4; font-family: 'Garamond', serif; z-index: 2000; pointer-events: none;
         }
 
-        .bio-tag { font-size: 0.5rem; color: #fff; opacity: 0.8; letter-spacing: 2px; margin-top: 8px; }
+        .bio-tag { font-size: 0.55rem; color: #fff; opacity: 0.9; letter-spacing: 2px; margin-top: 8px; }
+        .orcid-id { font-size: 0.45rem; color: var(--gold); opacity: 0.6; margin-top: 4px; font-family: monospace; }
     </style>
 </head>
 <body>
 
     <div class="universal-spiral">
-        <a href="https://zenodo.org/search?q=John+Carter" target="_blank" class="center-beacon">
-            <div style="font-family:'Arial Black', sans-serif; font-size: 0.75rem; color: #fff; letter-spacing: 4px;">RESEARCHER</div>
+        <a href="https://orcid.org/0009-0004-1363-304X" target="_blank" class="center-beacon">
+            <div style="font-family:'Arial Black', sans-serif; font-size: 0.7rem; color: #fff; letter-spacing: 4px;">RESEARCHER</div>
             <div class="bio-tag">JOHN CARTER</div>
+            <div class="orcid-id">ID: 0009-0004-1363-304X</div>
         </a>
         
         <a href="https://www.ufosworldwide.com/appdetector/" class="node n-ghost">INITIALIZE GHOST BOX</a>
         
         <a href="app.html" class="node n-ufo">UFO ANOMALY DASHBOARD</a>
         
-        <a href="https://eartharxiv.org/repository/view/12638/" class="node n-science" target="_blank">SCIENTIFIC PREPRINTS</a>
+        <a href="https://eartharxiv.org/repository/view/12638/" class="node n-science" target="_blank">WATER STRESS ANALYSIS</a>
     </div>
 
-    <div id="the-well">
+    <div id="footer-conduit">
         <p style="letter-spacing: 4px; font-size: 0.6rem; color: var(--gold);">CONDUIT TO THE OTHERSIDE</p>
         <p style="font-size: 0.45rem; margin: 6px 0; color: #fff; opacity: 0.7;">ENVIRONMENTAL FREQUENCY HARVEST · SONAR ACTIVE</p>
     </div>
