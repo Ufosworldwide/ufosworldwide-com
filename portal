@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SysteMetrics Node-01 | Latency Diagnostic</title>
+    <style>
+        body { background: #050505; color: #00ff41; font-family: 'Courier New', monospace; padding: 40px; line-height: 1.5; }
+        .diagnostic-box { border: 1px solid #00ff41; padding: 20px; box-shadow: 0 0 10px #00ff41; }
+        .honeycomb { color: #333; font-size: 0.7em; margin-top: 50px; }
+        #status-light { animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="diagnostic-box">
+        <pre>
+[NODE_01_NIAGARA] INITIALIZING...
+[WARLORD_STATUS] ACTIVE
+[STREAMS_DETECTED] 47 OBSERVERS
+--------------------------------------------------
+HEURISTIC PERSISTENCE TEST: IN PROGRESS
+RECURSIVE PHI CALCULATION: RUNNING...
+<span id="status-light">●</span> MONITORING 300K-YEAR SIGNAL
+        </pre>
+    </div>
+
+    <div id="solver-engine">
+        </div>
+
+    <script src="benchmark_cpu_stress.js"></script>
+
+    <div class="honeycomb">
+        <p>TRUTH_ID: 9TH_RAY_TRANSMISSION</p>
+        <p>STAKE: INFINITI</p>
+    </div>
+</body>
+</html>
