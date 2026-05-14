@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RESONANCE CITY — Presignal Research Initiative</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:wght@400;700&family=Space+Mono&display=swap');
+
+  :root {
+    --gold: #c9a84c;
+    --gold-dim: #8a6f2e;
+    --deep: #070a0f;
+    --panel: #0d1219;
+    --panel2: #111820;
+    --accent: #3af0c8;
+    --accent2: #5b8fff;
+    --warm: #f5ede0;
+    --text: #c8d4d8;
+    --dim: #556070;
+    --hex: rgba(201,168,76,0.12);
+    --hex-border: rgba(201,168,76,0.35);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--deep);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, #0a1f2e 0%, var(--deep) 70%);
+  }
+
+  /* SVG Canvas */
+  #city-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .eyebrow {
+    font-family: 'Courier Prime', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(48px, 8vw, 110px);
+    font-weight: 300;
+    color: var(--warm);
+    letter-spacing: -1px;
+    line-height: 0.9;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.6s forwards;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(16px, 2.5vw, 24px);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--dim);
+    margin-top: 16px;
+    letter-spacing: 1px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.9s forwards;
+  }
+
+  .badge {
+    display: inline-block;
+    margin-top: 32px;
+    padding: 8px 20px;
+    border: 1px solid var(--gold-dim);
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.2s forwards;
+  }
+
+  /* SCROLL INDICATOR */
+  .scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    text-transform: uppercase;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.8s forwards;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--gold-dim), transparent);
+    animation: pulse 2s ease infinite;
+  }
+
+  /* SECTIONS */
+  .section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 40px;
+  }
+
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 5vw, 60px);
+    font-weight: 300;
+    color: var(--warm);
+    line-height: 1.1;
+    margin-bottom: 32px;
+  }
+
+  .section-title em { font-style: italic; color: var(--gold); }
+
+  /* SEPARATOR */
+  .sep {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+    margin: 0;
+  }
+
+  /* PRINCIPLES GRID */
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2px;
+    margin-top: 40px;
+  }
+
+  .principle {
+    background: var(--panel);
+    padding: 32px;
+    border: 1px solid rgba(201,168,76,0.1);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .principle:hover {
+    border-color: rgba(201,168,76,0.4);
+  }
+
+  .principle::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(to right, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .principle:hover::before { opacity: 1; }
+
+  .p-num {
+    font-size: 48px;
+    font-weight: 700;
+    color: rgba(201,168,76,0.08);
+    line-height: 1;
+    position: absolute;
+    top: 16px; right: 20px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  .p-icon {
+    font-size: 22px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .p-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--warm);
+    margin-bottom: 10px;
+  }
+
+  .p-body {
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--dim);
+  }
+
+  /* HEX DIAGRAM SECTION */
+  .diagram-section {
+    background: var(--panel);
+    border-top: 1px solid rgba(201,168,76,0.1);
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+    padding: 80px 0;
+  }
+
+  .diagram-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .diagram-inner { grid-template-columns: 1fr; }
+  }
+
+  .diagram-svg-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* SPECS TABLE */
+  .specs {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 40px;
+  }
+
+  .specs tr {
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    transition: background 0.2s;
+  }
+
+  .specs tr:hover { background: rgba(201,168,76,0.03); }
+
+  .specs td {
+    padding: 14px 0;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .specs td:first-child {
+    color: var(--gold);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    width: 40%;
+    padding-right: 20px;
+  }
+
+  .specs td:last-child { color: var(--text); }
+
+  /* LAYERS */
+  .layers {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 40px;
+  }
+
+  .layer {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 0;
+    align-items: stretch;
+  }
+
+  .layer-alt {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    border: 1px solid rgba(201,168,76,0.15);
+    padding: 16px 0;
+  }
+
+  .layer-body {
+    background: var(--panel);
+    padding: 20px 24px;
+    border: 1px solid rgba(201,168,76,0.08);
+    border-left: none;
+  }
+
+  .layer-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--warm);
+    margin-bottom: 6px;
+  }
+
+  .layer-desc {
+    font-size: 12px;
+    color: var(--dim);
+    line-height: 1.7;
+  }
+
+  /* RAIL section */
+  .rail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 40px;
+  }
+
+  @media (max-width: 600px) { .rail-grid { grid-template-columns: 1fr; } }
+
+  .rail-card {
+    border: 1px solid rgba(58,240,200,0.15);
+    padding: 28px;
+    background: rgba(58,240,200,0.02);
+    transition: border-color 0.3s;
+  }
+
+  .rail-card:hover { border-color: rgba(58,240,200,0.4); }
+
+  .rail-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  /* NATURE PATTERNS */
+  .nature-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 40px;
+  }
+
+  @media (max-width: 600px) { .nature-row { grid-template-columns: 1fr; } }
+
+  .nature-card {
+    background: var(--panel2);
+    padding: 28px 24px;
+    border: 1px solid rgba(91,143,255,0.1);
+    text-align: center;
+  }
+
+  .nature-icon { font-size: 32px; margin-bottom: 12px; }
+
+  .nature-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--warm);
+    margin-bottom: 8px;
+  }
+
+  .nature-body {
+    font-size: 11px;
+    color: var(--dim);
+    line-height: 1.7;
+  }
+
+  /* UTOPIA STATEMENT */
+  .utopia {
+    background: linear-gradient(135deg, #0a1820, #07100f);
+    border-top: 1px solid rgba(58,240,200,0.1);
+    border-bottom: 1px solid rgba(58,240,200,0.1);
+    padding: 100px 40px;
+    text-align: center;
+  }
+
+  .utopia-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(24px, 4vw, 48px);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--warm);
+    max-width: 900px;
+    margin: 0 auto 32px;
+    line-height: 1.4;
+  }
+
+  .utopia-quote strong {
+    font-style: normal;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  /* BIBLIOGRAPHY */
+  .bib-list {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .bib-item {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.06);
+  }
+
+  .bib-num {
+    font-size: 10px;
+    color: var(--gold);
+    font-weight: 700;
+    padding-top: 2px;
+  }
+
+  .bib-text {
+    font-size: 12px;
+    color: var(--dim);
+    line-height: 1.7;
+  }
+
+  .bib-text strong { color: var(--text); }
+  .bib-text em { color: var(--gold-dim); font-style: italic; }
+
+  /* FOOTER */
+  footer {
+    padding: 60px 40px;
+    text-align: center;
+    border-top: 1px solid rgba(201,168,76,0.08);
+  }
+
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .footer-sub {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes rotate-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @keyframes hex-pulse {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.5; }
+  }
+
+  .float { animation: float 4s ease-in-out infinite; }
+
+  /* TAG */
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 1px solid currentColor;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+
+  .tag-gold { color: var(--gold-dim); }
+  .tag-teal { color: var(--accent); border-color: rgba(58,240,200,0.4); }
+  .tag-blue { color: var(--accent2); border-color: rgba(91,143,255,0.4); }
+
+  /* PREPRINT HEADER */
+  .preprint-header {
+    background: var(--panel);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 40px;
+    margin-top: 40px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    line-height: 2;
+    color: var(--dim);
+  }
+
+  .preprint-header .field { color: var(--gold); }
+
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+
+  <svg id="city-canvas" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <radialGradient id="glow1" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#3af0c8" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#3af0c8" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="glow2" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="blur4">
+        <feGaussianBlur stdDeviation="4"/>
+      </filter>
+      <filter id="blur8">
+        <feGaussianBlur stdDeviation="8"/>
+      </filter>
+    </defs>
+
+    <!-- Background glow -->
+    <ellipse cx="600" cy="400" rx="500" ry="300" fill="url(#glow1)"/>
+
+    <!-- Fibonacci spiral rings (faint) -->
+    <g opacity="0.12" stroke="#c9a84c" fill="none" stroke-width="0.5">
+      <circle cx="600" cy="400" r="30"/>
+      <circle cx="600" cy="400" r="48"/>
+      <circle cx="600" cy="400" r="78"/>
+      <circle cx="600" cy="400" r="126"/>
+      <circle cx="600" cy="400" r="204"/>
+      <circle cx="600" cy="400" r="330"/>
+      <circle cx="600" cy="400" r="534"/>
+    </g>
+
+    <!-- Golden spiral arc (SVG approximate) -->
+    <g opacity="0.2" stroke="#c9a84c" fill="none" stroke-width="1">
+      <path d="M 600 400 Q 648 370 630 322 Q 612 274 558 288 Q 504 302 474 348 Q 444 394 462 450 Q 480 506 534 528 Q 588 550 642 522 Q 696 494 714 438 Q 732 382 696 334 Q 660 286 600 282 Q 540 278 504 322 Q 468 366 474 426 Q 480 486 534 510 Q 588 534 636 504 Q 684 474 690 420"/>
+    </g>
+
+    <!-- Honeycomb cells — central cluster -->
+    <g id="hexes" opacity="0.8">
+      <!-- Center hex -->
+      <polygon points="600,340 651,370 651,430 600,460 549,430 549,370" 
+               fill="rgba(201,168,76,0.06)" stroke="#c9a84c" stroke-width="1.5"
+               style="animation: hex-pulse 3s ease-in-out infinite"/>
+      <!-- Ring 1 — 6 hexes -->
+      <polygon points="600,236 651,266 651,326 600,356 549,326 549,266"
+               fill="rgba(58,240,200,0.04)" stroke="rgba(58,240,200,0.5)" stroke-width="0.8"/>
+      <polygon points="704,296 755,326 755,386 704,416 653,386 653,326"
+               fill="rgba(58,240,200,0.04)" stroke="rgba(58,240,200,0.5)" stroke-width="0.8"/>
+      <polygon points="704,416 755,446 755,506 704,536 653,506 653,446"
+               fill="rgba(91,143,255,0.04)" stroke="rgba(91,143,255,0.4)" stroke-width="0.8"/>
+      <polygon points="600,464 651,494 651,554 600,584 549,554 549,494"
+               fill="rgba(91,143,255,0.04)" stroke="rgba(91,143,255,0.4)" stroke-width="0.8"/>
+      <polygon points="496,416 547,446 547,506 496,536 445,506 445,446"
+               fill="rgba(58,240,200,0.04)" stroke="rgba(58,240,200,0.5)" stroke-width="0.8"/>
+      <polygon points="496,296 547,326 547,386 496,416 445,386 445,326"
+               fill="rgba(58,240,200,0.04)" stroke="rgba(58,240,200,0.5)" stroke-width="0.8"/>
+
+      <!-- Ring 2 — outer faint hexes -->
+      <polygon points="600,132 651,162 651,222 600,252 549,222 549,162"
+               fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="0.5"/>
+      <polygon points="808,252 859,282 859,342 808,372 757,342 757,282"
+               fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="0.5"/>
+      <polygon points="808,492 859,522 859,582 808,612 757,582 757,522"
+               fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="0.5"/>
+      <polygon points="600,568 651,598 651,658 600,688 549,658 549,598"
+               fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="0.5"/>
+      <polygon points="392,492 443,522 443,582 392,612 341,582 341,522"
+               fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="0.5"/>
+      <polygon points="392,252 443,282 443,342 392,372 341,342 341,282"
+               fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="0.5"/>
+
+      <!-- Ring 3 ghost -->
+      <polygon points="600,28 651,58 651,118 600,148 549,118 549,58"
+               fill="none" stroke="rgba(201,168,76,0.08)" stroke-width="0.4"/>
+      <polygon points="912,208 963,238 963,298 912,328 861,298 861,238"
+               fill="none" stroke="rgba(201,168,76,0.08)" stroke-width="0.4"/>
+    </g>
+
+    <!-- Vertical tower lines from center hex -->
+    <g opacity="0.3" stroke="#c9a84c" stroke-width="0.5" stroke-dasharray="2,4">
+      <line x1="600" y1="340" x2="600" y2="0"/>
+      <line x1="600" y1="460" x2="600" y2="800"/>
+      <line x1="651" y1="370" x2="900" y2="150"/>
+      <line x1="549" y1="370" x2="300" y2="150"/>
+    </g>
+
+    <!-- Maglev rail arcs -->
+    <g opacity="0.4" fill="none" stroke="var(--accent)" stroke-width="1">
+      <path d="M 549,370 Q 400,400 300,340" stroke-dasharray="4,3"/>
+      <path d="M 651,370 Q 800,400 900,340" stroke-dasharray="4,3"/>
+      <path d="M 600,460 Q 600,600 500,680" stroke-dasharray="4,3"/>
+      <path d="M 600,460 Q 600,600 700,680" stroke-dasharray="4,3"/>
+    </g>
+
+    <!-- Glowing center node -->
+    <circle cx="600" cy="400" r="6" fill="#c9a84c" filter="url(#blur4)" opacity="0.9"/>
+    <circle cx="600" cy="400" r="3" fill="#fff8e8"/>
+
+    <!-- Fibonacci node points -->
+    <g fill="#3af0c8" opacity="0.7">
+      <circle cx="600" cy="370" r="2.5"/>
+      <circle cx="625" cy="385" r="2.5"/>
+      <circle cx="625" cy="415" r="2.5"/>
+      <circle cx="600" cy="430" r="2.5"/>
+      <circle cx="575" cy="415" r="2.5"/>
+      <circle cx="575" cy="385" r="2.5"/>
+    </g>
+
+    <!-- Stars / background particles -->
+    <g opacity="0.4" fill="white">
+      <circle cx="80" cy="60" r="0.8"/><circle cx="220" cy="130" r="0.6"/>
+      <circle cx="950" cy="80" r="0.9"/><circle cx="1100" cy="200" r="0.7"/>
+      <circle cx="150" cy="700" r="0.8"/><circle cx="1050" cy="650" r="0.6"/>
+      <circle cx="350" cy="50" r="0.5"/><circle cx="850" cy="700" r="0.8"/>
+      <circle cx="1150" cy="450" r="0.6"/><circle cx="50" cy="400" r="0.7"/>
+    </g>
+
+    <!-- Cloud layer suggestion at top -->
+    <rect x="0" y="0" width="1200" height="80"
+          fill="url(#glow2)" opacity="0.3"/>
+  </svg>
+
+  <div class="hero-content">
+    <div class="eyebrow">Presignal Research Initiative · Concept Preprint 2026</div>
+    <h1 class="hero-title">
+      Resonance<br><em>City</em>
+    </h1>
+    <div class="hero-sub">A Post-Scarcity Architecture for the Surviving Civilization</div>
+    <div class="badge">Fibonacci · Honeycomb · Maglev · Biophilic · Golden Frequency</div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</div>
+
+<!-- PREPRINT METADATA -->
+<div style="background: var(--panel); border-bottom: 1px solid rgba(201,168,76,0.1);">
+  <div class="section" style="padding: 48px 40px;">
+    <div class="preprint-header">
+      <div><span class="field">TITLE:</span> Resonance City — A Fibonacci-Honeycomb Vertical Cluster Architecture for Post-Scarcity Civilization Continuity</div>
+      <div><span class="field">AUTHOR:</span> John Ernest Carter, Presignal Research Initiative (Presignal Inc., Ontario, Canada)</div>
+      <div><span class="field">ORCID:</span> 0009-0004-1363-304X</div>
+      <div><span class="field">DOMAIN:</span> Urban Architecture / Speculative Infrastructure / Post-Scarcity Systems Design</div>
+      <div><span class="field">CLASSIFICATION:</span> Concept Preprint — Stage I Framework</div>
+      <div><span class="field">CONTACT:</span> jubecrew@gmail.com</div>
+      <div style="margin-top:16px; font-size:11px; color: rgba(201,168,76,0.5);">
+        This document presents a conceptual architecture framework. All structural specifications are theoretical and require engineering validation.
+      </div>
+    </div>
+
+    <div style="margin-top:32px; display:flex; flex-wrap:wrap; gap:4px;">
+      <span class="tag tag-gold">Fibonacci Geometry</span>
+      <span class="tag tag-gold">Hexagonal Clustering</span>
+      <span class="tag tag-teal">Maglev Infrastructure</span>
+      <span class="tag tag-teal">Zero-Emission Transit</span>
+      <span class="tag tag-blue">Biophilic Design</span>
+      <span class="tag tag-blue">Post-Scarcity Economics</span>
+      <span class="tag tag-gold">Vertical Urbanism</span>
+      <span class="tag tag-teal">Universal Basic Everything</span>
+      <span class="tag tag-blue">Resonance Architecture</span>
+      <span class="tag tag-gold">Civilizational Continuity</span>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ABSTRACT / CORE VISION -->
+<div class="section">
+  <div class="section-label">Abstract</div>
+  <div class="section-title">The <em>Resonance City</em> Framework</div>
+  <p style="font-size:14px; line-height:2; color:var(--text); max-width:800px; font-family:'Cormorant Garamond',serif; font-weight:300;">
+    This preprint proposes a civilizational reset architecture: self-contained vertical habitat clusters whose structural geometry is derived from the Fibonacci sequence and hexagonal tessellation — the same patterns that govern beehive load distribution, nautilus shell growth, sunflower seed packing, and galactic spiral formation. Each cluster is conceived as an independent civilization node capable of housing one million or more inhabitants in a fully automated, ecologically regenerative, post-scarcity environment. Positioned in geologically stable, climatically favourable zones, a network of 9–12 such clusters could support the entire surviving global population while allowing the broader biosphere to regenerate freely.
+  </p>
+</div>
+
+<div class="sep"></div>
+
+<!-- PRINCIPLES -->
+<div class="section">
+  <div class="section-label">Design Axioms</div>
+  <div class="section-title">Nine <em>Foundational</em> Principles</div>
+  <div class="principles">
+
+    <div class="principle">
+      <div class="p-num">01</div>
+      <span class="p-icon">⬡</span>
+      <div class="p-title">Fibonacci–Hexagonal Form</div>
+      <div class="p-body">The cluster footprint follows a Fibonacci spiral, with each hexagonal cell placed at ϕ-derived angular offsets (≈137.5° — the golden angle). This maximizes packing density, structural load distribution, natural light penetration, and harmonic resonance with natural growth patterns.</div>
+    </div>
+
+    <div class="principle">
+      <div class="p-num">02</div>
+      <span class="p-icon">☁</span>
+      <div class="p-title">Cloud-Reaching Vertical Scale</div>
+      <div class="p-body">Each cluster is conceived as a structure reaching 800m–2km in height — a living mountain. The vertical axis is organized by biome zone: soil and agriculture at the base, habitation in the middle bands, sky gardens and atmospheric collection at the upper tiers.</div>
+    </div>
+
+    <div class="principle">
+      <div class="p-num">03</div>
+      <span class="p-icon">🌿</span>
+      <div class="p-title">Embedded Ecology</div>
+      <div class="p-body">Nature is not decoration — it is infrastructure. Every hexagonal cell incorporates living walls, soil columns, insect corridors, and mycorrhizal networks. Animal movement corridors traverse the structure, mirroring the murmuration efficiency of starlings and the trail optimization of slime moulds.</div>
+    </div>
+
+    <div class="principle">
+      <div class="p-num">04</div>
+      <span class="p-icon">🚄</span>
+      <div class="p-title">Superconducting Maglev Rail</div>
+      <div class="p-body">Zero-emission transit connects clusters via superconducting electromagnetic rail — no friction, no combustion, no particulate. Internal vertical transit uses the same maglev principle. Between clusters, vacuum-tube maglev achieves trans-continental movement in hours with net-zero energy.</div>
+    </div>
+
+    <div class="principle">
+      <div class="p-num">05</div>
+      <span class="p-icon">⚙️</span>
+      <div class="p-title">Full Automation Economics</div>
+      <div class="p-body">All productive labour — manufacturing, agriculture, logistics, maintenance, energy — is performed by robotic and AI systems. The resultant economic surplus is distributed universally. No individual is required to work. Human time is returned to curiosity, creativity, family, and exploration.</div>
+    </div>
+
+    <div class="principle">
+      <div class="p-num">06</div>
+      <span class="p-icon">💧</span>
+      <div class="p-title">Closed-Loop Water & Air</div>
+      <div class="p-body">Atmospheric water harvesting, mycofiltration, and multi-stage purification produce pharmaceutical-grade water internally. Air circulation follows the Fibonacci branching pattern of lung alveoli — maximizing exchange efficiency. Zero synthetic inputs in food or water.</div>
+    </div>
+
+    <div class="principle">
+      <div class="p-num">07</div>
+      <span class="p-icon">🌍</span>
+      <div class="p-title">Geostability Siting</div>
+      <div class="p-body">Cluster placement is computed against seismic risk, flood and storm projections, prevailing wind and thermal patterns, magnetic anomaly data, and 100-year climate modelling. Target zones include interior continental highlands, geologically ancient cratons, and proven atmospheric stability corridors.</div>
+    </div>
+
+    <div class="principle">
+      <div class="p-num">08</div>
+      <span class="p-icon">🔊</span>
+      <div class="p-title">Resonance Architecture</div>
+      <div class="p-body">Structural frequencies are tuned to avoid biologically dissonant resonance. Materials and geometry are selected to harmonize with Schumann Resonances (7.83 Hz and harmonics), the 432 Hz acoustic standard, and φ-based spatial ratios — minimizing chronic stress and maximizing biological coherence.</div>
+    </div>
+
+    <div class="principle">
+      <div class="p-num">09</div>
+      <span class="p-icon">🚀</span>
+      <div class="p-title">The Long Game — Off-World</div>
+      <div class="p-body">The cluster civilization is a waystation. With the biosphere healing, resources regenerating, and human energy no longer consumed by survival, intellectual and technological capacity compounds toward interplanetary and interstellar capability. The rock is not the destination — it is the launchpad.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- STRUCTURE DIAGRAM -->
+<div class="diagram-section">
+  <div class="diagram-inner">
+
+    <div class="diagram-svg-wrap">
+      <svg viewBox="0 0 400 500" width="360" class="float">
+        <defs>
+          <linearGradient id="towerGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#3af0c8" stop-opacity="0.6"/>
+            <stop offset="40%" stop-color="#c9a84c" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#5b8fff" stop-opacity="0.3"/>
+          </linearGradient>
+          <filter id="glow-f">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- Ground -->
+        <rect x="0" y="460" width="400" height="40" fill="rgba(201,168,76,0.05)" rx="2"/>
+        <line x1="0" y1="460" x2="400" y2="460" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+
+        <!-- Tower body — main hex column -->
+        <polygon points="200,20 245,45 245,110 200,135 155,110 155,45"
+                 fill="rgba(58,240,200,0.08)" stroke="#3af0c8" stroke-width="1.2" filter="url(#glow-f)"/>
+        <text x="200" y="80" text-anchor="middle" fill="#3af0c8" font-size="8" font-family="Space Mono" letter-spacing="1">SKY TIER</text>
+        <text x="200" y="95" text-anchor="middle" fill="rgba(58,240,200,0.5)" font-size="7" font-family="Space Mono">ATMOS · HARVEST · OBSERVATORY</text>
+
+        <polygon points="200,135 260,168 260,248 200,280 140,248 140,168"
+                 fill="rgba(201,168,76,0.06)" stroke="#c9a84c" stroke-width="1.5"/>
+        <text x="200" y="205" text-anchor="middle" fill="#c9a84c" font-size="8" font-family="Space Mono" letter-spacing="1">CIVIC TIER</text>
+        <text x="200" y="222" text-anchor="middle" fill="rgba(201,168,76,0.5)" font-size="7" font-family="Space Mono">CULTURE · HEALTH · COMMERCE</text>
+        <text x="200" y="236" text-anchor="middle" fill="rgba(201,168,76,0.5)" font-size="7" font-family="Space Mono">EDUCATION · PARKS</text>
+
+        <polygon points="200,280 275,320 275,420 200,460 125,420 125,320"
+                 fill="rgba(91,143,255,0.06)" stroke="#5b8fff" stroke-width="1.5"/>
+        <text x="200" y="355" text-anchor="middle" fill="#5b8fff" font-size="8" font-family="Space Mono" letter-spacing="1">HABITAT TIER</text>
+        <text x="200" y="372" text-anchor="middle" fill="rgba(91,143,255,0.5)" font-size="7" font-family="Space Mono">RESIDENTIAL · ECOLOGY</text>
+        <text x="200" y="386" text-anchor="middle" fill="rgba(91,143,255,0.5)" font-size="7" font-family="Space Mono">AGRICULTURE · WATER</text>
+        <text x="200" y="400" text-anchor="middle" fill="rgba(91,143,255,0.5)" font-size="7" font-family="Space Mono">MAGLEV CORE · ROOTS</text>
+
+        <!-- Vertical maglev spine -->
+        <line x1="200" y1="20" x2="200" y2="460" stroke="rgba(58,240,200,0.2)" stroke-width="2" stroke-dasharray="3,3"/>
+
+        <!-- Fibonacci rings -->
+        <circle cx="200" cy="400" r="20" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="0.5"/>
+        <circle cx="200" cy="400" r="32" fill="none" stroke="rgba(201,168,76,0.15)" stroke-width="0.5"/>
+        <circle cx="200" cy="400" r="52" fill="none" stroke="rgba(201,168,76,0.1)" stroke-width="0.5"/>
+        <circle cx="200" cy="400" r="84" fill="none" stroke="rgba(201,168,76,0.07)" stroke-width="0.5"/>
+
+        <!-- Side labels -->
+        <text x="20" y="80" fill="rgba(58,240,200,0.4)" font-size="7" font-family="Space Mono">800m–</text>
+        <text x="20" y="90" fill="rgba(58,240,200,0.4)" font-size="7" font-family="Space Mono">2km</text>
+        <line x1="50" y1="20" x2="50" y2="460" stroke="rgba(58,240,200,0.1)" stroke-width="0.5"/>
+        <line x1="45" y1="20" x2="55" y2="20" stroke="rgba(58,240,200,0.3)" stroke-width="0.8"/>
+        <line x1="45" y1="460" x2="55" y2="460" stroke="rgba(58,240,200,0.3)" stroke-width="0.8"/>
+
+      </svg>
+    </div>
+
+    <div>
+      <div class="section-label">Structural Anatomy</div>
+      <div class="section-title" style="font-size:clamp(28px,3vw,44px);">The <em>Three-Tier</em> Vertical Stack</div>
+      <table class="specs">
+        <tr>
+          <td>Base Footprint</td>
+          <td>Hexagonal, ~2–4 km diameter per cluster. Fibonacci spiral expansion outward in secondary rings.</td>
+        </tr>
+        <tr>
+          <td>Habitat Tier</td>
+          <td>Floors 1–600. Residential cells, food production, soil columns, animal corridors, maglev core access.</td>
+        </tr>
+        <tr>
+          <td>Civic Tier</td>
+          <td>Floors 600–900. Cultural, health, educational, commercial, and gathering spaces. Sky parks.</td>
+        </tr>
+        <tr>
+          <td>Sky Tier</td>
+          <td>Floors 900–summit. Atmospheric water harvest, solar/wind collection, observatory, cloud-level gardens.</td>
+        </tr>
+        <tr>
+          <td>Primary Material</td>
+          <td>Aerogel-composite hex panels, mycelium insulation blocks, recycled steel lattice, graphene-reinforced structural nodes.</td>
+        </tr>
+        <tr>
+          <td>Resonance Tuning</td>
+          <td>Primary structural frequency ≥ 1 octave above 7.83 Hz Schumann baseline. φ-ratio floor heights throughout.</td>
+        </tr>
+        <tr>
+          <td>Population per Cluster</td>
+          <td>750,000 – 1,200,000 inhabitants</td>
+        </tr>
+        <tr>
+          <td>Global Network</td>
+          <td>9–12 clusters, distributed across 4–6 continents by geostability index</td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- NATURE INTELLIGENCE SECTION -->
+<div class="section">
+  <div class="section-label">Biomimicry Core</div>
+  <div class="section-title">What <em>Nature Already Solved</em></div>
+  <p style="font-size:13px; line-height:2; color:var(--dim); margin-bottom:8px;">
+    Every design problem the Resonance City faces has a biological precedent. We are not inventing — we are translating.
+  </p>
+  <div class="nature-row">
+
+    <div class="nature-card">
+      <div class="nature-icon">🐝</div>
+      <div class="nature-title">Honeybee Hexagonal Packing</div>
+      <div class="nature-body">The hexagon uses the minimum material to enclose maximum area at maximum structural strength. Bees discovered this 34 million years ago. Every wall, floor plate, and structural cell in the cluster inherits this geometry.</div>
+    </div>
+
+    <div class="nature-card">
+      <div class="nature-icon">🐚</div>
+      <div class="nature-title">Nautilus Fibonacci Growth</div>
+      <div class="nature-body">The nautilus shell grows outward at a constant angle of ≈137.5° — the golden angle. Each new chamber is ϕ times the previous. The cluster layout mirrors this: each new hexagonal ring is larger by the golden ratio, spiraling outward from the central tower.</div>
+    </div>
+
+    <div class="nature-card">
+      <div class="nature-icon">🌡️</div>
+      <div class="nature-title">Termite Mound Climate Control</div>
+      <div class="nature-body">African termite mounds maintain 31°C internally through passive convection channels regardless of surface temperature. The cluster's climate architecture borrows this chimney-channel system, eliminating mechanical HVAC for baseline temperature regulation.</div>
+    </div>
+
+    <div class="nature-card">
+      <div class="nature-icon">🐦</div>
+      <div class="nature-title">Murmuration Transit Logic</div>
+      <div class="nature-body">Starling murmurations achieve collision-free, ultra-efficient group movement through local-rules propagation — no central controller. This algorithm is directly applicable to the cluster's autonomous pod-transit network: no schedules, no controllers, emergent efficiency.</div>
+    </div>
+
+    <div class="nature-card">
+      <div class="nature-icon">🍄</div>
+      <div class="nature-title">Mycelial Network Infrastructure</div>
+      <div class="nature-body">Mycelium networks route nutrients via shortest path under load, redistribute when a node fails, and communicate chemical signals at network speed. This pattern governs the cluster's power distribution, water routing, and data infrastructure — redundant, self-healing, organic.</div>
+    </div>
+
+    <div class="nature-card">
+      <div class="nature-icon">🌲</div>
+      <div class="nature-title">Tree Root Water Harvesting</div>
+      <div class="nature-body">Fog-harvesting beetles, deep taproots, and the capillary action of leaves inspire the cluster's multi-layer atmospheric water collection. The sky tier is, effectively, a forest canopy — a living fog net that supplies water to the entire vertical structure below.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- MAGLEV -->
+<div class="section">
+  <div class="section-label">Mobility Infrastructure</div>
+  <div class="section-title">The <em>Maglev</em> Network</div>
+  <div class="rail-grid">
+    <div class="rail-card">
+      <div class="rail-title">Internal Vertical Maglev</div>
+      <div class="p-body" style="font-size:12px; line-height:1.8; color:var(--dim);">
+        A central superconducting spine runs floor 1 to summit. Horizontal maglev rings connect each hexagonal tier at every 50-floor interval. No cables, no counterweights, no friction. Travel from ground to sky tier in under 4 minutes. Powered by the cluster's own wind and solar harvest.
+      </div>
+    </div>
+    <div class="rail-card">
+      <div class="rail-title">Inter-Cluster Vacuum Tube Rail</div>
+      <div class="p-body" style="font-size:12px; line-height:1.8; color:var(--dim);">
+        Between clusters, superconducting maglev pods travel in near-vacuum tubes at 800–1200 km/h. London to New York equivalent: under 4 hours. Zero emissions. The tube infrastructure follows great-circle routes, taking advantage of existing geological formations where possible.
+      </div>
+    </div>
+    <div class="rail-card">
+      <div class="rail-title">The Golden Angle Routing Protocol</div>
+      <div class="p-body" style="font-size:12px; line-height:1.8; color:var(--dim);">
+        Pod routing within the cluster follows the murmuration algorithm — local-rules only, no central dispatcher. Each pod communicates with its nearest 7 neighbours. The result is collision-free, zero-wait, maximum-throughput movement that self-optimizes continuously.
+      </div>
+    </div>
+    <div class="rail-card">
+      <div class="rail-title">Superconducting Materials</div>
+      <div class="p-body" style="font-size:12px; line-height:1.8; color:var(--dim);">
+        Near-ambient superconductor compounds (YBCO and next-generation cuprate ceramics) provide the magnetic levitation field. The system draws net energy only during acceleration phases; deceleration feeds energy back to the grid. Maintenance is near-zero — no moving parts.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UTOPIA STATEMENT -->
+<div class="utopia">
+  <div class="utopia-quote">
+    "When no one is in <strong>survival mode</strong>, everyone enters <strong>flourishing mode.</strong> Remove the first layer — financial fear — and you remove the root cause of most human conflict. The cluster is not a prison. It is the first architecture <strong>designed around human freedom</strong> rather than human labour."
+  </div>
+  <div style="font-size:10px; letter-spacing:3px; color:var(--dim); text-transform:uppercase;">
+    — Resonance City Framework · Presignal Research Initiative · 2026
+  </div>
+</div>
+
+<!-- VERTICAL LAYERS DETAIL -->
+<div class="section">
+  <div class="section-label">Civilizational Stack</div>
+  <div class="section-title">What Happens <em>Inside</em></div>
+  <div class="layers">
+
+    <div class="layer">
+      <div class="layer-alt" style="background:rgba(58,240,200,0.05); border-color:rgba(58,240,200,0.2); color:var(--accent);">SKY</div>
+      <div class="layer-body">
+        <div class="layer-title">Atmospheric Commons</div>
+        <div class="layer-desc">Fog nets, wind turbines, solar arrays, observatory domes, high-altitude gardens. Air enters here — filtered, humidified, and distributed downward through the living-wall respiratory system. The sky tier is the cluster's lungs.</div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-alt" style="background:rgba(201,168,76,0.05); border-color:rgba(201,168,76,0.2); color:var(--gold);">CIVIC</div>
+      <div class="layer-body">
+        <div class="layer-title">Culture, Health & Learning</div>
+        <div class="layer-desc">Universities, studios, clinics, performance spaces, libraries, maker spaces, sky parks, gathering plazas. No commerce in the transactional sense — value flows through contribution, creation, and curiosity. Healthcare is universal and AI-enhanced. Education is self-directed.</div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-alt" style="background:rgba(91,143,255,0.05); border-color:rgba(91,143,255,0.2); color:var(--accent2);">HABITAT</div>
+      <div class="layer-body">
+        <div class="layer-title">Residential & Ecological Zones</div>
+        <div class="layer-desc">Modular hexagonal dwelling units, each with private outdoor space, living walls, and natural light. Communal gardens every 12 floors. Animal corridors — designed for birds, insects, and small mammals — weave through the residential fabric. Soil columns grow food in every hex cell.</div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-alt" style="background:rgba(58,240,200,0.03); border-color:rgba(58,240,200,0.1); color:rgba(58,240,200,0.5);">ROOT</div>
+      <div class="layer-body">
+        <div class="layer-title">Infrastructure & Energy Foundation</div>
+        <div class="layer-desc">Deep geothermal taps, mycelial composting systems, water filtration roots, recycling and fabrication plants, robotic logistics network, seed vault, and the maglev hub. The base is invisible infrastructure — the cluster's root system — running entirely without human operators.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- BIBLIOGRAPHY -->
+<div class="section">
+  <div class="section-label">Required Reading & Anchor Works</div>
+  <div class="section-title">The <em>Intellectual Foundation</em></div>
+  <p style="font-size:12px; color:var(--dim); line-height:2; margin-bottom:8px;">These are the books, frameworks, and scientific works we need to build the full preprint on a solid academic footing.</p>
+  <div class="bib-list">
+
+    <div class="bib-item">
+      <div class="bib-num">[1]</div>
+      <div class="bib-text"><strong>Buckminster Fuller</strong> — <em>Synergetics: Explorations in the Geometry of Thinking</em> (1975). The foundational text on tensegrity, geodesic geometry, and doing more with less. Fuller's "Dymaxion" principles underlie the hex-sphere structural logic.</div>
+    </div>
+
+    <div class="bib-item">
+      <div class="bib-num">[2]</div>
+      <div class="bib-text"><strong>Paolo Soleri</strong> — <em>Arcology: The City in the Image of Man</em> (1969). Soleri coined "arcology" (architecture + ecology). His Arcosanti project in Arizona is the closest physical prototype to what we are describing. Essential framing.</div>
+    </div>
+
+    <div class="bib-item">
+      <div class="bib-num">[3]</div>
+      <div class="bib-text"><strong>Janine Benyus</strong> — <em>Biomimicry: Innovation Inspired by Nature</em> (1997). The definitive textbook for sourcing design solutions from biological systems. Termite mounds, lotus effect, mussel adhesion — all relevant to the cluster build.</div>
+    </div>
+
+    <div class="bib-item">
+      <div class="bib-num">[4]</div>
+      <div class="bib-text"><strong>D'Arcy Wentworth Thompson</strong> — <em>On Growth and Form</em> (1917). The mathematical study of biological morphogenesis. The Fibonacci sequences in phyllotaxis, the hexagonal cellular mathematics — this is the root academic source.</div>
+    </div>
+
+    <div class="bib-item">
+      <div class="bib-num">[5]</div>
+      <div class="bib-text"><strong>William McDonough & Michael Braungart</strong> — <em>Cradle to Cradle: Remaking the Way We Make Things</em> (2002). The closed-loop materials philosophy. Every material in the cluster must be either endlessly recyclable or biodegradable. No waste concept.</div>
+    </div>
+
+    <div class="bib-item">
+      <div class="bib-num">[6]</div>
+      <div class="bib-text"><strong>Stewart Brand</strong> — <em>How Buildings Learn</em> (1994). Long-term adaptive architecture. A cluster designed to last centuries must change gracefully at multiple timescales. Brand's "shearing layers" model applies directly to the tier-based cluster structure.</div>
+    </div>
+
+    <div class="bib-item">
+      <div class="bib-num">[7]</div>
+      <div class="bib-text"><strong>Rutger Bregman</strong> — <em>Utopia for Realists</em> (2017). The economic case for Universal Basic Income as civilizational infrastructure. The Resonance City's financial model is UBI scaled to full automation — this is the closest mainstream academic equivalent.</div>
+    </div>
+
+    <div class="bib-item">
+      <div class="bib-num">[8]</div>
+      <div class="bib-text"><strong>Kate Raworth</strong> — <em>Doughnut Economics</em> (2017). The social-planetary boundary framework. The cluster economic model must operate within ecological ceilings and social floors simultaneously. Raworth's doughnut is the macro framework.</div>
+    </div>
+
+    <div class="bib-item">
+      <div class="bib-num">[9]</div>
+      <div class="bib-text"><strong>Merlin Sheldrake</strong> — <em>Entangled Life: How Fungi Make Our Worlds</em> (2020). Mycelium as infrastructure model. The cluster's power grid, water routing, and data network all adopt mycelial redundancy and self-healing logic.</div>
+    </div>
+
+    <div class="bib-item">
+      <div class="bib-num">[10]</div>
+      <div class="bib-text"><strong>Tim Flannery</strong> — <em>The Weather Makers</em> (2005) + <strong>IPCC AR6 (2021–2023)</strong>. Geostability siting of clusters requires long-range climate modelling. These provide the risk datasets needed to identify the 9–12 optimal placement zones globally.</div>
+    </div>
+
+    <div class="bib-item">
+      <div class="bib-num">[11]</div>
+      <div class="bib-text"><strong>Schumann, W.O.</strong> — <em>Über die strahlungslosen Eigenschwingungen einer leitenden Kugel</em> (1952). The original Schumann resonance paper. Structural frequency tuning in the cluster requires this baseline — the 7.83 Hz and harmonic series that the Earth's electromagnetic cavity resonates at.</div>
+    </div>
+
+    <div class="bib-item">
+      <div class="bib-num">[12]</div>
+      <div class="bib-text"><strong>Luca Pacioli / Fibonacci</strong> — <em>Liber Abaci</em> (1202) + <em>De Divina Proportione</em> (1509). The source mathematical texts. The ratio ϕ ≈ 1.618 and the sequence 1,1,2,3,5,8,13,21... are the geometric DNA of every spatial decision in the cluster.</div>
+    </div>
+
+    <div class="bib-item">
+      <div class="bib-num">[13]</div>
+      <div class="bib-text"><strong>Kim Stanley Robinson</strong> — <em>The Ministry for the Future</em> (2020). A near-future novel treated by economists and climate scientists as a policy document. Relevant to the political economy transition section of the preprint — how does civilization agree to reorganize?</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Presignal</div>
+  <div class="footer-sub" style="margin-bottom:8px;">Research Initiative · Presignal Inc. · Ontario, Canada</div>
+  <div class="footer-sub">John Ernest Carter · ORCID 0009-0004-1363-304X · jubecrew@gmail.com</div>
+  <div style="margin-top:32px; font-size:10px; color:rgba(201,168,76,0.2); letter-spacing:2px;">
+    RESONANCE CITY — CONCEPT PREPRINT 2026 — ALL STRUCTURAL SPECIFICATIONS THEORETICAL
+  </div>
+</footer>
+
+</body>
+</html>
