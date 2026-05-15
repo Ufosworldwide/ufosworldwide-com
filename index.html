@@ -17,7 +17,7 @@
     <style>
         body { background-color: #0a0a0a; color: #00ff41; font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
         .dashboard { border: 1px solid #00ff41; padding: 20px; box-shadow: 0 0 15px #00ff41; background: rgba(0, 20, 0, 0.9); width: 100%; max-width: 900px; }
-        h1 { font-size: 1.2rem; border-bottom: 1px solid #00ff41; padding-bottom: 10px; color: #00ff41; text-align: center; }
+        h1 { font-size: 1.2rem; border-bottom: 1px solid #00ff41; padding-bottom: 10px; color: #00ff41; text-align: center; letter-spacing: 2px; }
         .section-header { color: #00ffff; font-size: 0.9rem; margin: 20px 0 10px 0; border-left: 3px solid #00ffff; padding-left: 10px; text-transform: uppercase; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; }
         .card { border: 1px solid #222; padding: 10px; background: rgba(0,0,0,0.6); }
@@ -26,8 +26,8 @@
         .live-counter { background: #000; border: 1px solid #444; padding: 10px; margin-bottom: 20px; text-align: center; }
         .count-number { font-size: 2.5rem; color: #00ffff; text-shadow: 0 0 10px #00ffff; }
         .inquiry-port { margin-top: 25px; border: 1px solid #00ffff; padding: 15px; background: rgba(0, 20, 40, 0.5); }
-        textarea { width: 100%; background: #000; color: #00ff41; border: 1px solid #00ff41; padding: 10px; box-sizing: border-box; resize: none; }
-        button { background: #00ff41; color: #000; border: none; padding: 10px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; }
+        textarea { width: 100%; background: #000; color: #00ff41; border: 1px solid #00ff41; padding: 10px; box-sizing: border-box; resize: none; font-family: monospace; }
+        button { background: #00ff41; color: #000; border: none; padding: 12px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; text-transform: uppercase; }
         .blink { animation: blinker 1.5s linear infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
     </style>
@@ -35,28 +35,25 @@
 <body>
 
     <div class="dashboard">
-        <h1>NIAGARA NODE: MASTER BEACON v4.1 <span class="blink">●</span></h1>
+        <h1>NIAGARA NODE: MASTER BEACON v4.2 <span class="blink">●</span></h1>
         
         <div class="live-counter">
-            <div style="font-size: 0.7rem; color: #888;">GHOST SIGNALS DETECTED</div>
+            <div style="font-size: 0.7rem; color: #888; letter-spacing: 1px;">TOTAL GHOST SIGNALS DETECTED</div>
             <div id="signal-count" class="count-number">1502</div>
         </div>
 
-        <div class="section-header">Field Apps (Sensors)</div>
+        <div class="section-header">Field Instrumentation Suite</div>
         <div class="grid">
-            <div class="card"><a href="https://ufosworldwide.com/app" class="link">UFOs Worldwide</a></div>
+            <div class="card"><a href="https://ufosworldwide.com/app" class="link">UFOs Worldwide Hub</a></div>
             <div class="card"><a href="https://aeroscopeuap.netlify.app/" class="link">Aeroscope UAP</a></div>
             <div class="card"><a href="https://signalscopex11.netlify.app/" class="link">SignalScope X11</a></div>
             <div class="card"><a href="https://ether-listen.netlify.app/" class="link">Ether-Listen</a></div>
             <div class="card"><a href="https://veilofash.netlify.app/" class="link">Veil of Ash</a></div>
             <div class="card"><a href="https://thornsignal.netlify.app/" class="link">Thorn Signal</a></div>
-            <div class="card"><a href="https://admirable-queijadas-b90981.netlify.app/" class="link">Metadata Node</a></div>
+            <div class="card"><a href="https://admirable-queijadas-b90981.netlify.app/" class="link">Metadata Processor</a></div>
         </div>
 
         <div class="section-header">Scientific Core (The 11 Pillars)</div>
         <div class="grid">
             <div class="card"><a href="https://doi.org/10.31223/X5J47D" class="link">10.31223/X5J47D (GPDM)</a></div>
-            <div class="card"><a href="https://doi.org/10.5281/zenodo.19653415" class="link">10.5281/zenodo.19653415</a></div>
-            <div class="card"><a href="https://doi.org/10.5281/zenodo.19717287" class="link">10.5281/zenodo.19717287</a></div>
-            <div class="card"><a href="https://doi.org/10.5281/zenodo.20192553" class="link">10.5281/zenodo.20192553</a></div>
-            <div class="card"><a href="
+            <div class="card"><a href="https://doi.org/10.5281/zenodo.19653415" class="link">10.52
