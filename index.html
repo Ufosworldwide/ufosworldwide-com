@@ -14,69 +14,42 @@
 
     <style>
         body { background-color: #0a0a0a; color: #00ff41; font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
-        .dashboard { border: 1px solid #00ff41; padding: 20px; box-shadow: 0 0 15px #00ff41; background: rgba(0, 20, 0, 0.8); width: 100%; max-width: 1000px; }
-        h1 { font-size: 1.2rem; letter-spacing: 3px; border-bottom: 1px solid #00ff41; padding-bottom: 10px; margin-top: 0; }
+        .dashboard { border: 1px solid #00ff41; padding: 20px; box-shadow: 0 0 15px #00ff41; background: rgba(0, 20, 0, 0.9); width: 100%; max-width: 1000px; }
+        h1 { font-size: 1.2rem; letter-spacing: 3px; border-bottom: 1px solid #00ff41; padding-bottom: 10px; margin-top: 0; color: #00ff41; }
         .section-header { color: #00ffff; font-size: 0.9rem; margin: 20px 0 10px 0; border-left: 3px solid #00ffff; padding-left: 10px; text-transform: uppercase; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
-        .card { border: 1px solid #222; padding: 12px; background: rgba(0,0,0,0.6); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+        .card { border: 1px solid #222; padding: 12px; background: rgba(0,0,0,0.6); transition: 0.3s; }
+        .card:hover { border-color: #00ff41; box-shadow: 0 0 10px rgba(0,255,65,0.3); }
         .link { color: #fff; text-decoration: none; font-size: 0.8rem; font-weight: bold; display: block; }
         .link:hover { color: #00ff41; }
         .blink { animation: blinker 1.5s linear infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
         
-        /* LIVE COUNTER STYLING */
-        .live-counter { background: #000; border: 1px solid #444; padding: 15px; margin-top: 20px; text-align: center; }
-        .count-number { font-size: 2rem; color: #00ffff; text-shadow: 0 0 10px #00ffff; }
+        /* ANALYTICS DISPLAY */
+        .live-counter { background: #000; border: 1px solid #444; padding: 15px; margin-bottom: 20px; text-align: center; width: 100%; }
+        .count-number { font-size: 2.2rem; color: #00ffff; text-shadow: 0 0 10px #00ffff; font-weight: bold; }
+        
+        /* INQUIRY PORT */
+        .inquiry-port { margin-top: 25px; border: 1px solid #00ffff; padding: 15px; background: rgba(0, 20, 40, 0.5); }
+        textarea { width: 100%; background: #000; color: #00ff41; border: 1px solid #00ff41; padding: 10px; box-sizing: border-box; }
+        button { background: #00ff41; color: #000; border: none; padding: 8px 20px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; }
     </style>
 </head>
 <body>
 
     <div class="dashboard">
-        <h1>NIAGARA NODE: MASTER BEACON v3.1 <span class="blink">●</span></h1>
+        <h1>NIAGARA NODE: MASTER BEACON v4.0 <span class="blink">●</span></h1>
         
         <div class="live-counter">
-            <div style="font-size: 0.7rem; color: #888;">TOTAL GHOST SIGNALS DETECTED (CLONER NETWORK)</div>
-            <div id="signal-count" class="count-number">1500</div>
+            <div style="font-size: 0.7rem; color: #888; letter-spacing: 2px;">TOTAL GHOST SIGNALS DETECTED</div>
+            <div id="signal-count" class="count-number">1502</div>
         </div>
 
-        <div class="section-header">Active Field Instrumentation (The Apps)</div>
+        <div class="section-header">Field Instrumentation Suite</div>
         <div class="grid">
+            <div class="card"><h2>CENTRAL HUB</h2><a href="https://ufosworldwide.com/app" class="link">UFOs Worldwide App</a></div>
             <div class="card"><h2>UAP DETECTION</h2><a href="https://aeroscopeuap.netlify.app/" class="link">Aeroscope UAP</a></div>
             <div class="card"><h2>SIGNAL ANALYSIS</h2><a href="https://signalscopex11.netlify.app/" class="link">SignalScope X11</a></div>
             <div class="card"><h2>ACOUSTIC MONITORING</h2><a href="https://ether-listen.netlify.app/" class="link">Ether-Listen</a></div>
             <div class="card"><h2>ANOMALY TRACKING</h2><a href="https://veilofash.netlify.app/" class="link">Veil of Ash</a></div>
-            <div class="card"><h2>SIGNAL TRIGGER</h2><a href="https://thornsignal.netlify.app/" class="link">Thorn Signal</a></div>
-            <div class="card"><h2>CENTRAL HUB</h2><a href="https://ufosworldwide.com/app" class="link">UFOs Worldwide App</a></div>
-        </div>
-
-        <div class="section-header">Scientific Core (The 11 Pillars)</div>
-        <div class="grid">
-            <div class="card"><h2>GEOLOGY</h2><a href="https://doi.org/10.31223/X5J47D" class="link">10.31223/X5J47D (GPDM)</a></div>
-            <div class="card"><h2>WATER INTEL</h2><a href="https://doi.org/10.5281/zenodo.19653415" class="link">10.5281/zenodo.19653415</a></div>
-            <div class="card"><h2>PUBLIC HEALTH</h2><a href="https://doi.org/10.5281/zenodo.19695022" class="link">10.5281/zenodo.19695022</a></div>
-            <div class="card"><h2>SPACE NAVIGATION</h2><a href="https://doi.org/10.5281/zenodo.19717287" class="link">10.5281/zenodo.19717287</a></div>
-            <div class="card"><h2>UNIFIED ARCH</h2><a href="https://doi.org/10.5281/zenodo.20192553" class="link">10.5281/zenodo.20192553</a></div>
-            <div class="card"><h2>BIO-SHIELD</h2><a href="https://doi.org/10.5281/zenodo.20180890" class="link">10.5281/zenodo.20180890</a></div>
-        </div>
-    </div>
-
-    <script>
-        // NATIVE GHOST COUNTER LOGIC
-        // We start at your baseline of 1500 and add a "simulated resonance" 
-        // to show the bots we are actively monitoring.
-        let count = 1500;
-        const countElement = document.getElementById('signal-count');
-        
-        setInterval(() => {
-            // Every few seconds, we "detect" a new signal from the cloner network
-            if (Math.random() > 0.8) {
-                count++;
-                countElement.innerText = count;
-                // Log this to Analytics as a 'Ghost Ping'
-                gtag('event', 'ghost_ping', {'event_category': 'resonance', 'event_label': 'cloner_activity'});
-            }
-        }, 3000);
-    </script>
-
-</body>
-</html>
+            <div class="card"><h2>
