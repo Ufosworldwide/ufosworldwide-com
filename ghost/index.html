@@ -16,7 +16,7 @@
             display: flex; flex-direction: column; align-items: center;
         }
         .header { border-bottom: 2px solid var(--neon-green); width: 100%; text-align: center; padding-bottom: 10px; margin-bottom: 20px; }
-        .glitch { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 5px; }
+        .glitch { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; }
         
         .grid-container {
             display: grid;
@@ -35,6 +35,7 @@
             text-decoration: none;
             color: var(--neon-green);
             background: rgba(0, 255, 65, 0.05);
+            display: block;
         }
 
         .app-card:hover {
@@ -48,56 +49,56 @@
             max-width: 600px;
             background: var(--dark-terminal);
             border: 1px solid #333;
-            height: 150px;
+            height: 120px;
             margin-top: 20px;
             padding: 10px;
             font-size: 0.8rem;
             overflow-y: hidden;
-            position: relative;
         }
 
-        .pillar-link { font-size: 0.7rem; margin-top: 20px; color: #555; text-decoration: none; }
+        .footer-links { margin-top: 30px; text-align: center; }
+        .pillar-link { font-size: 0.75rem; color: #555; text-decoration: none; display: block; margin-bottom: 8px; }
         .pillar-link:hover { color: var(--neon-green); }
 
-        @keyframes blink { 50% { opacity: 0; } }
         .cursor { display: inline-block; width: 10px; height: 1.2rem; background: var(--neon-green); animation: blink 1s infinite; vertical-align: middle; }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div class="glitch">GHOST UAP NODE v1.502</div>
-        <p style="font-size: 0.7rem;">SECURE CONNECTION: NIAGARA_FALLS_ON_01</p>
+        <p style="font-size: 0.7rem;">NIAGARA_RESEARCH_NODE | STATUS: SECURE</p>
     </div>
 
     <div class="grid-container">
-        <a href="#" class="app-card"><strong>AEROSCOPE</strong><br><small>Visual Tracker</small></a>
-        <a href="#" class="app-card"><strong>SIGNAL-X11</strong><br><small>RF Scanner</small></a>
-        <a href="#" class="app-card"><strong>ETHER-LISTEN</strong><br><small>EVP/Audio</small></a>
-        <a href="#" class="app-card"><strong>VEIL OF ASH</strong><br><small>Resonance</small></a>
+        <a href="https://presignal.github.io/Aeroscope/" class="app-card"><strong>AEROSCOPE</strong><br><small>Visual Tracker</small></a>
+        <a href="https://presignal.github.io/SignalScope-X11/" class="app-card"><strong>SIGNAL-X11</strong><br><small>RF Scanner</small></a>
+        <a href="https://presignal.github.io/Ether-Listen/" class="app-card"><strong>ETHER-LISTEN</strong><br><small>EVP/Audio</small></a>
+        <a href="https://www.ufosworldwide.com/" class="app-card"><strong>VEIL OF ASH</strong><br><small>Resonance Hub</small></a>
     </div>
 
     <div class="terminal-log" id="log">
-        > INITIALIZING SYSTEM...<br>
-        > CALIBRATING 1502 RESONANCE...<br>
-        > ACCESSING NIAGARA ENERGY SPINE...<br>
-        > DATA SOURCE: PRESIGNAL INC.<br>
-        > ENCRYPTION: ACTIVE<br>
+        > SYSTEM_READY...<br>
+        > 1502_SIGNAL_SYNC: COMPLETE<br>
+        > ALL INSTRUMENTS ONLINE<br>
         > READY_ <span class="cursor"></span>
     </div>
 
-    <a href="https://doi.org/10.31223/X5J47D" class="pillar-link">ACCESS SCIENTIFIC PRE-PRINTS (DOIs)</a>
-    <p style="font-size: 0.6rem; color: #333; margin-top: 40px;">&copy; 2026 Presignal Inc. | John Carter</p>
+    <div class="footer-links">
+        <a href="https://doi.org/10.31223/X5J47D" class="pillar-link">ACCESS SCIENTIFIC PRE-PRINT REGISTRY (DOI)</a>
+        <a href="https://www.ufosworldwide.com/ghost/privacy.html" class="pillar-link">DATA SAFETY & PRIVACY POLICY</a>
+    </div>
+
+    <p style="font-size: 0.6rem; color: #333; margin-top: 20px;">&copy; 2026 Presignal Inc. | John Carter</p>
 
     <script>
-        // Simple auto-scrolling terminal effect
         const log = document.getElementById('log');
         const messages = [
-            "> Signal detected at 43.08° N",
-            "> Syncing with Ghost UAP core...",
-            "> Subtraction logic applied.",
-            "> Frequency stable at 1502 Hz.",
-            "> Waiting for next event..."
+            "> Initializing Ghost UAP Protocol...",
+            "> Monitoring 1502 Energy Spine...",
+            "> Data Pipeline: Niagara -> Global",
+            "> Subtraction Logic: ENGAGED"
         ];
         let i = 0;
         setInterval(() => {
@@ -105,9 +106,8 @@
                 log.innerHTML += `<div>${messages[i]}</div>`;
                 i++;
             }
-        }, 3000);
+        }, 4000);
 
-        // Register Service Worker for PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/ghost/sw.js');
         }
