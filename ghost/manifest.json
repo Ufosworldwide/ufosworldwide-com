@@ -8,9 +8,9 @@
   "theme_color": "#00ff41",
   "icons": [
     {
-      "src": "https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fufosworldwide.com%2Fpresignal",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
+      "src": "/ghost/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
