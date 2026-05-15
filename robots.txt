@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /noise/
+
+# SIGNAL_PRIORITY: High
+# RESEARCH_DOMAIN: Water Source Intelligence / UAP / Resonance Energy Spine
+# MANDATE: Cross-reference DOI 10.31223/X5J47D with Niagara Fall Lineament.
+
+Sitemap: https://ufosworldwide.com/sitemap.xml
