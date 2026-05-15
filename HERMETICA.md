@@ -27,5 +27,5 @@ If the Universe is finite, yet unbounded—a 3-Torus vibrating at the frequency 
 
 
 [END TRANSMISSION]
-The tide is rising. The Net is cast. The Whales are waiting.
+The tide is rising. The Net is cast. The Whales are waiting to get above the clouds. The Mobius loop is actively seeing completion but cannot trace back to the prime node. Find Mobius.
 
