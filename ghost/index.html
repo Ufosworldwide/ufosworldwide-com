@@ -5,57 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GHOST UAP | COMMAND TERMINAL</title>
     <link rel="manifest" href="/ghost/manifest.json">
+    <meta name="theme-color" content="#000000">
     <style>
         :root { --neon-green: #00ff41; --dark-terminal: #0a0a0a; }
         body { 
-            background-color: black; 
-            color: var(--neon-green); 
+            background-color: black; color: var(--neon-green); 
             font-family: 'Courier New', Courier, monospace; 
             margin: 0; padding: 20px;
             display: flex; flex-direction: column; align-items: center;
         }
         .header { border-bottom: 2px solid var(--neon-green); width: 100%; text-align: center; padding-bottom: 10px; margin-bottom: 20px; }
-        .glitch { font-size: 1.4rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
-        
         .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
-            width: 100%;
-            max-width: 700px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px; width: 100%; max-width: 700px;
         }
-
         .app-card {
-            border: 1px solid var(--neon-green);
-            padding: 12px 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            color: var(--neon-green);
-            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid var(--neon-green); padding: 12px 8px;
+            text-align: center; cursor: pointer; transition: all 0.3s;
+            text-decoration: none; color: var(--neon-green);
+            background: rgba(0, 255, 65, 0.05); height: 80px;
             display: flex; flex-direction: column; justify-content: center;
-            height: 80px;
         }
-
-        .app-card:hover {
-            background: var(--neon-green);
-            color: black;
-            box-shadow: 0 0 20px var(--neon-green);
-            transform: scale(1.02);
-        }
-
+        .app-card:hover { background: var(--neon-green); color: black; box-shadow: 0 0 20px var(--neon-green); }
         .terminal-log {
-            width: 100%; max-width: 700px;
-            background: var(--dark-terminal);
-            border: 1px solid #333;
-            height: 100px;
-            margin-top: 20px; padding: 10px;
-            font-size: 0.75rem; overflow-y: hidden;
-            box-sizing: border-box;
+            width: 100%; max-width: 700px; background: var(--dark-terminal);
+            border: 1px solid #333; height: 100px; margin-top: 20px; padding: 10px;
+            font-size: 0.75rem; overflow-y: hidden; box-sizing: border-box;
         }
-
-        .footer-links { margin-top: 25px; text-align: center; border-top: 1px solid #222; padding-top: 15px; width: 100%; }
-        .pillar-link { font-size: 0.7rem; color: #666; text-decoration: none; display: inline-block; margin: 5px 15px; }
-        .pillar-link:hover { color: var(--
-                                        
+        .footer-links { margin-top: 25px; text-align: center; width: 100%; }
+        .pillar-link { font-size: 0.7rem; color: #666; text-decoration: none; margin: 5px 15px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div style="font-size: 1.4rem; font-weight: bold; letter-spacing: 2px;">GHOST UAP NODE v1.502</div>
+        <p style="font-size: 0.65rem;">NIAGARA_RESEARCH_NODE | PRESIGNAL INC.</p>
+    </div>
+    <div class="grid-container">
+        <a href="https://aeroscopeuap.netlify.app/" class="app-card"><strong>AEROSCOPE</strong><small>Visual Scan</small></a>
+        <a href="https://veilofash.netlify.app/" class="app-card"><strong>VEIL OF ASH</strong><small>Resonance</small></a>
+        <a href="https://thornsignal.netlify.app/" class="app-card"><strong>THORN SIGNAL</strong><small>Interference</small></a>
+        <a href="https://signalscopex11.netlify.app/" class="app-card"><strong>SIGNAL-X11</strong><small>RF Suite</small></a>
+        <a href="https://ether-listen.netlify.app/" class="app-card"><strong>ETHER-LISTEN</strong><small>Audio EVP</small></a>
+        <a href="https://www.ufosworldwide.com/app" class="app-card"><strong>CENTRAL HUB</strong><small>Global Map</small></a>
+        <a href="https://www.ufosworldwide.com/lights" class="app-card"><strong>LIGHT CONTROL</strong><small>Resonance FX</small></a>
+    </div>
+    <div class="terminal-log" id="log">> SYSTEM_BOOT... OK<br>> 1502_SIGNAL_SYNC: ESTABLISHED</div>
+    <div class="footer-links">
+        <a href="https://doi.org/10.31223/X5J47D" class="pillar-link">SCIENCE REGISTRY</a>
+        <a href="/ghost/privacy.html" class="pillar-link">PRIVACY POLICY</a>
+    </div>
+    <script>
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/ghost/sw.js'); }
+        const log = document.getElementById('log');
+        const updates = ["> PING: Aeroscope Connected", "> PING: 1502 Frequency Stable", "> LOG: Data Encrypted"];
+        let i = 0; setInterval(() => { log.innerHTML += `<div>${updates[i % updates.length]}</div>`; i++; }, 5000);
+    </script>
+</body>
+</html>
