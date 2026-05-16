@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Presignal · Video Package Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #06060f;
+    --surface: #0a0a18;
+    --border: #1e1e3a;
+    --cyan: #00d4ff;
+    --purple: #7b2fff;
+    --green: #00ff9d;
+    --amber: #ffaa00;
+    --text: #cccce8;
+    --muted: #555;
+    --mono: 'Space Mono', monospace;
+    --serif: 'Crimson Pro', Georgia, serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(ellipse at 15% 0%, #0a0a2e 0%, #07070f 55%, #050510 100%);
+    min-height: 100vh;
+    color: var(--text);
+    font-family: var(--serif);
+    padding: 28px 16px 80px;
+  }
+
+  /* Header */
+  .header { max-width: 720px; margin: 0 auto 28px; }
+  .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .logo {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .brand { font-family: var(--mono); font-size: 10px; letter-spacing: 4px; color: var(--cyan); font-weight: 700; }
+  .title { font-size: 20px; font-weight: 700; color: #e8e8f8; letter-spacing: -0.3px; font-family: var(--mono); }
+  .subtitle { margin-left: 48px; font-family: var(--mono); font-size: 10px; letter-spacing: 1px; color: var(--muted); }
+
+  /* Drop zone */
+  #dropzone {
+    max-width: 720px; margin: 0 auto 24px;
+    border: 2px dashed #2a2a4a; border-radius: 16px;
+    background: var(--surface); padding: 64px 24px;
+    text-align: center; cursor: pointer; transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #dropzone.drag { border-color: var(--cyan); background: #00d4ff08; }
+  #dropzone .icon { font-size: 48px; opacity: 0.5; margin-bottom: 14px; }
+  #dropzone .label { font-family: var(--mono); font-size: 13px; letter-spacing: 2px; color: #888; margin-bottom: 8px; }
+  #dropzone .sub { font-family: var(--mono); font-size: 10px; color: #444; letter-spacing: 1px; }
+  #file-input { display: none; }
+
+  /* Spinner */
+  #spinner {
+    display: none; flex-direction: column; align-items: center;
+    gap: 16px; padding: 60px 0; max-width: 720px; margin: 0 auto;
+  }
+  .spin-ring {
+    width: 48px; height: 48px; border-radius: 50%;
+    border: 3px solid #1a1a2e; border-top: 3px solid var(--cyan);
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spin-label { font-family: var(--mono); font-size: 12px; letter-spacing: 3px; color: var(--cyan); }
+
+  /* Error */
+  #error-box {
+    display: none; max-width: 720px; margin: 0 auto 20px;
+    background: #120808; border: 1px solid #ff444433;
+    border-radius: 8px; padding: 20px;
+    color: #ff6666; font-family: var(--mono); font-size: 12px;
+  }
+  #error-box button {
+    display: block; margin-top: 12px; background: transparent;
+    border: 1px solid #ff444444; color: #ff6666; padding: 6px 14px;
+    border-radius: 4px; cursor: pointer; font-family: var(--mono); font-size: 11px;
+  }
+
+  /* Output */
+  #output { display: none; max-width: 720px; margin: 0 auto; }
+
+  .meta-bar {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px; margin-bottom: 18px;
+    display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+  }
+  .meta-item { flex: 1; min-width: 140px; }
+  .meta-label { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: var(--muted); margin-bottom: 4px; }
+  .meta-value { font-size: 14px; color: var(--text); }
+  .meta-doi { font-family: var(--mono); font-size: 11px; color: var(--cyan); }
+  .meta-domain { font-family: var(--mono); font-size: 11px; color: var(--purple); }
+
+  #new-btn {
+    background: transparent; border: 1px solid #2a2a4a;
+    color: var(--muted); padding: 6px 14px; border-radius: 4px;
+    font-family: var(--mono); font-size: 10px; cursor: pointer;
+    letter-spacing: 1px; white-space: nowrap;
+  }
+
+  /* Sections */
+  .section {
+    border-radius: 8px; margin-bottom: 12px;
+    background: var(--surface); overflow: hidden;
+    border: 1px solid transparent; /* set per section */
+  }
+  .section-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; cursor: pointer; user-select: none;
+  }
+  .section-title { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; font-weight: 700; }
+  .section-controls { display: flex; gap: 8px; align-items: center; }
+  .section-toggle { font-size: 16px; line-height: 1; }
+  .section-body { padding: 14px 16px; }
+  .section-body.hidden { display: none; }
+
+  .copy-btn {
+    background: transparent; border: 1px solid #2a2a4a;
+    color: var(--muted); padding: 3px 10px; border-radius: 4px;
+    font-size: 10px; font-family: var(--mono); cursor: pointer;
+    letter-spacing: 1px; transition: all 0.2s;
+  }
+  .copy-btn.copied { border-color: var(--cyan); color: var(--cyan); background: #00d4ff18; }
+
+  .content-box {
+    background: #06060f; border: 1px solid #181828;
+    border-radius: 6px; padding: 14px;
+    color: var(--text); font-family: var(--serif);
+    font-size: 15px; line-height: 1.85; white-space: pre-wrap;
+  }
+
+  /* Script segments */
+  .seg-block { margin-bottom: 16px; border-left: 2px solid #7b2fff33; padding-left: 12px; }
+  .seg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .seg-title { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: var(--purple); font-weight: 700; }
+  .seg-dur { font-family: var(--mono); font-size: 10px; color: #444; border: 1px solid #222; border-radius: 4px; padding: 2px 8px; }
+  .seg-visual { font-family: var(--mono); font-size: 11px; color: #666; margin-top: 6px; }
+
+  .sub-label { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; font-weight: 700; margin-bottom: 8px; }
+
+  /* Workflow */
+  .workflow { background: #080812; border: 1px solid #181828; border-radius: 8px; padding: 16px; margin-top: 4px; }
+  .workflow-title { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: #444; margin-bottom: 12px; }
+  .workflow-step { display: flex; gap: 12px; margin-bottom: 8px; align-items: flex-start; }
+  .step-num { font-family: var(--mono); font-size: 10px; color: var(--cyan); flex-shrink: 0; padding-top: 2px; }
+  .step-text { font-size: 14px; color: #777; line-height: 1.5; }
+
+  /* Tag pills */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .tag {
+    background: #00d4ff11; border: 1px solid #00d4ff33;
+    border-radius: 4px; padding: 3px 10px;
+    color: var(--cyan); font-family: var(--mono); font-size: 10px;
+  }
+
+  @media (max-width: 480px) {
+    body { padding: 20px 12px 80px; }
+    #dropzone { padding: 48px 16px; }
+    .meta-bar { flex-direction: column; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-row">
+    <div class="logo">⚡</div>
+    <div>
+      <div class="brand">PRESIGNAL · JOHN ERNEST CARTER</div>
+      <div class="title">Video Package Generator</div>
+    </div>
+  </div>
+  <div class="subtitle">DROP PREPRINT PDF → FULL PRODUCTION PACKAGE</div>
+</div>
+
+<!-- Drop Zone -->
+<div id="dropzone">
+  <div class="icon">📄</div>
+  <div class="label">DROP YOUR PREPRINT PDF</div>
+  <div class="sub">or tap to browse</div>
+  <input type="file" id="file-input" accept="application/pdf"/>
+</div>
+
+<!-- Spinner -->
+<div id="spinner">
+  <div class="spin-ring"></div>
+  <div class="spin-label">READING SIGNAL...</div>
+</div>
+
+<!-- Error -->
+<div id="error-box">
+  <span id="error-msg"></span>
+  <button onclick="reset()">TRY AGAIN</button>
+</div>
+
+<!-- Output -->
+<div id="output">
+  <!-- Meta bar -->
+  <div class="meta-bar">
+    <div class="meta-item">
+      <div class="meta-label">PAPER</div>
+      <div class="meta-value" id="out-title"></div>
+    </div>
+    <div class="meta-item" id="doi-wrap">
+      <div class="meta-label">DOI</div>
+      <div class="meta-doi" id="out-doi"></div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">DOMAIN</div>
+      <div class="meta-domain" id="out-domain"></div>
+    </div>
+    <button id="new-btn" onclick="reset()">NEW PDF</button>
+  </div>
+
+  <!-- YouTube Metadata -->
+  <div class="section" id="sec-yt" style="border-color:#00d4ff28; border-left:3px solid var(--cyan);">
+    <div class="section-header" style="background:#00d4ff08;" onclick="toggle('yt')">
+      <span class="section-title" style="color:var(--cyan);">YOUTUBE METADATA</span>
+      <div class="section-controls">
+        <button class="copy-btn" onclick="event.stopPropagation();copySection('yt-copy','yt-copybtn')" id="yt-copybtn">COPY</button>
+        <span class="section-toggle" id="yt-tog" style="color:var(--cyan);">−</span>
+      </div>
+    </div>
+    <div class="section-body" id="yt-body">
+      <div class="content-box" id="yt-content"></div>
+      <div class="tags" id="yt-tags"></div>
+    </div>
+    <span id="yt-copy" style="display:none"></span>
+  </div>
+
+  <!-- Full Script -->
+  <div class="section" id="sec-script" style="border-color:#7b2fff28; border-left:3px solid var(--purple);">
+    <div class="section-header" style="background:#7b2fff08;" onclick="toggle('script')">
+      <span class="section-title" style="color:var(--purple);">FULL VIDEO SCRIPT</span>
+      <div class="section-controls">
+        <button class="copy-btn" onclick="event.stopPropagation();copySection('script-copy','script-copybtn')" id="script-copybtn">COPY</button>
+        <span class="section-toggle" id="script-tog" style="color:var(--purple);">−</span>
+      </div>
+    </div>
+    <div class="section-body" id="script-body">
+      <div class="sub-label" style="color:var(--purple);">HOOK — OPEN TO CAMERA</div>
+      <div class="content-box" id="out-hook" style="margin-bottom:16px;"></div>
+      <div class="sub-label" style="color:var(--purple);">ELEVATOR PITCH</div>
+      <div class="content-box" id="out-elevator" style="margin-bottom:16px;"></div>
+      <div id="out-segments"></div>
+      <div class="sub-label" style="color:var(--purple);">CALL TO ACTION</div>
+      <div class="content-box" id="out-cta"></div>
+    </div>
+    <span id="script-copy" style="display:none"></span>
+  </div>
+
+  <!-- NotebookLM -->
+  <div class="section" id="sec-nb" style="border-color:#00ff9d28; border-left:3px solid var(--green);">
+    <div class="section-header" style="background:#00ff9d08;" onclick="toggle('nb')">
+      <span class="section-title" style="color:var(--green);">NOTEBOOKLM PROMPT</span>
+      <div class="section-controls">
+        <button class="copy-btn" onclick="event.stopPropagation();copySection('nb-copy','nb-copybtn')" id="nb-copybtn">COPY</button>
+        <span class="section-toggle" id="nb-tog" style="color:var(--green);">−</span>
+      </div>
+    </div>
+    <div class="section-body" id="nb-body">
+      <div class="content-box" id="out-nb"></div>
+    </div>
+    <span id="nb-copy" style="display:none"></span>
+  </div>
+
+  <!-- Descript -->
+  <div class="section" id="sec-desc" style="border-color:#ffaa0028; border-left:3px solid var(--amber);">
+    <div class="section-header" style="background:#ffaa0008;" onclick="toggle('desc')">
+      <span class="section-title" style="color:var(--amber);">DESCRIPT PRODUCTION NOTES</span>
+      <div class="section-controls">
+        <button class="copy-btn" onclick="event.stopPropagation();copySection('desc-copy','desc-copybtn')" id="desc-copybtn">COPY</button>
+        <span class="section-toggle" id="desc-tog" style="color:var(--amber);">−</span>
+      </div>
+    </div>
+    <div class="section-body" id="desc-body">
+      <div class="content-box" id="out-desc"></div>
+    </div>
+    <span id="desc-copy" style="display:none"></span>
+  </div>
+
+  <!-- Workflow -->
+  <div class="workflow">
+    <div class="workflow-title">PRODUCTION WORKFLOW</div>
+    <div class="workflow-step"><span class="step-num">01</span><span class="step-text">Copy NotebookLM prompt → generate Audio Overview MP3</span></div>
+    <div class="workflow-step"><span class="step-num">02</span><span class="step-text">Import MP3 into Descript → auto-transcribe</span></div>
+    <div class="workflow-step"><span class="step-num">03</span><span class="step-text">Edit using Descript notes above → export MP4</span></div>
+    <div class="workflow-step"><span class="step-num">04</span><span class="step-text">Upload to YouTube with metadata above</span></div>
+  </div>
+</div>
+
+<script>
+const API_URL = "https://api.anthropic.com/v1/messages";
+
+// ── Toggle sections ──────────────────────────────────────
+function toggle(id) {
+  const body = document.getElementById(id + '-body');
+  const tog  = document.getElementById(id + '-tog');
+  const open = !body.classList.contains('hidden');
+  body.classList.toggle('hidden', open);
+  tog.textContent = open ? '+' : '−';
+}
+
+// ── Copy helper ──────────────────────────────────────────
+function copySection(copyId, btnId) {
+  const text = document.getElementById(copyId).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById(btnId);
+    btn.textContent = 'COPIED';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── State ────────────────────────────────────────────────
+function showSpinner(on) {
+  document.getElementById('spinner').style.display = on ? 'flex' : 'none';
+}
+function showDropzone(on) {
+  document.getElementById('dropzone').style.display = on ? 'block' : 'none';
+}
+function showOutput(on) {
+  document.getElementById('output').style.display = on ? 'block' : 'none';
+}
+function showError(msg) {
+  const box = document.getElementById('error-box');
+  document.getElementById('error-msg').textContent = msg;
+  box.style.display = 'block';
+}
+function hideError() {
+  document.getElementById('error-box').style.display = 'none';
+}
+
+function reset() {
+  showDropzone(true);
+  showSpinner(false);
+  showOutput(false);
+  hideError();
+  document.getElementById('file-input').value = '';
+}
+
+// ── Drag & drop ──────────────────────────────────────────
+const dz = document.getElementById('dropzone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag');
+  processFile(e.dataTransfer.files[0]);
+});
+dz.addEventListener('click', () => document.getElementById('file-input').click());
+document.getElementById('file-input').addEventListener('change', e => processFile(e.target.files[0]));
+
+// ── Process PDF ──────────────────────────────────────────
+async function processFile(file) {
+  if (!file || file.type !== 'application/pdf') {
+    showError('Please drop a PDF file.'); return;
+  }
+  hideError();
+  showDropzone(false);
+  showSpinner(true);
+
+  // base64 encode
+  const base64 = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+
+  const systemPrompt = `You are a science video producer for PRESIGNAL, an independent multi-domain research initiative by JOHN ERNEST CARTER. Turn this academic preprint PDF into a complete video production package for "Johnny Carter the Science Guy" — a YouTube science channel.
+
+Brand voice: authoritative but accessible, frontier science without jargon, slightly maverick, grounded in real field data. John speaks plainly and directly to camera.
+
+IMPORTANT: Attention spans are 24 seconds. Every segment must earn its keep. No filler. Hooks must land in the first sentence.
+
+Respond ONLY with a valid JSON object. No preamble, no markdown fences. Structure:
+{
+  "detected_title": "string",
+  "detected_doi": "string or null",
+  "detected_domain": "string",
+  "hook": "2 punchy sentences max, direct to camera, under 35 words",
+  "elevator": "one paragraph plain-language, what it does and why it matters, under 70 words",
+  "segments": [
+    { "title": "string", "duration": "e.g. 60 sec", "script": "spoken narration 60-100 words tight no filler", "visual_note": "brief B-roll or graphic suggestion" }
+  ],
+  "callToAction": "2-3 sentences, closes video, points to Zenodo/Presignal, asks follow/subscribe",
+  "notebooklm_prompt": "detailed prompt to paste into NotebookLM for Audio Overview",
+  "descript_notes": "scene-by-scene production notes for Descript, plain list",
+  "youtube_title": "compelling title under 70 chars",
+  "youtube_description": "full description ~180 words includes DOI and Presignal mention",
+  "tags": ["7 youtube tags as strings under 50 chars each"]
+}`;
+
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 3000,
+        system: systemPrompt,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+            { type: 'text', text: 'Generate the full video production package. Use 5-6 segments optimized for 24-second attention spans — tight, punchy, no padding.' }
+          ]
+        }]
+      })
+    });
+
+    const data = await resp.json();
+    const raw = (data.content?.find(b => b.type === 'text')?.text || '').replace(/```json|```/g, '').trim();
+    const d = JSON.parse(raw);
+    renderOutput(d);
+  } catch(e) {
+    showSpinner(false);
+    showDropzone(true);
+    showError('Could not process this PDF. Make sure it is text-based (not scanned) and try again.');
+  }
+}
+
+// ── Render ────────────────────────────────────────────────
+function renderOutput(d) {
+  // Meta
+  document.getElementById('out-title').textContent = d.detected_title || '—';
+  document.getElementById('out-domain').textContent = d.detected_domain || '—';
+  const doiWrap = document.getElementById('doi-wrap');
+  if (d.detected_doi) {
+    document.getElementById('out-doi').textContent = d.detected_doi;
+    doiWrap.style.display = 'block';
+  } else { doiWrap.style.display = 'none'; }
+
+  // YouTube
+  const ytText = `TITLE:\n${d.youtube_title}\n\nDESCRIPTION:\n${d.youtube_description}`;
+  document.getElementById('yt-content').textContent = ytText;
+  document.getElementById('yt-copy').textContent = `${d.youtube_title}\n\n${d.youtube_description}\n\nTags: ${(d.tags||[]).join(', ')}`;
+  const tagsEl = document.getElementById('yt-tags');
+  tagsEl.innerHTML = '';
+  (d.tags||[]).forEach(t => {
+    const pill = document.createElement('span');
+    pill.className = 'tag'; pill.textContent = t;
+    tagsEl.appendChild(pill);
+  });
+
+  // Script
+  document.getElementById('out-hook').textContent = d.hook || '';
+  document.getElementById('out-elevator').textContent = d.elevator || '';
+  const segsEl = document.getElementById('out-segments');
+  segsEl.innerHTML = '';
+  (d.segments||[]).forEach((s, i) => {
+    segsEl.innerHTML += `
+      <div class="seg-block">
+        <div class="seg-header">
+          <span class="seg-title">SEGMENT ${i+1}: ${s.title}</span>
+          <span class="seg-dur">${s.duration}</span>
+        </div>
+        <div class="content-box">${s.script}</div>
+        <div class="seg-visual">📷 ${s.visual_note}</div>
+      </div>`;
+  });
+  document.getElementById('out-cta').textContent = d.callToAction || '';
+
+  // Full script copy text
+  const fullScript = [
+    `[HOOK]\n${d.hook}`,
+    `[ELEVATOR]\n${d.elevator}`,
+    ...(d.segments||[]).map((s,i) => `[SEGMENT ${i+1}: ${s.title}]\n${s.script}`),
+    `[CALL TO ACTION]\n${d.callToAction}`
+  ].join('\n\n');
+  document.getElementById('script-copy').textContent = fullScript;
+
+  // NotebookLM
+  document.getElementById('out-nb').textContent = d.notebooklm_prompt || '';
+  document.getElementById('nb-copy').textContent = d.notebooklm_prompt || '';
+
+  // Descript
+  document.getElementById('out-desc').textContent = d.descript_notes || '';
+  document.getElementById('desc-copy').textContent = d.descript_notes || '';
+
+  showSpinner(false);
+  showOutput(true);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
