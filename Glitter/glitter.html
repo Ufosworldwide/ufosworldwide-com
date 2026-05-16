@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosmic Pigments | UFOs Worldwide × Chunky Glitter Company</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --void: #050508;
+    --deep: #0a0a12;
+    --panel: #0f0f1a;
+    --border: rgba(255,255,255,0.07);
+    --accent: #c8a97e;
+    --glow-teal: #4ecdc4;
+    --glow-purple: #a78bfa;
+    --glow-rose: #f472b6;
+    --glow-gold: #fbbf24;
+    --text: #e8e4dc;
+    --muted: rgba(232,228,220,0.45);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Star field */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 42% 8%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 68% 35%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 83% 12%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 27% 55%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 91% 67%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 5% 78%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 88%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 73% 92%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 38% 72%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 61% 48%, rgba(200,169,126,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 18% 93%, rgba(255,255,255,0.3) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Nebula glow */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -20%;
+    left: -10%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(ellipse, rgba(78,205,196,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .nebula-right {
+    position: fixed;
+    bottom: -10%;
+    right: -10%;
+    width: 50%;
+    height: 50%;
+    background: radial-gradient(ellipse, rgba(167,139,250,0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Header */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 4rem 2rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.8rem, 7vw, 5rem);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.2rem;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .tagline {
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto 2rem;
+    line-height: 1.8;
+  }
+
+  /* Affiliation banner */
+  .affiliation {
+    display: inline-block;
+    border: 1px solid var(--border);
+    background: rgba(200,169,126,0.06);
+    padding: 0.6rem 1.4rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .affiliation a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(200,169,126,0.3);
+  }
+
+  /* Intro text */
+  .intro {
+    max-width: 640px;
+    margin: 3rem auto;
+    padding: 0 2rem;
+    text-align: center;
+    position: relative;
+    z-index: 5;
+  }
+
+  .intro p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+    font-weight: 300;
+    line-height: 1.8;
+    color: rgba(232,228,220,0.75);
+  }
+
+  .intro p strong {
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  /* Section label */
+  .section-label {
+    text-align: center;
+    margin: 4rem 0 2.5rem;
+    position: relative;
+    z-index: 5;
+  }
+
+  .section-label span {
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .section-label::before,
+  .section-label::after {
+    content: '';
+    display: inline-block;
+    width: 60px;
+    height: 1px;
+    background: var(--border);
+    vertical-align: middle;
+    margin: 0 1.2rem;
+  }
+
+  /* Product grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5px;
+    max-width: 1100px;
+    margin: 0 auto 5rem;
+    padding: 0 1.5rem;
+    position: relative;
+    z-index: 5;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.4s ease, border-color 0.4s ease;
+    cursor: pointer;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .card-anastasia::before { background: radial-gradient(ellipse at 50% 0%, rgba(78,205,196,0.12) 0%, transparent 70%); }
+  .card-olivia::before    { background: radial-gradient(ellipse at 50% 0%, rgba(244,114,182,0.12) 0%, transparent 70%); }
+  .card-vita::before      { background: radial-gradient(ellipse at 50% 0%, rgba(251,191,36,0.10) 0%, transparent 70%); }
+  .card-aurora::before    { background: radial-gradient(ellipse at 50% 0%, rgba(167,139,250,0.12) 0%, transparent 70%); }
+
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255,255,255,0.14);
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  .card-anastasia:hover { box-shadow: 0 20px 60px rgba(78,205,196,0.12); }
+  .card-olivia:hover    { box-shadow: 0 20px 60px rgba(244,114,182,0.12); }
+  .card-vita:hover      { box-shadow: 0 20px 60px rgba(251,191,36,0.10); }
+  .card-aurora:hover    { box-shadow: 0 20px 60px rgba(167,139,250,0.12); }
+
+  /* Colour shift preview bar */
+  .shift-bar {
+    height: 3px;
+    width: 100%;
+  }
+  .shift-anastasia { background: linear-gradient(90deg, #4ecdc4, #a78bfa, #60a5fa); }
+  .shift-olivia    { background: linear-gradient(90deg, #6ee7b7, #c4b5fd, #f9a8d4); }
+  .shift-vita      { background: linear-gradient(90deg, #60a5fa, #4ecdc4, #fbbf24); }
+  .shift-aurora    { background: linear-gradient(90deg, #cd7f32, #f472b6, #a78bfa); }
+
+  .card-image {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.92) saturate(1.1);
+    transition: filter 0.4s ease;
+  }
+
+  .card:hover .card-image { filter: brightness(1) saturate(1.2); }
+
+  /* Image placeholder for cards without photos */
+  .card-image-placeholder {
+    width: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: rgba(255,255,255,0.08);
+  }
+
+  .card-body {
+    padding: 1.6rem 1.8rem 2rem;
+  }
+
+  .card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.9rem;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.3rem;
+    line-height: 1;
+  }
+
+  .card-anastasia .card-name { color: #7dd3cc; }
+  .card-olivia .card-name    { color: #f0abcd; }
+  .card-vita .card-name      { color: #fcd34d; }
+  .card-aurora .card-name    { color: #c4b5fd; }
+
+  .card-shift {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .card-desc {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: rgba(232,228,220,0.6);
+    margin-bottom: 1.4rem;
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.4rem;
+  }
+
+  .card-price {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+  }
+
+  .card-size {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .card-uses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .use-tag {
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    padding: 0.25rem 0.55rem;
+    color: var(--muted);
+  }
+
+  .buy-btn {
+    display: block;
+    width: 100%;
+    padding: 0.85rem 1rem;
+    text-align: center;
+    text-decoration: none;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    border: 1px solid currentColor;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .buy-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .card-anastasia .buy-btn { color: #7dd3cc; }
+  .card-olivia .buy-btn    { color: #f0abcd; }
+  .card-vita .buy-btn      { color: #fcd34d; }
+  .card-aurora .buy-btn    { color: #c4b5fd; }
+
+  .card-anastasia .buy-btn::after { background: rgba(78,205,196,0.08); }
+  .card-olivia .buy-btn::after    { background: rgba(244,114,182,0.08); }
+  .card-vita .buy-btn::after      { background: rgba(251,191,36,0.08); }
+  .card-aurora .buy-btn::after    { background: rgba(167,139,250,0.08); }
+
+  .buy-btn:hover::after { opacity: 1; }
+
+  /* Tip block */
+  .tip-block {
+    max-width: 700px;
+    margin: 0 auto 5rem;
+    padding: 2rem 2.5rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    background: rgba(200,169,126,0.04);
+    position: relative;
+    z-index: 5;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+  }
+
+  .tip-block p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: rgba(232,228,220,0.7);
+    font-style: italic;
+  }
+
+  .tip-block strong {
+    color: var(--accent);
+    font-style: normal;
+    font-weight: 400;
+  }
+
+  /* Discount banner */
+  .discount-bar {
+    background: rgba(200,169,126,0.08);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 1.2rem 2rem;
+    text-align: center;
+    margin-bottom: 4rem;
+    position: relative;
+    z-index: 5;
+  }
+
+  .discount-bar p {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .discount-code {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    display: block;
+    margin-top: 0.3rem;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    border-top: 1px solid var(--border);
+    position: relative;
+    z-index: 5;
+  }
+
+  footer p {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    line-height: 2;
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  header { animation: fadeUp 0.8s ease both; }
+  .intro { animation: fadeUp 0.8s ease 0.15s both; }
+  .grid  { animation: fadeUp 0.8s ease 0.3s both; }
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; gap: 1px; }
+    header { padding: 3rem 1.5rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nebula-right"></div>
+
+<header>
+  <div class="eyebrow">UFOs Worldwide Presents</div>
+  <h1>Something <em>shifts</em><br>in the light</h1>
+  <p class="tagline">Colour-shifting chameleon mica powders<br>from a Canadian maker who refuses to quit</p>
+  <div class="affiliation">
+    In affiliation with <a href="https://chunkyglittercompany.ca" target="_blank" rel="noopener">Chunky Glitter Company</a> · Niagara Falls, Ontario
+  </div>
+</header>
+
+<div class="intro">
+  <p>
+    These aren't ordinary pigments. Under different light, at different angles, 
+    they shift — green becomes purple becomes blue. They look like something 
+    <strong>captured from a field observation.</strong> Kristen makes them by hand 
+    in Niagara Falls. Canadian made, Canadian shipped. No border surprises.
+  </p>
+</div>
+
+<div class="discount-bar">
+  <p>First order discount — use code at checkout</p>
+  <span class="discount-code">HELLO15</span>
+  <p style="margin-top:0.3rem">15% off · one use per customer · chunkyglittercompany.ca</p>
+  <p style="margin-top:0.8rem; font-size:0.65rem; letter-spacing:0.15em; color:rgba(200,169,126,0.5)">Referred by UFOs Worldwide · use code <strong style="color:var(--accent)">JOHN1111</strong> at checkout</p>
+</div>
+
+<div class="section-label">
+  <span>The Chameleon Collection</span>
+</div>
+
+<div class="grid">
+
+  <!-- ANASTASIA -->
+  <div class="card card-anastasia" onclick="window.open('https://chunkyglittercompany.ca/products/chameleon-mica-1','_blank')">
+    <div class="shift-bar shift-anastasia"></div>
+    <div class="card-image-placeholder" style="background: linear-gradient(135deg, #0d1a1a 0%, #0f1020 100%);">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="30" stroke="rgba(78,205,196,0.2)" stroke-width="1"/>
+        <circle cx="40" cy="40" r="20" stroke="rgba(167,139,250,0.2)" stroke-width="1"/>
+        <circle cx="40" cy="40" r="10" fill="rgba(78,205,196,0.15)"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <div class="card-name">Anastasia</div>
+      <div class="card-shift">Green → Light Purple → Blue</div>
+      <div class="card-desc">
+        A graceful, pearly shift. Calm and sophisticated — more shimmer than glitter, perfect for makers who want movement without intensity.
+      </div>
+      <div class="card-meta">
+        <span class="card-price">$8.95 CAD</span>
+        <span class="card-size">5g jar · Chameleon Mica</span>
+      </div>
+      <div class="card-uses">
+        <span class="use-tag">Resin</span>
+        <span class="use-tag">Nail Art</span>
+        <span class="use-tag">Soaps</span>
+        <span class="use-tag">Cosmetic Grade</span>
+        <span class="use-tag">Black Base</span>
+      </div>
+      <a href="https://chunkyglittercompany.ca/products/chameleon-mica-1" target="_blank" rel="noopener" class="buy-btn" onclick="event.stopPropagation()">
+        Shop Anastasia →
+      </a>
+    </div>
+  </div>
+
+  <!-- OLIVIA -->
+  <div class="card card-olivia" onclick="window.open('https://chunkyglittercompany.ca/products/chameleon-mica-1-olivia','_blank')">
+    <div class="shift-bar shift-olivia"></div>
+    <div class="card-image-placeholder" style="background: linear-gradient(135deg, #1a0d14 0%, #120f1a 100%);">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="30" stroke="rgba(244,114,182,0.2)" stroke-width="1"/>
+        <circle cx="40" cy="40" r="20" stroke="rgba(196,181,253,0.2)" stroke-width="1"/>
+        <circle cx="40" cy="40" r="10" fill="rgba(244,114,182,0.15)"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <div class="card-name">Olivia</div>
+      <div class="card-shift">Green → Light Purple → Pink</div>
+      <div class="card-desc">
+        Soft and romantic. Glides between gentle green, lilac, and a blush of pink with a pearlescent, light-responsive finish.
+      </div>
+      <div class="card-meta">
+        <span class="card-price">$8.95 CAD</span>
+        <span class="card-size">5g jar · Chameleon Mica</span>
+      </div>
+      <div class="card-uses">
+        <span class="use-tag">Resin</span>
+        <span class="use-tag">Polish</span>
+        <span class="use-tag">Paint</span>
+        <span class="use-tag">Cosmetic Grade</span>
+        <span class="use-tag">Black Base</span>
+      </div>
+      <a href="https://chunkyglittercompany.ca/products/chameleon-mica-1-olivia" target="_blank" rel="noopener" class="buy-btn" onclick="event.stopPropagation()">
+        Shop Olivia →
+      </a>
+    </div>
+  </div>
+
+  <!-- VITA -->
+  <div class="card card-vita" onclick="window.open('https://chunkyglittercompany.ca/products/vita','_blank')">
+    <div class="shift-bar shift-vita"></div>
+    <div class="card-image-placeholder" style="background: linear-gradient(135deg, #0d1420 0%, #0a1010 100%);">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="30" stroke="rgba(96,165,250,0.2)" stroke-width="1"/>
+        <circle cx="40" cy="40" r="20" stroke="rgba(251,191,36,0.2)" stroke-width="1"/>
+        <circle cx="40" cy="40" r="10" fill="rgba(78,205,196,0.15)"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <div class="card-name">Vita</div>
+      <div class="card-shift">Blue → Green → Gold</div>
+      <div class="card-desc">
+        Light catching sea glass. Quiet, clean, and beautifully nuanced — a subtle pearly shift that drifts from soft blue to warm gold.
+      </div>
+      <div class="card-meta">
+        <span class="card-price">$8.95 CAD</span>
+        <span class="card-size">5g jar · Chameleon Mica</span>
+      </div>
+      <div class="card-uses">
+        <span class="use-tag">Resin</span>
+        <span class="use-tag">Soaps</span>
+        <span class="use-tag">Tumblers</span>
+        <span class="use-tag">Cosmetic Grade</span>
+        <span class="use-tag">Black Base</span>
+      </div>
+      <a href="https://chunkyglittercompany.ca/products/vita" target="_blank" rel="noopener" class="buy-btn" onclick="event.stopPropagation()">
+        Shop Vita →
+      </a>
+    </div>
+  </div>
+
+  <!-- CLAUDIA -->
+  <div class="card card-aurora" onclick="window.open('https://chunkyglittercompany.ca/products/claudia-bronze-pink-purple-chameleon-colour-shift-mica-powder','_blank')">
+    <div class="shift-bar shift-aurora"></div>
+    <div class="card-image-placeholder" style="background: linear-gradient(135deg, #1a0a0d 0%, #120a14 100%);">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="30" stroke="rgba(205,127,50,0.2)" stroke-width="1"/>
+        <circle cx="40" cy="40" r="20" stroke="rgba(244,114,182,0.2)" stroke-width="1"/>
+        <circle cx="40" cy="40" r="10" fill="rgba(167,139,250,0.15)"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <div class="card-name">Claudia</div>
+      <div class="card-shift">Bronze → Pink → Purple</div>
+      <div class="card-desc">
+        A quiet gleam. Moves gently between soft bronze, rosy pink, and a whisper of violet — elegant rather than loud.
+      </div>
+      <div class="card-meta">
+        <span class="card-price">$8.95 CAD</span>
+        <span class="card-size">5g jar · Chameleon Mica</span>
+      </div>
+      <div class="card-uses">
+        <span class="use-tag">Resin</span>
+        <span class="use-tag">Soaps</span>
+        <span class="use-tag">Polish</span>
+        <span class="use-tag">Cosmetic Grade</span>
+        <span class="use-tag">Black Base</span>
+      </div>
+      <a href="https://chunkyglittercompany.ca/products/claudia-bronze-pink-purple-chameleon-colour-shift-mica-powder" target="_blank" rel="noopener" class="buy-btn" onclick="event.stopPropagation()">
+        Shop Claudia →
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Tip block -->
+<div style="padding: 0 2rem; position: relative; z-index: 5; max-width: 700px; margin: 0 auto 5rem;">
+  <div class="tip-block">
+    <p>
+      <strong>Pro tip from the field:</strong> Every one of these shifts most dramatically over a black base. 
+      The darker the surface, the more the colour transition reveals itself — much like anomalous phenomena 
+      that only become visible against the right background.
+    </p>
+  </div>
+</div>
+
+<footer>
+  <p>
+    Curated by <a href="https://ufosworldwide.com" target="_blank">UFOs Worldwide</a><br>
+    Products fulfilled by <a href="https://chunkyglittercompany.ca" target="_blank">Chunky Glitter Company</a> · Niagara Falls, Ontario, Canada<br>
+    This page is an affiliate recommendation. All orders, shipping, and fulfillment handled by Chunky Glitter Company.<br><br>
+    First order code <strong style="color:var(--accent)">HELLO15</strong> · 15% off · one use per customer<br>
+    Tracking code <strong style="color:var(--accent)">JOHN1111</strong> · enter at checkout · helps us know you came from here
+  </p>
+</footer>
+
+</body>
+</html>
