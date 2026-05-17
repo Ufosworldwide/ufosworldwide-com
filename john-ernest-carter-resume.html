@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>John Ernest Carter — Independent Systems Theorist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Courier+Prime:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B1628;
+    --deep: #0D2040;
+    --steel: #1E4D7B;
+    --silver: #7A9BBF;
+    --pale: #B8CEDF;
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --white: #F0F4F8;
+    --cream: #EDE8E0;
+    --red: #8B1A1A;
+    --mono: 'Courier Prime', monospace;
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --display: 'Bebas Neue', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── GRID LINES ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(122,155,191,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(122,155,191,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 80px 0 60px;
+    position: relative;
+    border-bottom: 1px solid rgba(122,155,191,0.2);
+  }
+
+  .header-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: end;
+  }
+
+  .name-block { position: relative; }
+
+  .label-top {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .label-top::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(52px, 8vw, 88px);
+    letter-spacing: 3px;
+    line-height: 0.95;
+    color: var(--white);
+  }
+
+  h1 span {
+    display: block;
+    color: var(--steel);
+    font-size: 0.6em;
+    letter-spacing: 8px;
+  }
+
+  .invented-title {
+    margin-top: 24px;
+    font-family: var(--serif);
+    font-size: 15px;
+    font-style: italic;
+    color: var(--pale);
+    font-weight: 300;
+    letter-spacing: 1px;
+    line-height: 1.5;
+    max-width: 480px;
+  }
+
+  .invented-title strong {
+    color: var(--gold-light);
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .header-meta {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--silver);
+    line-height: 2;
+  }
+
+  .header-meta a {
+    color: var(--gold);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .header-meta a:hover { color: var(--gold-light); }
+
+  .seeking-badge {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 14px;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: pulse-border 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-border {
+    0%, 100% { border-color: var(--gold); color: var(--gold); }
+    50% { border-color: var(--gold-light); color: var(--gold-light); box-shadow: 0 0 12px rgba(201,168,76,0.3); }
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 60px 0;
+    border-bottom: 1px solid rgba(122,155,191,0.12);
+    animation: fadeUp 0.6s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  section:nth-child(1) { animation-delay: 0.1s; }
+  section:nth-child(2) { animation-delay: 0.2s; }
+  section:nth-child(3) { animation-delay: 0.3s; }
+  section:nth-child(4) { animation-delay: 0.4s; }
+  section:nth-child(5) { animation-delay: 0.5s; }
+  section:nth-child(6) { animation-delay: 0.6s; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, rgba(201,168,76,0.4), transparent);
+  }
+
+  /* ── STATEMENT ── */
+  .statement {
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--cream);
+    font-style: italic;
+    border-left: 2px solid var(--gold);
+    padding-left: 28px;
+    max-width: 760px;
+  }
+
+  .statement strong {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--white);
+  }
+
+  /* ── DOMAINS GRID ── */
+  .domains-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .domain-card {
+    padding: 20px;
+    border: 1px solid rgba(122,155,191,0.2);
+    background: rgba(30,77,123,0.08);
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+
+  .domain-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--gold);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.3s ease;
+  }
+
+  .domain-card:hover {
+    border-color: rgba(201,168,76,0.4);
+    background: rgba(30,77,123,0.15);
+    transform: translateY(-2px);
+  }
+
+  .domain-card:hover::before { transform: scaleY(1); }
+
+  .domain-icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  .domain-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--pale);
+    text-transform: uppercase;
+  }
+
+  /* ── PORTFOLIO TABLE ── */
+  .pub-list { list-style: none; }
+
+  .pub-item {
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(122,155,191,0.08);
+    align-items: start;
+    transition: background 0.2s;
+  }
+
+  .pub-item:hover {
+    background: rgba(30,77,123,0.05);
+    margin: 0 -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .pub-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--steel);
+    padding-top: 4px;
+    text-align: right;
+  }
+
+  .pub-content {}
+
+  .pub-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.4;
+    margin-bottom: 4px;
+  }
+
+  .pub-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--silver);
+    letter-spacing: 1px;
+  }
+
+  .pub-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    padding: 3px 8px;
+    border: 1px solid;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-top: 4px;
+  }
+
+  .tag-earth { border-color: #4a8f6f; color: #4a8f6f; }
+  .tag-space { border-color: #4a6f9f; color: #4a6f9f; }
+  .tag-water { border-color: #3a7fa0; color: #3a7fa0; }
+  .tag-medical { border-color: #8f4a6f; color: #8f4a6f; }
+  .tag-risk { border-color: #8B1A1A; color: #9f5a3a; }
+  .tag-energy { border-color: #8f7a2a; color: #8f7a2a; }
+  .tag-physics { border-color: #5a4a8f; color: #7a6abf; }
+  .tag-ai { border-color: #4a7a6f; color: #5a9a8f; }
+  .tag-genealogy { border-color: #6f5a3a; color: #8f7a5a; }
+  .tag-uap { border-color: #3a6f8f; color: #5a8faf; }
+
+  /* ── SKILLS / METHODOLOGY ── */
+  .method-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .method-block {}
+
+  .method-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .method-text {
+    font-size: 15px;
+    color: var(--pale);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ── EMPLOYMENT HISTORY ── */
+  .job-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 32px;
+    padding: 28px 0;
+    border-bottom: 1px solid rgba(122,155,191,0.08);
+  }
+
+  .job-date {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--silver);
+    padding-top: 4px;
+    line-height: 1.8;
+  }
+
+  .job-title-main {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .job-org {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  .job-desc {
+    font-size: 15px;
+    color: var(--pale);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ── CONTACT / CTA ── */
+  .cta-block {
+    padding: 80px 0;
+    text-align: center;
+  }
+
+  .cta-title {
+    font-family: var(--display);
+    font-size: clamp(36px, 6vw, 64px);
+    letter-spacing: 4px;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+
+  .cta-sub {
+    font-size: 16px;
+    color: var(--silver);
+    font-style: italic;
+    margin-bottom: 40px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .contact-grid {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .contact-item {
+    padding: 14px 28px;
+    border: 1px solid rgba(122,155,191,0.3);
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--pale);
+    text-decoration: none;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .contact-item:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(201,168,76,0.05);
+  }
+
+  .contact-item.primary {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--navy);
+    font-weight: 700;
+  }
+
+  .contact-item.primary:hover {
+    background: var(--gold-light);
+    border-color: var(--gold-light);
+    color: var(--navy);
+  }
+
+  /* ── ORCID STRIP ── */
+  .orcid-strip {
+    background: rgba(30,77,123,0.15);
+    border: 1px solid rgba(122,155,191,0.15);
+    padding: 20px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .orcid-left {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--silver);
+  }
+
+  .orcid-left strong {
+    color: var(--gold);
+    display: block;
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+
+  .pub-count {
+    font-family: var(--display);
+    font-size: 48px;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .pub-count-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--silver);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 40px 0;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(122,155,191,0.4);
+    letter-spacing: 2px;
+    border-top: 1px solid rgba(122,155,191,0.1);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .container { padding: 0 24px; }
+    .header-inner { grid-template-columns: 1fr; }
+    .header-meta { text-align: left; }
+    .method-grid { grid-template-columns: 1fr; }
+    .job-row { grid-template-columns: 1fr; gap: 8px; }
+    .pub-item { grid-template-columns: 36px 1fr; }
+    .pub-tag { display: none; }
+    .orcid-strip { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ── HEADER ── -->
+  <header>
+    <div class="header-inner">
+      <div class="name-block">
+        <div class="label-top">Curriculum Vitae · 2026</div>
+        <h1>John Ernest<span>Carter</span></h1>
+        <p class="invented-title">
+          <strong>Independent Systems Theorist &amp; Multi-Domain Research Director</strong><br>
+          Specializing in civilizational risk architecture, planetary intelligence systems,<br>
+          and cross-domain knowledge synthesis at the intersection of science and consequence.
+        </p>
+      </div>
+      <div class="header-meta">
+        <div>Niagara Region, Ontario, Canada</div>
+        <div>jubecrew@gmail.com</div>
+        <div><a href="https://orcid.org/0009-0004-1363-304X" target="_blank">ORCID 0009-0004-1363-304X</a></div>
+        <div><a href="https://zenodo.org/search?q=carter+presignal" target="_blank">Zenodo Portfolio →</a></div>
+        <div style="margin-top:16px">
+          <span class="seeking-badge">● Actively Seeking Engagement</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── PROFESSIONAL STATEMENT ── -->
+  <section>
+    <div class="section-label">Professional Statement</div>
+    <p class="statement">
+      I map terrain that institutions have not yet named. My work sits at the intersection of
+      <strong>systems collapse, planetary resilience, and civilizational continuity</strong> —
+      producing original frameworks across earth science, space science, public health, energy architecture,
+      existential risk, and environmental intelligence. I do not fit a department.
+      I fit a mandate: <strong>see further, connect more, act before the window closes.</strong>
+    </p>
+  </section>
+
+  <!-- ── DOMAINS ── -->
+  <section>
+    <div class="section-label">Research Domains</div>
+    <div class="domains-grid">
+      <div class="domain-card">
+        <div class="domain-icon">🌍</div>
+        <div class="domain-name">Earth Science</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon">🌌</div>
+        <div class="domain-name">Space Science</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon">💧</div>
+        <div class="domain-name">Water Intelligence</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon">⚕️</div>
+        <div class="domain-name">Medical Research</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon">⚠️</div>
+        <div class="domain-name">Existential Risk</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon">⚡</div>
+        <div class="domain-name">Energy Architecture</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon">⚛️</div>
+        <div class="domain-name">Theoretical Physics</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon">🔭</div>
+        <div class="domain-name">UAP Research</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon">🤖</div>
+        <div class="domain-name">AI Research Infrastructure</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon">🧬</div>
+        <div class="domain-name">Genealogical Science</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PUBLISHED PORTFOLIO ── -->
+  <section>
+    <div class="section-label">Published Research Portfolio · 2026</div>
+
+    <div class="orcid-strip">
+      <div class="orcid-left">
+        <strong>ORCID Verified Portfolio</strong>
+        0009-0004-1363-304X · Presignal Research Initiative · Presignal Inc. (Ontario Corp. No. 1001577205)
+      </div>
+      <div style="text-align:right">
+        <div class="pub-count">20</div>
+        <div class="pub-count-label">Published Works · 2026</div>
+      </div>
+    </div>
+
+    <ul class="pub-list">
+
+      <li class="pub-item">
+        <div class="pub-num">01</div>
+        <div class="pub-content">
+          <div class="pub-title">The Extinction Codex: A Complete Systems Taxonomy of Civilizational Collapse and Extinction-Level Risk Vectors Facing Human Civilization</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.20259839 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-risk">Existential Risk</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">02</div>
+        <div class="pub-content">
+          <div class="pub-title">The Shape of the Universe as a Nested Topological Lattice: Prime Hierarchies and Cosmological Constant Quantization</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.20258025 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-physics">Physics</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">03</div>
+        <div class="pub-content">
+          <div class="pub-title">Topological–Möbius–Lattice Collider Architecture (TMLCA): Integrating Möbius Beam Topology, Fibonacci Quasiperiodic RF Structures and Vortex Beam Dynamics</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.20257671 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-physics">Physics</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">04</div>
+        <div class="pub-content">
+          <div class="pub-title">Numerical Sequence Anomaly Correlation: Cross-Domain Documentary Analysis of Sequences 6-11-6-11 and 333-444-666-777-888-999-1111</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.20247383 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-uap">UAP</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">05</div>
+        <div class="pub-content">
+          <div class="pub-title">The Asymptotic Foundry: An Open Multi-Agent Framework for Priority-Tiered Collaborative AI Research with Hash-Chained Verification</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.20242176 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-ai">AI</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">06</div>
+        <div class="pub-content">
+          <div class="pub-title">Global Geostability Index (GGI): A Pareto-Optimal Multi-Hazard Framework for Long-Duration Civilizational Infrastructure Siting</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.20219651 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-risk">Risk</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">07</div>
+        <div class="pub-content">
+          <div class="pub-title">Four Pillars for the Architects of Civilization: Gravity, Atmosphere, Lightning, and Geometric Intelligence — A Unified Energy Architecture</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.20192553 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-energy">Energy</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">08</div>
+        <div class="pub-content">
+          <div class="pub-title">The Vertical Arcology Hydraulic Spine (VAHS): A Theoretical Energy Architecture for Closed-Loop Megastructure Integration</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.20181743 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-energy">Energy</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">09</div>
+        <div class="pub-content">
+          <div class="pub-title">From Water Bears to Nuclear Workers: The Case for Dsup-Inspired Prophylactic Radioprotection in Occupational Low-Dose Radiation Environments</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.20180890 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-medical">Medical</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">10</div>
+        <div class="pub-content">
+          <div class="pub-title">Primary Source Confirmation of United Empire Loyalist Lineal Descent: The Jackson–McFadden–Carter Chain and the 1851 Canada West Census Discovery</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.20172776 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-genealogy">Genealogy</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">11</div>
+        <div class="pub-content">
+          <div class="pub-title">Seasonal Source Water Temperature as a Predictive Indicator for Legionella Outbreak Risk in Ontario Healthcare Facilities (v2)</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.19948007 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-water">Water</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">12</div>
+        <div class="pub-content">
+          <div class="pub-title">Seasonal Source Water Temperature as a Predictive Indicator for Legionella Outbreak Risk in Ontario Healthcare Facilities (v1)</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.19935260 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-water">Water</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">13</div>
+        <div class="pub-content">
+          <div class="pub-title">The Presignal EM Sentinel: A Camera-Free Long-Duration Electromagnetic Monitoring Node for Geological Plasma Discharge Research</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.19870281 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-earth">Earth Sci.</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">14</div>
+        <div class="pub-content">
+          <div class="pub-title">The Presignal Field Node v2.0: A Triggered Multi-Spectrum Acquisition System for Geological Plasma Discharge Research</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.19870137 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-earth">Earth Sci.</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">15</div>
+        <div class="pub-content">
+          <div class="pub-title">The Interstellar Medium as Navigable Terrain: ISM Mapping, Plasma Conductivity Pathways, and Propulsion Strategy for Near-Term Interstellar Probes</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.19717522 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-space">Space</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">16</div>
+        <div class="pub-content">
+          <div class="pub-title">The Traveling System: A Framework for Galactic Forcing of Terrestrial Climate and Biosphere Through Heliospheric Variability</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.19717287 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-space">Space</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">17</div>
+        <div class="pub-content">
+          <div class="pub-title">Seasonal Source Water Temperature as a Predictive Indicator for Legionella Outbreak Risk — PWQMN Baseline Analysis</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.19695022 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-water">Water</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">18</div>
+        <div class="pub-content">
+          <div class="pub-title">Chronic Source Water Quality Exceedances in the Grand River Watershed: Implications for AI Data Center Cooling Infrastructure in Ontario</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.19653415 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-water">Water</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">19</div>
+        <div class="pub-content">
+          <div class="pub-title">The Immunological Tinnitus Subtype (ITS): Rheumatoid Arthritis, TNF-α, and the Case for Autoimmune-Targeted Treatment of Tinnitus</div>
+          <div class="pub-meta">Zenodo · 10.5281/zenodo.19654306 · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-medical">Medical</span></div>
+      </li>
+
+      <li class="pub-item">
+        <div class="pub-num">20</div>
+        <div class="pub-content">
+          <div class="pub-title">The Geological Pathway Diversity Model (GPDM): A Unified Classification and Predictive Framework for Anomalous Luminous Phenomena</div>
+          <div class="pub-meta">EarthArxiv · 10.31223/X5J47D · 2026</div>
+        </div>
+        <div><span class="pub-tag tag-earth">Earth Sci.</span></div>
+      </li>
+
+    </ul>
+  </section>
+
+  <!-- ── METHODOLOGY ── -->
+  <section>
+    <div class="section-label">Methodology & Approach</div>
+    <div class="method-grid">
+      <div class="method-block">
+        <div class="method-title">Subtraction Framework</div>
+        <p class="method-text">Systematic elimination of noise to isolate genuine signal. Applied equally to UAP field investigation, source water chemistry, genealogical record resolution, and civilizational risk mapping. The method precedes the domain.</p>
+      </div>
+      <div class="method-block">
+        <div class="method-title">Cross-Domain Synthesis</div>
+        <p class="method-text">Original frameworks emerge at the intersection of disciplines that do not normally share a conversation. The Geological Pathway Diversity Model connects earth science, plasma physics, and atmospheric optics. The Extinction Codex connects epidemiology, astrophysics, geopolitics, and ecology in a single taxonomy.</p>
+      </div>
+      <div class="method-block">
+        <div class="method-title">Independent Operation</div>
+        <p class="method-text">All research conducted outside institutional constraints, privately funded, with full intellectual ownership. No editorial gatekeeping. No departmental mandate. No timeline other than the one the research requires.</p>
+      </div>
+      <div class="method-block">
+        <div class="method-title">Open Science Commitment</div>
+        <p class="method-text">All work published under CC BY 4.0. Every DOI permanently citable. ORCID-verified authorship. The portfolio is designed to be built upon, not protected.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── EMPLOYMENT ── -->
+  <section>
+    <div class="section-label">Professional Background</div>
+
+    <div class="job-row">
+      <div class="job-date">2026 — Present</div>
+      <div>
+        <div class="job-title-main">Founder & Research Director</div>
+        <div class="job-org">Presignal Research Initiative · Presignal Inc. · Ontario Corp. No. 1001577205</div>
+        <p class="job-desc">Founded and operate an independent multi-domain research organization producing original scientific frameworks across earth science, space science, medical research, water intelligence, energy architecture, existential risk, and theoretical physics. 20 peer-reviewed preprints published in 2026. Active scientific relationships with Project Hessdalen (Fred Pallesen, CEO) and Stockholm University (Dr. Beatriz Villarroel). Operates AquaSignal water intelligence platform and UFOs Worldwide (32,500 Instagram followers).</p>
+      </div>
+    </div>
+
+    <div class="job-row">
+      <div class="job-date">2026 — Present</div>
+      <div>
+        <div class="job-title-main">Independent Author & Publisher</div>
+        <div class="job-org">Amazon KDP · Multiple Pen Names</div>
+        <p class="job-desc">Author of fiction and nonfiction across multiple series: the Thorn Palamos Investigation series (8 volumes + companion novella), the Humanity dystopian trilogy, J. Varyn dark fantasy (Ashfeed Chronicles), Aelvryn Noctis romantasy (The Veiled Dominion), and the Fast Track Industry Leader Series (9 titles). All titles produced to verified KDP print specification.</p>
+      </div>
+    </div>
+
+    <div class="job-row">
+      <div class="job-date">2024 — Present</div>
+      <div>
+        <div class="job-title-main">Logistics & Operations</div>
+        <div class="job-org">Performance Auto Group · Niagara Region, Ontario</div>
+        <p class="job-desc">Primary employment funding independent research operations. 12 years prior management experience. Background in Apple product support during early iPhone launch cycles. Demonstrated capacity to operate at full research output while maintaining parallel professional obligations.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── WHAT I'M SEEKING ── -->
+  <section>
+    <div class="section-label">What I Am Seeking</div>
+    <div class="method-grid">
+      <div class="method-block">
+        <div class="method-title">Independent Research Fellowship</div>
+        <p class="method-text">Santa Fe Institute, Perimeter Institute, CSER Cambridge, Future of Humanity Institute, or equivalent. Positions designed for thinkers who do not fit departmental boxes.</p>
+      </div>
+      <div class="method-block">
+        <div class="method-title">Senior Advisor — Existential Risk / Planetary Resilience</div>
+        <p class="method-text">Government bodies, UN agencies, major foundations, or private organizations building serious civilizational resilience infrastructure. The Extinction Codex is the credential.</p>
+      </div>
+      <div class="method-block">
+        <div class="method-title">Chief Science Officer / Research Director</div>
+        <p class="method-text">Organizations requiring someone who can operate simultaneously across multiple scientific domains, produce original frameworks, and translate complex systems into actionable intelligence.</p>
+      </div>
+      <div class="method-block">
+        <div class="method-title">Visiting Scholar / Affiliate Researcher</div>
+        <p class="method-text">University of Waterloo, McMaster, University of Toronto, or equivalent. Interdisciplinary futures, complex systems, or planetary science programs. Niagara Region based; remote-capable.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <div class="cta-block">
+    <div class="cta-title">Open For Contact</div>
+    <p class="cta-sub">If you are building something that requires thinking no single discipline can provide, this is the conversation.</p>
+    <div class="contact-grid">
+      <a href="mailto:jubecrew@gmail.com" class="contact-item primary">
+        ✉ jubecrew@gmail.com
+      </a>
+      <a href="https://orcid.org/0009-0004-1363-304X" target="_blank" class="contact-item">
+        ORCID Profile →
+      </a>
+      <a href="https://zenodo.org/search?q=presignal+carter" target="_blank" class="contact-item">
+        Full Portfolio on Zenodo →
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="container">
+    © 2026 John Ernest Carter · Presignal Research Initiative · Niagara Region, Ontario, Canada · All research CC BY 4.0
+  </div>
+</footer>
+
+</body>
+</html>
