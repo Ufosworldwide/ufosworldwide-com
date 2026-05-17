@@ -15,21 +15,222 @@
     </script>
 
     <style>
-        body { background-color: #0a0a0a; color: #00ff41; font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
-        .dashboard { border: 1px solid #00ff41; padding: 20px; box-shadow: 0 0 15px #00ff41; background: rgba(0, 20, 0, 0.9); width: 100%; max-width: 900px; }
-        h1 { font-size: 1.2rem; border-bottom: 1px solid #00ff41; padding-bottom: 10px; color: #00ff41; text-align: center; letter-spacing: 2px; }
-        .section-header { color: #00ffff; font-size: 0.9rem; margin: 20px 0 10px 0; border-left: 3px solid #00ffff; padding-left: 10px; text-transform: uppercase; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; }
-        .card { border: 1px solid #222; padding: 10px; background: rgba(0,0,0,0.6); }
-        .link { color: #fff; text-decoration: none; font-size: 0.8rem; font-weight: bold; display: block; }
-        .link:hover { color: #00ff41; }
-        .live-counter { background: #000; border: 1px solid #444; padding: 10px; margin-bottom: 20px; text-align: center; }
-        .count-number { font-size: 2.5rem; color: #00ffff; text-shadow: 0 0 10px #00ffff; }
-        .inquiry-port { margin-top: 25px; border: 1px solid #00ffff; padding: 15px; background: rgba(0, 20, 40, 0.5); }
-        textarea { width: 100%; background: #000; color: #00ff41; border: 1px solid #00ff41; padding: 10px; box-sizing: border-box; resize: none; font-family: monospace; }
-        button { background: #00ff41; color: #000; border: none; padding: 12px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; text-transform: uppercase; }
+        body { 
+            background-color: #0a0a0a; 
+            color: #00ff41; 
+            font-family: 'Courier New', Courier, monospace; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px; 
+            margin: 0; 
+            min-height: 100vh;
+        }
+        
+        .dashboard { 
+            border: 1px solid #00ff41; 
+            padding: 30px; 
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.2); 
+            background: rgba(0, 10, 0, 0.95); 
+            width: 100%; 
+            max-width: 950px; 
+            box-sizing: border-box;
+        }
+        
+        h1 { 
+            font-size: 1.3rem; 
+            border-bottom: 1px solid #00ff41; 
+            padding-bottom: 15px; 
+            color: #00ff41; 
+            text-align: center; 
+            letter-spacing: 3px; 
+            margin-top: 0;
+        }
+        
+        .live-counter { 
+            background: #000; 
+            border: 1px solid #222; 
+            padding: 15px; 
+            margin-bottom: 35px; 
+            text-align: center; 
+        }
+        
+        .count-number { 
+            font-size: 2.8rem; 
+            color: #00ffff; 
+            text-shadow: 0 0 12px #00ffff; 
+            font-weight: bold;
+        }
+
+        /* Honeycomb Structural Framework (Fibonacci-Inspired Scaling Layer) */
+        .honeycomb-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 0;
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .hc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 160px);
+            grid-gap: 22px 12px;
+            justify-content: center;
+        }
+
+        /* Structural offset calculations to interlock the lines */
+        .hc-grid > div:nth-child(4n+3), 
+        .hc-grid > div:nth-child(4n+4) {
+            transform: translateY(53px);
+        }
+
+        /* Adjust grid height boundaries to account for downward transform offsets */
+        .hc-grid {
+            padding-bottom: 60px;
+        }
+
+        .hexagon {
+            position: relative;
+            width: 160px;
+            height: 92.38px; /* Correct geometry aspect ratio for perfect hexagon bounds */
+            background-color: rgba(0, 5, 0, 0.8);
+            margin: 46.19px 0;
+            border-left: 2px solid #00ff41;
+            border-right: 2px solid #00ff41;
+            transition: all 0.35s ease-in-out;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+        }
+
+        /* Hexagonal Dynamic Line Pseudo Elements */
+        .hexagon::before, .hexagon::after {
+            content: "";
+            position: absolute;
+            width: 113.14px;
+            height: 113.14px;
+            transform: scaleY(0.5774) rotate(-45deg);
+            background-color: inherit;
+            left: 21.43px;
+            transition: all 0.35s ease-in-out;
+            z-index: 1;
+        }
+
+        .hexagon::before {
+            top: -56.57px;
+            border-top: 2px solid #00ff41;
+            border-right: 2px solid #00ff41;
+        }
+
+        .hexagon::after {
+            bottom: -56.57px;
+            border-bottom: 2px solid #00ff41;
+            border-left: 2px solid #00ff41;
+        }
+
+        /* Interconnected Node Accent Rings to visually simulate physical connectivity lines */
+        .hex-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 10;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .hex-title {
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .hex-meta {
+            color: #00ffff;
+            font-size: 0.55rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Geometric Interaction Handlers */
+        .hexagon:hover {
+            background-color: rgba(0, 35, 15, 0.9);
+            border-left: 2px solid #00ffff;
+            border-right: 2px solid #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            transform: scale(1.05);
+            z-index: 20;
+        }
+
+        .hexagon:hover::before {
+            border-top: 2px solid #00ffff;
+            border-right: 2px solid #00ffff;
+        }
+
+        .hexagon:hover::after {
+            border-bottom: 2px solid #00ffff;
+            border-left: 2px solid #00ffff;
+        }
+
+        .hexagon:hover .hex-title {
+            color: #00ff41;
+        }
+
+        .hexagon:hover .hex-meta {
+            color: #fff;
+            text-shadow: 0 0 5px #fff;
+        }
+
+        /* Content Wrappers for Anchor Layers */
+        .hexagon a {
+            text-decoration: none;
+            position: absolute;
+            top: -46.19px;
+            left: 0;
+            width: 160px;
+            height: 184.76px;
+            z-index: 15;
+        }
+
+        .node-annotation {
+            color: #00ffff;
+            font-size: 0.85rem;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            border-left: 3px solid #00ffff;
+            padding-left: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            width: 100%;
+        }
+
         .blink { animation: blinker 1.5s linear infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
+
+        @media (max-width: 768px) {
+            .hc-grid {
+                grid-template-columns: repeat(2, 160px);
+            }
+            .hc-grid > div:nth-child(4n+3), 
+            .hc-grid > div:nth-child(4n+4) {
+                transform: none;
+            }
+            .hc-grid > div:nth-child(2n+2) {
+                transform: translateY(53px);
+            }
+            .hc-grid {
+                padding-bottom: 60px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -38,22 +239,106 @@
         <h1>NIAGARA NODE: MASTER BEACON v4.2 <span class="blink">●</span></h1>
         
         <div class="live-counter">
-            <div style="font-size: 0.7rem; color: #888; letter-spacing: 1px;">TOTAL GHOST SIGNALS DETECTED</div>
+            <div style="font-size: 0.7rem; color: #888; letter-spacing: 1px;">TOTAL SIGNAL ANOMALIES PROCESSED</div>
             <div id="signal-count" class="count-number">1502</div>
         </div>
 
-        <div class="section-header">Field Instrumentation Suite</div>
-        <div class="grid">
-            <div class="card"><a href="https://ufosworldwide.com/app" class="link">UFOs Worldwide Hub</a></div>
-            <div class="card"><a href="https://aeroscopeuap.netlify.app/" class="link">Aeroscope UAP</a></div>
-            <div class="card"><a href="https://signalscopex11.netlify.app/" class="link">SignalScope X11</a></div>
-            <div class="card"><a href="https://ether-listen.netlify.app/" class="link">Ether-Listen</a></div>
-            <div class="card"><a href="https://veilofash.netlify.app/" class="link">Veil of Ash</a></div>
-            <div class="card"><a href="https://thornsignal.netlify.app/" class="link">Thorn Signal</a></div>
-            <div class="card"><a href="https://admirable-queijadas-b90981.netlify.app/" class="link">Metadata Processor</a></div>
-        </div>
+        <div class="node-annotation">Interconnected Matrix Array</div>
 
-        <div class="section-header">Scientific Core (The 11 Pillars)</div>
-        <div class="grid">
-            <div class="card"><a href="https://doi.org/10.31223/X5J47D" class="link">10.31223/X5J47D (GPDM)</a></div>
-            <div class="card"><a href="https://doi.org/10.5281/zenodo.19653415" class="link">10.52
+        <div class="honeycomb-container">
+            <div class="hc-grid">
+                
+                <div class="hexagon">
+                    <a href="https://ufosworldwide.com/app" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">UFOs Worldwide</span>
+                        <span class="hex-meta">CORE HUB</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="https://aeroscopeuap.netlify.app/" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">Aeroscope UAP</span>
+                        <span class="hex-meta">RADAR FEED</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="https://signalscopex11.netlify.app/" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">SignalScope X11</span>
+                        <span class="hex-meta">RF INSTRUMENT</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="https://ether-listen.netlify.app/" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">Ether Listen</span>
+                        <span class="hex-meta">FLUX SENSOR</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="https://veilofash.netlify.app/" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">Veil of Ash</span>
+                        <span class="hex-meta">SIMULATION</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="https://thornsignal.netlify.app/" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">Thorn Signal</span>
+                        <span class="hex-meta">TERMINAL</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="https://admirable-queijadas-b90981.netlify.app/" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">Metadata Proc</span>
+                        <span class="hex-meta">DATA MATRIX</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="www.ufosworldwide.myresume.html" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">Corporate Dossier</span>
+                        <span class="hex-meta">MYRESUME.HTML</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="https://doi.org/10.31223/X5J47D" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">GPDM Model</span>
+                        <span class="hex-meta">DOI: X5J47D</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="https://doi.org/10.5281/zenodo.19653415" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">Zenodo Core</span>
+                        <span class="hex-meta">DATASET REPO</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="https://orcid.org/0009-0004-1363-304X" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">ORCID Registry</span>
+                        <span class="hex-meta">0009-0004-1363-304X</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
