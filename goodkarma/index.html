@@ -1,66 +1,828 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GoodKarma — Honest Customer Experience Certification</title>
-    <style>
-        body { font-family: system-ui, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; line-height: 1.6; }
-        h1, h2 { color: #0d6efd; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        .badge { background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 12px 24px; border-radius: 8px; font-weight: bold; display: inline-block; }
-        .good { color: #28a745; }
-        .bad { color: #dc3545; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good Karma — Niagara Falls</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #2D6A4F;
+    --green-mid: #40916C;
+    --green-light: #74C69D;
+    --green-faint: #D8F3DC;
+    --gold: #B7950B;
+    --gold-light: #F9E79F;
+    --cream: #FAFAF7;
+    --dark: #1A2E1A;
+    --mid: #4A5568;
+    --soft: #9CA3AF;
+    --border: rgba(45,106,79,0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    font-weight: 300;
+  }
+
+  /* NAV */
+  nav {
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--cream);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .logo span { color: var(--gold); }
+
+  .nav-right {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .nav-right a {
+    font-size: 13px;
+    color: var(--mid);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.2s;
+  }
+
+  .nav-right a:hover { color: var(--green); }
+
+  .btn {
+    background: var(--green);
+    color: white;
+    padding: 10px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+
+  .btn:hover { background: var(--green-mid); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--green);
+    border: 1px solid var(--green);
+    padding: 10px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .btn-outline:hover {
+    background: var(--green);
+    color: white;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 80px 40px 60px;
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--green-faint);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+    letter-spacing: 0.06em;
+  }
+
+  .badge-pill::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--green-light);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 7vw, 72px);
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--dark);
+    margin-bottom: 12px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--green);
+  }
+
+  .hero p {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--mid);
+    margin-bottom: 36px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* HOW IT WORKS */
+  .section {
+    padding: 72px 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green-mid);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  .section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 48px;
+    line-height: 1.15;
+  }
+
+  .section h2 em {
+    font-style: italic;
+    color: var(--green);
+  }
+
+  /* STEPS */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  .step {
+    padding: 32px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    position: relative;
+    transition: box-shadow 0.3s;
+  }
+
+  .step:hover {
+    box-shadow: 0 8px 32px rgba(45,106,79,0.08);
+  }
+
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    color: var(--green-faint);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .step h3 {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--dark);
+    margin-bottom: 10px;
+  }
+
+  .step p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--mid);
+  }
+
+  /* SCORECARD */
+  .scorecard {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .scorecard-header {
+    background: var(--green);
+    color: white;
+    padding: 20px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .scorecard-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 400;
+  }
+
+  .score-total {
+    font-size: 13px;
+    opacity: 0.8;
+  }
+
+  .scorecard-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 16px;
+    padding: 16px 28px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    transition: background 0.2s;
+  }
+
+  .scorecard-row:hover { background: var(--green-faint); }
+  .scorecard-row:last-child { border-bottom: none; }
+
+  .criteria-name {
+    font-size: 14px;
+    color: var(--dark);
+  }
+
+  .criteria-detail {
+    font-size: 12px;
+    color: var(--soft);
+    margin-top: 2px;
+  }
+
+  .criteria-pts {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--green);
+    white-space: nowrap;
+  }
+
+  .criteria-bar {
+    width: 80px;
+    height: 4px;
+    background: var(--green-faint);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .criteria-bar-fill {
+    height: 100%;
+    background: var(--green-light);
+    border-radius: 2px;
+  }
+
+  .scorecard-footer {
+    padding: 20px 28px;
+    background: var(--green-faint);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .threshold {
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  /* BADGE */
+  .badge-section {
+    background: var(--green);
+    padding: 72px 40px;
+    text-align: center;
+    color: white;
+  }
+
+  .gk-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    color: var(--green);
+    padding: 24px 40px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+
+  .gk-badge-icon { font-size: 36px; }
+
+  .gk-badge-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--green);
+  }
+
+  .gk-badge-sub {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--soft);
+  }
+
+  .badge-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    margin-bottom: 16px;
+  }
+
+  .badge-section p {
+    font-size: 16px;
+    opacity: 0.8;
+    max-width: 520px;
+    margin: 0 auto 36px;
+    line-height: 1.7;
+  }
+
+  /* DIRECTORY */
+  .directory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .biz-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    transition: box-shadow 0.3s;
+    position: relative;
+  }
+
+  .biz-card:hover {
+    box-shadow: 0 8px 32px rgba(45,106,79,0.08);
+  }
+
+  .biz-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--green-faint);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+
+  .biz-category {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--soft);
+    margin-bottom: 8px;
+  }
+
+  .biz-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 8px;
+  }
+
+  .biz-desc {
+    font-size: 13px;
+    color: var(--mid);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .biz-score {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 500;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+
+  .stars { color: var(--gold); font-size: 14px; }
+
+  /* FEEDBACK FORM */
+  .feedback-section {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 48px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .feedback-section h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--dark);
+    margin-bottom: 8px;
+  }
+
+  .feedback-section > p {
+    font-size: 14px;
+    color: var(--mid);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--dark);
+    margin-bottom: 6px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--dark);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--green-mid);
+  }
+
+  .form-group textarea { resize: vertical; min-height: 100px; }
+
+  .form-note {
+    font-size: 12px;
+    color: var(--soft);
+    margin-top: 6px;
+  }
+
+  .form-rule {
+    background: var(--green-faint);
+    border-left: 3px solid var(--green);
+    padding: 12px 16px;
+    border-radius: 0 4px 4px 0;
+    font-size: 13px;
+    color: var(--green);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  /* SUBMIT SECTION */
+  .submit-section {
+    background: var(--dark);
+    padding: 72px 40px;
+    text-align: center;
+    color: white;
+  }
+
+  .submit-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    margin-bottom: 16px;
+  }
+
+  .submit-section p {
+    font-size: 16px;
+    opacity: 0.7;
+    max-width: 480px;
+    margin: 0 auto 36px;
+    line-height: 1.7;
+  }
+
+  .submit-input-row {
+    display: flex;
+    gap: 12px;
+    max-width: 500px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .submit-input-row input {
+    flex: 1;
+    min-width: 240px;
+    padding: 14px 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .submit-input-row input::placeholder { color: rgba(255,255,255,0.35); }
+  .submit-input-row input:focus { border-color: var(--green-light); }
+
+  .btn-green {
+    background: var(--green-mid);
+    color: white;
+    padding: 14px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-green:hover { background: var(--green-light); color: var(--dark); }
+
+  .submit-note {
+    font-size: 12px;
+    opacity: 0.4;
+    margin-top: 16px;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 40px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .footer-copy {
+    font-size: 12px;
+    color: var(--soft);
+  }
+
+  .footer-tagline {
+    font-size: 12px;
+    color: var(--soft);
+    font-style: italic;
+  }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero > * {
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero > *:nth-child(1) { animation-delay: 0s; }
+  .hero > *:nth-child(2) { animation-delay: 0.1s; }
+  .hero > *:nth-child(3) { animation-delay: 0.2s; }
+  .hero > *:nth-child(4) { animation-delay: 0.3s; }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .steps { grid-template-columns: 1fr; }
+    .section { padding: 48px 20px; }
+    .feedback-section { padding: 32px 24px; }
+    footer { flex-direction: column; text-align: center; }
+    .scorecard-row { grid-template-columns: 1fr auto; }
+    .criteria-bar { display: none; }
+  }
+</style>
 </head>
 <body>
 
-<h1>GoodKarma</h1>
-<p><strong>Honest Customer Experience Certification</strong> — Real signals. Transparent standards. Updated regularly.</p>
+<!-- NAV -->
+<nav>
+  <div class="logo">Good<span>Karma</span> <span style="font-size:13px;color:var(--soft);font-family:'DM Sans',sans-serif;font-weight:300;">Niagara</span></div>
+  <div class="nav-right">
+    <a href="#how">How It Works</a>
+    <a href="#directory">Directory</a>
+    <a href="#feedback">Leave Feedback</a>
+    <a href="#submit" class="btn">Submit Your Business</a>
+  </div>
+</nav>
 
-<div class="badge">GoodKarma Certified ✓</div>
+<!-- HERO -->
+<section class="hero">
+  <div class="badge-pill">Niagara Falls · Est. 2026</div>
+  <h1>Real businesses.<br><em>Honest karma.</em></h1>
+  <p>Good Karma independently audits Niagara Falls businesses and certifies the ones that genuinely serve their customers, their staff, and their community. Free to list. Real to earn.</p>
+  <div class="hero-btns">
+    <a href="#directory" class="btn">Browse Certified Businesses</a>
+    <a href="#submit" class="btn-outline">Get Your Business Listed</a>
+  </div>
+</section>
 
-<h2>How It Works</h2>
-<p>Businesses and websites are evaluated on real customer experience signals. If they meet high standards, they earn a public GoodKarma badge. Once certified, they are reviewed yearly. If standards slip, they move to BadKarma until fixed.</p>
+<hr class="divider">
 
-<h2>GoodKarma Scorecard (Transparent Criteria)</h2>
-<table>
-    <tr><th>Criteria</th><th>Points</th><th>Threshold for GoodKarma</th></tr>
-    <tr><td>Review Rating (Google, Trustpilot, etc.)</td><td>25</td><td>≥4.3 stars + recent activity</td></tr>
-    <tr><td>Complaint Resolution</td><td>20</td><td>Most public complaints addressed promptly</td></tr>
-    <tr><td>Transparency (Contact, Policies, Address)</td><td>15</td><td>Clear and verifiable</td></tr>
-    <tr><td>Website Security &amp; Quality</td><td>10</td><td>HTTPS, fast, mobile-friendly, no major flags</td></tr>
-    <tr><td>Business Longevity &amp; History</td><td>10</td><td>Clean record, reasonable domain age</td></tr>
-    <tr><td>Fulfillment &amp; Delivery Signals</td><td>10</td><td>Clear shipping/return policy, low red flags</td></tr>
-    <tr><td>No Major Red Flags</td><td>10</td><td>No scam reports, fake reviews, etc.</td></tr>
-</table>
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="section-label">How It Works</div>
+  <h2>Three steps to <em>Good Karma</em></h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Submit Your Business</h3>
+      <p>Enter your business name, website, and email. We index you automatically and notify you that your listing is live. Free. Takes 60 seconds.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>We Audit Your Standards</h3>
+      <p>A Good Karma auditor reviews your business against our scorecard — transparency, complaint resolution, community contribution, and customer experience.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>Earn Your Badge</h3>
+      <p>Score 75 or above and you receive the Good Karma badge to display on your website. Reviewed yearly. Honest standards. No pay-to-win.</p>
+    </div>
+  </div>
+</section>
 
-<p><strong>GoodKarma:</strong> 75+ points → Green Badge<br>
-<strong>BadKarma:</strong> Below threshold or serious issues → Public warning</p>
+<hr class="divider">
 
-<h2>GoodKarma Certified Sites</h2>
-<p><em>Directory coming soon. Currently accepting applications.</em></p>
+<!-- SCORECARD -->
+<section class="section">
+  <div class="section-label">The Standard</div>
+  <h2>What we actually <em>measure</em></h2>
+  <div class="scorecard">
+    <div class="scorecard-header">
+      <h3>Good Karma Scorecard</h3>
+      <span class="score-total">100 points total · 75 to certify</span>
+    </div>
+    <div class="scorecard-row">
+      <div>
+        <div class="criteria-name">Customer Experience</div>
+        <div class="criteria-detail">Reviews, response rate, complaint resolution</div>
+      </div>
+      <div class="criteria-bar"><div class="criteria-bar-fill" style="width:25%"></div></div>
+      <div class="criteria-pts">25 pts</div>
+    </div>
+    <div class="scorecard-row">
+      <div>
+        <div class="criteria-name">Transparency</div>
+        <div class="criteria-detail">Clear contact info, honest policies, real address</div>
+      </div>
+      <div class="criteria-bar"><div class="criteria-bar-fill" style="width:20%"></div></div>
+      <div class="criteria-pts">20 pts</div>
+    </div>
+    <div class="scorecard-row">
+      <div>
+        <div class="criteria-name">Community Contribution</div>
+        <div class="criteria-detail">Local employment, community involvement, fair treatment</div>
+      </div>
+      <div class="criteria-bar"><div class="criteria-bar-fill" style="width:20%"></div></div>
+      <div class="criteria-pts">20 pts</div>
+    </div>
+    <div class="scorecard-row">
+      <div>
+        <div class="criteria-name">Service Quality</div>
+        <div class="criteria-detail">Delivers what it promises, consistent standards</div>
+      </div>
+      <div class="criteria-bar"><div class="criteria-bar-fill" style="width:20%"></div></div>
+      <div class="criteria-pts">20 pts</div>
+    </div>
+    <div class="scorecard-row">
+      <div>
+        <div class="criteria-name">Clean Record</div>
+        <div class="criteria-detail">No serious complaints, no fraud flags, no deceptive practices</div>
+      </div>
+      <div class="criteria-bar"><div class="criteria-bar-fill" style="width:15%"></div></div>
+      <div class="criteria-pts">15 pts</div>
+    </div>
+    <div class="scorecard-footer">
+      <span class="threshold">✓ Good Karma: 75+ points</span>
+      <span class="threshold" style="color:#dc3545">✗ Needs Improvement: Below 75</span>
+    </div>
+  </div>
+</section>
 
-<h2>BadKarma List</h2>
-<p><em>Sites that failed to maintain standards. Updated yearly.</em></p>
+<!-- BADGE -->
+<section class="badge-section">
+  <div class="gk-badge">
+    <div class="gk-badge-icon">🌿</div>
+    <div class="gk-badge-title">Good Karma Certified</div>
+    <div class="gk-badge-sub">Niagara Falls · Audited 2026</div>
+  </div>
+  <h2>The badge means something</h2>
+  <p>When a business displays the Good Karma badge, visitors know it has been independently audited — not just reviewed by strangers online. It's earned, not bought.</p>
+  <a href="#submit" class="btn" style="background:white;color:var(--green);">Apply for Certification</a>
+</section>
 
-<h2>Apply for GoodKarma Certification</h2>
-<p><a href="YOUR_GOOGLE_FORM_LINK_HERE" target="_blank">Submit Your Website for Review →</a></p>
-<p>Free. Transparent. We review based on public customer signals.</p>
+<!-- DIRECTORY -->
+<section class="section" id="directory">
+  <div class="section-label">Certified Businesses</div>
+  <h2>Niagara's <em>Good Karma</em> directory</h2>
+  <div class="directory-grid">
 
-<h2>GoodKarma Badge Code (for certified sites)</h2>
-<pre>
-&lt;a href="https://www.ufosworldwide.com/goodkarma" target="_blank"&gt;
-  &lt;img src="https://www.ufosworldwide.com/goodkarma-badge.png" alt="GoodKarma Certified" style="height:60px;"&gt;
-&lt;/a&gt;
-</pre>
+    <!-- PLACEHOLDER CARDS — replace with real businesses -->
+    <div class="biz-card">
+      <div class="biz-badge">✓ Certified</div>
+      <div class="biz-category">Restaurant</div>
+      <div class="biz-name">Your Business Here</div>
+      <div class="biz-desc">This is where your certified Niagara Falls businesses will appear. Submit your business to be considered for Good Karma certification.</div>
+      <div class="biz-score">
+        <span class="stars">★★★★★</span>
+        <span>Karma Score: 88/100</span>
+      </div>
+    </div>
 
-<p>This badge links back to this page and updates if status changes.</p>
+    <div class="biz-card">
+      <div class="biz-badge">✓ Certified</div>
+      <div class="biz-category">Tourism Experience</div>
+      <div class="biz-name">Your Business Here</div>
+      <div class="biz-desc">Certified businesses receive a badge, a directory listing, and direct customer feedback that helps them improve — not just a star rating.</div>
+      <div class="biz-score">
+        <span class="stars">★★★★★</span>
+        <span>Karma Score: 91/100</span>
+      </div>
+    </div>
 
-<hr>
-<p><strong>Operated independently from www.ufosworldwide.com</strong> — Goal: Maximum truth and good customer experiences on the internet.</p>
-<p>Last updated: May 2026 | Yearly reviews</p>
+    <div class="biz-card">
+      <div class="biz-badge">✓ Certified</div>
+      <div class="biz-category">Hotel & Accommodation</div>
+      <div class="biz-name">Your Business Here</div>
+      <div class="biz-desc">Good Karma is free to join. The certification is earned through a genuine audit — not a payment. Submit your business today.</div>
+      <div class="biz-score">
+        <span class="stars">★★★★☆</span>
+        <span>Karma Score: 79/100</span>
+      </div>
+    </div>
 
-</body>
-</html>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- FEEDBACK -->
+<section class="section" id="feedback">
+  <div class="section-label">Customer Feedback</div>
+  <h2>Tell us what <em>actually happened</em></h2>
+  <div class="feedback-section">
+    <h3>Leave honest feedback</h3>
+    <p>Your feedback goes directly to the busines
