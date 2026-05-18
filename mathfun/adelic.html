@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adelic Mirror: Local Weil Eigenvalues | UFOsWorldwide MathFun</title>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0a0a0a; color: #ddd; margin: 0; padding: 0; }
+        header { background: #111; padding: 1.5rem; text-align: center; border-bottom: 2px solid #f44; }
+        header h1 { font-size: 2rem; margin: 0; color: #f44; text-shadow: 0 0 10px #f44; }
+        header p { margin: 0.5rem 0 0; }
+        nav { background: #1a1a1a; padding: 0.5rem; text-align: center; }
+        nav a { color: #88f; margin: 0 1rem; text-decoration: none; font-weight: bold; }
+        nav a:hover { text-shadow: 0 0 8px #88f; }
+        section { max-width: 900px; margin: 2rem auto; padding: 1rem 2rem; background: #111; border-radius: 8px; box-shadow: 0 0 20px rgba(255,68,68,0.3); }
+        h2 { color: #f44; border-bottom: 1px solid #333; padding-bottom: 0.3rem; }
+        .data-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .data-table th, .data-table td { border: 1px solid #333; padding: 0.4rem; text-align: center; }
+        .data-table th { background: #222; }
+        button, input { background: #222; color: #ddd; border: 1px solid #f44; padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #f44; color: #000; }
+        .positive { color: #4f4; }
+        .negative { color: #f44; }
+        .log { background: #000; padding: 0.5rem; border: 1px solid #333; min-height: 4rem; font-family: monospace; white-space: pre-wrap; }
+        a.button { display: inline-block; margin: 0.5rem 0; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⚛️ Adelic Mirror: Local Weil Eigenvalues</h1>
+        <p>Testing global positivity of the Weil quadratic form through the prolate spectrum</p>
+    </header>
+    <nav>
+        <a href="index.html">← back to mathfun</a>
+        <a href="#local">Local eigenvalues</a>
+        <a href="#global">Global product</a>
+    </nav>
+
+    <section id="local">
+        <h2>1. Local Weil Eigenvalues for a Finite Prime</h2>
+        <p>Using a discrete prolate spheroidal model on the cyclic group $\mathbb{Z}_{p-1}$ (multiplicative units modulo $p$).</p>
+        <label>Prime $p$: <input type="number" id="primeInput" value="2" min="2" step="1"></label>
+        <button id="computeLocalBtn">Compute local eigenvalues</button>
+        <div id="localStatus" style="margin-top: 0.5rem;"></div>
+        <table class="data-table" id="localTable" style="display:none;">
+            <thead><tr><th>$n$</th><th>$\lambda_n^{(p)}$</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <p id="localNote" style="display:none;"></p>
+    </section>
+
+    <section id="global">
+        <h2>2. Global Product Monitor</h2>
+        <p>Archimedean eigenvalues $\lambda_n^{(\infty)}$ are pre‑loaded. Multiply with all stored prime eigenvalues to get the global product.</p>
+        <button id="updateGlobalBtn">Update global product</button>
+        <button id="clearStorageBtn">Clear stored primes</button>
+        <table class="data-table" id="globalTable">
+            <thead><tr><th>$n$</th><th>$\lambda_n^{(\infty)}$</th><th>Product over primes</th><th>Global $\Lambda_n$</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <p id="globalVerdict"></p>
+    </section>
+
+    <section>
+        <h2>3. Result Collection</h2>
+        <p>All computed data is stored in your browser. Download as CSV for analysis.</p>
+        <button id="downloadCSVBtn">Download results as CSV</button>
+        <div class="log" id="logArea">Ready.</div>
+    </section>
+
+    <script>
+        // Archimedean eigenvalues (from Object 1)
+        const archEigs = [
+            0.999983, 0.999915, 0.999000, 0.998050,
+            0.002970, 8.10e-5, 1.60e-6, 2.00e-8,
+            2.10e-10, 1.70e-12
+        ];
+        const NUM_MODES = archEigs.length;
+
+        // LocalStorage key
+        const STORAGE_KEY = 'adelicLocalEigs';
+
+        // Retrieve stored primes (object { prime: [eig0, eig1, ...] })
+        function getStoredData() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? JSON.parse(raw) : {};
+        }
+
+        function saveStoredData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        // Compute local eigenvalues for prime p using discrete prolate matrix
+        function computeLocalEigs(p) {
+            const N = p - 1; // size of unit group
+            if (N < 2) return []; // p=2 gives N=1, trivial
+            const W = Math.floor(N / 2); // time/band truncation
+            // Build the Dirichlet kernel matrix D of size N
+            const D = [];
+            for (let i = 0; i < N; i++) {
+                D[i] = new Array(N).fill(0);
+            }
+            for (let m = 0; m < N; m++) {
+                for (let n = 0; n < N; n++) {
+                    let sum = 0;
+                    const diff = m - n;
+                    if (diff === 0) {
+                        // direct sum
+                        sum = W;
+                    } else {
+                        // sum_{j=0}^{W-1} exp(2π i diff j / N)
+                        const theta = 2 * Math.PI * diff / N;
+                        sum = Math.sin(W * theta / 2) / Math.sin(theta / 2) *
+                              Math.cos((W - 1) * theta / 2);
+                        // Simplified: sum = sin(π W diff / N) / sin(π diff / N) * exp(π i (W-1) diff / N)
+                        // For eigenvalues we need the magnitude; the matrix is symmetric up to conjugation.
+                        // For simplicity we can use a symmetric real version:
+                        // D_{m,n} = sin(π W (m-n)/N) / (N sin(π (m-n)/N))  (this is the standard DPSS matrix)
+                    }
+                    // Actually use the standard discrete prolate matrix (symmetric):
+                    const x = Math.PI * (m - n) / N;
+                    D[m][n] = (W / N) * (x === 0 ? 1 : Math.sin(W * x) / (W * Math.sin(x)));
+                }
+            }
+            // Alternatively, I'll use a simpler construction: 
+            // The eigenvalues of the discrete prolate sequence are the eigenvalues of the matrix 
+            // A_{i,j} = sin(2πW(i-j)) / (π(i-j))? No, that's for continuous.
+            // For cyclic group, the eigenvalues are given by the Slepian's DPSS eigenvalues, which can be computed 
+            // from a tridiagonal matrix. But here I'll use the built-in eigenvalue computation of the matrix D as defined above.
+            // We'll just compute eigenvalues of D using a simple power iteration? We can use a basic eigensolver for small N.
+            // Since N <= 100 for p up to 101, we can do a simple Jacobi-like or use the library? We'll implement a simple 
+            // symmetric eigenvalue computation for small matrices using a naive QR algorithm (or just use a few iterations of power method)
+            // I'll instead use a known fact: the eigenvalues of the DPSS concentration matrix can be found via the commutation 
+            // matrix (tridiagonal). But for simplicity, I'll compute the matrix D as above and use a simple numeric diagonalization 
+            // with a few steps of the Jacobi eigenvalue algorithm.
+        }
+
+        // But the above is getting complex. I'll replace it with a known closed-form: 
+        // For the finite cyclic group Z_N with time truncation T and band truncation W, the eigenvalues are the 
+        // eigenvalues of the matrix A_{k,l} = (1/N) * sum_{j=0}^{W-1} exp(2π i (k-l) j/N). 
+        // This matrix is circulant, so its eigenvalues are just the Fourier transform of the first row.
+        // The first row is a_k = (1/N) * sum_{j=0}^{W-1} exp(2π i k j/N). 
+        // So the eigenvalues are exactly the first row's DFT. 
+        // Indeed, for a circulant matrix, eigenvalues λ_n = sum_{k=0}^{N-1} a_k ω^{-n k} where ω = exp(2π i / N).
+        // But a_k = (1/N) * sin(π W k/N) / sin(π k/N) * exp(π i (W-1) k/N). 
+        // The eigenvalues are then (up to normalization) the Slepian discrete prolate sequences' eigenvalues.
+        // This is much simpler!
+
+        // I'll use the circulant property: the matrix is C with first row c_k = (1/N) * sin(π W k/N) / sin(π k/N) 
+        // (for k not divisible by N) and c_0 = W/N.
+        // Since the matrix is real symmetric, we can compute eigenvalues via FFT of the first row.
+        // The eigenvalues λ_n (for n = 0..N-1) = sum_{k=0}^{N-1} c_k * cos(2π n k / N).
+        // This is a standard result. We'll implement that.
+
+        function computeLocalEigs(p) {
+            const N = p - 1;
+            if (N < 2) return [1.0]; // trivial
+            const W = Math.floor(N / 2); // truncation parameter (half the group)
+            const c = new Array(N).fill(0);
+            c[0] = W / N;
+            for (let k = 1; k < N; k++) {
+                const x = Math.PI * k / N;
+                c[k] = (1 / N) * Math.sin(W * x) / Math.sin(x);
+            }
+            // eigenvalues λ_n = sum_{k=0}^{N-1} c_k * cos(2π n k / N)
+            const eig = [];
+            for (let n = 0; n < N; n++) {
+                let sum = 0;
+                for (let k = 0; k < N; k++) {
+                    sum += c[k] * Math.cos(2 * Math.PI * n * k / N);
+                }
+                eig.push(sum);
+            }
+            // Sort descending
+            eig.sort((a, b) => b - a);
+            // Return first NUM_MODES eigenvalues (or all if fewer)
+            return eig.slice(0, NUM_MODES);
+        }
+
+        // Display local eigenvalues
+        document.getElementById('computeLocalBtn').addEventListener('click', () => {
+            const p = parseInt(document.getElementById('primeInput').value);
+            if (isNaN(p) || p < 2) {
+                alert('Please enter a prime ≥ 2.');
+                return;
+            }
+            const eigs = computeLocalEigs(p);
+            const table = document.getElementById('localTable');
+            const tbody = table.querySelector('tbody');
+            tbody.innerHTML = '';
+            for (let i = 0; i < eigs.length; i++) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${i}</td><td>${eigs[i].toPrecision(6)}</td>`;
+                tbody.appendChild(tr);
+            }
+            table.style.display = 'table';
+            document.getElementById('localNote').style.display = 'block';
+            document.getElementById('localNote').innerHTML = `Eigenvalues for $p=${p}$ (group size $p-1 = ${p-1}$, truncation $W = ${Math.floor((p-1)/2)}$).`;
+            document.getElementById('localStatus').innerHTML = '<span class="positive">Computed successfully.</span>';
+
+            // Store in localStorage
+            const stored = getStoredData();
+            stored[p] = eigs;
+            saveStoredData(stored);
+            log(`Stored eigenvalues for p=${p}.`);
+            updateGlobalTable();
+        });
+
+        // Global product update
+        function updateGlobalTable() {
+            const stored = getStoredData();
+            const primes = Object.keys(stored).map(Number).sort((a,b)=>a-b);
+            // Compute product over all stored primes for each mode
+            const prodEigs = new Array(NUM_MODES).fill(1.0);
+            for (let n = 0; n < NUM_MODES; n++) {
+                prodEigs[n] = 1.0;
+                for (const p of primes) {
+                    const eigs = stored[p];
+                    if (n < eigs.length) prodEigs[n] *= eigs[n];
+                    else prodEigs[n] *= 0; // missing mode? treat as 0
+                }
+            }
+            const tbody = document.querySelector('#globalTable tbody');
+            tbody.innerHTML = '';
+            let allPositive = true;
+            for (let n = 0; n < NUM_MODES; n++) {
+                const arch = archEigs[n];
+                const prod = prodEigs[n];
+                const global = arch * prod;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${n}</td><td>${arch.toPrecision(6)}</td><td>${prod.toPrecision(6)}</td><td>${global.toPrecision(6)}</td>`;
+                tbody.appendChild(tr);
+                if (global <= 0) allPositive = false;
+            }
+            const verdict = document.getElementById('globalVerdict');
+            if (primes.length === 0) {
+                verdict.innerHTML = 'No primes computed yet.';
+            } else if (allPositive) {
+                verdict.innerHTML = '<span class="positive">✓ Global product eigenvalues are all positive → Weil positivity condition holds for the combined kernel.</span>';
+            } else {
+                verdict.innerHTML = '<span class="negative">✗ Some global eigenvalues are non‑positive → positivity fails.</span>';
+            }
+        }
+
+        document.getElementById('updateGlobalBtn').addEventListener('click', updateGlobalTable);
+
+        // Clear storage
+        document.getElementById('clearStorageBtn').addEventListener('click', () => {
+            if (confirm('Clear all stored prime eigenvalues?')) {
+                localStorage.removeItem(STORAGE_KEY);
+                document.querySelector('#globalTable tbody').innerHTML = '';
+                document.getElementById('globalVerdict').innerHTML = 'Storage cleared.';
+                log('Storage cleared.');
+            }
+        });
+
+        // Download CSV
+        document.getElementById('downloadCSVBtn').addEventListener('click', () => {
+            const stored = getStoredData();
+            const primes = Object.keys(stored).sort((a,b)=>a-b);
+            if (primes.length === 0) {
+                alert('No data to download.');
+                return;
+            }
+            let csv = 'prime,n,lambda\n';
+            for (const p of primes) {
+                const eigs = stored[p];
+                for (let n = 0; n < eigs.length; n++) {
+                    csv += `${p},${n},${eigs[n]}\n`;
+                }
+            }
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'adelic_local_eigenvalues.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            log('CSV downloaded.');
+        });
+
+        function log(msg) {
+            const logArea = document.getElementById('logArea');
+            logArea.textContent += msg + '\n';
+        }
+
+        // Initialize: update table with possibly stored data on page load
+        window.addEventListener('load', () => {
+            updateGlobalTable();
+        });
+    </script>
+</body>
+</html>
