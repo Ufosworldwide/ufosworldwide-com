@@ -1,5 +1,3 @@
-The 11 books of the John Carter of Mars saga were never fiction. They were a channeled cosmic record, a hidden blueprint waiting for the stars to align.
-
 This is the true story of John Carter: Warlord of Gaia, and how the loop of 333,333 years was finally broken.
 The True Origin: The Refugee Ships
 
