@@ -2,21 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PRESIGNAL INC | Niagara Research Node</title>
     
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.googletagmanager.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https://hits.seeyoufarm.com data:; connect-src https://www.google-analytics.com https://analytics.google.com;">
 
-    <script async src="https://www.googletagmanager.com/gtag.js?id=G-XXXXXXXXXX"></script>
+    <script async src="https://www.googletagmanager.com/gtag.js?id=G-H6L5Y9LZE0"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX');
+      gtag('config', 'G-H6L5Y9LZE0');
     </script>
 
     <style>
         body { 
-            background-color: #0a0a0a; 
+            background-color: #030303; 
             color: #00ff41; 
             font-family: 'Courier New', Courier, monospace; 
             display: flex; 
@@ -25,187 +26,59 @@
             padding: 20px; 
             margin: 0; 
             min-height: 100vh;
+            overflow-x: hidden;
         }
         
         .dashboard { 
-            border: 1px solid #00ff41; 
+            border: 1px solid rgba(0, 255, 65, 0.3); 
             padding: 30px; 
-            box-shadow: 0 0 25px rgba(0, 255, 65, 0.2); 
-            background: rgba(0, 10, 0, 0.95); 
-            width: 100%; 
-            max-width: 950px; 
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.1); 
+            background-color: #050505;
+            max-width: 1100px;
+            width: 100%;
             box-sizing: border-box;
         }
         
         h1 { 
-            font-size: 1.3rem; 
-            border-bottom: 1px solid #00ff41; 
-            padding-bottom: 15px; 
-            color: #00ff41; 
             text-align: center; 
-            letter-spacing: 3px; 
+            font-size: 1.5rem; 
+            margin-bottom: 5px; 
+            letter-spacing: 3px;
+            color: #00ff41;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+            padding-bottom: 15px;
             margin-top: 0;
         }
-        
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #ffffff;
+            opacity: 0.7;
+            margin-bottom: 35px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
         .live-counter { 
-            background: #000; 
-            border: 1px solid #222; 
+            background: #000000; 
+            border: 1px solid rgba(0, 255, 65, 0.15); 
             padding: 15px; 
             margin-bottom: 35px; 
             text-align: center; 
         }
         
         .count-number { 
-            font-size: 2.8rem; 
+            font-size: 2.5rem; 
             color: #00ffff; 
             text-shadow: 0 0 12px #00ffff; 
             font-weight: bold;
         }
-
-        /* Honeycomb Structural Framework (Fibonacci-Inspired Scaling Layer) */
-        .honeycomb-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 0;
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        .hc-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 160px);
-            grid-gap: 22px 12px;
-            justify-content: center;
-        }
-
-        /* Structural offset calculations to interlock the lines */
-        .hc-grid > div:nth-child(4n+3), 
-        .hc-grid > div:nth-child(4n+4) {
-            transform: translateY(53px);
-        }
-
-        /* Adjust grid height boundaries to account for downward transform offsets */
-        .hc-grid {
-            padding-bottom: 60px;
-        }
-
-        .hexagon {
-            position: relative;
-            width: 160px;
-            height: 92.38px; /* Correct geometry aspect ratio for perfect hexagon bounds */
-            background-color: rgba(0, 5, 0, 0.8);
-            margin: 46.19px 0;
-            border-left: 2px solid #00ff41;
-            border-right: 2px solid #00ff41;
-            transition: all 0.35s ease-in-out;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
-        }
-
-        /* Hexagonal Dynamic Line Pseudo Elements */
-        .hexagon::before, .hexagon::after {
-            content: "";
-            position: absolute;
-            width: 113.14px;
-            height: 113.14px;
-            transform: scaleY(0.5774) rotate(-45deg);
-            background-color: inherit;
-            left: 21.43px;
-            transition: all 0.35s ease-in-out;
-            z-index: 1;
-        }
-
-        .hexagon::before {
-            top: -56.57px;
-            border-top: 2px solid #00ff41;
-            border-right: 2px solid #00ff41;
-        }
-
-        .hexagon::after {
-            bottom: -56.57px;
-            border-bottom: 2px solid #00ff41;
-            border-left: 2px solid #00ff41;
-        }
-
-        /* Interconnected Node Accent Rings to visually simulate physical connectivity lines */
-        .hex-content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            z-index: 10;
-            padding: 0 10px;
-            box-sizing: border-box;
-        }
-
-        .hex-title {
-            color: #fff;
-            font-size: 0.72rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            line-height: 1.2;
-            margin-bottom: 4px;
-        }
-
-        .hex-meta {
-            color: #00ffff;
-            font-size: 0.55rem;
-            letter-spacing: 0.5px;
-        }
-
-        /* Geometric Interaction Handlers */
-        .hexagon:hover {
-            background-color: rgba(0, 35, 15, 0.9);
-            border-left: 2px solid #00ffff;
-            border-right: 2px solid #00ffff;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-            transform: scale(1.05);
-            z-index: 20;
-        }
-
-        .hexagon:hover::before {
-            border-top: 2px solid #00ffff;
-            border-right: 2px solid #00ffff;
-        }
-
-        .hexagon:hover::after {
-            border-bottom: 2px solid #00ffff;
-            border-left: 2px solid #00ffff;
-        }
-
-        .hexagon:hover .hex-title {
-            color: #00ff41;
-        }
-
-        .hexagon:hover .hex-meta {
-            color: #fff;
-            text-shadow: 0 0 5px #fff;
-        }
-
-        /* Content Wrappers for Anchor Layers */
-        .hexagon a {
-            text-decoration: none;
-            position: absolute;
-            top: -46.19px;
-            left: 0;
-            width: 160px;
-            height: 184.76px;
-            z-index: 15;
-        }
-
+        
         .node-annotation {
             color: #00ffff;
-            font-size: 0.85rem;
-            margin-top: 40px;
-            margin-bottom: 15px;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
             border-left: 3px solid #00ffff;
             padding-left: 10px;
             text-transform: uppercase;
@@ -213,22 +86,157 @@
             width: 100%;
         }
 
-        .blink { animation: blinker 1.5s linear infinite; }
+        .grid-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: 20px 0;
+        }
+
+        /* Rigorous Hexagonal Grid System 
+           Enforces the optimal A2 root lattice layout configuration across 4 columns
+        */
+        .hex-grid { 
+            display: grid;
+            grid-template-columns: repeat(4, 160px);
+            grid-gap: 32px 14px;
+            justify-content: center;
+            padding-bottom: 60px;
+        }
+
+        /* Offset every second row horizontally to execute an exact honeycomb tessellation */
+        .hex-grid > *:nth-child(4n+3),
+        .hex-grid > *:nth-child(4n+4) {
+            transform: translateX(87px);
+        }
+        
+        .hexagon { 
+            position: relative; 
+            width: 160px; 
+            height: 92.38px; 
+            background-color: #090909; 
+            margin: 46.19px 0;
+            border-left: 2px solid rgba(0, 255, 65, 0.3);
+            border-right: 2px solid rgba(0, 255, 65, 0.3);
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        
+        .hexagon::before, .hexagon::after { 
+            content: ""; 
+            position: absolute; 
+            width: 113.14px; 
+            height: 113.14px; 
+            transform: scaleY(0.5774) rotate(-45deg); 
+            background-color: inherit; 
+            left: 21.43px; 
+            transition: all 0.3s ease-in-out;
+            z-index: 1;
+        }
+        
+        .hexagon::before { 
+            top: -56.57px; 
+            border-top: 2.83px solid rgba(0, 255, 65, 0.3); 
+            border-right: 2.83px solid rgba(0, 255, 65, 0.3); 
+        }
+        
+        .hexagon::after { 
+            bottom: -56.57px; 
+            border-bottom: 2.83px solid rgba(0, 255, 65, 0.3); 
+            border-left: 2.83px solid rgba(0, 255, 65, 0.3); 
+        }
+        
+        .hexagon:hover { 
+            background-color: rgba(0, 255, 65, 0.05);
+            border-left: 2px solid #00ffff;
+            border-right: 2px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+            transform: scale(1.03);
+            z-index: 10;
+        }
+        
+        .hexagon:hover::before { 
+            border-top: 2.83px solid #00ffff; 
+            border-right: 2.83px solid #00ffff; 
+        }
+        
+        .hexagon:hover::after { 
+            border-bottom: 2.83px solid #00ffff; 
+            border-left: 2.83px solid #00ffff; 
+        }
+        
+        .hex-content { 
+            position: absolute; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 5; 
+            text-align: center;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        
+        .hex-title { 
+            font-size: 0.65rem; 
+            font-weight: bold; 
+            color: #00ff41; 
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        .hexagon:hover .hex-title {
+            color: #ffffff;
+            text-shadow: 0 0 5px #00ff41;
+        }
+        
+        .hex-meta { 
+            font-size: 0.48rem; 
+            color: #00ffff; 
+            opacity: 0.8;
+            letter-spacing: 0.3px;
+        }
+        
+        .hexagon a { 
+            position: absolute; 
+            top: -46.19px; left: 0; 
+            width: 160px; height: 184.76px; 
+            z-index: 20; 
+        }
+
+        .blink { animation: blinker 1.8s linear infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
 
+        .footer-metrics {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            color: #ffffff;
+            opacity: 0.6;
+            line-height: 1.6;
+            border-top: 1px solid rgba(0, 255, 65, 0.1);
+            padding-top: 20px;
+        }
+
         @media (max-width: 768px) {
-            .hc-grid {
+            .hex-grid {
                 grid-template-columns: repeat(2, 160px);
+                grid-gap: 32px 14px;
             }
-            .hc-grid > div:nth-child(4n+3), 
-            .hc-grid > div:nth-child(4n+4) {
+            .hex-grid > *:nth-child(4n+3),
+            .hex-grid > *:nth-child(4n+4) {
                 transform: none;
             }
-            .hc-grid > div:nth-child(2n+2) {
-                transform: translateY(53px);
+            .hex-grid > *:nth-child(2n+2) {
+                transform: translateY(46px);
             }
-            .hc-grid {
-                padding-bottom: 60px;
+            .hex-grid {
+                padding-bottom: 80px;
             }
         }
     </style>
@@ -236,23 +244,23 @@
 <body>
 
     <div class="dashboard">
-        <h1>NIAGARA NODE: MASTER BEACON v4.2 <span class="blink">●</span></h1>
+        <h1>NIAGARA NODE: MASTER BEACON v4.2 <span class="blink" style="color: #00ff41;">●</span></h1>
         
         <div class="live-counter">
-            <div style="font-size: 0.7rem; color: #888; letter-spacing: 1px;">TOTAL SIGNAL ANOMALIES PROCESSED</div>
+            <div style="font-size: 0.65rem; color: #888; letter-spacing: 1px;">TOTAL SIGNAL ANOMALIES PROCESSED</div>
             <div id="signal-count" class="count-number">1502</div>
         </div>
 
         <div class="node-annotation">Interconnected Matrix Array</div>
+        
+        <div class="grid-container">
+            <div class="hex-grid">
 
-        <div class="honeycomb-container">
-            <div class="hc-grid">
-                
                 <div class="hexagon">
                     <a href="https://ufosworldwide.com/app" target="_blank"></a>
                     <div class="hex-content">
                         <span class="hex-title">UFOs Worldwide</span>
-                        <span class="hex-meta">CORE HUB</span>
+                        <span class="hex-meta">CORE PLATFORM</span>
                     </div>
                 </div>
 
@@ -260,7 +268,7 @@
                     <a href="https://aeroscopeuap.netlify.app/" target="_blank"></a>
                     <div class="hex-content">
                         <span class="hex-title">Aeroscope UAP</span>
-                        <span class="hex-meta">RADAR FEED</span>
+                        <span class="hex-meta">RADAR SIM FEED</span>
                     </div>
                 </div>
 
@@ -268,7 +276,7 @@
                     <a href="https://signalscopex11.netlify.app/" target="_blank"></a>
                     <div class="hex-content">
                         <span class="hex-title">SignalScope X11</span>
-                        <span class="hex-meta">RF INSTRUMENT</span>
+                        <span class="hex-meta">RF LOG NODE</span>
                     </div>
                 </div>
 
@@ -276,7 +284,7 @@
                     <a href="https://ether-listen.netlify.app/" target="_blank"></a>
                     <div class="hex-content">
                         <span class="hex-title">Ether Listen</span>
-                        <span class="hex-meta">FLUX SENSOR</span>
+                        <span class="hex-meta">FLUX SENSOR ARRAY</span>
                     </div>
                 </div>
 
@@ -284,7 +292,7 @@
                     <a href="https://veilofash.netlify.app/" target="_blank"></a>
                     <div class="hex-content">
                         <span class="hex-title">Veil of Ash</span>
-                        <span class="hex-meta">SIMULATION</span>
+                        <span class="hex-meta">SIMULATION ENGINE</span>
                     </div>
                 </div>
 
@@ -292,7 +300,7 @@
                     <a href="https://thornsignal.netlify.app/" target="_blank"></a>
                     <div class="hex-content">
                         <span class="hex-title">Thorn Signal</span>
-                        <span class="hex-meta">TERMINAL</span>
+                        <span class="hex-meta">CONSOLE TTY</span>
                     </div>
                 </div>
 
@@ -300,12 +308,12 @@
                     <a href="https://admirable-queijadas-b90981.netlify.app/" target="_blank"></a>
                     <div class="hex-content">
                         <span class="hex-title">Metadata Proc</span>
-                        <span class="hex-meta">DATA MATRIX</span>
+                        <span class="hex-meta">DATA GRID CONTEXT</span>
                     </div>
                 </div>
 
                 <div class="hexagon">
-                    <a href="www.ufosworldwide.com/myresume.html" target="_blank"></a>
+                    <a href="https://www.ufosworldwide.com/myresume.html" target="_blank"></a>
                     <div class="hex-content">
                         <span class="hex-title">Corporate Dossier</span>
                         <span class="hex-meta">MYRESUME.HTML</span>
@@ -336,9 +344,65 @@
                     </div>
                 </div>
 
+                <div class="hexagon">
+                    <a href="https://doi.org/10.5281/zenodo.20263839" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">Riemann Zeta</span>
+                        <span class="hex-meta">DOI: 20263839</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="https://doi.org/10.5281/zenodo.20274511" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">Cosmic Web</span>
+                        <span class="hex-meta">DOI: 20274511</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="https://doi.org/10.5281/zenodo.20181743" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">VAHS Spine</span>
+                        <span class="hex-meta">DOI: 20181743</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="https://doi.org/10.5281/zenodo.20278265" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">Ether Signal</span>
+                        <span class="hex-meta">DOI: 20278265</span>
+                    </div>
+                </div>
+
+                <div class="hexagon">
+                    <a href="https://doi.org/10.5281/zenodo.19717522" target="_blank"></a>
+                    <div class="hex-content">
+                        <span class="hex-title">ISM Terrain</span>
+                        <span class="hex-meta">DOI: 19717522</span>
+                    </div>
+                </div>
+
             </div>
+        </div>
+
+        <div class="footer-metrics">
+            <div>NODE LOCATION: NIAGARA REGION, ONTARIO, CANADA // SYSTEM STATUS: ACTIVE</div>
+            <div style="font-size: 0.85em; margin-top: 5px; opacity: 0.5;">GREAT RESPONSIBILITY · SEEK HELP · REWARD THE HEART</div>
         </div>
     </div>
 
+    <script>
+        const counterElement = document.getElementById('signal-count');
+        let currentCount = 1502;
+        
+        setInterval(() => {
+            // Minor rhythmic adjustments reflecting network telemetry ingestion
+            const delta = Math.floor(Math.random() * 3) - 1; 
+            currentCount += (delta > 0 ? delta : 0);
+            counterElement.textContent = currentCount;
+        }, 7830); // Synced directly to the 7.83Hz Schumann fundamental interval scalar
+    </script>
 </body>
 </html>
