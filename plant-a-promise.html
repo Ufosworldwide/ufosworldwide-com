@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plant a Promise — A Presignal STEM Initiative</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:linear-gradient(135deg,#0a1628 0%,#0d2137 50%,#061a0f 100%); min-height:100vh; font-family:Georgia,serif; color:#e8f4e8; }
+button { cursor:pointer; font-family:Georgia,serif; border:none; }
+input, select, textarea { font-family:Georgia,serif; outline:none; }
+input::placeholder, textarea::placeholder { color:rgba(168,212,168,0.3); }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideIn { from{opacity:0;transform:translateX(-12px)} to{opacity:1;transform:translateX(0)} }
+@keyframes glow { 0%,100%{opacity:0.4;r:2} 50%{opacity:0.1;r:3.5} }
+.fade-in { animation:fadeIn 0.35s ease both; }
+.slide-in { animation:slideIn 0.4s ease both; }
+::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:rgba(0,0,0,0.2)} ::-webkit-scrollbar-thumb{background:rgba(126,207,126,0.3);border-radius:2px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const {useState,useEffect,useRef} = React;
+const h = React.createElement;
+
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const CITIES = [
+  {id:1,name:"Toronto",region:"ON",country:"CA",x:72,y:37,flowers:142,trees:67},
+  {id:2,name:"Hamilton",region:"ON",country:"CA",x:70,y:39,flowers:89,trees:34},
+  {id:3,name:"Ottawa",region:"ON",country:"CA",x:76,y:34,flowers:203,trees:91},
+  {id:4,name:"Vancouver",region:"BC",country:"CA",x:18,y:32,flowers:178,trees:122},
+  {id:5,name:"Calgary",region:"AB",country:"CA",x:29,y:29,flowers:95,trees:58},
+  {id:6,name:"New York",region:"NY",country:"US",x:74,y:44,flowers:312,trees:145},
+  {id:7,name:"Chicago",region:"IL",country:"US",x:64,y:42,flowers:267,trees:98},
+  {id:8,name:"Los Angeles",region:"CA",country:"US",x:17,y:52,flowers:189,trees:77},
+  {id:9,name:"Austin",region:"TX",country:"US",x:52,y:60,flowers:134,trees:43},
+  {id:10,name:"Seattle",region:"WA",country:"US",x:16,y:30,flowers:221,trees:167},
+  {id:11,name:"Montreal",region:"QC",country:"CA",x:78,y:33,flowers:156,trees:72},
+  {id:12,name:"Winnipeg",region:"MB",country:"CA",x:44,y:27,flowers:78,trees:29},
+  {id:13,name:"Denver",region:"CO",country:"US",x:42,y:49,flowers:98,trees:54},
+  {id:14,name:"Atlanta",region:"GA",country:"US",x:66,y:56,flowers:143,trees:61},
+  {id:15,name:"Halifax",region:"NS",country:"CA",x:85,y:33,flowers:62,trees:28},
+];
+
+const INITIAL_WALL = [
+  {name:"Sophie",label:"Westdale PS",city:"Hamilton, ON",type:"flower",kind:"school",date:"May 14"},
+  {name:"Theo",label:"Rideau Elementary",city:"Ottawa, ON",type:"tree",kind:"school",date:"May 13"},
+  {name:"Amara",label:"Home Garden",city:"Chicago, IL",type:"flower",kind:"home",date:"May 13"},
+  {name:"Lucas",label:"Maple Leaf PS",city:"Toronto, ON",type:"flower",kind:"school",date:"May 12"},
+  {name:"Priya",label:"Sunrise Community Garden",city:"Seattle, WA",type:"tree",kind:"community",date:"May 12"},
+  {name:"James",label:"Parkview MS",city:"Austin, TX",type:"flower",kind:"school",date:"May 11"},
+  {name:"Zoe",label:"Home Garden",city:"Ottawa, ON",type:"flower",kind:"home",date:"May 11"},
+  {name:"Noah",label:"Westside Elementary",city:"Vancouver, BC",type:"tree",kind:"school",date:"May 10"},
+  {name:"Fatima",label:"Balcony Garden",city:"Calgary, AB",type:"flower",kind:"home",date:"May 10"},
+  {name:"Eli",label:"Brooklyn STEM",city:"New York, NY",type:"tree",kind:"school",date:"May 9"},
+  {name:"Maria",label:"Riverdale Community Garden",city:"Toronto, ON",type:"flower",kind:"community",date:"May 8"},
+  {name:"Devon",label:"Home Backyard",city:"Denver, CO",type:"tree",kind:"home",date:"May 8"},
+];
+
+const WEEKS = [
+  {week:0,title:"Planting Day 🌱",tasks:["Record date planted","Note soil type & location","Water gently after planting","Take a photo or sketch your spot"]},
+  {week:1,title:"Week 1 — First Watch",tasks:["Check soil moisture daily","Record if any sprouts appear","Measure sunlight hours each day","Draw or photograph your planting spot"]},
+  {week:2,title:"Week 2 — Early Growth",tasks:["Measure any sprout height in mm","Note leaf colour and shape","Record watering amount in mL","Check for insect or bee visitors 🐝"]},
+  {week:3,title:"Week 3 — Observation",tasks:["Photograph or sketch growth","Compare to your Week 1 drawing","Count number of visible stems","Note any changes in soil condition"]},
+  {week:4,title:"Week 4 — Science Report",tasks:["Measure total height in cm","Record first bud if visible","Write one hypothesis about next week","Share your findings with your class or family"]},
+];
+
+const PARTNERS = [
+  {name:"Ottawa Wildflower Seed Library",region:"Canada",desc:"Free native seeds for schools and community projects across ON, QC, NB and NS.",url:"https://wildflowerseedlibrary.ca"},
+  {name:"Northern Wildflowers",region:"Canada",desc:"Annual Community Garden Giveaway open to groups across Canada introducing children to gardening.",url:"https://northernwildflowers.ca"},
+  {name:"Slow Food USA — Plant a Seed",region:"USA",desc:"Free seeds to school gardens with STEM-aligned educational materials and toolkits.",url:"https://slowfoodusa.org/plant-a-seed-2026/"},
+  {name:"Pollinator Partnership",region:"Canada & USA",desc:"Native seed grants open to schools and community groups in both countries.",url:"https://pollinator.org"},
+  {name:"Monarch Watch",region:"USA",desc:"Free milkweed plugs for schools and nonprofits to create pollinator habitat.",url:"https://monarchwatch.org"},
+];
+
+const TOTAL_FLOWERS = CITIES.reduce((a,c)=>a+c.flowers,0);
+const TOTAL_TREES   = CITIES.reduce((a,c)=>a+c.trees,0);
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const kindIcon  = k => k==="school"?"🏫":k==="community"?"🌆":"🏡";
+const kindLabel = k => k==="school"?"School":k==="community"?"Community Garden":"Home";
+const css = obj => obj; // passthrough for style objects
+
+// ── COMPONENTS ────────────────────────────────────────────────────────────────
+
+function Header({totalFlowers,totalTrees}) {
+  return h("div",{style:{background:"linear-gradient(180deg,rgba(0,0,0,0.65) 0%,transparent 100%)",padding:"22px 16px 14px",textAlign:"center"}},
+    h("div",{style:{fontSize:11,letterSpacing:4,color:"#7ecf7e",textTransform:"uppercase",marginBottom:6}},"A Presignal × STEM Initiative"),
+    h("div",{style:{fontSize:32,fontWeight:"bold",color:"#fff",lineHeight:1.1}},"🌱 Plant a Promise"),
+    h("div",{style:{fontSize:13,color:"#a8d4a8",marginTop:6,fontStyle:"italic"}},"Schools. Homes. Communities. Every plant on the map forever."),
+    h("div",{style:{display:"flex",justifyContent:"center",gap:14,marginTop:16}},
+      h("div",{style:{background:"rgba(255,200,0,0.15)",border:"1px solid rgba(255,200,0,0.4)",borderRadius:12,padding:"9px 16px",textAlign:"center"}},
+        h("div",{style:{fontSize:22,fontWeight:"bold",color:"#ffd700"}},"🐝 "+totalFlowers.toLocaleString()),
+        h("div",{style:{fontSize:9,color:"#ffd700",opacity:0.8,letterSpacing:2,marginTop:2}},"BEE COINS ISSUED")
+      ),
+      h("div",{style:{background:"rgba(100,200,100,0.15)",border:"1px solid rgba(100,200,100,0.4)",borderRadius:12,padding:"9px 16px",textAlign:"center"}},
+        h("div",{style:{fontSize:22,fontWeight:"bold",color:"#90ee90"}},"🐿️ "+totalTrees.toLocaleString()),
+        h("div",{style:{fontSize:9,color:"#90ee90",opacity:0.8,letterSpacing:2,marginTop:2}},"NUT COINS ISSUED")
+      )
+    )
+  );
+}
+
+function Nav({tab,setTab}) {
+  const tabs = [{id:"map",label:"🗺️ Map"},{id:"wall",label:"🌿 Wall"},{id:"science",label:"🔬 Science"},{id:"register",label:"✋ Join"},{id:"partners",label:"🤝 Seeds"}];
+  return h("div",{style:{display:"flex",borderBottom:"1px solid rgba(255,255,255,0.1)",background:"rgba(0,0,0,0.35)",overflowX:"auto"}},
+    tabs.map(t=>h("button",{key:t.id,onClick:()=>setTab(t.id),style:{
+      flex:1,minWidth:58,padding:"12px 6px",background:tab===t.id?"rgba(126,207,126,0.18)":"transparent",
+      color:tab===t.id?"#7ecf7e":"#5a7a5a",fontSize:11,
+      borderBottom:tab===t.id?"2px solid #7ecf7e":"2px solid transparent",
+      transition:"all 0.2s",whiteSpace:"nowrap"
+    }},t.label))
+  );
+}
+
+// ── MAP TAB ───────────────────────────────────────────────────────────────────
+function MapTab({cities,selectedCity,setSelectedCity}) {
+  const total = TOTAL_FLOWERS+TOTAL_TREES;
+  return h("div",{style:{padding:16}},
+    h("div",{style:{fontSize:11,color:"#7ecf7e",marginBottom:12,textAlign:"center",letterSpacing:1}},"TAP A CITY — CANADA & UNITED STATES"),
+
+    // SVG map
+    h("div",{style:{background:"linear-gradient(135deg,#061428 0%,#0a2010 100%)",border:"1px solid rgba(126,207,126,0.2)",borderRadius:16,padding:8,position:"relative"}},
+      h("svg",{viewBox:"0 0 100 80",style:{width:"100%",height:"auto",display:"block"}},
+        // background land mass suggestion
+        h("rect",{x:10,y:14,width:80,height:57,rx:5,fill:"rgba(20,60,30,0.35)",stroke:"rgba(126,207,126,0.12)",strokeWidth:0.3}),
+        // labels
+        h("text",{x:50,y:23,textAnchor:"middle",fontSize:2.8,fill:"rgba(126,207,126,0.35)",fontFamily:"Georgia"},"CANADA"),
+        h("text",{x:50,y:57,textAnchor:"middle",fontSize:2.8,fill:"rgba(126,207,126,0.35)",fontFamily:"Georgia"},"UNITED STATES"),
+        // border
+        h("line",{x1:12,y1:38,x2:88,y2:38,stroke:"rgba(255,255,255,0.08)",strokeWidth:0.25,strokeDasharray:"1.5,1.5"}),
+        // city dots
+        cities.map(city=>{
+          const sz = Math.max(1.6,Math.min(3.4,(city.flowers+city.trees)/110));
+          const isSel = selectedCity?.id===city.id;
+          const col = city.country==="CA"?"#ffd700":"#90ee90";
+          return h("g",{key:city.id,onClick:()=>setSelectedCity(isSel?null:city),style:{cursor:"pointer"}},
+            // pulse
+            h("circle",{cx:city.x,cy:city.y,r:sz+2,fill:"none",stroke:col,strokeWidth:0.4,opacity:0.25,className:"pulse-ring"}),
+            // dot
+            h("circle",{cx:city.x,cy:city.y,r:isSel?sz+0.8:sz,fill:col,opacity:0.9}),
+            // label
+            h("text",{x:city.x,y:city.y-sz-1.2,textAnchor:"middle",fontSize:1.9,fill:"#fff",opacity:0.7,fontFamily:"Georgia"},city.name)
+          );
+        })
+      ),
+      // legend
+      h("div",{style:{display:"flex",justifyContent:"center",gap:20,paddingTop:6,paddingBottom:4}},
+        h("div",{style:{display:"flex",alignItems:"center",gap:6,fontSize:10,color:"#ffd700"}},
+          h("div",{style:{width:10,height:10,borderRadius:"50%",background:"#ffd700"}}), "Canada"),
+        h("div",{style:{display:"flex",alignItems:"center",gap:6,fontSize:10,color:"#90ee90"}},
+          h("div",{style:{width:10,height:10,borderRadius:"50%",background:"#90ee90"}}), "United States")
+      )
+    ),
+
+    // city card
+    selectedCity && h("div",{className:"fade-in",style:{marginTop:14,background:"rgba(0,0,0,0.5)",border:"1px solid rgba(126,207,126,0.4)",borderRadius:14,padding:16}},
+      h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}},
+        h("div",null,
+          h("div",{style:{fontSize:18,fontWeight:"bold",color:"#fff"}},selectedCity.name),
+          h("div",{style:{fontSize:11,color:"#7ecf7e",letterSpacing:1}},selectedCity.region+", "+selectedCity.country)
+        ),
+        h("button",{onClick:()=>setSelectedCity(null),style:{background:"none",color:"#6a8a6a",fontSize:22,lineHeight:1}}, "×")
+      ),
+      h("div",{style:{display:"flex",gap:12}},
+        h("div",{style:{flex:1,background:"rgba(255,215,0,0.1)",borderRadius:10,padding:"10px",textAlign:"center"}},
+          h("div",{style:{fontSize:26}},"🐝"),
+          h("div",{style:{fontSize:22,fontWeight:"bold",color:"#ffd700"}},selectedCity.flowers),
+          h("div",{style:{fontSize:10,color:"#ffd700",opacity:0.8,marginTop:2}},"FLOWERS PLANTED")
+        ),
+        h("div",{style:{flex:1,background:"rgba(100,200,100,0.1)",borderRadius:10,padding:"10px",textAlign:"center"}},
+          h("div",{style:{fontSize:26}},"🐿️"),
+          h("div",{style:{fontSize:22,fontWeight:"bold",color:"#90ee90"}},selectedCity.trees),
+          h("div",{style:{fontSize:10,color:"#90ee90",opacity:0.8,marginTop:2}},"TREES PLANTED")
+        )
+      ),
+      h("div",{style:{marginTop:10,fontSize:11,color:"#7ecf7e",textAlign:"center"}},
+        "🌍 "+(selectedCity.flowers+selectedCity.trees)+" total plants in the ground in "+selectedCity.name
+      )
+    ),
+
+    // global stats
+    h("div",{style:{marginTop:14,background:"rgba(0,0,0,0.3)",borderRadius:12,padding:16,textAlign:"center"}},
+      h("div",{style:{fontSize:11,color:"#7ecf7e",letterSpacing:2,marginBottom:8}},"GLOBAL IMPACT"),
+      h("div",{style:{fontSize:30,fontWeight:"bold",color:"#fff"}},total.toLocaleString()),
+      h("div",{style:{fontSize:12,color:"#a8d4a8",marginTop:4}},"plants promised and in the ground"),
+      h("div",{style:{fontSize:11,color:"#6a8a6a",marginTop:4}},"across "+cities.length+" cities · Canada & United States")
+    )
+  );
+}
+
+// ── WALL TAB ──────────────────────────────────────────────────────────────────
+function WallTab({wall}) {
+  return h("div",{style:{padding:16}},
+    h("div",{style:{fontSize:12,color:"#7ecf7e",marginBottom:4,letterSpacing:1}},"WALL OF PLANTERS"),
+    h("div",{style:{fontSize:11,color:"#6a8a6a",marginBottom:16,fontStyle:"italic"}},"Schools, homes, and community gardens — every promise, every plant."),
+    // kind filter chips (visual only for now)
+    h("div",{style:{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}},
+      ["All","🏫 School","🏡 Home","🌆 Community"].map((k,i)=>
+        h("div",{key:i,style:{padding:"5px 12px",borderRadius:20,background:"rgba(126,207,126,0.12)",border:"1px solid rgba(126,207,126,0.25)",fontSize:11,color:"#7ecf7e"}},k)
+      )
+    ),
+    wall.map((entry,i)=>
+      h("div",{key:i,className:i===0&&entry.date==="Today"?"slide-in":"",style:{
+        display:"flex",alignItems:"center",gap:12,
+        background:i===0&&entry.date==="Today"?"rgba(126,207,126,0.1)":"rgba(0,0,0,0.3)",
+        border:"1px solid "+(entry.type==="flower"?"rgba(255,215,0,0.2)":"rgba(100,200,100,0.2)"),
+        borderRadius:12,padding:"12px 14px",marginBottom:8
+      }},
+        h("div",{style:{fontSize:24}}, entry.type==="flower"?"🌸":"🌳"),
+        h("div",{style:{flex:1}},
+          h("div",{style:{fontSize:14,color:"#fff",fontWeight:"bold"}},entry.name),
+          h("div",{style:{fontSize:11,color:"#7ecf7e"}},kindIcon(entry.kind)+" "+entry.label),
+          h("div",{style:{fontSize:10,color:"#6a8a6a"}},entry.city)
+        ),
+        h("div",{style:{textAlign:"right"}},
+          h("div",{style:{fontSize:18}}, entry.type==="flower"?"🐝":"🐿️"),
+          h("div",{style:{fontSize:9,color:"#6a8a6a",marginTop:3}},entry.date)
+        )
+      )
+    ),
+    h("div",{style:{textAlign:"center",padding:"16px 0",fontSize:11,color:"#6a8a6a",fontStyle:"italic"}},
+      wall.length+" planters have made their promise"
+    )
+  );
+}
+
+// ── SCIENCE TAB ───────────────────────────────────────────────────────────────
+function ScienceTab() {
+  return h("div",{style:{padding:16}},
+    h("div",{style:{fontSize:12,color:"#7ecf7e",marginBottom:4,letterSpacing:1}},"🔬 GROWTH SCIENCE TRACKER"),
+    h("div",{style:{fontSize:11,color:"#6a8a6a",marginBottom:16,fontStyle:"italic"}},"A real field science experiment — weekly, all season long. Works for schools and home gardeners alike."),
+
+    // what scientists record
+    h("div",{style:{background:"rgba(0,0,0,0.4)",border:"1px solid rgba(126,207,126,0.2)",borderRadius:14,padding:14,marginBottom:16}},
+      h("div",{style:{fontSize:13,color:"#7ecf7e",marginBottom:10,fontWeight:"bold"}},"📋 What Scientists Record Each Week"),
+      ["Date & weather conditions","Watering amount (mL)","Sunlight hours observed","Plant height in mm or cm","Number of leaves or stems","Bee or insect visitors 🐝","Soil moisture (dry / moist / wet)","Weekly sketch or photo"].map((item,i)=>
+        h("div",{key:i,style:{display:"flex",alignItems:"center",gap:8,marginBottom:7}},
+          h("div",{style:{width:6,height:6,borderRadius:"50%",background:"#7ecf7e",flexShrink:0}}),
+          h("div",{style:{fontSize:12,color:"#c8e4c8"}},item)
+        )
+      )
+    ),
+
+    // weekly timeline
+    h("div",{style:{fontSize:11,color:"#7ecf7e",marginBottom:10,letterSpacing:1}},"WEEKLY GROWTH TIMELINE"),
+    WEEKS.map((week,i)=>
+      h("div",{key:i,style:{background:"rgba(0,0,0,0.3)",border:"1px solid rgba(126,207,126,0.15)",borderLeft:"3px solid #7ecf7e",borderRadius:"0 12px 12px 0",padding:"12px 14px",marginBottom:10,marginLeft:8}},
+        h("div",{style:{fontSize:13,fontWeight:"bold",color:"#fff",marginBottom:6}},week.title),
+        week.tasks.map((task,j)=>h("div",{key:j,style:{fontSize:11,color:"#a8c8a8",marginBottom:3}},"→ "+task))
+      )
+    ),
+
+    // growth log prompt
+    h("div",{style:{background:"rgba(126,207,126,0.08)",border:"1px solid rgba(126,207,126,0.3)",borderRadius:14,padding:16,textAlign:"center",marginTop:4}},
+      h("div",{style:{fontSize:22,marginBottom:6}},"📄"),
+      h("div",{style:{fontSize:13,color:"#7ecf7e",fontWeight:"bold"}},"Printable Science Sheets"),
+      h("div",{style:{fontSize:11,color:"#a8c8a8",marginTop:6,lineHeight:1.6}},"Weekly tracking sheets for classrooms and home gardeners — STEM-ready, grade K–12 appropriate. Digital log submission coming soon."),
+      h("div",{style:{marginTop:12,background:"rgba(126,207,126,0.15)",border:"1px solid #7ecf7e",borderRadius:8,padding:"9px 16px",fontSize:12,color:"#7ecf7e",display:"inline-block"}},
+        "📥 PDF Downloads — Coming Soon"
+      )
+    )
+  );
+}
+
+// ── PARTNERS TAB ──────────────────────────────────────────────────────────────
+function PartnersTab() {
+  return h("div",{style:{padding:16}},
+    h("div",{style:{fontSize:12,color:"#7ecf7e",marginBottom:4,letterSpacing:1}},"🤝 SEED PARTNERS"),
+    h("div",{style:{fontSize:11,color:"#6a8a6a",marginBottom:16,fontStyle:"italic"}},"Organizations offering free seeds and plants for schools and communities across Canada and the USA."),
+
+    PARTNERS.map((p,i)=>
+      h("div",{key:i,style:{background:"rgba(0,0,0,0.35)",border:"1px solid rgba(126,207,126,0.2)",borderRadius:12,padding:14,marginBottom:12}},
+        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}},
+          h("div",{style:{fontSize:13,fontWeight:"bold",color:"#fff",flex:1,paddingRight:8}},p.name),
+          h("div",{style:{fontSize:9,color:"#7ecf7e",background:"rgba(126,207,126,0.15)",borderRadius:6,padding:"3px 8px",whiteSpace:"nowrap"}},p.region)
+        ),
+        h("div",{style:{fontSize:11,color:"#a8c8a8",lineHeight:1.6,marginBottom:10}},p.desc),
+        h("a",{href:p.url,target:"_blank",rel:"noopener",style:{fontSize:11,color:"#7ecf7e",textDecoration:"none",borderBottom:"1px solid rgba(126,207,126,0.3)"}},
+          "Visit → "+p.url.replace("https://","")
+        )
+      )
+    ),
+
+    // outreach callout
+    h("div",{style:{background:"rgba(255,215,0,0.08)",border:"1px solid rgba(255,215,0,0.3)",borderRadius:14,padding:16,marginTop:8,textAlign:"center"}},
+      h("div",{style:{fontSize:20,marginBottom:8}},"📬"),
+      h("div",{style:{fontSize:13,color:"#ffd700",fontWeight:"bold"}},"Seed Company?"),
+      h("div",{style:{fontSize:11,color:"#c8a830",marginTop:6,lineHeight:1.6}},"If your organization offers free seeds or plants for schools and communities, we would love to feature you as an official Plant a Promise partner."),
+      h("a",{href:"mailto:jubecrew@gmail.com?subject=Plant a Promise Partnership",style:{display:"inline-block",marginTop:12,background:"rgba(255,215,0,0.2)",border:"1px solid #ffd700",borderRadius:8,padding:"9px 16px",fontSize:12,color:"#ffd700",textDecoration:"none"}},
+        "✉️ Get in Touch"
+      )
+    )
+  );
+}
+
+// ── REGISTER TAB ─────────────────────────────────────────────────────────────
+function RegisterTab({onSubmit}) {
+  const [submitted, setSubmitted] = useState(false);
+  const [kind, setKind] = useState("school");
+  const [type, setType] = useState("flower");
+  const [form, setForm] = useState({firstName:"",label:"",city:"",country:"CA",grade:""});
+
+  const labelPlaceholder = kind==="school"?"School name (e.g. Westdale Public School)":kind==="community"?"Garden or group name (e.g. Riverdale Community Garden)":"e.g. Backyard, Balcony, Front Garden";
+  const labelTitle = kind==="school"?"School Name":kind==="community"?"Garden / Group Name":"Planting Spot Name (optional)";
+
+  const handleGo = () => {
+    if(!form.firstName||!form.city) return;
+    onSubmit({...form,kind,type,label:form.label||(kind==="home"?"Home Garden":form.label)});
+    setSubmitted(true);
+  };
+
+  if(submitted) return h("div",{className:"fade-in",style:{padding:"40px 16px",textAlign:"center"}},
+    h("div",{style:{fontSize:60,marginBottom:16}}, type==="flower"?"🌸":"🌳"),
+    h("div",{style:{fontSize:24,fontWeight:"bold",color:"#fff",marginBottom:8}},"Promise Made, "+form.firstName+"!"),
+    h("div",{style:{fontSize:13,color:"#7ecf7e",marginBottom:20}},(form.label||kindLabel(kind))+" · "+form.city),
+    h("div",{style:{background:"rgba(0,0,0,0.4)",border:"2px solid "+(type==="flower"?"#ffd700":"#90ee90"),borderRadius:16,padding:22,marginBottom:20,display:"inline-block"}},
+      h("div",{style:{fontSize:42}}, type==="flower"?"🐝":"🐿️"),
+      h("div",{style:{fontSize:20,fontWeight:"bold",color:type==="flower"?"#ffd700":"#90ee90",marginTop:8}}, type==="flower"?"BEE COIN EARNED":"NUT COIN EARNED"),
+      h("div",{style:{fontSize:11,color:"#a8c8a8",marginTop:6}},"Your planting is now on the map.")
+    ),
+    h("div",{style:{fontSize:13,color:"#7ecf7e",marginBottom:6}},"Next step:"),
+    h("div",{style:{fontSize:12,color:"#a8c8a8",marginBottom:20,lineHeight:1.6}},"Head to the 🔬 Science tab and start your Week 1 growth tracker."),
+    h("a",{href:"#top",style:{display:"inline-block",padding:"11px 22px",background:"rgba(126,207,126,0.2)",border:"1px solid #7ecf7e",borderRadius:10,color:"#7ecf7e",fontSize:13,textDecoration:"none"}},"See My City on the Map →")
+  );
+
+  return h("div",{style:{padding:16}},
+    h("div",{style:{fontSize:12,color:"#7ecf7e",marginBottom:4,letterSpacing:1}},"✋ MAKE YOUR PROMISE"),
+    h("div",{style:{fontSize:11,color:"#6a8a6a",marginBottom:20,fontStyle:"italic"}},"Schools, homes, and community gardens all welcome."),
+
+    // WHO IS PLANTING
+    h("div",{style:{fontSize:11,color:"#7ecf7e",marginBottom:8,letterSpacing:1}},"I AM PLANTING AS"),
+    h("div",{style:{display:"flex",gap:8,marginBottom:20}},
+      [{id:"school",icon:"🏫",label:"School"},{id:"home",icon:"🏡",label:"Home"},{id:"community",icon:"🌆",label:"Community"}].map(opt=>
+        h("button",{key:opt.id,onClick:()=>setKind(opt.id),style:{
+          flex:1,padding:"12px 6px",borderRadius:12,
+          border:"2px solid "+(kind===opt.id?"#7ecf7e":"rgba(255,255,255,0.1)"),
+          background:kind===opt.id?"rgba(126,207,126,0.15)":"rgba(0,0,0,0.3)",
+          color:kind===opt.id?"#7ecf7e":"#6a8a6a",textAlign:"center",transition:"all 0.2s"
+        }},
+          h("div",{style:{fontSize:22}},opt.icon),
+          h("div",{style:{fontSize:12,marginTop:4}},opt.label)
+        )
+      )
+    ),
+
+    // WHAT PLANTING
+    h("div",{style:{fontSize:11,color:"#7ecf7e",marginBottom:8,letterSpacing:1}},"I AM PLANTING"),
+    h("div",{style:{display:"flex",gap:10,marginBottom:20}},
+      [{id:"flower",emoji:"🌸",label:"Flowers",sub:"Earn 🐝 BEE COIN",col:"#ffd700"},{id:"tree",emoji:"🌳",label:"A Tree",sub:"Earn 🐿️ NUT COIN",col:"#90ee90"}].map(opt=>
+        h("button",{key:opt.id,onClick:()=>setType(opt.id),style:{
+          flex:1,padding:"14px 8px",borderRadius:12,
+          border:"2px solid "+(type===opt.id?opt.col:"rgba(255,255,255,0.1)"),
+          background:type===opt.id?"rgba("+(opt.id==="flower"?"255,215,0":"144,238,144")+",0.12)":"rgba(0,0,0,0.3)",
+          color:type===opt.id?opt.col:"#6a8a6a",textAlign:"center",transition:"all 0.2s"
+        }},
+          h("div",{style:{fontSize:26}},opt.emoji),
+          h("div",{style:{fontSize:13,marginTop:4}},opt.label),
+          h("div",{style:{fontSize:10,marginTop:4,opacity:0.8}},opt.sub)
+        )
+      )
+    ),
+
+    // FORM FIELDS
+    ...[
+      {key:"firstName",title:"Your First Name",ph:"e.g. Sophie  (no last name needed)"},
+      {key:"label",title:labelTitle,ph:labelPlaceholder},
+      {key:"city",title:"City / Town",ph:"e.g. Hamilton"},
+    ].map(f=>
+      h("div",{key:f.key,style:{marginBottom:14}},
+        h("div",{style:{fontSize:11,color:"#7ecf7e",marginBottom:6,letterSpacing:1}},f.title.toUpperCase()),
+        h("input",{type:"text",placeholder:f.ph,value:form[f.key],
+          onChange:ev=>setForm(prev=>({...prev,[f.key]:ev.target.value})),
+          style:{width:"100%",background:"rgba(0,0,0,0.4)",border:"1px solid rgba(126,207,126,0.3)",
+            borderRadius:10,padding:"12px 14px",color:"#e8f4e8",fontSize:14}})
+      )
+    ),
+
+    // COUNTRY
+    h("div",{style:{marginBottom:16}},
+      h("div",{style:{fontSize:11,color:"#7ecf7e",marginBottom:8,letterSpacing:1}},"COUNTRY"),
+      h("div",{style:{display:"flex",gap:10}},
+        [{id:"CA",label:"🍁 Canada"},{id:"US",label:"🇺🇸 United States"}].map(c=>
+          h("button",{key:c.id,onClick:()=>setForm(f=>({...f,country:c.id})),style:{
+            flex:1,padding:"10px",borderRadius:10,
+            border:"1px solid "+(form.country===c.id?"#7ecf7e":"rgba(255,255,255,0.1)"),
+            background:form.country===c.id?"rgba(126,207,126,0.15)":"rgba(0,0,0,0.3)",
+            color:form.country===c.id?"#7ecf7e":"#6a8a6a",fontSize:13,transition:"all 0.2s"
+          }},c.label)
+        )
+      )
+    ),
+
+    // GRADE (school only)
+    kind==="school" && h("div",{style:{marginBottom:20}},
+      h("div",{style:{fontSize:11,color:"#7ecf7e",marginBottom:8,letterSpacing:1}},"GRADE LEVEL"),
+      h("div",{style:{display:"flex",flexWrap:"wrap",gap:8}},
+        ["K–2","3–5","6–8","9–12","Teacher / Staff"].map(g=>
+          h("button",{key:g,onClick:()=>setForm(f=>({...f,grade:g})),style:{
+            padding:"8px 14px",borderRadius:8,
+            border:"1px solid "+(form.grade===g?"#7ecf7e":"rgba(255,255,255,0.1)"),
+            background:form.grade===g?"rgba(126,207,126,0.15)":"rgba(0,0,0,0.3)",
+            color:form.grade===g?"#7ecf7e":"#6a8a6a",fontSize:12,transition:"all 0.2s"
+          }},g)
+        )
+      )
+    ),
+
+    // PRIVACY NOTE
+    h("div",{style:{background:"rgba(0,0,0,0.3)",borderRadius:10,padding:12,marginBottom:16,fontSize:11,color:"#6a8a6a",lineHeight:1.6}},
+      "🔒 ",h("strong",{style:{color:"#7ecf7e"}},"Privacy first.")," First names only. No addresses ever — only your city appears on the map. Safe for all ages. COPPA & PIPEDA friendly."
+    ),
+
+    // SUBMIT
+    h("button",{onClick:handleGo,style:{
+      width:"100%",padding:"16px",
+      background:"linear-gradient(135deg,#2d7a2d,#1a5c1a)",
+      border:"1px solid #7ecf7e",borderRadius:12,
+      color:"#fff",fontSize:16,fontWeight:"bold",letterSpacing:1
+    }},"🌱 MAKE MY PROMISE")
+  );
+}
+
+// ── ROOT APP ──────────────────────────────────────────────────────────────────
+function PlantAPromise() {
+  const [tab, setTab] = useState("map");
+  const [selectedCity, setSelectedCity] = useState(null);
+  const [wall, setWall] = useState(INITIAL_WALL);
+  const [flowers, setFlowers] = useState(TOTAL_FLOWERS);
+  const [trees, setTrees] = useState(TOTAL_TREES);
+
+  const handleRegister = (data) => {
+    const entry = {name:data.firstName,label:data.label,city:data.city+", "+data.country,type:data.type,kind:data.kind,date:"Today"};
+    setWall(w=>[entry,...w]);
+    if(data.type==="flower") setFlowers(f=>f+1);
+    else setTrees(t=>t+1);
+  };
+
+  return h("div",{id:"top",style:{minHeight:"100vh",maxWidth:600,margin:"0 auto"}},
+    h(Header,{totalFlowers:flowers,totalTrees:trees}),
+    h(Nav,{tab,setTab}),
+    tab==="map"      && h(MapTab,{cities:CITIES,selectedCity,setSelectedCity}),
+    tab==="wall"     && h(WallTab,{wall}),
+    tab==="science"  && h(ScienceTab,null),
+    tab==="register" && h(RegisterTab,{onSubmit:handleRegister}),
+    tab==="partners" && h(PartnersTab,null),
+
+    // footer
+    h("div",{style:{textAlign:"center",padding:"24px 16px",borderTop:"1px solid rgba(126,207,126,0.1)",marginTop:16}},
+      h("div",{style:{fontSize:11,color:"#3a5a3a",marginBottom:4}},"Plant a Promise · A Presignal Research Initiative"),
+      h("div",{style:{fontSize:10,color:"#2a4a2a"}},"Niagara Region, Ontario, Canada · presignal.ca")
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(h(PlantAPromise,null));
+</script>
+</body>
+</html>
