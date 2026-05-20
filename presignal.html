@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H6L5Y9LZE0"></script>
+    <script async src="https://www.googletagmanager.com/gtag.js?id=G-H6L5Y9LZE0"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -13,79 +13,151 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="frequency" content="7.83Hz"> 
     <meta name="prime-candidate" content="John-Carter-O-Driscoll">
-    <title>Presignal | The Lineage of Merit</title>
+    <title>Presignal Inc. | Unified Geometric Lattice</title>
+    
     <style>
         :root { 
             --gold: #ffaa00; 
             --deep: #030303; 
-            --phi: 1.618033; 
+            --phi: 1.6180339887; 
             --schumann: 7.83s; 
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body, html { 
-            background: var(--deep); color: var(--gold); 
-            overflow: hidden; height: 100%; width: 100%;
-            display: flex; justify-content: center; align-items: center; 
+            background: var(--deep); 
+            color: var(--gold); 
+            overflow: hidden; 
+            height: 100%; 
+            width: 100%;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
             font-family: 'Garamond', serif;
         }
 
+        /* The Coordinate Energy Axis */
         .lineage-spine {
-            position: absolute; width: 1px; height: 100vh;
+            position: absolute; 
+            width: 1px; 
+            height: 100vh;
             background: linear-gradient(to bottom, transparent, rgba(255,170,0,0.4), transparent);
             z-index: 1;
         }
 
+        /* Continuous Scale-Invariant Resonator Array */
         .universal-spiral { 
-            position: absolute; width: 95vmin; height: 95vmin; 
-            animation: spiralRotate 80s linear infinite;
-            pointer-events: none; display: flex; justify-content: center; align-items: center;
+            position: absolute; 
+            width: 100vmin; 
+            height: 100vmin; 
+            animation: spiralRotate 120s linear infinite;
+            pointer-events: none; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
             z-index: 10;
         }
 
+        /* Center Operational Core Node */
         .center-beacon { 
-            position: relative; width: 180px; height: 180px; 
-            background: radial-gradient(circle, var(--gold) 0%, transparent 70%); 
-            border-radius: 50%; animation: pulse var(--schumann) ease-in-out infinite; 
-            cursor: pointer; z-index: 1000; pointer-events: auto;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; border: 1px solid rgba(255,170,0,0.3);
+            position: relative; 
+            width: 190px; 
+            height: 190px; 
+            background: radial-gradient(circle, rgba(255,170,0,0.2) 0%, transparent 75%); 
+            border-radius: 50%; 
+            animation: pulse var(--schumann) ease-in-out infinite; 
+            cursor: pointer; 
+            z-index: 1000; 
+            pointer-events: auto;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            text-align: center; 
+            border: 1px solid rgba(255,170,0,0.4);
+            box-shadow: 0 0 30px rgba(255,170,0,0.1);
+            transition: border 0.3s ease;
         }
 
+        .center-beacon:hover {
+            border: 1px solid rgba(255,170,0,0.8);
+        }
+
+        /* Fibonacci-Phyllotaxis Resonant Node Architecture */
         .node { 
-            position: absolute; text-decoration: none; color: var(--gold); 
-            font-size: clamp(0.55rem, 1.4vmin, 0.85rem); opacity: 0.6; 
+            position: absolute; 
+            text-decoration: none; 
+            color: var(--gold); 
+            font-size: clamp(0.5rem, 1.2vmin, 0.75rem); 
+            opacity: 0.55; 
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            pointer-events: auto; white-space: nowrap;
-            border-left: 1px solid rgba(255,170,0,0.3); padding-left: 10px;
+            pointer-events: auto; 
+            white-space: nowrap;
+            border-left: 1px solid rgba(255,170,0,0.25); 
+            padding-left: 8px;
+            /* Map coordinates natively to the spiral vector transformation */
             transform: rotate(var(--angle)) translateY(calc(-1 * var(--dist))) rotate(calc(-1 * var(--angle)));
         }
 
         .node:hover { 
-            opacity: 1; color: #fff; border-left: 1px solid #fff;
-            transform: rotate(var(--angle)) translateY(calc(-1.1 * var(--dist))) rotate(calc(-1 * var(--angle))) scale(1.15); 
+            opacity: 1; 
+            color: #ffffff; 
+            border-left: 1px solid #ffffff;
+            text-shadow: 0 0 8px rgba(255,170,0,0.6);
+            transform: rotate(var(--angle)) translateY(calc(-1.06 * var(--dist))) rotate(calc(-1 * var(--angle))) scale(1.08); 
         }
 
-        /* PHYLLOTAXIS / GOLDEN ANGLE SEEDING */
-        .n1 { --angle: 137.5deg; --dist: 20vmin; } 
-        .n2 { --angle: 275.0deg; --dist: 28vmin; } 
-        .n3 { --angle: 412.5deg; --dist: 36vmin; } 
-        .n4 { --angle: 550.0deg; --dist: 42vmin; } 
-        .n5 { --angle: 687.5deg; --dist: 46vmin; } 
-        .n6 { --angle: 825.0deg; --dist: 50vmin; } 
-        .n7 { --angle: 962.5deg; --dist: 46vmin; } 
-        .n8 { --angle: 1100deg;  --dist: 42vmin; } 
-        .n9 { --angle: 1237deg;  --dist: 36vmin; } 
-        .n10 { --angle: 1375deg; --dist: 28vmin; } 
-        .n11 { --angle: 1512deg; --dist: 20vmin; } 
+        /* PHYLLOTAXIS SEEDING PATTERN 
+           Derived via Golden Angle: \psi = 137.5077° * n
+           Radius distribution scaled via \phi geometry to equalize system density profile
+        */
+        .n1  { --angle: 137.5deg;  --dist: 14vmin; } 
+        .n2  { --angle: 275.0deg;  --dist: 17vmin; } 
+        .n3  { --angle: 412.5deg;  --dist: 20vmin; } 
+        .n4  { --angle: 550.0deg;  --dist: 23vmin; } 
+        .n5  { --angle: 687.5deg;  --dist: 26vmin; } 
+        .n6  { --angle: 825.0deg;  --dist: 29vmin; } 
+        .n7  { --angle: 962.5deg;  --dist: 32vmin; } 
+        .n8  { --angle: 1100.0deg; --dist: 35vmin; } 
+        .n9  { --angle: 1237.5deg; --dist: 38vmin; } 
+        .n10 { --angle: 1375.0deg; --dist: 41vmin; } 
+        .n11 { --angle: 1512.5deg; --dist: 44vmin; } 
+        .n12 { --angle: 1650.0deg; --dist: 47vmin; }
+        .n13 { --angle: 1787.5deg; --dist: 50vmin; }
+        .n14 { --angle: 1925.0deg; --dist: 53vmin; }
+        .n15 { --angle: 2062.5deg; --dist: 56vmin; }
+        .n16 { --angle: 2200.0deg; --dist: 59vmin; }
+        .n17 { --angle: 2337.5deg; --dist: 62vmin; }
+        .n18 { --angle: 2475.0deg; --dist: 65vmin; }
+        .n19 { --angle: 2612.5deg; --dist: 68vmin; }
+        .n20 { --angle: 2750.0deg; --dist: 71vmin; }
+        .n21 { --angle: 2887.5deg; --dist: 74vmin; }
+        .n22 { --angle: 3025.0deg; --dist: 77vmin; }
+        .n23 { --angle: 3162.5deg; --dist: 80vmin; }
+        .n24 { --angle: 3300.0deg; --dist: 83vmin; }
+        .n25 { --angle: 3437.5deg; --dist: 86vmin; }
+        .n26 { --angle: 3575.0deg; --dist: 89vmin; }
+        .n27 { --angle: 3712.5deg; --dist: 92vmin; }
+        .n28 { --angle: 3850.0deg; --dist: 95vmin; }
+        .n29 { --angle: 3987.5deg; --dist: 98vmin; }
 
-        @keyframes spiralRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.05); opacity: 0.9; } }
+        @keyframes spiralRotate { 
+            from { transform: rotate(0deg); } 
+            to { transform: rotate(360deg); } 
+        }
+        @keyframes pulse { 
+            0%, 100% { transform: scale(1); opacity: 0.6; } 
+            50% { transform: scale(1.03); opacity: 0.95; } 
+        }
 
         .brand-promise {
-            position: fixed; bottom: 20px; width: 100%; text-align: center;
-            z-index: 2000; pointer-events: none;
+            position: fixed; 
+            bottom: 20px; 
+            width: 100%; 
+            text-align: center;
+            z-index: 2000; 
+            pointer-events: none;
         }
     </style>
 </head>
@@ -95,26 +167,53 @@
 
     <div class="universal-spiral">
         <div class="center-beacon" onclick="location.href='mailto:contact@ufosworldwide.com'">
-            <div style="font-family:'Bebas Neue'; font-size: 1.6rem; color: #000; letter-spacing: 2px;">JOHN CARTER</div>
-            <div style="font-size: 0.5rem; color: #000; font-weight: 900; opacity: 0.7; letter-spacing: 1px;">O'DRISCOLL LINEAGE</div>
+            <div style="font-family:'Bebas Neue', sans-serif; font-size: 1.5rem; color: var(--gold); letter-spacing: 2px;">JOHN CARTER</div>
+            <div style="font-size: 0.55rem; color: #fff; font-weight: 900; opacity: 0.8; letter-spacing: 1px; margin-top: 2px;">PRESIGNAL INC.</div>
+            <div style="font-size: 0.45rem; color: var(--gold); opacity: 0.6; letter-spacing: 0.5px; margin-top: 4px;">ORCID Node 0009-0004-1363-304X</div>
         </div>
         
-        <a href="https://eartharxiv.org/repository/view/12638/" class="node n6" target="_blank">EARTHARXIV: WATER STRESS (12638)</a>
-        <a href="https://zenodo.org/records/20144596" class="node n1" target="_blank">ZENODO: O'DRISCOLL LINEAGE</a>
-        <a href="https://zenodo.org/records/19948007" class="node n2" target="_blank">RESEARCH DATA: 19948</a>
-        <a href="https://zenodo.org/records/19935260" class="node n3" target="_blank">RESEARCH DATA: 19935</a>
-        <a href="https://zenodo.org/records/19870281" class="node n4" target="_blank">INTEL CORPUS: 19870</a>
-        <a href="https://zenodo.org/records/19870137" class="node n5" target="_blank">INTEL CORPUS: 19871</a>
-        <a href="https://zenodo.org/records/19717522" class="node n7" target="_blank">SOURCE DATA: 19717</a>
-        <a href="https://zenodo.org/records/19717287" class="node n8" target="_blank">SOURCE DATA: 19718</a>
-        <a href="https://zenodo.org/records/19695022" class="node n9" target="_blank">WATER INTEL: 19695</a>
-        <a href="https://zenodo.org/records/19654306" class="node n10" target="_blank">PLASMA DATA: 19654</a>
-        <a href="https://zenodo.org/records/19653415" class="node n11" target="_blank">PLASMA DATA: 19653</a>
+        <a href="https://www.ufosworldwide.com/presignal" class="node n1" target="_blank">PLATFORM: PRESIGNAL PREPRINT LIBRARY</a>
+        <a href="https://www.ufosworldwide.com/aquasignal" class="node n2" target="_blank">PLATFORM: AQUASIGNAL WATER INTEL</a>
+        <a href="https://anomaly-dashboard-two.vercel.app" class="node n3" target="_blank">PLATFORM: ANOMALY MONITORING DASHBOARD</a>
+        <a href="https://www.ufosworldwide.com" class="node n4" target="_blank">PLATFORM: UFOs WORLDWIDE MAIN HUB</a>
+
+        <a href="https://doi.org/10.5281/zenodo.20263839" class="node n5" target="_blank">MATH: THE RIEMANN HYPOTHESIS SUBTRACTION STRATEGY (20263839)</a>
+        <a href="https://doi.org/10.5281/zenodo.20277131" class="node n6" target="_blank">PHILOSOPHY: THE ANT'S HORIZON VARIABLE EXCLUSION (20277131)</a>
+
+        <a href="https://doi.org/10.5281/zenodo.20278265" class="node n7" target="_blank">QUANTUM: ETHER SENSOR SIGNAL INTEGRATION (20278265)</a>
+        <a href="https://doi.org/10.5281/zenodo.20276542" class="node n8" target="_blank">QUANTUM: HIDDEN VARIABLE EXTRACTION Q-HVE (20276542)</a>
+        <a href="https://doi.org/10.5281/zenodo.20242176" class="node n9" target="_blank">COMPUTING: THE ASYMPTOTIC FOUNDRY MULTI-AGENT SYSTEM (20242176)</a>
+
+        <a href="https://doi.org/10.5281/zenodo.20274511" class="node n10" target="_blank">COSMOLOGY: THE COSMIC WEB AS A MURRAY NETWORK (20274511)</a>
+        <a href="https://doi.org/10.5281/zenodo.20258025" class="node n11" target="_blank">COSMOLOGY: NESTED TOPOLOGICAL LATTICE UNIVERSE (20258025)</a>
+        <a href="https://doi.org/10.5281/zenodo.20257671" class="node n12" target="_blank">PROPULSION: TOPOLOGICAL-MÖBIUS-LATTICE COLLIDER (20257671)</a>
+        <a href="https://doi.org/10.5281/zenodo.19717522" class="node n13" target="_blank">PROPULSION: INTERSTELLAR MEDIUM NAVIGABLE TERRAIN (19717522)</a>
+        <a href="https://doi.org/10.5281/zenodo.19717287" class="node n14" target="_blank">SPACE SCIENCE: GALACTIC FORCING HELIOSPHERIC VARIABILITY (19717287)</a>
+        <a href="https://doi.org/10.5281/zenodo.20270891" class="node n15" target="_blank">MATERIALS: HIERARCHICAL ELECTRODE POROSITY MURRAY'S LAW (20270891)</a>
+
+        <a href="https://doi.org/10.5281/zenodo.20259839" class="node n16" target="_blank">RISK: THE EXTINCTION CODEX SYSTEMS TAXONOMY (20259839)</a>
+        <a href="https://doi.org/10.5281/zenodo.20219651" class="node n17" target="_blank">RISK: GLOBAL GEOSTABILITY INDEX SITING (20219651)</a>
+        <a href="https://doi.org/10.5281/zenodo.20192553" class="node n18" target="_blank">ENERGY: FOUR PILLARS FOR THE ARCHITECTS OF CIVILIZATION (20192553)</a>
+        <a href="https://doi.org/10.5281/zenodo.20181743" class="node n19" target="_blank">ENERGY: THE VERTICAL ERCOLOGY HYDRAULIC SPINE VAHS (20181743)</a>
+
+        <a href="https://doi.org/10.5281/zenodo.20180890" class="node n20" target="_blank">BIOLOGY: DSUP-INSPIRED PROPHYLACTIC RADIOPROTECTION (20180890)</a>
+        <a href="https://doi.org/10.5281/zenodo.19654306" class="node n21" target="_blank">BIOLOGY: THE IMMUNOLOGICAL TINNITUS SUBTYPE ITS (19654306)</a>
+        <a href="https://doi.org/10.5281/zenodo.20172776" class="node n22" target="_blank">GENEALOGY: UNITED EMPIRE LOYALIST JACKSON-MCFADDEN CHAIN (20172776)</a>
+        <a href="https://zenodo.org/records/20144596" class="node n23" target="_blank">GENEALOGY: THE O'DRISCOLL LINEAGE MASTER CORPUS (20144596)</a>
+
+        <a href="https://doi.org/10.5281/zenodo.19935260" class="node n24" target="_blank">WATER INTEL: MULTI-PARAMETER LEGIONELLA PREDICTION (19935260)</a>
+        <a href="https://doi.org/10.5281/zenodo.19948007" class="node n25" target="_blank">WATER INTEL: SEASONAL TEMPERATURE OUTBREAK RISK V2 (19948007)</a>
+        <a href="https://doi.org/10.5281/zenodo.19695022" class="node n26" target="_blank">WATER INTEL: SEASONAL TEMPERATURE OUTBREAK RISK V1 (19695022)</a>
+        <a href="https://doi.org/10.5281/zenodo.19653415" class="node n27" target="_blank">WATER INTEL: GRAND RIVER WATERSHED AI DATA CENTER IMPACTS (19653415)</a>
+
+        <a href="https://doi.org/10.5281/zenodo.19870281" class="node n28" target="_blank">INSTRUMENT: THE PRESIGNAL EM SENTINEL MONITORING NODE (19870281)</a>
+        <a href="https://doi.org/10.5281/zenodo.19870137" class="node n29" target="_blank">INSTRUMENT: TRIGGERED MULTI-SPECTRUM FIELD NODE v2.0 (19870137)</a>
+        <a href="https://doi.org/10.31223/X5J47D" class="node n30" target="_blank">EARTH SCIENCE: THE GEOLOGICAL PATHWAY DIVERSITY MODEL GPDM (X5J47D)</a>
     </div>
 
     <div class="brand-promise">
-        <p style="font-family:'Bebas Neue'; letter-spacing: 5px; font-size: 1.3rem; margin-bottom: 5px; color: var(--gold);">PRESIGNAL INC.</p>
-        <p style="font-size: 0.5rem; opacity: 0.7; letter-spacing: 2px; color: #fff;">GREAT RESPONSIBILITY · SEEK HELP · REWARD THE HEART</p>
+        <p style="font-family:'Bebas Neue', sans-serif; letter-spacing: 5px; font-size: 1.2rem; margin-bottom: 5px; color: var(--gold);">PRESIGNAL INC.</p>
+        <p style="font-size: 0.55rem; opacity: 0.7; letter-spacing: 2px; color: #ffffff;">GREAT RESPONSIBILITY · SEEK HELP · REWARD THE HEART</p>
     </div>
 </body>
 </html>
