@@ -1,6 +1,6 @@
 # Philosophy of the Garden
 
-> "The garden is not a trap. The path is the trap." — Anonymous
+&gt; "The garden is not a trap. The path is the trap." — Anonymous
 
 ## Influences
 
