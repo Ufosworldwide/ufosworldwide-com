@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Niagara Node — Sensor Collector</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #000;
+    color: #00ff41;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    padding: 16px;
+    min-height: 100vh;
+  }
+  h1 { font-size: 14px; letter-spacing: 0.2em; margin-bottom: 16px; color: #00ff41; border-bottom: 1px solid #003300; padding-bottom: 8px; }
+  .row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #001100; }
+  .label { color: #005511; }
+  .val { color: #00ff41; }
+  .val.ok { color: #00ff41; }
+  .val.warn { color: #ffaa00; }
+  .val.err { color: #ff3333; }
+  #status { margin: 12px 0; padding: 10px; border: 1px solid #003300; font-size: 12px; color: #00aa22; min-height: 40px; }
+  #log { margin-top: 12px; height: 200px; overflow-y: auto; font-size: 11px; color: #004400; }
+  .log-line { padding: 2px 0; border-bottom: 1px solid #001100; }
+  .log-line.ok { color: #00aa22; }
+  .log-line.err { color: #ff3333; }
+  button {
+    margin-top: 12px;
+    width: 100%;
+    padding: 12px;
+    background: #001a00;
+    border: 1px solid #00ff41;
+    color: #00ff41;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+  }
+  button:active { background: #003300; }
+  .pulse { animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+</style>
+</head>
+<body>
+
+<h1>◈ PRESIGNAL · NIAGARA FIELD NODE 001</h1>
+
+<div class="row"><span class="label">STATUS</span><span class="val" id="s-status">INITIALIZING</span></div>
+<div class="row"><span class="label">NODE ID</span><span class="val">NFN-001-NIAGARA</span></div>
+<div class="row"><span class="label">LOCATION</span><span class="val">43.4643°N 79.6909°W</span></div>
+<div class="row"><span class="label">INTERVAL</span><span class="val">60s</span></div>
+<div class="row"><span class="label">PUSHES SENT</span><span class="val" id="s-count">0</span></div>
+<div class="row"><span class="label">LAST PUSH</span><span class="val" id="s-last">—</span></div>
+<div class="row"><span class="label">MAG X/Y/Z (μT)</span><span class="val" id="s-mag">—</span></div>
+<div class="row"><span class="label">ACCEL X/Y/Z</span><span class="val" id="s-acc">—</span></div>
+<div class="row"><span class="label">GYRO X/Y/Z</span><span class="val" id="s-gyro">—</span></div>
+<div class="row"><span class="label">LIGHT (lux)</span><span class="val" id="s-light">—</span></div>
+<div class="row"><span class="label">ERRORS</span><span class="val" id="s-errors">0</span></div>
+
+<div id="status">Requesting sensor permissions...</div>
+
+<button onclick="startNode()">▶ START NODE</button>
+<button onclick="pushNow()" style="margin-top:4px; border-color:#005511; color:#005511;">PUSH NOW (TEST)</button>
+
+<div id="log"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, addDoc, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDYnezOndO4OUXdFdumwSobgOBf8n6fLdM",
+  authDomain: "anomaly-intelligence.firebaseapp.com",
+  projectId: "anomaly-intelligence",
+  storageBucket: "anomaly-intelligence.firebasestorage.app",
+  messagingSenderId: "341282991733",
+  appId: "1:341282991733:web:f01390ac6fadd4a261923c"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const nodeRef = collection(db, 'niagara-field-node');
+
+let pushCount = 0;
+let errorCount = 0;
+let intervalHandle = null;
+let isRunning = false;
+
+const sensors = {
+  mag: null,
+  accel: null,
+  gyro: null,
+  light: null
+};
+
+const latest = {
+  mag_x: null, mag_y: null, mag_z: null,
+  accel_x: null, accel_y: null, accel_z: null,
+  gyro_x: null, gyro_y: null, gyro_z: null,
+  light_lux: null
+};
+
+function log(msg, cls='') {
+  const el = document.getElementById('log');
+  const line = document.createElement('div');
+  line.className = 'log-line ' + cls;
+  const t = new Date().toISOString().slice(11,19);
+  line.textContent = `[${t}] ${msg}`;
+  el.insertBefore(line, el.firstChild);
+  while (el.children.length > 60) el.removeChild(el.lastChild);
+}
+
+function setStatus(msg) {
+  document.getElementById('s-status').textContent = msg;
+  document.getElementById('status').textContent = msg;
+}
+
+function initSensors() {
+  try {
+    if ('Magnetometer' in window) {
+      sensors.mag = new Magnetometer({ frequency: 1 });
+      sensors.mag.addEventListener('reading', () => {
+        latest.mag_x = sensors.mag.x;
+        latest.mag_y = sensors.mag.y;
+        latest.mag_z = sensors.mag.z;
+        document.getElementById('s-mag').textContent =
+          `${sensors.mag.x?.toFixed(2)} / ${sensors.mag.y?.toFixed(2)} / ${sensors.mag.z?.toFixed(2)}`;
+      });
+      sensors.mag.addEventListener('error', e => log('MAG error: ' + e.error?.message, 'err'));
+      sensors.mag.start();
+      log('AK09918 Magnetometer started @ 1Hz', 'ok');
+    } else {
+      log('Magnetometer API not available — using DeviceOrientationEvent fallback', 'err');
+      window.addEventListener('deviceorientation', e => {
+        latest.mag_x = e.alpha;
+        latest.mag_y = e.beta;
+        latest.mag_z = e.gamma;
+      });
+    }
+  } catch(e) { log('Magnetometer init failed: ' + e.message, 'err'); }
+
+  try {
+    if ('Accelerometer' in window) {
+      sensors.accel = new Accelerometer({ frequency: 1 });
+      sensors.accel.addEventListener('reading', () => {
+        latest.accel_x = sensors.accel.x;
+        latest.accel_y = sensors.accel.y;
+        latest.accel_z = sensors.accel.z;
+        document.getElementById('s-acc').textContent =
+          `${sensors.accel.x?.toFixed(3)} / ${sensors.accel.y?.toFixed(3)} / ${sensors.accel.z?.toFixed(3)}`;
+      });
+      sensors.accel.addEventListener('error', e => log('ACC error: ' + e.error?.message, 'err'));
+      sensors.accel.start();
+      log('LSM6DSO Accelerometer started @ 1Hz', 'ok');
+    } else {
+      window.addEventListener('devicemotion', e => {
+        const a = e.accelerationIncludingGravity;
+        if (a) { latest.accel_x = a.x; latest.accel_y = a.y; latest.accel_z = a.z; }
+      });
+      log('Accelerometer API not available — using DeviceMotion fallback', 'err');
+    }
+  } catch(e) { log('Accelerometer init failed: ' + e.message, 'err'); }
+
+  try {
+    if ('Gyroscope' in window) {
+      sensors.gyro = new Gyroscope({ frequency: 1 });
+      sensors.gyro.addEventListener('reading', () => {
+        latest.gyro_x = sensors.gyro.x;
+        latest.gyro_y = sensors.gyro.y;
+        latest.gyro_z = sensors.gyro.z;
+        document.getElementById('s-gyro').textContent =
+          `${sensors.gyro.x?.toFixed(4)} / ${sensors.gyro.y?.toFixed(4)} / ${sensors.gyro.z?.toFixed(4)}`;
+      });
+      sensors.gyro.start();
+      log('LSM6DSO Gyroscope started @ 1Hz', 'ok');
+    }
+  } catch(e) { log('Gyroscope init failed: ' + e.message, 'err'); }
+
+  try {
+    if ('AmbientLightSensor' in window) {
+      sensors.light = new AmbientLightSensor({ frequency: 1 });
+      sensors.light.addEventListener('reading', () => {
+        latest.light_lux = sensors.light.illuminance;
+        document.getElementById('s-light').textContent =
+          sensors.light.illuminance?.toFixed(1) + ' lux';
+      });
+      sensors.light.start();
+      log('STK31610 Ambient Light started', 'ok');
+    }
+  } catch(e) { log('ALS init failed: ' + e.message, 'err'); }
+}
+
+async function pushData() {
+  const payload = {
+    node_id: 'NFN-001-NIAGARA',
+    lat: 43.4643,
+    lng: -79.6909,
+    timestamp: serverTimestamp(),
+    client_time: new Date().toISOString(),
+    mag_x: latest.mag_x,
+    mag_y: latest.mag_y,
+    mag_z: latest.mag_z,
+    accel_x: latest.accel_x,
+    accel_y: latest.accel_y,
+    accel_z: latest.accel_z,
+    gyro_x: latest.gyro_x,
+    gyro_y: latest.gyro_y,
+    gyro_z: latest.gyro_z,
+    light_lux: latest.light_lux,
+    mag_total: (latest.mag_x && latest.mag_y && latest.mag_z)
+      ? Math.sqrt(latest.mag_x**2 + latest.mag_y**2 + latest.mag_z**2)
+      : null
+  };
+
+  try {
+    await addDoc(nodeRef, payload);
+    pushCount++;
+    document.getElementById('s-count').textContent = pushCount;
+    document.getElementById('s-last').textContent = new Date().toISOString().slice(11,19) + ' UTC';
+    log(`Push #${pushCount} OK — MAG ${latest.mag_x?.toFixed(2)}/${latest.mag_y?.toFixed(2)}/${latest.mag_z?.toFixed(2)} μT`, 'ok');
+  } catch(e) {
+    errorCount++;
+    document.getElementById('s-errors').textContent = errorCount;
+    log('Push FAILED: ' + e.message, 'err');
+  }
+}
+
+async function startNode() {
+  if (isRunning) return;
+
+  setStatus('Requesting permissions...');
+
+  try {
+    const perms = await Promise.all([
+      navigator.permissions.query({ name: 'accelerometer' }),
+      navigator.permissions.query({ name: 'magnetometer' }),
+      navigator.permissions.query({ name: 'gyroscope' })
+    ]);
+    log('Permissions: ' + perms.map(p => p.state).join(', '), 'ok');
+  } catch(e) {
+    log('Permission query not supported — proceeding anyway', 'err');
+  }
+
+  initSensors();
+
+  await new Promise(r => setTimeout(r, 2000));
+  await pushData();
+
+  intervalHandle = setInterval(pushData, 60000);
+  isRunning = true;
+  setStatus('● NODE ACTIVE — pushing every 60s');
+  document.getElementById('s-status').className = 'val ok pulse';
+  log('Node started — interval 60s', 'ok');
+}
+
+async function pushNow() {
+  log('Manual push triggered', 'ok');
+  await pushData();
+}
+
+window.startNode = startNode;
+window.pushNow = pushNow;
+
+log('PWA loaded — tap START NODE to begin', 'ok');
+setStatus('Ready — tap START NODE');
+</script>
+</body>
+</html>
