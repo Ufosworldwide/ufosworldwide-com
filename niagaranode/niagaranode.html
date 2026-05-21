@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Niagara Field Node — Presignal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --matrix-green: #00ff41;
+    --matrix-bright: #ccffcc;
+    --matrix-dim: #003b00;
+    --matrix-mid: #00aa22;
+    --bg: #000000;
+    --panel-bg: rgba(0, 8, 0, 0.82);
+    --panel-border: rgba(0, 255, 65, 0.25);
+    --panel-border-hover: rgba(0, 255, 65, 0.9);
+    --text-primary: #00ff41;
+    --text-secondary: #00aa22;
+    --text-dim: #005511;
+    --accent: #00ff41;
+    --danger: #ff3333;
+    --warning: #ffaa00;
+    --info: #00ffff;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: #000;
+    overflow-x: hidden;
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--text-primary);
+  }
+
+  /* ── MATRIX CANVAS BACKGROUND ── */
+  #matrix-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+  }
+
+  /* ── OVERLAY CANVAS (transparent, on top of dashboard) ── */
+  #matrix-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 10;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  #app {
+    position: relative;
+    z-index: 5;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--panel-border);
+  }
+
+  .logo-block {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  .logo-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--matrix-green);
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 20px rgba(0,255,65,0.8), 0 0 40px rgba(0,255,65,0.4);
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text-secondary);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .header-status {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    letter-spacing: 0.1em;
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--matrix-green);
+    box-shadow: 0 0 8px var(--matrix-green);
+    animation: pulse-dot 2s ease-in-out infinite;
+    margin-right: 6px;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--matrix-green); }
+    50% { opacity: 0.5; box-shadow: 0 0 4px var(--matrix-green); }
+  }
+
+  .utc-clock {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    color: var(--matrix-green);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── INSTRUCTION STRIP ── */
+  .hint-strip {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    animation: flicker 4s ease-in-out infinite;
+  }
+
+  @keyframes flicker {
+    0%, 90%, 100% { opacity: 0.4; }
+    95% { opacity: 0.9; }
+  }
+
+  /* ── METRIC CARDS ROW ── */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .metric-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    padding: 16px;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    cursor: default;
+  }
+
+  .metric-card:hover {
+    border-color: var(--panel-border-hover);
+    box-shadow: 0 0 20px rgba(0,255,65,0.15), inset 0 0 20px rgba(0,255,65,0.05);
+    background: rgba(0, 20, 0, 0.92);
+  }
+
+  .metric-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .metric-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--matrix-green);
+    text-shadow: 0 0 10px rgba(0,255,65,0.5);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .metric-value.anomaly { color: var(--danger); text-shadow: 0 0 10px rgba(255,51,51,0.5); }
+  .metric-value.warning { color: var(--warning); text-shadow: 0 0 10px rgba(255,170,0,0.5); }
+  .metric-value.info { color: var(--info); text-shadow: 0 0 10px rgba(0,255,255,0.5); }
+
+  .metric-unit {
+    font-size: 10px;
+    color: var(--text-secondary);
+    letter-spacing: 0.1em;
+  }
+
+  .metric-delta {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  /* ── MAIN GRID ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── PANEL ── */
+  .panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    padding: 20px;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  }
+
+  .panel:hover {
+    border-color: var(--panel-border-hover);
+    box-shadow: 0 0 30px rgba(0,255,65,0.12), inset 0 0 30px rgba(0,255,65,0.04);
+    background: rgba(0, 20, 0, 0.92);
+  }
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--panel-border);
+  }
+
+  .panel-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .panel-badge {
+    font-size: 9px;
+    padding: 2px 8px;
+    border: 1px solid var(--panel-border);
+    border-radius: 2px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .panel-badge.live {
+    border-color: var(--matrix-green);
+    color: var(--matrix-green);
+    animation: pulse-badge 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-badge {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* ── CHART CANVAS ── */
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 160px;
+  }
+
+  /* ── DATA TABLE ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+
+  .data-table th {
+    text-align: left;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-size: 9px;
+    padding: 0 0 8px 0;
+    border-bottom: 1px solid var(--panel-border);
+    font-weight: 400;
+  }
+
+  .data-table td {
+    padding: 7px 0;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(0,255,65,0.05);
+    vertical-align: middle;
+  }
+
+  .data-table td.val {
+    color: var(--matrix-green);
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+  }
+
+  .data-table td.val.dim { color: var(--text-dim); }
+  .data-table td.val.warn { color: var(--warning); }
+  .data-table td.val.alert { color: var(--danger); }
+  .data-table td.val.info { color: var(--info); }
+
+  /* ── LIVE FEED ── */
+  .live-feed {
+    height: 200px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--matrix-dim) transparent;
+  }
+
+  .feed-line {
+    font-size: 10px;
+    color: var(--text-dim);
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(0,255,65,0.03);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: 'Share Tech Mono', monospace;
+    animation: fadein 0.3s ease;
+  }
+
+  @keyframes fadein { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: none; } }
+
+  .feed-line .ts { color: var(--matrix-dim); margin-right: 8px; }
+  .feed-line .tag { color: var(--matrix-mid); margin-right: 8px; }
+  .feed-line .data { color: var(--matrix-green); }
+  .feed-line.alert-line .data { color: var(--danger); }
+  .feed-line.warn-line .data { color: var(--warning); }
+
+  /* ── BOTTOM WIDE PANEL ── */
+  .wide-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .wide-panel:hover {
+    border-color: var(--panel-border-hover);
+    box-shadow: 0 0 30px rgba(0,255,65,0.12);
+  }
+
+  /* ── SENSOR STATUS ROW ── */
+  .sensor-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .sensor-pill {
+    font-size: 10px;
+    padding: 4px 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 2px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+
+  .sensor-pill.active {
+    border-color: var(--matrix-green);
+    color: var(--matrix-green);
+    background: rgba(0,255,65,0.05);
+  }
+
+  .sensor-pill.inactive {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  /* ── CORRELATION EVENTS ── */
+  .event-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .event-item {
+    padding: 10px 14px;
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    font-size: 11px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .event-item.nominal { border-left: 3px solid var(--matrix-dim); }
+  .event-item.elevated { border-left: 3px solid var(--warning); }
+  .event-item.anomaly { border-left: 3px solid var(--danger); }
+
+  .event-time { color: var(--text-dim); min-width: 80px; font-size: 10px; }
+  .event-type { color: var(--text-secondary); min-width: 120px; letter-spacing: 0.1em; text-transform: uppercase; font-size: 9px; }
+  .event-val { color: var(--matrix-green); font-family: 'Orbitron', monospace; font-size: 12px; }
+  .event-item.elevated .event-val { color: var(--warning); }
+  .event-item.anomaly .event-val { color: var(--danger); }
+  .event-desc { color: var(--text-dim); font-size: 10px; flex: 1; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--panel-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  .footer a { color: var(--text-secondary); text-decoration: none; }
+  .footer a:hover { color: var(--matrix-green); }
+
+  /* ── WAITING STATE ── */
+  .waiting-msg {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+  }
+
+  .waiting-msg .blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--matrix-dim); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- MATRIX BACKGROUND (always visible) -->
+<canvas id="matrix-bg"></canvas>
+
+<!-- DASHBOARD (middle layer) -->
+<div id="app">
+
+  <header class="header">
+    <div class="logo-block">
+      <div class="logo-title">PRESIGNAL</div>
+      <div class="logo-sub">Niagara Field Node · Station 001</div>
+    </div>
+    <div class="header-status">
+      <span><span class="status-dot"></span>NODE ACTIVE</span>
+      <span>43.4643° N · 79.6909° W</span>
+      <span class="utc-clock" id="clock">--:--:-- UTC</span>
+    </div>
+  </header>
+
+  <div class="hint-strip">[ hover to reveal through the matrix ]</div>
+
+  <!-- METRIC CARDS -->
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-label">Magnetic X</div>
+      <div class="metric-value" id="mag-x">---</div>
+      <div class="metric-unit">μT · AK09918</div>
+      <div class="metric-delta" id="mag-x-delta">baseline loading...</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Magnetic Y</div>
+      <div class="metric-value" id="mag-y">---</div>
+      <div class="metric-unit">μT · AK09918</div>
+      <div class="metric-delta" id="mag-y-delta">baseline loading...</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Magnetic Z</div>
+      <div class="metric-value" id="mag-z">---</div>
+      <div class="metric-unit">μT · AK09918</div>
+      <div class="metric-delta" id="mag-z-delta">baseline loading...</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Seismic Z</div>
+      <div class="metric-value" id="accel-z">---</div>
+      <div class="metric-unit">m/s² · LSM6DSO</div>
+      <div class="metric-delta" id="accel-delta">baseline loading...</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Ambient Light</div>
+      <div class="metric-value" id="light-val">---</div>
+      <div class="metric-unit">lux · STK31610</div>
+      <div class="metric-delta" id="light-delta">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Anomaly Events</div>
+      <div class="metric-value" id="anomaly-count">0</div>
+      <div class="metric-unit">last 24h</div>
+      <div class="metric-delta" id="last-event">no events logged</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- MAGNETOMETER CHART -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Magnetometer · 60s rolling</span>
+        <span class="panel-badge live">LIVE</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="mag-chart" role="img" aria-label="Rolling magnetometer X Y Z readings over time">Magnetometer data loading...</canvas>
+      </div>
+    </div>
+
+    <!-- SEISMIC CHART -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Seismic · Accelerometer Z-axis</span>
+        <span class="panel-badge live">LIVE</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="accel-chart" role="img" aria-label="Rolling Z-axis accelerometer readings">Seismic data loading...</canvas>
+      </div>
+    </div>
+
+    <!-- SENSOR STATUS TABLE -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Sensor Status</span>
+        <span class="panel-badge">SAMSUNG S20 FE</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Sensor</th>
+            <th>Vendor</th>
+            <th>Rate</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>AK09918 Magnetometer</td><td>AKM</td><td class="val">100 Hz</td><td class="val" id="s-mag">INIT</td></tr>
+          <tr><td>LSM6DSO Accelerometer</td><td>STMicro</td><td class="val">416 Hz</td><td class="val" id="s-acc">INIT</td></tr>
+          <tr><td>STK31610 Ambient Light</td><td>Sensortek</td><td class="val">ON-CHG</td><td class="val" id="s-als">INIT</td></tr>
+          <tr><td>LSM6DSO Gyroscope</td><td>STMicro</td><td class="val">416 Hz</td><td class="val" id="s-gyro">INIT</td></tr>
+          <tr><td>Google SeismicMonitor</td><td>Google</td><td class="val">50 Hz</td><td class="val info">RUNNING</td></tr>
+          <tr><td>WideIR ALS</td><td>Sensortek</td><td class="val">ON-CHG</td><td class="val" id="s-ir">INIT</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- LIVE FEED -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Live Data Feed</span>
+        <span class="panel-badge live">STREAMING</span>
+      </div>
+      <div class="live-feed" id="live-feed">
+        <div class="feed-line"><span class="ts">--:--:--</span><span class="tag">[INIT]</span><span class="data">Awaiting node connection...</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CORRELATION EVENTS PANEL -->
+  <div class="wide-panel">
+    <div class="panel-header">
+      <span class="panel-title">Anomaly Log · Multi-channel Correlation Events</span>
+      <span class="panel-badge" id="events-count">0 EVENTS</span>
+    </div>
+    <div class="event-list" id="event-list">
+      <div class="event-item nominal">
+        <span class="event-time">--:--:--</span>
+        <span class="event-type">NOMINAL</span>
+        <span class="event-val">—</span>
+        <span class="event-desc">No anomaly events logged. Baseline collection in progress.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CROSS-REFERENCE PANEL -->
+  <div class="wide-panel">
+    <div class="panel-header">
+      <span class="panel-title">Cross-Reference · External Feed Status</span>
+      <span class="panel-badge">GPDM v2.4</span>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Feed</th>
+          <th>Source</th>
+          <th>Last Value</th>
+          <th>Correlation</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Kp Geomagnetic Index</td>
+          <td>NOAA SWPC</td>
+          <td class="val" id="kp-val">—</td>
+          <td class="val dim" id="kp-corr">—</td>
+          <td class="val info">EXT FEED</td>
+        </tr>
+        <tr>
+          <td>USGS Seismic (M2.5+)</td>
+          <td>USGS Earthquake</td>
+          <td class="val" id="usgs-val">—</td>
+          <td class="val dim" id="usgs-corr">—</td>
+          <td class="val info">EXT FEED</td>
+        </tr>
+        <tr>
+          <td>NASA DONKI Solar Events</td>
+          <td>NASA DONKI</td>
+          <td class="val" id="donki-val">—</td>
+          <td class="val dim" id="donki-corr">—</td>
+          <td class="val info">EXT FEED</td>
+        </tr>
+        <tr>
+          <td>Local Magnetic Field</td>
+          <td>Niagara Node 001</td>
+          <td class="val" id="local-mag">—</td>
+          <td class="val dim">PRIMARY</td>
+          <td class="val" id="local-status">INIT</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="footer">
+    <span>PRESIGNAL INC. · NIAGARA REGION · ONTARIO · CANADA · ORCID 0009-0004-1363-304X</span>
+    <span><a href="/">ufosworldwide.com</a> · <a href="/presignal">presignal</a></span>
+    <span id="node-uptime">UPTIME: 00:00:00</span>
+  </footer>
+
+</div>
+
+<!-- MATRIX OVERLAY (on top, reveals on hover) -->
+<canvas id="matrix-overlay"></canvas>
+
+<!-- CHART.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, onSnapshot, query, orderBy, limit, addDoc, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "FIREBASE_API_KEY_PLACEHOLDER",
+  authDomain: "anomaly-intelligence.firebaseapp.com",
+  projectId: "anomaly-intelligence",
+  storageBucket: "anomaly-intelligence.appspot.com",
+  messagingSenderId: "FIREBASE_SENDER_ID_PLACEHOLDER",
+  appId: "FIREBASE_APP_ID_PLACEHOLDER"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const nodeRef = collection(db, 'niagara-field-node');
+const q = query(nodeRef, orderBy('timestamp', 'desc'), limit(120));
+
+const magHistory = { x: [], y: [], z: [], labels: [] };
+const accelHistory = { z: [], labels: [] };
+const MAX_POINTS = 60;
+
+let anomalyCount = 0;
+let startTime = Date.now();
+let magBaseline = null;
+let feedInitialized = false;
+
+function ts() {
+  return new Date().toISOString().slice(11,19) + ' UTC';
+}
+
+function addFeedLine(tag, data, cls='') {
+  const feed = document.getElementById('live-feed');
+  const line = document.createElement('div');
+  line.className = 'feed-line' + (cls ? ' ' + cls : '');
+  line.innerHTML = `<span class="ts">${ts()}</span><span class="tag">[${tag}]</span><span class="data">${data}</span>`;
+  feed.insertBefore(line, feed.firstChild);
+  while (feed.children.length > 80) feed.removeChild(feed.lastChild);
+}
+
+function updateMetrics(doc) {
+  const d = doc.data();
+  if (!d) return;
+
+  const mx = d.mag_x?.toFixed(2) ?? '---';
+  const my = d.mag_y?.toFixed(2) ?? '---';
+  const mz = d.mag_z?.toFixed(2) ?? '---';
+  const az = d.accel_z?.toFixed(4) ?? '---';
+  const lux = d.light_lux?.toFixed(1) ?? '---';
+
+  document.getElementById('mag-x').textContent = mx;
+  document.getElementById('mag-y').textContent = my;
+  document.getElementById('mag-z').textContent = mz;
+  document.getElementById('accel-z').textContent = az;
+  document.getElementById('light-val').textContent = lux;
+  document.getElementById('local-mag').textContent = `${mx} μT`;
+  document.getElementById('local-status').textContent = 'LIVE';
+  document.getElementById('local-status').className = 'val';
+
+  ['s-mag','s-acc','s-als','s-gyro','s-ir'].forEach(id => {
+    const el = document.getElementById(id);
+    el.textContent = 'ONLINE';
+    el.className = 'val';
+  });
+
+  if (!magBaseline && d.mag_x) {
+    magBaseline = { x: d.mag_x, y: d.mag_y, z: d.mag_z };
+  }
+
+  if (magBaseline) {
+    const dx = (d.mag_x - magBaseline.x).toFixed(3);
+    const dy = (d.mag_y - magBaseline.y).toFixed(3);
+    const dz = (d.mag_z - magBaseline.z).toFixed(3);
+    document.getElementById('mag-x-delta').textContent = `Δ ${dx > 0 ? '+' : ''}${dx} from baseline`;
+    document.getElementById('mag-y-delta').textContent = `Δ ${dy > 0 ? '+' : ''}${dy} from baseline`;
+    document.getElementById('mag-z-delta').textContent = `Δ ${dz > 0 ? '+' : ''}${dz} from baseline`;
+
+    const absDelta = Math.abs(d.mag_x - magBaseline.x);
+    if (absDelta > 2.0) {
+      checkAnomaly('MAG-X SPIKE', `${dx} μT deviation`, 'anomaly');
+    }
+  }
+
+  if (!feedInitialized) {
+    addFeedLine('NODE', 'Niagara Field Node 001 connected');
+    addFeedLine('SENSOR', `AK09918 magnetometer online @ 100Hz`);
+    addFeedLine('SENSOR', `LSM6DSO accelerometer online @ 416Hz`);
+    addFeedLine('GPDM', 'Pathway 1 monitoring active — p-hole ULF detection');
+    feedInitialized = true;
+  }
+
+  addFeedLine('DATA', `MAG ${mx}/${my}/${mz}μT | ACC ${az}m/s² | LUX ${lux}`);
+
+  const t = new Date().toISOString().slice(11,16);
+  if (magHistory.labels.length >= MAX_POINTS) {
+    magHistory.x.shift(); magHistory.y.shift(); magHistory.z.shift(); magHistory.labels.shift();
+    accelHistory.z.shift(); accelHistory.labels.shift();
+  }
+  if (d.mag_x) { magHistory.x.push(d.mag_x); magHistory.y.push(d.mag_y); magHistory.z.push(d.mag_z); magHistory.labels.push(t); }
+  if (d.accel_z) { accelHistory.z.push(d.accel_z); accelHistory.labels.push(t); }
+
+  magChart.data.labels = magHistory.labels;
+  magChart.data.datasets[0].data = magHistory.x;
+  magChart.data.datasets[1].data = magHistory.y;
+  magChart.data.datasets[2].data = magHistory.z;
+  magChart.update('none');
+
+  accelChart.data.labels = accelHistory.labels;
+  accelChart.data.datasets[0].data = accelHistory.z;
+  accelChart.update('none');
+}
+
+function checkAnomaly(type, value, level='elevated') {
+  anomalyCount++;
+  document.getElementById('anomaly-count').textContent = anomalyCount;
+  document.getElementById('anomaly-count').className = 'metric-value anomaly';
+  document.getElementById('last-event').textContent = `last: ${ts()}`;
+  document.getElementById('events-count').textContent = `${anomalyCount} EVENTS`;
+
+  const list = document.getElementById('event-list');
+  const item = document.createElement('div');
+  item.className = `event-item ${level}`;
+  item.innerHTML = `
+    <span class="event-time">${ts()}</span>
+    <span class="event-type">${type}</span>
+    <span class="event-val">${value}</span>
+    <span class="event-desc">Multi-channel deviation detected. Cross-reference with NOAA/USGS feeds.</span>`;
+  list.insertBefore(item, list.firstChild);
+  if (list.children.length > 20) list.removeChild(list.lastChild);
+
+  addFeedLine('ANOMALY', `${type} :: ${value}`, level === 'anomaly' ? 'alert-line' : 'warn-line');
+}
+
+onSnapshot(q, (snap) => {
+  if (!snap.empty) {
+    updateMetrics(snap.docs[0]);
+  }
+}, (err) => {
+  addFeedLine('ERROR', 'Firestore connection failed: ' + err.message, 'alert-line');
+  document.getElementById('local-status').textContent = 'ERROR';
+  document.getElementById('local-status').className = 'val alert';
+});
+
+window._addAnomaly = checkAnomaly;
+</script>
+
+<script>
+/* ── CHARTS ── */
+const chartDefaults = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: false,
+  plugins: { legend: { display: false } },
+  scales: {
+    x: { display: false },
+    y: {
+      ticks: { color: '#005511', font: { family: 'Share Tech Mono', size: 10 }, maxTicksLimit: 4 },
+      grid: { color: 'rgba(0,255,65,0.05)' },
+      border: { color: 'rgba(0,255,65,0.1)' }
+    }
+  }
+};
+
+const magChart = new Chart(document.getElementById('mag-chart'), {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [
+      { label: 'X', data: [], borderColor: '#00ff41', borderWidth: 1.5, pointRadius: 0, tension: 0.3 },
+      { label: 'Y', data: [], borderColor: '#00ffff', borderWidth: 1.5, pointRadius: 0, tension: 0.3 },
+      { label: 'Z', data: [], borderColor: '#00aa22', borderWidth: 1.5, pointRadius: 0, tension: 0.3 }
+    ]
+  },
+  options: { ...chartDefaults }
+});
+
+const accelChart = new Chart(document.getElementById('accel-chart'), {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [
+      { label: 'Z', data: [], borderColor: '#00ff41', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: true,
+        backgroundColor: 'rgba(0,255,65,0.03)' }
+    ]
+  },
+  options: { ...chartDefaults }
+});
+
+/* ── UTC CLOCK ── */
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toUTCString().slice(17,25) + ' UTC';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ── UPTIME ── */
+const startTime = Date.now();
+setInterval(() => {
+  const s = Math.floor((Date.now() - startTime) / 1000);
+  const h = String(Math.floor(s/3600)).padStart(2,'0');
+  const m = String(Math.floor((s%3600)/60)).padStart(2,'0');
+  const sec = String(s%60).padStart(2,'0');
+  document.getElementById('node-uptime').textContent = `UPTIME: ${h}:${m}:${sec}`;
+}, 1000);
+
+/* ══════════════════════════════════════════════
+   MATRIX RAIN — DUAL CANVAS SYSTEM
+   bg canvas  : full opaque matrix, always visible behind dashboard
+   overlay canvas : semi-transparent matrix ON TOP of dashboard
+                    cursor proximity reveals dashboard through overlay
+   ══════════════════════════════════════════════ */
+
+const CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF∇∆∑∏⊕⊗≡≈∞ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*274';
+const FONT_SIZE = 14;
+const GREEN_SHADES = ['#003300','#004400','#005500','#006600','#008800','#00aa00','#00cc22','#00ee33','#00ff41','#ccffcc'];
+const BRIGHT = '#ccffcc';
+
+/* BG CANVAS — full opaque */
+const bgCanvas = document.getElementById('matrix-bg');
+const bgCtx = bgCanvas.getContext('2d');
+
+/* OVERLAY CANVAS */
+const ovCanvas = document.getElementById('matrix-overlay');
+const ovCtx = ovCanvas.getContext('2d');
+
+let cols, drops_bg, drops_ov, brightCol_bg, brightCol_ov;
+let mouseX = -999, mouseY = -999;
+const REVEAL_RADIUS = 180;
+
+function initMatrix() {
+  bgCanvas.width = ovCanvas.width = window.innerWidth;
+  bgCanvas.height = ovCanvas.height = window.innerHeight;
+  cols = Math.floor(window.innerWidth / FONT_SIZE);
+  drops_bg = Array(cols).fill(1).map(() => Math.random() * -100);
+  drops_ov = Array(cols).fill(1).map(() => Math.random() * -100);
+  brightCol_bg = Array(cols).fill(0).map(() => Math.floor(Math.random() * GREEN_SHADES.length));
+  brightCol_ov = Array(cols).fill(0).map(() => Math.floor(Math.random() * GREEN_SHADES.length));
+}
+
+function drawBg() {
+  bgCtx.fillStyle = 'rgba(0,0,0,0.05)';
+  bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+  bgCtx.font = FONT_SIZE + 'px "Share Tech Mono", monospace';
+
+  for (let i = 0; i < cols; i++) {
+    const char = CHARS[Math.floor(Math.random() * CHARS.length)];
+    const y = drops_bg[i] * FONT_SIZE;
+    const x = i * FONT_SIZE;
+
+    if (drops_bg[i] === Math.floor(drops_bg[i]) && Math.random() > 0.7) {
+      bgCtx.fillStyle = BRIGHT;
+    } else {
+      bgCtx.fillStyle = GREEN_SHADES[Math.floor(Math.random() * GREEN_SHADES.length)];
+    }
+    bgCtx.fillText(char, x, y);
+
+    if (y > bgCanvas.height && Math.random() > 0.975) drops_bg[i] = 0;
+    drops_bg[i] += 0.5;
+  }
+}
+
+function drawOverlay() {
+  ovCtx.clearRect(0, 0, ovCanvas.width, ovCanvas.height);
+
+  /* Compute per-column opacity based on mouse distance */
+  for (let i = 0; i < cols; i++) {
+    const x = i * FONT_SIZE + FONT_SIZE / 2;
+
+    /* Find min distance from mouse to any point in this column */
+    let minDist = Infinity;
+    const colTop = 0;
+    const colBot = ovCanvas.height;
+    const closestY = Math.max(colTop, Math.min(colBot, mouseY));
+    minDist = Math.hypot(x - mouseX, closestY - mouseY);
+
+    /* Opacity: 0 when mouse is close, 0.72 when far */
+    const proximity = Math.max(0, 1 - minDist / REVEAL_RADIUS);
+    const opacity = 0.72 * (1 - proximity);
+
+    if (opacity < 0.01) continue;
+
+    const char = CHARS[Math.floor(Math.random() * CHARS.length)];
+    const y = drops_ov[i] * FONT_SIZE;
+
+    ovCtx.globalAlpha = opacity;
+    if (drops_ov[i] === Math.floor(drops_ov[i]) && Math.random() > 0.7) {
+      ovCtx.fillStyle = BRIGHT;
+    } else {
+      ovCtx.fillStyle = GREEN_SHADES[3 + Math.floor(Math.random() * 4)];
+    }
+    ovCtx.font = FONT_SIZE + 'px "Share Tech Mono", monospace';
+    ovCtx.fillText(char, x, y);
+    ovCtx.globalAlpha = 1;
+
+    if (y > ovCanvas.height && Math.random() > 0.975) drops_ov[i] = 0;
+    drops_ov[i] += 0.4;
+  }
+
+  /* Soft circular reveal gradient centered on mouse */
+  if (mouseX > 0) {
+    const grd = ovCtx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, REVEAL_RADIUS);
+    grd.addColorStop(0, 'rgba(0,0,0,0.0)');
+    grd.addColorStop(0.6, 'rgba(0,0,0,0.0)');
+    grd.addColorStop(1, 'rgba(0,0,0,0.0)');
+    ovCtx.fillStyle = grd;
+  }
+}
+
+function animate() {
+  drawBg();
+  drawOverlay();
+  requestAnimationFrame(animate);
+}
+
+/* Track mouse on the document */
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+document.addEventListener('mouseleave', () => {
+  mouseX = -999;
+  mouseY = -999;
+});
+
+/* Touch support */
+document.addEventListener('touchmove', e => {
+  mouseX = e.touches[0].clientX;
+  mouseY = e.touches[0].clientY;
+}, { passive: true });
+
+window.addEventListener('resize', initMatrix);
+
+initMatrix();
+animate();
+</script>
+</body>
+</html>
