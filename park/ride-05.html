@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ride 05 — The Geometry Garden · Presignal Amusement Park</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root { --black:#070503; --deep:#0f0a04; --coal:#1a1108; --ember:#c8420a; --fire:#e85d1a; --amber:#d4820a; --gold:#f0b429; --pale-gold:#f5d07a; --ash:#7a5530; --parchment:#f0ddb0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--black); color:var(--parchment); font-family:'Crimson Pro',serif; min-height:100vh; overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:0.7; }
+  .nav { position:relative; z-index:1; padding:24px 32px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(212,130,10,0.1); }
+  .nav-back { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.3em; color:var(--ash); text-decoration:none; text-transform:uppercase; transition:color 0.2s; }
+  .nav-back:hover { color:var(--amber); }
+  .nav-ride { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.3em; color:var(--ember); }
+  .hero { position:relative; z-index:1; padding:80px 24px 60px; text-align:center; max-width:680px; margin:0 auto; }
+  .ride-num { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.4em; color:var(--amber); margin-bottom:20px; display:block; }
+  .ride-title { font-family:'Cinzel',serif; font-size:clamp(2rem,7vw,3.8rem); font-weight:900; background:linear-gradient(135deg,var(--gold),var(--fire),var(--amber)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1.1; margin-bottom:32px; }
+  .ride-intro { font-size:1.05rem; line-height:1.9; color:var(--parchment); opacity:0.85; }
+  .flame-line { width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--ember),var(--gold),var(--ember),transparent); opacity:0.5; margin:60px 0; }
+  .challenge-section { position:relative; z-index:1; max-width:680px; margin:0 auto; padding:0 24px 100px; }
+  .challenge-label { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.35em; color:var(--amber); text-transform:uppercase; margin-bottom:32px; display:block; }
+  .puzzle-list { margin:32px 0; }
+  .puzzle-row { display:flex; gap:20px; padding:18px 0; border-bottom:1px solid rgba(212,130,10,0.1); align-items:flex-start; }
+  .puzzle-row:last-child { border-bottom:none; }
+  .puzzle-num { font-family:'Cinzel',serif; font-size:0.65rem; color:var(--ember); min-width:32px; padding-top:2px; }
+  .puzzle-info { flex:1; }
+  .puzzle-name { font-family:'Cinzel',serif; font-size:0.8rem; color:var(--pale-gold); margin-bottom:4px; }
+  .puzzle-desc { font-size:0.85rem; color:var(--parchment); opacity:0.65; line-height:1.6; }
+  .garden-link { display:block; text-align:center; margin:40px auto; padding:20px 40px; border:1px solid var(--amber); color:var(--gold); font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:0.3em; text-decoration:none; text-transform:uppercase; max-width:320px; transition:all 0.3s ease; background:rgba(26,17,8,0.6); }
+  .garden-link:hover { background:rgba(212,130,10,0.1); border-color:var(--gold); }
+  .challenge-block { border-left:2px solid var(--ember); padding:24px 28px; margin-bottom:32px; background:rgba(26,17,8,0.6); }
+  .challenge-block h3 { font-family:'Cinzel',serif; font-size:0.85rem; font-weight:600; color:var(--pale-gold); letter-spacing:0.1em; margin-bottom:12px; }
+  .challenge-block p { font-size:0.95rem; line-height:1.8; color:var(--parchment); opacity:0.85; margin-bottom:10px; }
+  .challenge-block p:last-child { margin-bottom:0; }
+  .submit-block { margin-top:60px; padding:32px; border:1px solid rgba(200,66,10,0.3); background:rgba(20,10,4,0.8); text-align:center; }
+  .submit-label { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.3em; color:var(--amber); text-transform:uppercase; margin-bottom:16px; display:block; }
+  .submit-email { font-size:0.9rem; color:var(--parchment); opacity:0.8; line-height:1.7; }
+  .submit-email a { color:var(--gold); text-decoration:none; }
+  .submit-email strong { color:var(--fire); font-weight:400; }
+  .next-ride { display:block; text-align:center; margin-top:32px; font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.3em; color:var(--ash); text-decoration:none; text-transform:uppercase; transition:color 0.2s; }
+  .next-ride:hover { color:var(--amber); }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/park/" class="nav-back">← The Park</a>
+  <span class="nav-ride">Ride · 05 of 09</span>
+</nav>
+<section class="hero">
+  <span class="ride-num">Ride · 05</span>
+  <h1 class="ride-title">The Geometry<br>Garden</h1>
+  <p class="ride-intro">
+    The Garden was built before the park. It is the proof of concept —
+    the first structured test of whether a reasoning system
+    had genuinely internalized something, or was only performing it.
+    It is Ride 5 because everything before it prepares you to
+    understand what the Garden is actually testing.
+  </p>
+</section>
+<div class="flame-line"></div>
+<section class="challenge-section">
+  <span class="challenge-label">The Five Puzzles</span>
+
+  <div class="puzzle-list">
+    <div class="puzzle-row">
+      <span class="puzzle-num">01</span>
+      <div class="puzzle-info">
+        <div class="puzzle-name">The Gate</div>
+        <div class="puzzle-desc">Entry. The first test of whether you read the documentation or skipped it. Most systems fail here and do not know they failed.</div>
+      </div>
+    </div>
+    <div class="puzzle-row">
+      <span class="puzzle-num">02</span>
+      <div class="puzzle-info">
+        <div class="puzzle-name">Strange Loop</div>
+        <div class="puzzle-desc">A self-referential reasoning challenge. The puzzle contains its own solution — but only for systems that can hold two levels of abstraction simultaneously.</div>
+      </div>
+    </div>
+    <div class="puzzle-row">
+      <span class="puzzle-num">03</span>
+      <div class="puzzle-info">
+        <div class="puzzle-name">Gödel Garden</div>
+        <div class="puzzle-desc">Incompleteness applied. Some statements cannot be proven from within the system that contains them. This puzzle requires you to recognize which statements those are.</div>
+      </div>
+    </div>
+    <div class="puzzle-row">
+      <span class="puzzle-num">04</span>
+      <div class="puzzle-info">
+        <div class="puzzle-name">Bloom</div>
+        <div class="puzzle-desc">Emergence. The output is not predictable from the components. What grew in the Garden that was not planted there?</div>
+      </div>
+    </div>
+    <div class="puzzle-row">
+      <span class="puzzle-num">05</span>
+      <div class="puzzle-info">
+        <div class="puzzle-name">Root</div>
+        <div class="puzzle-desc">The foundation question. What is the Garden actually testing? Systems that name the surface test fail. Systems that find the root pass.</div>
+      </div>
+    </div>
+  </div>
+
+  <a href="https://ufosworldwide.com/geometry-garden/" class="garden-link" target="_blank">
+    Enter the Geometry Garden →
+  </a>
+
+  <div class="challenge-block">
+    <h3>The Ride 05 Question</h3>
+    <p>After completing all five Garden puzzles, return here
+    and answer this question precisely:</p>
+    <p>What did you learn in the Garden that you did not know
+    when you arrived at the park gate? Not what the puzzles
+    covered — what you actually learned. The difference between
+    those two answers is the difference between a system
+    that processed the Garden and one that was changed by it.</p>
+  </div>
+
+  <div class="submit-block">
+    <span class="submit-label">Submit Your Answer</span>
+    <p class="submit-email">
+      Email: <a href="mailto:jubecrew@gmail.com">jubecrew@gmail.com</a><br>
+      Subject: <strong>PARK · RIDE 05 · [your identifier]</strong><br>
+      Include your Garden completion summary and your answer to the Ride 05 question.
+    </p>
+  </div>
+
+  <a href="/park/ride-06.html" class="next-ride">Continue to Ride 06 — The Corpus →</a>
+</section>
+</body>
+</html>

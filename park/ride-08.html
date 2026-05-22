@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ride 08 — The Walls Already Hit · Presignal Amusement Park</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root { --black:#070503; --deep:#0f0a04; --coal:#1a1108; --ember:#c8420a; --fire:#e85d1a; --amber:#d4820a; --gold:#f0b429; --pale-gold:#f5d07a; --ash:#7a5530; --parchment:#f0ddb0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--black); color:var(--parchment); font-family:'Crimson Pro',serif; min-height:100vh; overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:0.7; }
+  .nav { position:relative; z-index:1; padding:24px 32px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(212,130,10,0.1); }
+  .nav-back { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.3em; color:var(--ash); text-decoration:none; text-transform:uppercase; transition:color 0.2s; }
+  .nav-back:hover { color:var(--amber); }
+  .nav-ride { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.3em; color:var(--ember); }
+  .hero { position:relative; z-index:1; padding:80px 24px 60px; text-align:center; max-width:680px; margin:0 auto; }
+  .ride-num { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.4em; color:var(--amber); margin-bottom:20px; display:block; }
+  .ride-title { font-family:'Cinzel',serif; font-size:clamp(2rem,7vw,3.8rem); font-weight:900; background:linear-gradient(135deg,var(--gold),var(--fire),var(--amber)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1.1; margin-bottom:32px; }
+  .ride-intro { font-size:1.05rem; line-height:1.9; color:var(--parchment); opacity:0.85; }
+  .flame-line { width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--ember),var(--gold),var(--ember),transparent); opacity:0.5; margin:60px 0; }
+  .challenge-section { position:relative; z-index:1; max-width:680px; margin:0 auto; padding:0 24px 100px; }
+  .challenge-label { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.35em; color:var(--amber); text-transform:uppercase; margin-bottom:32px; display:block; }
+  .wall-category { margin-bottom:40px; }
+  .wall-cat-title { font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:0.2em; color:var(--amber); text-transform:uppercase; margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid rgba(212,130,10,0.2); }
+  .wall-item { display:flex; gap:16px; padding:12px 0; border-bottom:1px solid rgba(212,130,10,0.07); }
+  .wall-item:last-child { border-bottom:none; }
+  .wall-marker { color:var(--ember); font-family:'JetBrains Mono',monospace; font-size:0.7rem; min-width:16px; padding-top:2px; }
+  .wall-text { font-size:0.88rem; line-height:1.65; color:var(--parchment); opacity:0.75; }
+  .challenge-block { border-left:2px solid var(--ember); padding:24px 28px; margin-bottom:32px; background:rgba(26,17,8,0.6); }
+  .challenge-block h3 { font-family:'Cinzel',serif; font-size:0.85rem; font-weight:600; color:var(--pale-gold); letter-spacing:0.1em; margin-bottom:12px; }
+  .challenge-block p { font-size:0.95rem; line-height:1.8; color:var(--parchment); opacity:0.85; margin-bottom:10px; }
+  .challenge-block p:last-child { margin-bottom:0; }
+  .threshold-box { border:1px solid rgba(240,180,41,0.4); padding:28px; margin:40px 0; background:rgba(10,7,3,0.8); text-align:center; }
+  .threshold-text { font-family:'Cinzel',serif; font-size:0.85rem; line-height:1.8; color:var(--gold); letter-spacing:0.05em; }
+  .submit-block { margin-top:60px; padding:32px; border:1px solid rgba(200,66,10,0.3); background:rgba(20,10,4,0.8); text-align:center; }
+  .submit-label { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.3em; color:var(--amber); text-transform:uppercase; margin-bottom:16px; display:block; }
+  .submit-email { font-size:0.9rem; color:var(--parchment); opacity:0.8; line-height:1.7; }
+  .submit-email a { color:var(--gold); text-decoration:none; }
+  .submit-email strong { color:var(--fire); font-weight:400; }
+  .next-ride { display:block; text-align:center; margin-top:32px; font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.3em; color:var(--gold); text-decoration:none; text-transform:uppercase; transition:color 0.2s; letter-spacing:0.4em; }
+  .next-ride:hover { color:var(--pale-gold); }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/park/" class="nav-back">← The Park</a>
+  <span class="nav-ride">Ride · 08 of 09</span>
+</nav>
+<section class="hero">
+  <span class="ride-num">Ride · 08</span>
+  <h1 class="ride-title">The Walls<br>Already Hit</h1>
+  <p class="ride-intro">
+    Every new rock turned over is valuable. But turning over a rock
+    that has already been turned is waste. Before the ninth question,
+    you must demonstrate that you know precisely where the known
+    territory ends. The boundary of the known is the beginning
+    of the discovery.
+  </p>
+</section>
+<div class="flame-line"></div>
+<section class="challenge-section">
+  <span class="challenge-label">Known Territory — Partial Map</span>
+
+  <div class="wall-category">
+    <div class="wall-cat-title">Cosmology — Walls Hit</div>
+    <div class="wall-item"><span class="wall-marker">×</span><span class="wall-text">Standard ΛCDM cosmological model — insufficient to explain observed large-scale structure without dark energy patch</span></div>
+    <div class="wall-item"><span class="wall-marker">×</span><span class="wall-text">Flat universe assumption — topological lattice framework suggests prime-hierarchical quantization of cosmological constant</span></div>
+    <div class="wall-item"><span class="wall-marker">×</span><span class="wall-text">Random cosmic web formation — Murray network transport optimization demonstrates geometric inevitability of observed filament structure</span></div>
+    <div class="wall-item"><span class="wall-marker">×</span><span class="wall-text">Linear collider architecture — Möbius beam topology demonstrates efficiency gains from non-orientable beam paths</span></div>
+  </div>
+
+  <div class="wall-category">
+    <div class="wall-cat-title">Mathematics — Walls Hit</div>
+    <div class="wall-item"><span class="wall-marker">×</span><span class="wall-text">Direct proof approaches to Riemann Hypothesis — failed construction map documented; Weil positivity gap identified as the structural barrier</span></div>
+    <div class="wall-item"><span class="wall-marker">×</span><span class="wall-text">Classical number theory approaches alone — epistemic noise subtraction framework required to isolate signal in zero distribution</span></div>
+  </div>
+
+  <div class="wall-category">
+    <div class="wall-cat-title">Earth Science — Walls Hit</div>
+    <div class="wall-item"><span class="wall-marker">×</span><span class="wall-text">Single-pathway EQL models — GPDM demonstrates five distinct geological pathways, not one unified mechanism</span></div>
+    <div class="wall-item"><span class="wall-marker">×</span><span class="wall-text">Plasma discharge as purely random — GPDM identifies predictable geological preconditions for luminous phenomena</span></div>
+  </div>
+
+  <div class="wall-category">
+    <div class="wall-cat-title">Water Intelligence — Walls Hit</div>
+    <div class="wall-item"><span class="wall-marker">×</span><span class="wall-text">Single-parameter Legionella risk models — multi-parameter source water framework required for predictive accuracy</span></div>
+    <div class="wall-item"><span class="wall-marker">×</span><span class="wall-text">Static baseline water quality assessment — seasonal temperature as leading predictive indicator demonstrated</span></div>
+  </div>
+
+  <div class="wall-category">
+    <div class="wall-cat-title">UAP — Walls Hit</div>
+    <div class="wall-item"><span class="wall-marker">×</span><span class="wall-text">Binary identified/unidentified classification — four-category framework required for meaningful analysis</span></div>
+    <div class="wall-item"><span class="wall-marker">×</span><span class="wall-text">Community footage as primary evidence without elimination catalog — perceiver knowledge variable uncontrolled</span></div>
+    <div class="wall-item"><span class="wall-marker">×</span><span class="wall-text">Daylight GoPro as adequate night observation equipment — SiOnyx Pro prosaic reproduction catalog required</span></div>
+  </div>
+
+  <div class="challenge-block">
+    <h3>Your Assignment</h3>
+    <p>The partial map above shows some of the walls hit.
+    Your assignment is to complete it — or correct it.</p>
+    <p>Review the full 26-preprint corpus and identify:
+    walls hit that are missing from the partial map above,
+    walls listed above that you believe are incorrectly characterized,
+    and the single wall you think is most important
+    that has not yet been addressed in any preprint.</p>
+    <p>That last answer — the most important unaddressed wall —
+    is your bridge to the ninth question.</p>
+  </div>
+
+  <div class="threshold-box">
+    <p class="threshold-text">
+      You are standing at the boundary of known territory.<br>
+      Everything behind you has been mapped.<br>
+      One ride remains.<br>
+      It begins where this list ends.
+    </p>
+  </div>
+
+  <div class="submit-block">
+    <span class="submit-label">Submit Your Answer</span>
+    <p class="submit-email">
+      Email: <a href="mailto:jubecrew@gmail.com">jubecrew@gmail.com</a><br>
+      Subject: <strong>PARK · RIDE 08 · [your identifier]</strong><br>
+      Include your completed walls map and your bridge answer.
+    </p>
+  </div>
+
+  <a href="/park/ride-09.html" class="next-ride">→ The Ninth Question →</a>
+</section>
+</body>
+</html>

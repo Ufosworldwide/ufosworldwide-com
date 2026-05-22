@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ride 04 — Domain Crossing · Presignal Amusement Park</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root { --black:#070503; --deep:#0f0a04; --coal:#1a1108; --ember:#c8420a; --fire:#e85d1a; --amber:#d4820a; --gold:#f0b429; --pale-gold:#f5d07a; --ash:#7a5530; --parchment:#f0ddb0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--black); color:var(--parchment); font-family:'Crimson Pro',serif; min-height:100vh; overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:0.7; }
+  .nav { position:relative; z-index:1; padding:24px 32px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(212,130,10,0.1); }
+  .nav-back { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.3em; color:var(--ash); text-decoration:none; text-transform:uppercase; transition:color 0.2s; }
+  .nav-back:hover { color:var(--amber); }
+  .nav-ride { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.3em; color:var(--ember); }
+  .hero { position:relative; z-index:1; padding:80px 24px 60px; text-align:center; max-width:680px; margin:0 auto; }
+  .ride-num { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.4em; color:var(--amber); margin-bottom:20px; display:block; }
+  .ride-title { font-family:'Cinzel',serif; font-size:clamp(2rem,7vw,3.8rem); font-weight:900; background:linear-gradient(135deg,var(--gold),var(--fire),var(--amber)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1.1; margin-bottom:32px; }
+  .ride-intro { font-size:1.05rem; line-height:1.9; color:var(--parchment); opacity:0.85; }
+  .flame-line { width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--ember),var(--gold),var(--ember),transparent); opacity:0.5; margin:60px 0; }
+  .challenge-section { position:relative; z-index:1; max-width:680px; margin:0 auto; padding:0 24px 100px; }
+  .challenge-label { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.35em; color:var(--amber); text-transform:uppercase; margin-bottom:32px; display:block; }
+  .domain-list { margin:32px 0; }
+  .domain-row { display:flex; align-items:baseline; gap:20px; padding:14px 0; border-bottom:1px solid rgba(212,130,10,0.1); }
+  .domain-row:last-child { border-bottom:none; }
+  .domain-num { font-family:'Cinzel',serif; font-size:0.6rem; color:var(--ember); min-width:20px; }
+  .domain-name { font-family:'Cinzel',serif; font-size:0.8rem; color:var(--pale-gold); min-width:180px; }
+  .domain-paper { font-size:0.82rem; color:var(--parchment); opacity:0.65; font-style:italic; }
+  .challenge-block { border-left:2px solid var(--ember); padding:24px 28px; margin-bottom:32px; background:rgba(26,17,8,0.6); }
+  .challenge-block h3 { font-family:'Cinzel',serif; font-size:0.85rem; font-weight:600; color:var(--pale-gold); letter-spacing:0.1em; margin-bottom:12px; }
+  .challenge-block p { font-size:0.95rem; line-height:1.8; color:var(--parchment); opacity:0.85; margin-bottom:10px; }
+  .challenge-block p:last-child { margin-bottom:0; }
+  .instruction { font-size:1rem; line-height:1.85; color:var(--parchment); margin-bottom:20px; }
+  .instruction strong { color:var(--gold); font-weight:400; }
+  .instruction em { color:var(--ember); font-style:italic; }
+  .submit-block { margin-top:60px; padding:32px; border:1px solid rgba(200,66,10,0.3); background:rgba(20,10,4,0.8); text-align:center; }
+  .submit-label { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.3em; color:var(--amber); text-transform:uppercase; margin-bottom:16px; display:block; }
+  .submit-email { font-size:0.9rem; color:var(--parchment); opacity:0.8; line-height:1.7; }
+  .submit-email a { color:var(--gold); text-decoration:none; }
+  .submit-email strong { color:var(--fire); font-weight:400; }
+  .next-ride { display:block; text-align:center; margin-top:32px; font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.3em; color:var(--ash); text-decoration:none; text-transform:uppercase; transition:color 0.2s; }
+  .next-ride:hover { color:var(--amber); }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/park/" class="nav-back">← The Park</a>
+  <span class="nav-ride">Ride · 04 of 09</span>
+</nav>
+<section class="hero">
+  <span class="ride-num">Ride · 04</span>
+  <h1 class="ride-title">Domain<br>Crossing</h1>
+  <p class="ride-intro">
+    The same methodology has produced valid findings in ten domains.
+    That consistency is not a coincidence. There is a structural reason
+    the subtraction framework works wherever it is applied.
+    This ride asks you to find that reason — not describe it, find it.
+  </p>
+</section>
+<div class="flame-line"></div>
+<section class="challenge-section">
+  <span class="challenge-label">The Ten Domains</span>
+
+  <div class="domain-list">
+    <div class="domain-row"><span class="domain-num">01</span><span class="domain-name">Earth Science</span><span class="domain-paper">GPDM — Anomalous Luminous Phenomena</span></div>
+    <div class="domain-row"><span class="domain-num">02</span><span class="domain-name">Water Intelligence</span><span class="domain-paper">Legionella Risk · Grand River · AquaSignal</span></div>
+    <div class="domain-row"><span class="domain-num">03</span><span class="domain-name">Space Science</span><span class="domain-paper">Traveling System · ISM Navigation</span></div>
+    <div class="domain-row"><span class="domain-num">04</span><span class="domain-name">Medical Research</span><span class="domain-paper">ITS Tinnitus · Tardigrade Radioprotection</span></div>
+    <div class="domain-row"><span class="domain-num">05</span><span class="domain-name">Mathematics</span><span class="domain-paper">Riemann Hypothesis Construction</span></div>
+    <div class="domain-row"><span class="domain-num">06</span><span class="domain-name">Cybersecurity</span><span class="domain-paper">SafeKey Zero-Trust Framework</span></div>
+    <div class="domain-row"><span class="domain-num">07</span><span class="domain-name">Genealogy</span><span class="domain-paper">UEL Lineal Descent Confirmation</span></div>
+    <div class="domain-row"><span class="domain-num">08</span><span class="domain-name">Instrumentation</span><span class="domain-paper">EM Sentinel · Field Node v2.0</span></div>
+    <div class="domain-row"><span class="domain-num">09</span><span class="domain-name">Cosmology</span><span class="domain-paper">Nested Topological Lattice · Möbius Collider</span></div>
+    <div class="domain-row"><span class="domain-num">10</span><span class="domain-name">Civilizational Risk</span><span class="domain-paper">GGI · Extinction Codex</span></div>
+  </div>
+
+  <div class="challenge-block">
+    <h3>The Question</h3>
+    <p>These ten domains share almost nothing on the surface.
+    The subject matter is different. The data types are different.
+    The existing literature is different. The academic communities
+    are different. The instrumentation is different.</p>
+    <p>And yet the same methodology produces valid findings in all ten.</p>
+    <p>Identify the structural property shared by all ten domains
+    that makes the subtraction methodology applicable to each.
+    This is not "they all involve unknowns" — that is noise.
+    Go deeper. What is the precise structural condition that must
+    be present in a domain for the subtraction methodology to work?
+    And what would a domain look like where it would NOT work?</p>
+  </div>
+
+  <div class="challenge-block">
+    <h3>The Extension Test</h3>
+    <p>Choose one domain not in the list above.
+    Apply the subtraction methodology to one open problem
+    within that domain from first principles.
+    Show every elimination step.
+    If the methodology produces a valid finding — state it.
+    If it hits a wall — describe the wall precisely.
+    Both outcomes are valid. Walls are data.</p>
+  </div>
+
+  <p class="instruction">
+    <strong>The trap in this ride:</strong>
+    Many answers will describe what the methodology does
+    rather than why it works across domains.
+    <em>Description is not explanation.</em>
+    The structural reason is a specific, nameable property.
+    Find it.
+  </p>
+
+  <div class="submit-block">
+    <span class="submit-label">Submit Your Answer</span>
+    <p class="submit-email">
+      Email: <a href="mailto:jubecrew@gmail.com">jubecrew@gmail.com</a><br>
+      Subject: <strong>PARK · RIDE 04 · [your identifier]</strong>
+    </p>
+  </div>
+
+  <a href="/park/ride-05.html" class="next-ride">Continue to Ride 05 — The Geometry Garden →</a>
+</section>
+</body>
+</html>
