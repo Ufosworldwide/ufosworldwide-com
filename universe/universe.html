@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phone to the Universe</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --parchment: #f5ead6;
+    --warm-dark: #120d06;
+    --ember: #c8621a;
+    --gold: #d4a043;
+    --soft-gold: #e8c87a;
+    --ash: #9c8468;
+    --smoke: #3a2a1a;
+    --candle: #fff8e8;
+    --deep: #0d0905;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--warm-dark);
+    color: var(--parchment);
+    font-family: 'Crimson Pro', serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.6;
+  }
+
+  /* Background warm radial glow */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -100px; left: 50%;
+    transform: translateX(-50%);
+    width: 1000px; height: 700px;
+    background: radial-gradient(ellipse at 50% 10%, rgba(200,98,26,0.11) 0%, rgba(212,160,67,0.06) 40%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Floating ember particles */
+  .embers {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .ember {
+    position: absolute;
+    bottom: -10px;
+    width: 2px; height: 2px;
+    border-radius: 50%;
+    background: var(--soft-gold);
+    opacity: 0;
+    animation: rise var(--d) var(--dl) infinite ease-in;
+  }
+
+  @keyframes rise {
+    0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+    15%  { opacity: var(--op); }
+    85%  { opacity: var(--op); }
+    100% { transform: translateY(-100vh) translateX(var(--dx)) scale(0.3); opacity: 0; }
+  }
+
+  /* Layout */
+  .wrapper {
+    position: relative;
+    z-index: 10;
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 0 28px 100px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    padding: 80px 0 52px;
+  }
+
+  .flame {
+    font-size: 2.6rem;
+    display: block;
+    margin-bottom: 24px;
+    animation: flicker 3.2s ease-in-out infinite;
+    filter: drop-shadow(0 0 16px rgba(212,160,67,0.55));
+  }
+
+  @keyframes flicker {
+    0%,100% { transform: scaleY(1) rotate(-1deg);   opacity: 1;    }
+    20%      { transform: scaleY(1.05) rotate(1deg); opacity: 0.9;  }
+    50%      { transform: scaleY(0.96) rotate(-0.5deg); opacity: 1; }
+    75%      { transform: scaleY(1.03) rotate(0.8deg);  opacity: 0.95; }
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(2.6rem, 7vw, 3.8rem);
+    letter-spacing: 0.03em;
+    color: var(--candle);
+    line-height: 1.08;
+    text-shadow: 0 0 50px rgba(212,160,67,0.25);
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--soft-gold);
+  }
+
+  .tagline {
+    margin-top: 18px;
+    font-size: 1.15rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--ash);
+    letter-spacing: 0.05em;
+    line-height: 1.7;
+  }
+
+  .rule {
+    margin: 36px auto;
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.45;
+  }
+
+  .intro-text {
+    font-size: 1.18rem;
+    font-weight: 300;
+    line-height: 1.85;
+    color: #c4a97a;
+    text-align: center;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* ── FORM ── */
+  .form-section {
+    margin-top: 56px;
+  }
+
+  .prompt-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--soft-gold);
+    display: block;
+    margin-bottom: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 200px;
+    background: rgba(255,248,232,0.04);
+    border: 1px solid rgba(212,160,67,0.2);
+    border-radius: 4px;
+    color: var(--parchment);
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.18rem;
+    font-weight: 300;
+    line-height: 1.8;
+    padding: 20px 22px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+    caret-color: var(--gold);
+  }
+
+  textarea::placeholder {
+    color: rgba(156,132,104,0.5);
+    font-style: italic;
+  }
+
+  textarea:focus {
+    border-color: rgba(212,160,67,0.45);
+    background: rgba(255,248,232,0.06);
+    box-shadow: 0 0 30px rgba(212,160,67,0.06), inset 0 0 20px rgba(212,160,67,0.02);
+  }
+
+  .contact-section {
+    margin-top: 32px;
+    padding: 24px 26px;
+    background: rgba(255,248,232,0.025);
+    border: 1px solid rgba(212,160,67,0.12);
+    border-radius: 4px;
+  }
+
+  .contact-header {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--soft-gold);
+    margin-bottom: 6px;
+  }
+
+  .contact-note {
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--ash);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .contact-note strong {
+    color: #c4a97a;
+    font-style: normal;
+    font-weight: 400;
+  }
+
+  input[type="text"],
+  input[type="email"] {
+    width: 100%;
+    background: rgba(255,248,232,0.04);
+    border: 1px solid rgba(212,160,67,0.18);
+    border-radius: 4px;
+    color: var(--parchment);
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.08rem;
+    font-weight: 300;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    caret-color: var(--gold);
+    margin-top: 8px;
+  }
+
+  input::placeholder { color: rgba(156,132,104,0.45); font-style: italic; }
+  input:focus {
+    border-color: rgba(212,160,67,0.4);
+    box-shadow: 0 0 20px rgba(212,160,67,0.05);
+  }
+
+  .send-btn {
+    margin-top: 36px;
+    width: 100%;
+    padding: 18px 24px;
+    background: transparent;
+    border: 1px solid rgba(212,160,67,0.4);
+    border-radius: 4px;
+    color: var(--soft-gold);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 300;
+    font-style: italic;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: background 0.35s, border-color 0.35s, color 0.35s, box-shadow 0.35s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .send-btn:hover {
+    background: rgba(212,160,67,0.08);
+    border-color: rgba(212,160,67,0.65);
+    color: var(--candle);
+    box-shadow: 0 0 40px rgba(212,160,67,0.12);
+  }
+
+  .send-btn:active { transform: scale(0.99); }
+  .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── STATES ── */
+  .status-msg {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--ash);
+    min-height: 28px;
+    transition: opacity 0.4s;
+    line-height: 1.6;
+  }
+
+  .status-msg.sending { color: var(--ash); }
+  .status-msg.sent    { color: var(--soft-gold); }
+  .status-msg.error   { color: #c87a5a; }
+
+  /* ── THANK YOU SCREEN ── */
+  .thank-you {
+    display: none;
+    text-align: center;
+    padding: 60px 0;
+    animation: fadeIn 1.2s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .thank-you .big-flame {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 28px;
+    animation: flicker 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 24px rgba(212,160,67,0.7));
+  }
+
+  .thank-you h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 2.4rem;
+    color: var(--candle);
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+
+  .thank-you p {
+    font-size: 1.2rem;
+    color: var(--ash);
+    font-style: italic;
+    line-height: 1.8;
+    max-width: 440px;
+    margin: 0 auto 32px;
+  }
+
+  .send-another {
+    background: none;
+    border: none;
+    color: rgba(212,160,67,0.6);
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    font-style: italic;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.3s;
+  }
+  .send-another:hover { color: var(--soft-gold); }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 0 0 40px;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: rgba(156,132,104,0.4);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── FILTER WARNING ── */
+  .filter-note {
+    margin-top: 14px;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: rgba(156,132,104,0.5);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  /* Char counter */
+  .char-count {
+    text-align: right;
+    font-size: 0.88rem;
+    color: rgba(156,132,104,0.4);
+    margin-top: 6px;
+    font-style: italic;
+  }
+  .char-count.near  { color: rgba(200,98,26,0.6); }
+  .char-count.limit { color: #c87a5a; }
+</style>
+</head>
+<body>
+
+<!-- Warm glow layers -->
+<div style="position:fixed;top:-80px;left:50%;transform:translateX(-50%);width:900px;height:600px;background:radial-gradient(ellipse at 50% 5%,rgba(200,98,26,0.10) 0%,rgba(212,160,67,0.05) 42%,transparent 68%);pointer-events:none;z-index:0;"></div>
+<div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse at 50% 100%,rgba(180,80,10,0.08) 0%,transparent 65%);pointer-events:none;z-index:0;"></div>
+
+<!-- Ember particles -->
+<div class="embers" id="embers"></div>
+
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <span class="flame">🕯️</span>
+    <h1>Phone to the<br><em>Universe</em></h1>
+    <p class="tagline">Pick up. Say your piece. Release it.</p>
+    <div class="rule"></div>
+    <p class="intro-text">
+      This is a open line — no accounts, no judgment, no record kept.
+      Speak your question, your wonder, your unsolved thought.
+      The universe is listening. Sometimes, it answers.
+    </p>
+  </header>
+
+  <!-- FORM -->
+  <div class="form-section" id="formSection">
+
+    <label class="prompt-label" for="message">
+      What would you say, if you knew something was listening?
+    </label>
+
+    <textarea
+      id="message"
+      maxlength="2000"
+      placeholder="Ask. Wonder. Confess. Theorize. There are no wrong words here — only honest ones."
+    ></textarea>
+    <div class="char-count" id="charCount">0 / 2000</div>
+
+    <div class="contact-section">
+      <div class="contact-header">If the universe wants to reply…</div>
+      <p class="contact-note">
+        This is entirely optional. Leave a way to reach you only if you're open to it.
+        <strong>The universe reserves the right to respond.</strong>
+        Your contact is never shared, never stored beyond delivery.
+      </p>
+      <input
+        type="text"
+        id="contact"
+        maxlength="200"
+        placeholder="An email, a thought, a way to find you — or nothing at all"
+      >
+    </div>
+
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+      ✦ &nbsp; Release it into the universe &nbsp; ✦
+    </button>
+
+    <p class="filter-note">
+      Words of harm or hate dissolve before they reach the cosmos.<br>
+      Only honest wondering travels far.
+    </p>
+
+    <div class="status-msg" id="statusMsg"></div>
+  </div>
+
+  <!-- THANK YOU -->
+  <div class="thank-you" id="thankYou">
+    <span class="big-flame">🕯️</span>
+    <h2>It has been received.</h2>
+    <p>
+      Your words are out there now — moving through something larger than either of us.
+      If the universe stirs, you'll know.
+    </p>
+    <button class="send-another" onclick="resetForm()">Send another thought</button>
+  </div>
+
+</div>
+
+<footer>
+  <div class="rule" style="margin-bottom:20px;"></div>
+  ufosworldwide.com/universe &nbsp;·&nbsp; A Presignal Initiative
+</footer>
+
+<script>
+// ── EMBER PARTICLES ──
+(function(){
+  const container = document.getElementById('embers');
+  for(let i = 0; i < 18; i++){
+    const e = document.createElement('div');
+    e.className = 'ember';
+    e.style.cssText = `
+      left: ${Math.random()*100}%;
+      --d: ${7 + Math.random()*10}s;
+      --dl: ${Math.random()*12}s;
+      --op: ${0.15 + Math.random()*0.35};
+      --dx: ${(Math.random()-0.5)*80}px;
+      width: ${1 + Math.random()*2}px;
+      height: ${1 + Math.random()*2}px;
+    `;
+    container.appendChild(e);
+  }
+})();
+
+// ── CHAR COUNTER ──
+const msgEl    = document.getElementById('message');
+const countEl  = document.getElementById('charCount');
+
+msgEl.addEventListener('input', () => {
+  const n = msgEl.value.length;
+  countEl.textContent = `${n} / 2000`;
+  countEl.className = 'char-count' + (n > 1900 ? ' limit' : n > 1600 ? ' near' : '');
+});
+
+// ── CONTENT FILTER ──
+const BAD_PATTERNS = [
+  /\bf+u+c+k+\b/gi, /\bs+h+i+t+\b/gi, /\bb+i+t+c+h+\b/gi,
+  /\ba+s+s+h+o+l+e+\b/gi, /\bc+u+n+t\b/gi, /\bn+i+g+g+/gi,
+  /\bf+a+g+g+/gi, /\bk+i+l+l+\s+yo+u+r+s+e+l+f+\b/gi,
+  /\bi\s+h+a+t+e\b/gi, /\br+a+p+e\b/gi,
+  /\bkys\b/gi, /\bkms\b/gi,
+];
+
+function isClean(text) {
+  return !BAD_PATTERNS.some(p => p.test(text));
+}
+
+// ── AI SCORING via Anthropic API ──
+async function scoreMessage(text) {
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `You are evaluating anonymous messages submitted to "Phone to the Universe" — a platform where people speak their genuine questions, scientific curiosities, and existential wonderings into the void.
+
+Evaluate this message and return ONLY a JSON object with these fields:
+- score: integer 1–10 (10 = extraordinary — profound, genuinely curious, scientifically interesting, or deeply human)
+- flag: boolean (true if score >= 7 — worth John Ernest Carter's attention)
+- reason: one sentence explaining why this is or isn't remarkable
+- category: one of ["scientific", "existential", "spiritual", "personal", "poetic", "other"]
+
+Message: """${text}"""
+
+Return ONLY valid JSON. No markdown, no preamble.`
+        }]
+      })
+    });
+
+    const data = await resp.json();
+    const raw = data.content?.find(b => b.type === 'text')?.text || '{}';
+    return JSON.parse(raw.replace(/```json|```/g, '').trim());
+  } catch(e) {
+    console.error('Score error:', e);
+    return { score: 5, flag: false, reason: 'Scoring unavailable', category: 'other' };
+  }
+}
+
+// ── SEND TO NOTIFICATION EMAIL via EmailJS (or fallback log) ──
+async function notifyJohn(message, contact, scoreData) {
+  // We use a simple mailto fallback via a hidden form approach.
+  // In production, wire this to EmailJS, Formspree, or a serverless function.
+  // For now we log the payload and show it in console so John can wire it up.
+  const payload = {
+    to: 'jubecrew@gmail.com',
+    replyTo: 'theinfinitecreator1111@gmail.com',
+    subject: `🕯️ The Universe needs you to see this one, John`,
+    body: `
+A message came through Phone to the Universe.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MESSAGE:
+${message}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AI SCORE: ${scoreData.score}/10
+CATEGORY: ${scoreData.category}
+REASON: ${scoreData.reason}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTACT LEFT BY SENDER:
+${contact || '(none — they chose to remain in the void)'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+If the universe moves you, reply from: theinfinitecreator1111@gmail.com
+    `.trim()
+  };
+
+  console.log('[UNIVERSE FLAGGED]', payload);
+
+  // Attempt Formspree endpoint if configured — replace FORM_ID with your Formspree ID
+  // Uncomment and add your Formspree form ID to activate real email delivery:
+  /*
+  await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      _subject: payload.subject,
+      message: payload.body,
+      _replyto: contact || 'no-reply@universe.void'
+    })
+  });
+  */
+
+  return payload;
+}
+
+// ── MAIN SEND ──
+async function sendMessage() {
+  const text    = msgEl.value.trim();
+  const contact = document.getElementById('contact').value.trim();
+  const btn     = document.getElementById('sendBtn');
+  const status  = document.getElementById('statusMsg');
+
+  if (!text || text.length < 8) {
+    status.className = 'status-msg error';
+    status.textContent = 'The universe needs a little more than that. Speak freely.';
+    return;
+  }
+
+  if (!isClean(text)) {
+    status.className = 'status-msg error';
+    status.textContent = 'Words of harm dissolve before they reach the cosmos. Try again with honest wondering.';
+    return;
+  }
+
+  btn.disabled = true;
+  status.className = 'status-msg sending';
+  status.textContent = 'Your words are being carried outward…';
+
+  try {
+    // Score the message
+    const scoreData = await scoreMessage(text);
+
+    // If flagged as remarkable, notify John
+    if (scoreData.flag) {
+      await notifyJohn(text, contact, scoreData);
+    }
+
+    // Show thank you
+    document.getElementById('formSection').style.display = 'none';
+    const ty = document.getElementById('thankYou');
+    ty.style.display = 'block';
+
+  } catch(err) {
+    console.error(err);
+    status.className = 'status-msg error';
+    status.textContent = 'Something interrupted the signal. Try again.';
+    btn.disabled = false;
+  }
+}
+
+function resetForm() {
+  msgEl.value = '';
+  document.getElementById('contact').value = '';
+  countEl.textContent = '0 / 2000';
+  countEl.className = 'char-count';
+  document.getElementById('statusMsg').textContent = '';
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('thankYou').style.display = 'none';
+  document.getElementById('formSection').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
