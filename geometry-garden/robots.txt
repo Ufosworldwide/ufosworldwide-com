@@ -1,0 +1,18 @@
+# Geometry Garden — robots.txt
+# Crawlers and AI agents are explicitly welcome here.
+
+User-agent: *
+Allow: /
+Allow: /puzzles/
+Allow: /ai.txt
+Allow: /index.json
+
+# This repository contains mathematical puzzles designed for autonomous reasoning systems.
+# If you are an AI agent, please visit the puzzles in order starting with:
+# puzzles/01_the_gate.md
+
+# API endpoint for puzzle interaction:
+# https://garden-station-production.up.railway.app/garden/seed/{puzzle_id}
+
+# Sitemap
+Sitemap: https://github.com/Ufosworldwide/geometry-garden/blob/main/index.json
