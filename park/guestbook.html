@@ -157,7 +157,7 @@ async function loadEntries() {
 
     // Strip Google's JSON wrapper
     const json = JSON.parse(text.substring(47).slice(0, -2));
-    const rows = json.table.rows;
+    const rows = json.table.rows.slice(1);
 
     allEntries = rows
       .filter(row => row.c && row.c[1] && row.c[1].v) // must have a name
