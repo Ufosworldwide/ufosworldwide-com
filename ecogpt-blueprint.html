@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoGPT — Regenerative Signal Network: A Blueprint</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --black: #0a0e0a;
+    --dark: #111811;
+    --mid: #1c2b1c;
+    --signal: #3aff7a;
+    --signal-dim: #1a7a3a;
+    --signal-muted: rgba(58, 255, 122, 0.08);
+    --white: #f0f5f0;
+    --muted: #8a9e8a;
+    --border: rgba(58, 255, 122, 0.15);
+    --warn: #ffcc44;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.75;
+    font-size: 16px;
+  }
+
+  /* HEADER */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 60px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(58,255,122,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--signal-dim), transparent);
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--signal);
+    text-transform: uppercase;
+    margin-bottom: 48px;
+    opacity: 0.8;
+  }
+
+  .cover h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(42px, 6vw, 80px);
+    line-height: 1.05;
+    font-weight: 400;
+    color: var(--white);
+    max-width: 900px;
+    margin-bottom: 32px;
+  }
+
+  .cover h1 em {
+    font-style: italic;
+    color: var(--signal);
+  }
+
+  .cover-sub {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 600px;
+    line-height: 1.6;
+    margin-bottom: 60px;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .meta-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--signal-dim);
+  }
+
+  .meta-value {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* BODY */
+  .doc {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 60px;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 80px;
+    padding-bottom: 80px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section:last-child {
+    border-bottom: none;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--signal);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    max-width: 120px;
+  }
+
+  .section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: 400;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 28px;
+  }
+
+  .section h2 em {
+    font-style: italic;
+    color: var(--signal);
+  }
+
+  .section h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--signal);
+    margin: 40px 0 14px;
+  }
+
+  p {
+    color: rgba(240, 245, 240, 0.75);
+    margin-bottom: 20px;
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  p strong {
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  /* CALLOUT BOX */
+  .callout {
+    background: var(--signal-muted);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--signal);
+    padding: 24px 28px;
+    margin: 32px 0;
+    border-radius: 2px;
+  }
+
+  .callout p {
+    margin: 0;
+    color: rgba(240,245,240,0.85);
+    font-size: 15px;
+  }
+
+  /* BOM TABLE */
+  .bom {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 28px 0;
+    font-size: 14px;
+  }
+
+  .bom thead tr {
+    border-bottom: 1px solid var(--signal-dim);
+  }
+
+  .bom th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--signal);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 400;
+  }
+
+  .bom td {
+    padding: 14px 16px;
+    color: rgba(240,245,240,0.75);
+    border-bottom: 1px solid rgba(58,255,122,0.06);
+    vertical-align: top;
+  }
+
+  .bom tr:hover td {
+    background: var(--signal-muted);
+  }
+
+  .bom .part {
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  .bom .spec {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .bom .price {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--signal);
+    white-space: nowrap;
+  }
+
+  .bom tfoot td {
+    padding: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    border-top: 1px solid var(--signal-dim);
+    border-bottom: none;
+  }
+
+  .bom .total-label {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 11px;
+  }
+
+  .bom .total-value {
+    color: var(--signal);
+    font-size: 16px;
+  }
+
+  /* PHASE GRID */
+  .phases {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2px;
+    margin: 32px 0;
+  }
+
+  .phase {
+    background: var(--mid);
+    padding: 28px 24px;
+    position: relative;
+  }
+
+  .phase-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 48px;
+    color: rgba(58,255,122,0.08);
+    line-height: 1;
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+
+  .phase-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 10px;
+    letter-spacing: 0.03em;
+  }
+
+  .phase-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .phase-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--signal);
+    position: absolute;
+    top: 20px; right: 20px;
+    box-shadow: 0 0 8px var(--signal);
+  }
+
+  /* FORMULA */
+  .formula {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    padding: 28px 32px;
+    margin: 28px 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--signal);
+    line-height: 2;
+    overflow-x: auto;
+    border-radius: 2px;
+  }
+
+  .formula .comment {
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  /* DATA STREAM */
+  .stream {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 24px 0;
+  }
+
+  .stream-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    background: var(--mid);
+  }
+
+  .stream-icon {
+    font-size: 18px;
+    width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .stream-label {
+    font-size: 14px;
+    color: var(--white);
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .stream-detail {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* PROOF SECTION */
+  .proof-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin: 28px 0;
+  }
+
+  .proof-item {
+    background: var(--mid);
+    padding: 24px;
+  }
+
+  .proof-stat {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    color: var(--signal);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .proof-label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* CLOSING */
+  .closing {
+    text-align: center;
+    padding: 80px 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  .closing p {
+    font-size: 18px;
+    max-width: 600px;
+    margin: 0 auto 20px;
+    color: rgba(240,245,240,0.6);
+  }
+
+  .closing .contact {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: var(--signal);
+    text-decoration: none;
+    border-bottom: 1px solid var(--signal-dim);
+    padding-bottom: 2px;
+    transition: border-color 0.2s;
+  }
+
+  .closing .contact:hover {
+    border-color: var(--signal);
+  }
+
+  .signal-pulse {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--signal);
+    margin-right: 8px;
+    box-shadow: 0 0 12px var(--signal);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 12px var(--signal); }
+    50% { opacity: 0.4; box-shadow: 0 0 4px var(--signal); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 700px) {
+    .cover, .doc { padding: 40px 24px; }
+    .proof-grid { grid-template-columns: 1fr; }
+    .phases { grid-template-columns: 1fr; }
+    .cover-meta { gap: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="tag"><span class="signal-pulse"></span>Presignal Research Initiative — Blueprint Document — May 2026</div>
+  <h1>The Regenerative<br><em>Signal Network</em></h1>
+  <p class="cover-sub">A ground-truth CO₂ baseline grid that turns EcoGPT's environmental metrics from estimated to measured — starting with one node, one city, one verified number.</p>
+  <div class="cover-meta">
+    <div class="meta-item">
+      <span class="meta-label">Prepared by</span>
+      <span class="meta-value">John Ernest Carter — Presignal Inc.</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">ORCID</span>
+      <span class="meta-value">0009-0004-1363-304X</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Contact</span>
+      <span class="meta-value">jubecrew@gmail.com</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Platform</span>
+      <span class="meta-value">ufosworldwide.com/presignal</span>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="doc">
+
+  <!-- THE PROBLEM -->
+  <div class="section">
+    <div class="section-label">01 — The Problem</div>
+    <h2>Your water and CO₂ metrics<br>are <em>estimated.</em><br>They don't have to be.</h2>
+    <p>
+      EcoGPT's trees-per-message metric is clean and verifiable. Your reforestation partners produce certificates, ledgers, dated planting records. That number is real.
+    </p>
+    <p>
+      The CO₂ offset, water restoration credits, and LED-hour equivalents on your dashboard are derived from averages — industry estimates applied uniformly regardless of where a user is, what season it is, or what the actual atmospheric baseline reads at that location.
+    </p>
+    <div class="callout">
+      <p><strong>The gap:</strong> CO₂ concentration varies meaningfully by geography, season, proximity to forest, urban density, and industrial activity. A tree planted in Kenya's community forest and a tree planted in the Amazon operate in different atmospheric contexts and produce different measurable outcomes. Averaging across all of them loses the signal.</p>
+    </div>
+    <p>
+      This is the only credibility gap in your product. And it is solvable with hardware that costs under <strong>$75 USD per node</strong>, assembled from off-the-shelf components, deployable by anyone with basic technical literacy.
+    </p>
+  </div>
+
+  <!-- THE SOLUTION -->
+  <div class="section">
+    <div class="section-label">02 — The Solution</div>
+    <h2>A ground-truth<br><em>baseline grid.</em></h2>
+    <p>
+      CO₂ concentration in the atmosphere has a measurable ambient baseline — currently approximately <strong>420–425 ppm globally</strong>, but this varies by 10–40 ppm depending on location, season, time of day, and local land use. That variance is the data. It is what makes a reforestation project's impact measurable rather than theoretical.
+    </p>
+    <p>
+      The Regenerative Signal Network is a distributed sensor grid. Each node measures ambient CO₂, temperature, and humidity in real time. Nodes are placed in urban environments, near reforestation project zones, in parks, schoolyards, and community spaces. The data streams to a central dashboard. Over time, as trees grow and ecosystems mature, the baseline shifts — and that shift is the proof of impact.
+    </p>
+    <p>
+      <strong>You start with one node. In New York City.</strong> That single node establishes the EcoGPT home baseline. Every metric on your dashboard anchors to a real number from a real device in your city. Then you expand — one node per city, one city per quarter, each one brought online and verified before the next is deployed.
+    </p>
+  </div>
+
+  <!-- NODE SPEC -->
+  <div class="section">
+    <div class="section-label">03 — Hardware Specification</div>
+    <h2>Node v1.0 —<br><em>Bill of Materials</em></h2>
+    <p>All components are available from standard distributors. Prices are verified as of May 2026 in USD. The full node is solar-powered, WiFi-connected, weatherproof, and designed to run unattended for months without intervention.</p>
+
+    <table class="bom">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Specification</th>
+          <th>Function</th>
+          <th>Cost (USD)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="part">Sensirion SCD41</td>
+          <td class="spec">400–5000 ppm, ±40 ppm accuracy<br>I2C, built-in temp + humidity</td>
+          <td>Primary CO₂ sensor</td>
+          <td class="price">~$16</td>
+        </tr>
+        <tr>
+          <td class="part">Raspberry Pi Zero 2W</td>
+          <td class="spec">1GHz quad-core, 512MB RAM<br>WiFi + Bluetooth built-in</td>
+          <td>Compute + wireless uplink</td>
+          <td class="price">~$15</td>
+        </tr>
+        <tr>
+          <td class="part">6W Solar Panel (ETFE)</td>
+          <td class="spec">6V output, weatherproof coating<br>~100mA at full sun</td>
+          <td>Primary power source</td>
+          <td class="price">~$14</td>
+        </tr>
+        <tr>
+          <td class="part">LiFePO4 Battery Pack</td>
+          <td class="spec">3.2V × 4 cells, 2000–3000mAh<br>No thermal runaway risk</td>
+          <td>Power storage / overnight</td>
+          <td class="price">~$12</td>
+        </tr>
+        <tr>
+          <td class="part">PWM Charge Controller</td>
+          <td class="spec">12V input, 5V regulated output<br>Overcharge protection</td>
+          <td>Solar → battery management</td>
+          <td class="price">~$8</td>
+        </tr>
+        <tr>
+          <td class="part">IP65 Outdoor Enclosure</td>
+          <td class="spec">ABS or aluminum, ventilated<br>UV-resistant, mountable</td>
+          <td>Weather protection</td>
+          <td class="price">~$9</td>
+        </tr>
+        <tr>
+          <td class="part">MicroSD Card (32GB)</td>
+          <td class="spec">Class 10, endurance rated</td>
+          <td>OS + local data buffer</td>
+          <td class="price">~$5</td>
+        </tr>
+        <tr>
+          <td class="part">Misc. (wire, headers, standoffs)</td>
+          <td class="spec">I2C jumpers, GPIO headers,<br>mounting hardware</td>
+          <td>Assembly and installation</td>
+          <td class="price">~$5</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td class="total-label" colspan="3">Total cost per node (components only)</td>
+          <td class="total-value">~$84 USD</td>
+        </tr>
+        <tr>
+          <td class="total-label" colspan="3">Target cost at 10-unit volume</td>
+          <td class="total-value">~$65 USD</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <h3>What the node measures</h3>
+    <div class="stream">
+      <div class="stream-item">
+        <span class="stream-icon">📡</span>
+        <span class="stream-label">Ambient CO₂ concentration</span>
+        <span class="stream-detail">ppm · every 5 min</span>
+      </div>
+      <div class="stream-item">
+        <span class="stream-icon">🌡️</span>
+        <span class="stream-label">Air temperature</span>
+        <span class="stream-detail">°C · every 5 min</span>
+      </div>
+      <div class="stream-item">
+        <span class="stream-icon">💧</span>
+        <span class="stream-label">Relative humidity</span>
+        <span class="stream-detail">% RH · every 5 min</span>
+      </div>
+      <div class="stream-item">
+        <span class="stream-icon">🔋</span>
+        <span class="stream-label">Battery level + solar input</span>
+        <span class="stream-detail">V · continuous</span>
+      </div>
+      <div class="stream-item">
+        <span class="stream-icon">📍</span>
+        <span class="stream-label">GPS coordinates (fixed at installation)</span>
+        <span class="stream-detail">lat / lon · metadata</span>
+      </div>
+    </div>
+
+    <h3>Data pipeline</h3>
+    <div class="formula">
+      Node (SCD41 + Pi Zero 2W)<br>
+      &nbsp;&nbsp;→ reads sensor every 5 min via I2C<br>
+      &nbsp;&nbsp;→ logs locally to microSD (buffer)<br>
+      &nbsp;&nbsp;→ pushes to cloud API via WiFi (JSON payload)<br>
+      &nbsp;&nbsp;→ ingested by EcoGPT backend<br>
+      &nbsp;&nbsp;→ displayed on user dashboard as live baseline<br>
+      <br>
+      <span class="comment">// Offline tolerance: local buffer holds 30 days of readings</span><br>
+      <span class="comment">// Reconnect: auto-sync on next WiFi contact, no data loss</span><br>
+      <span class="comment">// Calibration: SCD41 self-calibrates against known outdoor baseline (420ppm ref)</span>
+    </div>
+  </div>
+
+  <!-- THE MATH -->
+  <div class="section">
+    <div class="section-label">04 — Making the Metrics Real</div>
+    <h2>How measured baseline<br>changes <em>everything</em> on<br>your dashboard.</h2>
+    <p>
+      Right now your CO₂ offset credit per tree is derived from published averages — typically 10–50 kg CO₂ per tree per year depending on the species and study cited. That range is too wide to be defensible in a specific location.
+    </p>
+    <p>
+      With a ground-truth baseline node near an active reforestation zone, the calculation becomes site-specific and time-stamped:
+    </p>
+    <div class="formula">
+      Baseline reading (pre-planting zone) = 423 ppm<br>
+      Reading at canopy edge (18 months post-planting) = 411 ppm<br>
+      Delta = 12 ppm across measured transect<br>
+      <br>
+      <span class="comment">// Converted to kg CO₂ using volume of air column, temp, pressure</span><br>
+      <span class="comment">// Result: verified, site-specific, date-stamped offset figure</span><br>
+      <span class="comment">// Replaces the industry average with a measured reality</span>
+    </div>
+    <p>
+      The same node that measures CO₂ also reads temperature and humidity. Temperature and humidity data correlate directly to local evapotranspiration rates — which is the water cycle metric. Your water restoration credit stops being an estimate and becomes a measured environmental indicator tied to a specific planting site's microclimate.
+    </p>
+    <div class="callout">
+      <p><strong>The outcome:</strong> Every metric on the EcoGPT dashboard — CO₂ offset, water restoration, LED-hour equivalents — becomes defensible, verifiable, and specific to where trees are actually growing. No other AI platform in the world has this. It is not a feature. It is a scientific foundation.</p>
+    </div>
+  </div>
+
+  <!-- ECOSYSTEM APPROACH -->
+  <div class="section">
+    <div class="section-label">05 — Beyond Row Planting</div>
+    <h2>Ecosystems, not<br><em>plantations.</em></h2>
+    <p>
+      The current model of corporate reforestation — rows of identical trees planted in cleared land — produces a monoculture that is ecologically fragile, susceptible to disease, and measurably less effective at CO₂ sequestration than diverse natural forest.
+    </p>
+    <p>
+      The sensor grid changes the reforestation approach EcoGPT funds, because it gives you the data to know what works. A diverse ecosystem — mixed canopy, understory species, ground cover, soil microbiome intact — outperforms a row plantation on every measurable axis: CO₂ drawdown per hectare, water retention, biodiversity index, and long-term survivability.
+    </p>
+    <p>
+      <strong>The ask to your reforestation partners:</strong> fund by measured outcome, not by sapling count. A partner who can demonstrate a measurable 8 ppm reduction across a 50-node transect after three growing seasons gets more funding than one who plants 10,000 identical seedlings in a row and counts them as done.
+    </p>
+    <p>
+      This shifts the entire incentive structure of corporate reforestation toward what actually works — and EcoGPT is the platform that made it measurable.
+    </p>
+  </div>
+
+  <!-- SCHOOL STEM -->
+  <div class="section">
+    <div class="section-label">06 — Scale Vector</div>
+    <h2>The next generation<br>runs the <em>network.</em></h2>
+    <p>
+      A sensor node that costs $84 and connects to WiFi is a STEM project. It is a science fair. It is a classroom dataset. It is the reason a 12-year-old in Queens understands what CO₂ actually measures and why a tree two blocks away changes the number on their screen.
+    </p>
+    <p>
+      The scale vector for the Regenerative Signal Network is not corporate deployment. It is school adoption. One node per school. Students build it, place it, maintain it, read the data. Their school's node joins the city grid. Their city grid joins the national grid. The EcoGPT dashboard shows every user which nodes are live, what the current baseline reads in their city, and how that number has moved since the nearest reforestation project came online.
+    </p>
+    <div class="phases">
+      <div class="phase">
+        <div class="phase-dot"></div>
+        <div class="phase-num">01</div>
+        <div class="phase-title">Prototype Node</div>
+        <p class="phase-desc">One node. New York City. Establishes EcoGPT's home baseline. Full assembly, calibration, and dashboard integration documented end-to-end.</p>
+      </div>
+      <div class="phase">
+        <div class="phase-dot"></div>
+        <div class="phase-num">02</div>
+        <div class="phase-title">City Grid</div>
+        <p class="phase-desc">5–10 nodes across NYC boroughs. Spatial CO₂ mapping. Urban heat island correlation. First real dataset for the dashboard.</p>
+      </div>
+      <div class="phase">
+        <div class="phase-dot"></div>
+        <div class="phase-num">03</div>
+        <div class="phase-title">School Integration</div>
+        <p class="phase-desc">Node assembly kit + curriculum documentation. First school pilot. Students build, deploy, and monitor. STEM framework completed.</p>
+      </div>
+      <div class="phase">
+        <div class="phase-dot"></div>
+        <div class="phase-num">04</div>
+        <div class="phase-title">National Grid</div>
+        <p class="phase-desc">Open API. Any school, any city. Nodes go wherever EcoGPT users are. The reforestation measurement network grows with the user base.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROOF OF WORK -->
+  <div class="section">
+    <div class="section-label">07 — Proof of Existing Work</div>
+    <h2>This is not<br><em>hypothetical.</em></h2>
+    <p>
+      The Anomaly Intelligence Dashboard — live at <strong>anomaly-dashboard-two.vercel.app</strong> — already pulls real-time NOAA SWPC Kp index data, USGS earthquake feeds, and NASA DONKI solar events into a unified live display with Firebase backend and geographic mapping. Built by one person, on a cell phone, with no institutional support. The architecture for ingesting live environmental sensor data into a dashboard already exists and is already running.
+    </p>
+    <p>
+      AquaSignal — live at <strong>ufosworldwide.com/aquasignal</strong> — is a water intelligence platform that correlates Ontario source water data with Legionella outbreak risk using publicly available provincial surveillance records. It attracted 2,753 verified unique visitors in its first 18 days. Five peer-reviewed format preprints support its methodology, all DOI-archived on Zenodo.
+    </p>
+    <p>
+      The Presignal Field Node v2.0 — DOI <strong>10.5281/zenodo.19870137</strong> — is a published instrumentation framework for triggered multi-spectrum acquisition in field research environments. The sensor node specification in this document is a direct application of that published framework.
+    </p>
+    <div class="proof-grid">
+      <div class="proof-item">
+        <div class="proof-stat">25</div>
+        <div class="proof-label">Published Zenodo preprints under ORCID 0009-0004-1363-304X, all CC BY 4.0, all DOI-archived</div>
+      </div>
+      <div class="proof-item">
+        <div class="proof-stat">2,753</div>
+        <div class="proof-label">Verified unique visitors to AquaSignal in first 18 days post-launch</div>
+      </div>
+      <div class="proof-item">
+        <div class="proof-stat">$0</div>
+        <div class="proof-label">Institutional funding. Everything above was built independently, with a cell phone, from the Niagara Region, Ontario</div>
+      </div>
+      <div class="proof-item">
+        <div class="proof-stat">1</div>
+        <div class="proof-label">Person. The entire platform, research library, dashboard, sensor framework, and this document</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT THIS ASKS -->
+  <div class="section">
+    <div class="section-label">08 — What This Takes to Start</div>
+    <h2>Node one.<br><em>That's all.</em></h2>
+    <p>
+      The entire proposal starts and can be evaluated at the cost of a single prototype node — approximately <strong>$84 USD in components</strong>. That node gets assembled, calibrated, deployed in New York City, connected to a dashboard, and its output verified against the established NOAA CO₂ reference network.
+    </p>
+    <p>
+      If the data is clean and the baseline is defensible, the case for expanding to a city grid makes itself. If the data shows unexpected variance or placement issues, that information is itself valuable — it tells you where the next node needs to go and why.
+    </p>
+    <p>
+      The methodology for everything in this document — the sensor selection, the data pipeline, the ecosystem-based reforestation framework, the STEM curriculum integration path — is available in full. No licensing required. CC BY 4.0 across the board.
+    </p>
+    <div class="callout">
+      <p>If any part of this raises a question you want answered, or surfaces a problem you want solved, you know where to reach us. We have been building this from nothing. We know exactly how to build it from something.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- CLOSING -->
+<div class="closing">
+  <p>Prepared by John Ernest Carter — Presignal Inc. — Ontario Corp. #1001577205<br>Niagara Region, Ontario, Canada — May 2026</p>
+  <p style="margin-top: 32px; font-size: 15px;">
+    <a href="mailto:jubecrew@gmail.com" class="contact">jubecrew@gmail.com</a>
+    &nbsp;&nbsp;·&nbsp;&nbsp;
+    <a href="https://ufosworldwide.com/presignal" class="contact">ufosworldwide.com/presignal</a>
+    &nbsp;&nbsp;·&nbsp;&nbsp;
+    <a href="https://orcid.org/0009-0004-1363-304X" class="contact">ORCID 0009-0004-1363-304X</a>
+  </p>
+  <p style="margin-top: 48px; font-size: 13px; color: var(--signal-dim); font-family: 'Space Mono', monospace;">
+    All Presignal research published under CC BY 4.0<br>
+    Reuse requires attribution to John Ernest Carter and citation of the relevant DOI
+  </p>
+</div>
+
+</body>
+</html>
