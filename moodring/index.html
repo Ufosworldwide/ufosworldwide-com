@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MOOD RING">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#05030c">
+<title>MOOD RING — Presignal</title>
+<link rel="manifest" href="manifest.json">
+
+<style>
+/* ── FONTS ──────────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* ── RESET & BASE ────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #05030c;
+  color: #fff;
+  font-family: 'Space Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── CRT OVERLAY ─────────────────────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 9999;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.035) 0px,
+    rgba(0,0,0,0.035) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 9998;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.5) 100%);
+}
+
+/* ── EMOJI MATRIX CANVAS (global background) ─────────────────────────────── */
+#matrix-canvas {
+  position: fixed; top: 0; left: 0; z-index: 0;
+  width: 100%; height: 100%;
+}
+
+/* ── SWIPE VIEWPORT ──────────────────────────────────────────────────────── */
+#panels-wrapper {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex;
+  width: 300%;
+  height: 100%;
+  transform: translateX(-33.333%);
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+
+.panel {
+  width: 33.333%;
+  flex-shrink: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── NAV DOTS ────────────────────────────────────────────────────────────── */
+#nav-dots {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  left: 50%; transform: translateX(-50%);
+  z-index: 200;
+  display: flex; gap: 10px; align-items: center;
+}
+.nav-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.nav-dot.active {
+  background: #fff;
+  box-shadow: 0 0 10px #fff8;
+  transform: scale(1.4);
+}
+
+/* ── SWIPE HINT ──────────────────────────────────────────────────────────── */
+#swipe-hint {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 300;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+#swipe-hint.visible { opacity: 1; }
+#swipe-hint span {
+  display: block;
+  font-family: 'VT323', monospace;
+  font-size: 1.8rem;
+  color: rgba(255,255,255,0.7);
+  animation: swipe-bounce 1.5s ease-in-out infinite;
+}
+@keyframes swipe-bounce {
+  0%,100% { transform: translateX(0); }
+  50% { transform: translateX(12px); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* PANEL 1 — MOOD RING                                                         */
+/* ─────────────────────────────────────────────────────────────────────────── */
+#panel-ring { justify-content: flex-start; }
+
+.panel-header {
+  width: 100%;
+  padding: 14px 20px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+.app-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 20px currentColor;
+  line-height: 1.1;
+}
+.app-subtitle {
+  font-family: 'VT323', monospace;
+  font-size: clamp(0.8rem, 3vw, 1rem);
+  opacity: 0.6;
+  letter-spacing: 0.05em;
+}
+.sensor-badge {
+  font-family: 'VT323', monospace;
+  font-size: 0.7rem;
+  text-align: right;
+  opacity: 0.5;
+  line-height: 1.4;
+}
+.sensor-badge span { display: block; }
+
+#ring-canvas-wrap {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 4px 0;
+}
+#ring-canvas { display: block; }
+
+#mood-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.9rem, 3.5vw, 1.15rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-align: center;
+  padding: 4px 0 2px;
+  min-height: 1.5rem;
+  flex-shrink: 0;
+  transition: color 0.5s;
+}
+#mood-sub {
+  font-family: 'VT323', monospace;
+  font-size: clamp(0.75rem, 3vw, 0.95rem);
+  opacity: 0.55;
+  text-align: center;
+  letter-spacing: 0.12em;
+  flex-shrink: 0;
+  padding-bottom: 4px;
+}
+
+/* Sensor readout strip */
+#sensor-strip {
+  width: 100%;
+  padding: 6px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sensor-pill {
+  font-family: 'VT323', monospace;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* Camera toggle */
+#camera-row {
+  display: flex;
+  gap: 8px;
+  padding: 4px 16px 0;
+  flex-shrink: 0;
+}
+.cam-btn {
+  font-family: 'VT323', monospace;
+  font-size: 0.85rem;
+  padding: 4px 14px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 100px;
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.cam-btn.active {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.4);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(255,255,255,0.15);
+}
+
+/* Hidden video + canvas for face detection */
+#face-video { display: none; }
+#face-canvas { display: none; }
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* PANEL 2 — MAGIC D11.11                                                      */
+/* ─────────────────────────────────────────────────────────────────────────── */
+#panel-d1111 {
+  justify-content: flex-start;
+  background: transparent;
+}
+
+#d1111-header {
+  width: 100%;
+  padding: 16px 20px 6px;
+  text-align: center;
+  flex-shrink: 0;
+}
+#d1111-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1rem, 4.5vw, 1.4rem);
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  color: #c78fff;
+  text-shadow: 0 0 25px #c78fff80;
+}
+#d1111-sub {
+  font-family: 'VT323', monospace;
+  font-size: 0.8rem;
+  color: rgba(200,160,255,0.5);
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+}
+
+#d1111-canvas-wrap {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 6px 0;
+}
+#d1111-canvas { display: block; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+#d1111-tap-hint {
+  font-family: 'VT323', monospace;
+  font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+  color: rgba(200,160,255,0.45);
+  letter-spacing: 0.12em;
+  text-align: center;
+  flex-shrink: 0;
+  animation: hint-pulse 2.5s ease-in-out infinite;
+}
+@keyframes hint-pulse {
+  0%,100% { opacity: 0.45; }
+  50% { opacity: 0.8; }
+}
+
+#d1111-sensor-strip {
+  width: 100%;
+  padding: 8px 16px 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* PANEL 3 — DICE VAULT                                                        */
+/* ─────────────────────────────────────────────────────────────────────────── */
+#panel-dice {
+  justify-content: flex-start;
+}
+
+#dice-header {
+  width: 100%;
+  padding: 14px 20px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+#dice-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #FFD700;
+  text-shadow: 0 0 20px #FFD70060;
+}
+#dice-subtitle {
+  font-family: 'VT323', monospace;
+  font-size: 0.78rem;
+  color: rgba(255,215,0,0.4);
+  letter-spacing: 0.08em;
+}
+#roll-all-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border: 1px solid #FFD70066;
+  border-radius: 100px;
+  background: rgba(255,215,0,0.08);
+  color: #FFD700;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+#roll-all-btn:active {
+  background: rgba(255,215,0,0.18);
+  box-shadow: 0 0 16px #FFD70044;
+}
+
+#dice-container {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── START OVERLAY ────────────────────────────────────────────────────────── */
+#start-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5,3,12,0.96);
+  gap: 24px;
+  padding: 32px;
+  text-align: center;
+}
+#start-logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 8vw, 3rem);
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  background: linear-gradient(135deg, #fff 0%, #gold 30%, #c78fff 70%, #4DFFFF 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #FFD700 25%, #c78fff 65%, #4DFFFF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  filter: drop-shadow(0 0 30px rgba(200,160,255,0.4));
+  animation: logo-pulse 3s ease-in-out infinite;
+}
+@keyframes logo-pulse {
+  0%,100% { filter: drop-shadow(0 0 30px rgba(200,160,255,0.4)); }
+  50% { filter: drop-shadow(0 0 50px rgba(200,160,255,0.7)); }
+}
+#start-tagline {
+  font-family: 'VT323', monospace;
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+}
+#start-desc {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.35);
+  max-width: 320px;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+}
+#start-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  padding: 16px 40px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 100px;
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 0 30px rgba(255,255,255,0.1);
+}
+#start-btn:hover, #start-btn:active {
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 0 40px rgba(255,255,255,0.25);
+  border-color: rgba(255,255,255,0.7);
+}
+#start-sensor-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  max-width: 340px;
+}
+.start-pill {
+  font-family: 'VT323', monospace;
+  font-size: 0.78rem;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.05em;
+}
+
+/* ── PRESIGNAL WATERMARK ─────────────────────────────────────────────────── */
+#presignal-mark {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 38px);
+  right: 14px;
+  z-index: 100;
+  font-family: 'VT323', monospace;
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.18);
+  letter-spacing: 0.1em;
+  pointer-events: none;
+}
+
+/* ── SCROLLBAR ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- Matrix background -->
+<canvas id="matrix-canvas"></canvas>
+
+<!-- Hidden face detection -->
+<video id="face-video" playsinline muted></video>
+<canvas id="face-canvas"></canvas>
+
+<!-- Start overlay -->
+<div id="start-overlay">
+  <div id="start-logo">MOOD RING</div>
+  <div id="start-tagline">
+    PRESIGNAL SENSOR ARRAY v1.0<br>
+    PHYSICAL REALITY → EMOJI TRUTH
+  </div>
+  <div id="start-desc">
+    No random numbers. Every emoji, every color, every roll — 
+    driven by your phone's actual physical sensors.<br>
+    Anti-Randomizer Law active.
+  </div>
+  <div id="start-sensor-list">
+    <span class="start-pill">📡 ACCELEROMETER</span>
+    <span class="start-pill">🌀 GYROSCOPE</span>
+    <span class="start-pill">🧲 MAGNETOMETER</span>
+    <span class="start-pill">🎤 MICROPHONE</span>
+    <span class="start-pill">📷 CAMERA</span>
+    <span class="start-pill">🌍 GPS · MOON</span>
+    <span class="start-pill">🔋 BATTERY</span>
+    <span class="start-pill">📶 NETWORK</span>
+  </div>
+  <button id="start-btn">OPEN THE FIELD</button>
+</div>
+
+<!-- Three-panel app -->
+<div id="panels-wrapper">
+
+  <!-- ── PANEL LEFT: MAGIC D11.11 ─────────────────────────────────────────── -->
+  <div class="panel" id="panel-d1111">
+    <div id="d1111-header">
+      <div id="d1111-title">✦ MAGIC D11.11 ✦</div>
+      <div id="d1111-sub">SENSOR-DRIVEN · NO PRNG · FIELD ORACLE</div>
+    </div>
+    <div id="d1111-canvas-wrap">
+      <canvas id="d1111-canvas"></canvas>
+    </div>
+    <div id="d1111-tap-hint">⚡ TAP THE DIE TO CONSULT THE FIELD ⚡</div>
+    <div id="d1111-sensor-strip"></div>
+  </div>
+
+  <!-- ── PANEL CENTER: MOOD RING ──────────────────────────────────────────── -->
+  <div class="panel" id="panel-ring">
+    <div class="panel-header">
+      <div>
+        <div class="app-title" id="ring-title-text" style="color:#fff;">MOOD RING</div>
+        <div class="app-subtitle">PRESIGNAL SENSOR ARRAY</div>
+      </div>
+      <div class="sensor-badge" id="sensor-badge">
+        <span id="badge-accel">ACCEL: INIT</span>
+        <span id="badge-gyro">GYRO: INIT</span>
+        <span id="badge-audio">MIC: OFF</span>
+        <span id="badge-moon">MOON: —</span>
+      </div>
+    </div>
+
+    <div id="ring-canvas-wrap">
+      <canvas id="ring-canvas"></canvas>
+    </div>
+
+    <div id="mood-label">SIGNAL INITIALIZING</div>
+    <div id="mood-sub">AWAITING SENSOR DATA</div>
+
+    <div id="camera-row">
+      <button class="cam-btn" id="btn-cam-off">📷 OFF</button>
+      <button class="cam-btn" id="btn-cam-front">🤳 FRONT</button>
+      <button class="cam-btn" id="btn-cam-rear">🔙 REAR</button>
+    </div>
+
+    <div id="sensor-strip">
+      <span class="sensor-pill" id="pill-mood">MOOD: —</span>
+      <span class="sensor-pill" id="pill-energy">ENERGY: —</span>
+      <span class="sensor-pill" id="pill-harmony">HARMONY: —</span>
+      <span class="sensor-pill" id="pill-heading">HDG: —</span>
+      <span class="sensor-pill" id="pill-battery">BAT: —</span>
+      <span class="sensor-pill" id="pill-net">NET: —</span>
+      <span class="sensor-pill" id="pill-face">FACE: —</span>
+    </div>
+  </div>
+
+  <!-- ── PANEL RIGHT: DICE VAULT ──────────────────────────────────────────── -->
+  <div class="panel" id="panel-dice">
+    <div id="dice-header">
+      <div>
+        <div id="dice-title">THE VAULT</div>
+        <div id="dice-subtitle">SENSOR-SEEDED · ALL DICE · NO PRNG</div>
+      </div>
+      <button id="roll-all-btn">ROLL ALL</button>
+    </div>
+    <div id="dice-container"></div>
+  </div>
+
+</div>
+
+<!-- Nav dots -->
+<div id="nav-dots">
+  <div class="nav-dot" data-panel="0" title="Magic D11.11"></div>
+  <div class="nav-dot active" data-panel="1" title="Mood Ring"></div>
+  <div class="nav-dot" data-panel="2" title="Dice Vault"></div>
+</div>
+
+<!-- Swipe hint -->
+<div id="swipe-hint">
+  <span>← SWIPE →</span>
+</div>
+
+<!-- Presignal watermark -->
+<div id="presignal-mark">PRESIGNAL INC. · DOI 10.5281/zenodo.20278265</div>
+
+<script src="js/sensors.js"></script>
+<script src="js/matrix.js"></script>
+<script src="js/ring.js"></script>
+<script src="js/d1111.js"></script>
+<script src="js/dice.js"></script>
+
+<script>
+/* ── APP CONTROLLER ─────────────────────────────────────────────────────── */
+
+let currentPanel = 1; // 0=D1111, 1=Ring, 2=Dice
+let moodRing, matrixEngine, d1111, diceVault;
+let hasSwipedOnce = false;
+let cameraMode = 'off'; // off | front | rear
+
+// ── PANEL NAVIGATION ──────────────────────────────────────────────────────
+function goToPanel(idx) {
+  currentPanel = Math.max(0, Math.min(2, idx));
+  const offset = (1 - currentPanel) * 33.333;
+  document.getElementById('panels-wrapper').style.transform = `translateX(${offset}%)`;
+  document.querySelectorAll('.nav-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === currentPanel);
+  });
+  if (!hasSwipedOnce) {
+    hasSwipedOnce = true;
+    document.getElementById('swipe-hint').classList.remove('visible');
+  }
+}
+
+document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+  dot.addEventListener('click', () => goToPanel(i));
+});
+
+// ── TOUCH SWIPE ────────────────────────────────────────────────────────────
+let touchStartX = 0, touchStartY = 0, dragging = false;
+const wrapper = document.getElementById('panels-wrapper');
+
+document.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  dragging = true;
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (!dragging) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 45) {
+    goToPanel(currentPanel + (dx < 0 ? 1 : -1));
+  }
+  dragging = false;
+}, { passive: true });
+
+// Mouse swipe for desktop
+let mouseStartX = 0, mouseDown = false;
+document.addEventListener('mousedown', e => { mouseStartX = e.clientX; mouseDown = true; });
+document.addEventListener('mouseup', e => {
+  if (!mouseDown) return;
+  const dx = e.clientX - mouseStartX;
+  if (Math.abs(dx) > 60) goToPanel(currentPanel + (dx < 0 ? 1 : -1));
+  mouseDown = false;
+});
+
+// ── MOOD LABEL ────────────────────────────────────────────────────────────
+function moodToLabel(mood, energy) {
+  if (mood > 0.88) return ['PURE JOY', 'RADIATING LOVE & LIGHT'];
+  if (mood > 0.75) return ['EUPHORIC', 'FIELD FREQUENCY: LOVE'];
+  if (mood > 0.62) return ['HAPPY', 'POSITIVE SIGNAL DETECTED'];
+  if (mood > 0.50) return ['CONTENT', 'STABLE ENERGY FIELD'];
+  if (mood > 0.38) return ['NEUTRAL', 'SIGNAL BALANCED'];
+  if (mood > 0.25) return ['UNEASY', 'LOW FREQUENCY DETECTED'];
+  if (mood > 0.15) return ['TENSION', 'NEGATIVE FLUX RISING'];
+  if (mood > 0.06) return ['ANGER', 'HIGH ENERGY DISTURBANCE'];
+  return ['VOID', 'FIELD COLLAPSED'];
+}
+
+function moodToColor(mood) {
+  const stops = [
+    { t: 1.00, c: '#ffffff' },
+    { t: 0.85, c: '#FFD700' },
+    { t: 0.65, c: '#4DFFB4' },
+    { t: 0.50, c: '#4DAAFF' },
+    { t: 0.35, c: '#C84DFF' },
+    { t: 0.20, c: '#FF6B4D' },
+    { t: 0.08, c: '#CC2020' },
+    { t: 0.00, c: '#200808' },
+  ];
+  for (let i = 0; i < stops.length - 1; i++) {
+    if (mood >= stops[i + 1].t) {
+      const lo = stops[i + 1], hi = stops[i];
+      const t = (mood - lo.t) / (hi.t - lo.t);
+      return interpolateHex(lo.c, hi.c, t);
+    }
+  }
+  return '#200808';
+}
+
+function interpolateHex(a, b, t) {
+  const ah = parseInt(a.slice(1), 16);
+  const bh = parseInt(b.slice(1), 16);
+  const ar = (ah >> 16) & 0xff, ag = (ah >> 8) & 0xff, ab = ah & 0xff;
+  const br = (bh >> 16) & 0xff, bg = (bh >> 8) & 0xff, bb = bh & 0xff;
+  const r = Math.round(ar + (br - ar) * t);
+  const g = Math.round(ag + (bg - ag) * t);
+  const blue = Math.round(ab + (bb - ab) * t);
+  return `#${((1<<24)|(r<<16)|(g<<8)|blue).toString(16).slice(1)}`;
+}
+
+// ── SENSOR UI UPDATES ─────────────────────────────────────────────────────
+function updateUI(state) {
+  const mood = state.composite.mood;
+  const energy = state.composite.energy;
+  const color = moodToColor(mood);
+
+  // Ring title color
+  document.getElementById('ring-title-text').style.color = color;
+  document.getElementById('ring-title-text').style.textShadow = `0 0 20px ${color}80`;
+
+  // Mood label
+  const [label, sub] = moodToLabel(mood, energy);
+  const ml = document.getElementById('mood-label');
+  ml.textContent = label;
+  ml.style.color = color;
+  ml.style.textShadow = `0 0 15px ${color}60`;
+  document.getElementById('mood-sub').textContent = sub;
+
+  // Sensor badges
+  document.getElementById('badge-accel').textContent =
+    `ACCEL Δ${state.accel.delta.toFixed(1)}`;
+  document.getElementById('badge-gyro').textContent =
+    `GYRO ${state.gyro.rate.toFixed(0)}°/s`;
+  document.getElementById('badge-audio').textContent =
+    `MIC ${(state.audio.rms * 100).toFixed(0)}%`;
+  document.getElementById('badge-moon').textContent =
+    `${state.geo.moonEmoji || '🌙'} ${state.geo.moonName || '—'}`;
+
+  // Pills
+  document.getElementById('pill-mood').textContent =
+    `MOOD ${(mood * 100).toFixed(0)}%`;
+  document.getElementById('pill-energy').textContent =
+    `NRG ${(energy * 100).toFixed(0)}%`;
+  document.getElementById('pill-harmony').textContent =
+    `HRM ${(state.composite.harmony * 100).toFixed(0)}%`;
+  document.getElementById('pill-heading').textContent =
+    `HDG ${state.mag.heading.toFixed(0)}°`;
+  document.getElementById('pill-battery').textContent =
+    `BAT ${(state.battery.level * 100).toFixed(0)}%${state.battery.charging ? '⚡' : ''}`;
+  document.getElementById('pill-net').textContent =
+    `NET ${state.network.type.toUpperCase()}`;
+  document.getElementById('pill-face').textContent =
+    state.face.detected
+      ? `FACE 😊${(state.face.mouthOpen * 100).toFixed(0)}%`
+      : 'FACE: NO SIGNAL';
+
+  // D11.11 sensor strip (abbreviated)
+  const d11strip = document.getElementById('d1111-sensor-strip');
+  if (d11strip) {
+    d11strip.innerHTML = `
+      <span class="sensor-pill" style="color:rgba(200,160,255,0.7)">Δ${state.accel.delta.toFixed(1)}</span>
+      <span class="sensor-pill" style="color:rgba(200,160,255,0.7)">${state.gyro.rate.toFixed(0)}°/s</span>
+      <span class="sensor-pill" style="color:rgba(200,160,255,0.7)">${(state.audio.rms*100).toFixed(0)}% MIC</span>
+      <span class="sensor-pill" style="color:rgba(200,160,255,0.7)">${state.mag.heading.toFixed(0)}° HDG</span>
+      <span class="sensor-pill" style="color:rgba(200,160,255,0.7)">${state.geo.moonEmoji || '🌙'} ${state.geo.moonName || '—'}</span>
+      <span class="sensor-pill" style="color:rgba(200,160,255,0.7)">SIG ${state.composite.signal % 9999}</span>
+    `;
+  }
+}
+
+// ── CAMERA CONTROLS ────────────────────────────────────────────────────────
+function setCameraMode(mode) {
+  cameraMode = mode;
+  document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
+  const map = { 'off': 'btn-cam-off', 'front': 'btn-cam-front', 'rear': 'btn-cam-rear' };
+  document.getElementById(map[mode])?.classList.add('active');
+
+  const eng = window.PresignalEngine;
+  if (mode === 'off') {
+    eng.stopCamera();
+  } else {
+    const video = document.getElementById('face-video');
+    const canvas = document.getElementById('face-canvas');
+    eng.initCamera(video, canvas, mode === 'front' ? 'user' : 'environment');
+  }
+}
+
+document.getElementById('btn-cam-off').addEventListener('click', () => setCameraMode('off'));
+document.getElementById('btn-cam-front').addEventListener('click', () => setCameraMode('front'));
+document.getElementById('btn-cam-rear').addEventListener('click', () => setCameraMode('rear'));
+document.getElementById('btn-cam-off').classList.add('active');
+
+// ── START ─────────────────────────────────────────────────────────────────
+document.getElementById('start-btn').addEventListener('click', async () => {
+  const overlay = document.getElementById('start-overlay');
+  overlay.style.transition = 'opacity 0.6s';
+  overlay.style.opacity = '0';
+  setTimeout(() => overlay.remove(), 700);
+
+  // Init sensor engine
+  await window.PresignalEngine.init();
+
+  // Init matrix background
+  const matrixCanvas = document.getElementById('matrix-canvas');
+  matrixEngine = new EmojiMatrix(matrixCanvas);
+  matrixEngine.draw();
+
+  // Init mood ring
+  const ringCanvas = document.getElementById('ring-canvas');
+  moodRing = new MoodRingRenderer(ringCanvas);
+  moodRing.draw();
+
+  // Init D11.11
+  const d11Canvas = document.getElementById('d1111-canvas');
+  d1111 = new MagicD1111(d11Canvas);
+  d11Canvas.addEventListener('click', () => d1111.roll());
+  d11Canvas.addEventListener('touchstart', (e) => { e.preventDefault(); d1111.roll(); }, { passive: false });
+  d1111.draw();
+
+  // Init Dice Vault
+  const diceContainer = document.getElementById('dice-container');
+  diceVault = new DiceVault(diceContainer);
+  document.getElementById('roll-all-btn').addEventListener('click', () => diceVault.rollAll());
+
+  // Subscribe to sensor updates
+  window.PresignalEngine.subscribe((state) => {
+    if (matrixEngine) matrixEngine.updateSensors(state);
+    if (moodRing) moodRing.update(state);
+    updateUI(state);
+  });
+
+  // Show swipe hint briefly
+  setTimeout(() => {
+    const hint = document.getElementById('swipe-hint');
+    hint.classList.add('visible');
+    setTimeout(() => hint.classList.remove('visible'), 3000);
+  }, 2000);
+});
+</script>
+</body>
+</html>

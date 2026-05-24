@@ -1,0 +1,90 @@
+{
+  "name": "MOOD RING — Presignal Sensor Array",
+  "short_name": "MOOD RING",
+  "description": "Three sensor-driven apps: Mood Ring, Magic D11.11 Oracle, and Dice Vault. All output driven by physical sensors — no random number generation. Anti-Randomizer Law compliant. Presignal Research Initiative.",
+  "start_url": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "portrait",
+  "background_color": "#05030c",
+  "theme_color": "#05030c",
+  "lang": "en",
+  "scope": "/",
+  "categories": ["entertainment", "lifestyle", "utilities"],
+  "screenshots": [],
+  "icons": [
+    {
+      "src": "icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mood Ring",
+      "short_name": "Mood Ring",
+      "description": "Open the Mood Ring sensor display",
+      "url": "/?panel=ring",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Magic D11.11",
+      "short_name": "D11.11",
+      "description": "Consult the sensor-driven oracle",
+      "url": "/?panel=d1111",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Dice Vault",
+      "short_name": "Dice",
+      "description": "Roll all dice with live sensor seeds",
+      "url": "/?panel=dice",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
