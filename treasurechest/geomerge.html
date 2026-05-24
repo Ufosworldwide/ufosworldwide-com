@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#000008">
+<title>GEOMERGE — Presignal</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#000008;--grid-bg:rgba(255,255,255,0.03);
+  --cell:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);
+  --text:#e8e0ff;--accent:#7B6FFF;--gold:#FFD700;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+  font-family:'Share Tech Mono',monospace;-webkit-font-smoothing:antialiased;touch-action:none}
+
+/* COSMIC BG */
+#cosmos{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* LAYOUT */
+#app{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;padding:0}
+
+/* HEADER */
+#hdr{width:100%;padding:10px 16px 4px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+#game-title{font-family:'Cinzel',serif;font-size:clamp(1rem,4.5vw,1.4rem);font-weight:900;letter-spacing:0.2em;
+  background:linear-gradient(135deg,#fff 0%,#c8b8ff 40%,#7B6FFF 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#score-wrap{text-align:right}
+#score-lbl{font-size:0.6rem;opacity:0.45;letter-spacing:0.12em}
+#score{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;color:var(--gold)}
+
+/* PHASE BANNER */
+#phase-banner{width:100%;text-align:center;padding:2px 0 4px;flex-shrink:0}
+#phase-txt{font-size:0.62rem;letter-spacing:0.18em;opacity:0.5;text-transform:uppercase}
+#shape-name{font-family:'Cinzel',serif;font-size:clamp(0.7rem,3vw,0.9rem);letter-spacing:0.15em;
+  color:#c8b8ff;min-height:1.2rem;transition:all 0.4s}
+
+/* GRID */
+#grid-wrap{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:center;width:100%;padding:4px 10px}
+#grid{display:grid;gap:6px;padding:6px;background:rgba(255,255,255,0.025);border-radius:16px;
+  border:1px solid rgba(255,255,255,0.06);box-shadow:0 0 60px rgba(123,111,255,0.08)}
+
+.cell{
+  border-radius:10px;background:var(--cell);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:visible;
+  transition:transform 0.1s;cursor:default;
+}
+.cell canvas{display:block;pointer-events:none}
+
+/* BOTTOM */
+#bottom{width:100%;padding:6px 16px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
+#next-wrap{display:flex;align-items:center;gap:10px;font-size:0.62rem;opacity:0.55;letter-spacing:0.1em}
+#next-canvas{border-radius:8px;border:1px solid rgba(255,255,255,0.1)}
+#controls{display:flex;gap:8px}
+.ctrl-btn{font-family:'Share Tech Mono',monospace;font-size:0.65rem;padding:5px 14px;
+  border:1px solid rgba(255,255,255,0.15);border-radius:100px;background:rgba(255,255,255,0.04);
+  color:rgba(255,255,255,0.55);cursor:pointer;letter-spacing:0.08em;-webkit-tap-highlight-color:transparent;transition:all 0.2s}
+.ctrl-btn:active{background:rgba(255,255,255,0.1);color:#fff}
+#hint{font-size:0.58rem;opacity:0.3;letter-spacing:0.08em;text-align:center}
+
+/* OVERLAY */
+#overlay{position:fixed;inset:0;z-index:500;display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:20px;padding:30px;text-align:center;
+  background:rgba(0,0,8,0.96)}
+#overlay.show{display:flex}
+#ov-title{font-family:'Cinzel',serif;font-size:clamp(1.5rem,7vw,2.4rem);font-weight:900;letter-spacing:0.15em;
+  background:linear-gradient(135deg,#fff,#c8b8ff,#7B6FFF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#ov-sub{font-family:'Cinzel',serif;font-size:clamp(0.8rem,3.5vw,1.1rem);color:rgba(200,180,255,0.7);letter-spacing:0.12em;line-height:1.6}
+#ov-canvas{border-radius:50%;box-shadow:0 0 60px rgba(123,111,255,0.5)}
+#ov-desc{font-size:0.72rem;color:rgba(255,255,255,0.4);max-width:300px;line-height:1.8;letter-spacing:0.04em}
+#ov-btn{font-family:'Cinzel',serif;font-size:0.9rem;font-weight:700;letter-spacing:0.15em;
+  padding:13px 36px;border:2px solid rgba(255,255,255,0.3);border-radius:100px;
+  background:rgba(255,255,255,0.04);color:#fff;cursor:pointer;transition:all 0.3s}
+#ov-btn:active{background:rgba(255,255,255,0.12)}
+
+/* WEB CANVAS overlay on grid */
+#web-canvas{position:absolute;top:0;left:0;pointer-events:none;z-index:5;border-radius:16px}
+
+/* MERGE FLASH */
+.merge-flash{position:fixed;inset:0;z-index:400;pointer-events:none;opacity:0;transition:opacity 0.3s}
+</style>
+</head>
+<body>
+<canvas id="cosmos"></canvas>
+<div class="merge-flash" id="mflash"></div>
+
+<div id="overlay" class="show">
+  <div id="ov-title">GEOMERGE</div>
+  <canvas id="ov-canvas" width="160" height="160"></canvas>
+  <div id="ov-sub">MERGE SHAPES INTO EXISTENCE<br>BUILD YOUR UNIVERSE</div>
+  <div id="ov-desc">
+    Start with a Point.<br>
+    Merge into impossible geometry.<br>
+    Weave the cosmic web.<br>
+    Birth a Klein bottle universe<br>from two Möbius strips.<br><br>
+    <em style="color:rgba(200,180,255,0.5)">Based on Presignal Möbius Signal Conservation<br>& Klein Bottle Universe preprints</em>
+  </div>
+  <button id="ov-btn">BEGIN</button>
+</div>
+
+<div id="app">
+  <div id="hdr">
+    <div>
+      <div id="game-title">GEOMERGE</div>
+    </div>
+    <div id="score-wrap">
+      <div id="score-lbl">COSMIC SCORE</div>
+      <div id="score">0</div>
+    </div>
+  </div>
+  <div id="phase-banner">
+    <div id="phase-txt">PHASE I — THE KNOWN</div>
+    <div id="shape-name">AWAITING FIRST MERGE</div>
+  </div>
+  <div id="grid-wrap">
+    <div id="grid" style="position:relative">
+      <canvas id="web-canvas"></canvas>
+    </div>
+  </div>
+  <div id="bottom">
+    <div id="next-wrap">
+      NEXT &nbsp;
+      <canvas id="next-canvas" width="44" height="44"></canvas>
+    </div>
+    <div id="controls">
+      <button class="ctrl-btn" id="btn-new">NEW GAME</button>
+      <button class="ctrl-btn" id="btn-info">CODEX</button>
+    </div>
+    <div id="hint">SWIPE TO MERGE · SAME SHAPES COMBINE</div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SHAPE DEFINITIONS
+// ═══════════════════════════════════════════════════════════════════════════
+const SHAPES = [
+  // PHASE 1 — THE KNOWN
+  {id:0,  name:'Point',         phase:1, sides:1,  color:'#ffffff', glow:'#ffffff', desc:'The seed of all geometry.'},
+  {id:1,  name:'Line',          phase:1, sides:2,  color:'#e0e8ff', glow:'#8899ff', desc:'Direction emerges.'},
+  {id:2,  name:'Triangle',      phase:1, sides:3,  color:'#a0c8ff', glow:'#4488ff', desc:'The first closed form.'},
+  {id:3,  name:'Square',        phase:1, sides:4,  color:'#80ffcc', glow:'#00cc88', desc:'Perfect right angles.'},
+  {id:4,  name:'Pentagon',      phase:1, sides:5,  color:'#ffdd80', glow:'#ffaa00', desc:'The golden ratio lives here.'},
+  {id:5,  name:'Hexagon',       phase:1, sides:6,  color:'#ff9966', glow:'#ff6600', desc:'Nature\'s most efficient tile.'},
+  {id:6,  name:'Octagon',       phase:1, sides:8,  color:'#ff6699', glow:'#ff0066', desc:'Eight-fold symmetry.'},
+  {id:7,  name:'Tetrahedron',   phase:1, sides:4,  color:'#cc66ff', glow:'#9900ff', desc:'The simplest solid. Four triangular faces.', is3d:true},
+  {id:8,  name:'Cube',          phase:1, sides:6,  color:'#66ccff', glow:'#0099ff', desc:'Six faces. Twelve edges. Eight vertices.', is3d:true},
+  {id:9,  name:'Octahedron',    phase:1, sides:8,  color:'#66ffaa', glow:'#00ff88', desc:'Eight equilateral triangles.', is3d:true},
+  {id:10, name:'Dodecahedron',  phase:1, sides:12, color:'#ffcc44', glow:'#ff8800', desc:'Twelve pentagonal faces. Plato\'s cosmos.', is3d:true},
+  {id:11, name:'Icosahedron',   phase:1, sides:20, color:'#ff4488', glow:'#ff0044', desc:'Twenty triangular faces. The final Platonic solid.', is3d:true},
+
+  // PHASE 2 — BEYOND THE KNOWN
+  {id:12, name:'Tetravortex',   phase:2, sides:24, color:'#ff44ff', glow:'#cc00ff', desc:'This shape has never existed before. Four vortical planes intersecting at impossible angles.', is3d:true, impossible:true},
+  {id:13, name:'Omnifacet',     phase:2, sides:32, color:'#44ffff', glow:'#00ccff', desc:'Every face reflects every other face simultaneously. Euclidean space rejects it.', is3d:true, impossible:true},
+  {id:14, name:'Nullplex',      phase:2, sides:48, color:'#88ff44', glow:'#44ff00', desc:'A shape that exists only in the moment of observation. Schrödinger\'s polygon.', is3d:true, impossible:true},
+  {id:15, name:'Hyperschedron', phase:2, sides:64, color:'#ff8844', glow:'#ff4400', desc:'Projects into 4D space. Its shadow in 3D is what you see here.', is3d:true, impossible:true},
+  {id:16, name:'Vortexion',     phase:2, sides:96, color:'#aa44ff', glow:'#7700ff', desc:'Rotates in a direction that has no name. Its edges are probability fields.', is3d:true, impossible:true},
+  {id:17, name:'Eigenform',     phase:2, sides:128,color:'#ffff44', glow:'#aaaa00', desc:'Self-referential. Contains its own definition. The shape that proves shapes exist.', is3d:true, impossible:true},
+
+  // PHASE 3 — THE WEB
+  {id:18, name:'Nexus Node',    phase:3, sides:256,color:'#ffffff', glow:'#aaaaff', desc:'A junction in the cosmic web. Threads reach toward adjacent nodes.', is3d:true, isWeb:true},
+  {id:19, name:'Filament',      phase:3, sides:512,color:'#ccccff', glow:'#8888ff', desc:'The large-scale structure emerges. You are building the cosmic web.', is3d:true, isWeb:true},
+  {id:20, name:'Void Node',     phase:3, sides:1024,color:'#8866ff',glow:'#4422ff', desc:'Where the filaments curve around emptiness. The shape of nothing.', is3d:true, isWeb:true},
+
+  // PHASE 4 — MÖBIUS & KLEIN
+  {id:21, name:'Möbius Ring',   phase:4, sides:0,  color:'#ff88cc', glow:'#ff00aa', desc:'One side. One edge. Merging two creates something that cannot be mapped in three dimensions.', isMobius:true},
+  {id:22, name:'Klein Manifold',phase:4, sides:0,  color:'#cc88ff', glow:'#8800ff', desc:'The universe itself has this topology. No inside. No outside. You are building from within.', isKlein:true},
+  {id:23, name:'∞ Universe',    phase:5, sides:0,  color:'#ffffff', glow:'#ffffff', desc:'You have built a universe. It contains everything that came before it. Including you.', isUniverse:true},
+];
+
+const GRID = 5; // 5×5
+const SPAWN_POOL = [0,0,0,1,1,2]; // weighted toward lower shapes
+let board = [], score = 0, highestId = 0, gamePhase = 1;
+let nextShape = 0;
+let cellPx = 0;
+let webNodes = []; // positions of web-phase shapes
+let universeBuilt = false;
+let tick = 0;
+let animFrame;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SHAPE RENDERER
+// ═══════════════════════════════════════════════════════════════════════════
+function drawShape(ctx, shape, size, t=0, bright=1) {
+  if(!shape) return;
+  const cx=size/2, cy=size/2, r=size*0.36;
+  const s=SHAPES[shape];
+  const col=s.color, glow=s.glow;
+  const phase=s.phase||1;
+
+  ctx.clearRect(0,0,size,size);
+
+  // Phase-based background glow
+  if(phase>=2){
+    const g=ctx.createRadialGradient(cx,cy,0,cx,cy,size*0.6);
+    g.addColorStop(0,glow+'44');g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,size*0.6,0,Math.PI*2);ctx.fill();
+  }
+
+  const pulse = 1 + Math.sin(t*0.06)*0.04*(phase>=2?1:0.3);
+  const rp = r*pulse;
+
+  ctx.save();
+  ctx.translate(cx,cy);
+
+  if(s.isUniverse){
+    _drawUniverse(ctx,rp,t,col,glow);
+  }else if(s.isKlein){
+    _drawKlein(ctx,rp,t,col,glow);
+  }else if(s.isMobius){
+    _drawMobius(ctx,rp,t,col,glow);
+  }else if(s.isWeb){
+    _drawWebNode(ctx,rp,t,col,glow,shape);
+  }else if(s.impossible){
+    _drawImpossible(ctx,rp,t,col,glow,s.sides);
+  }else if(s.is3d){
+    _draw3D(ctx,rp,t,col,glow,s.id);
+  }else{
+    _draw2D(ctx,rp,t,col,glow,s.sides,s.id);
+  }
+
+  ctx.restore();
+
+  // Phase 2+ shimmer
+  if(phase>=2 && Math.random()<0.05){
+    const px=Math.random()*size, py=Math.random()*size;
+    ctx.beginPath();ctx.arc(px,py,1+Math.random(),0,Math.PI*2);
+    ctx.fillStyle=glow+'88';ctx.fill();
+  }
+}
+
+function _draw2D(ctx,r,t,col,glow,sides,id){
+  if(id===0){// Point
+    const g=ctx.createRadialGradient(0,0,0,0,0,r*0.4);
+    g.addColorStop(0,'#fff');g.addColorStop(0.5,glow);g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*0.35,0,Math.PI*2);ctx.fill();
+    return;
+  }
+  if(id===1){// Line
+    ctx.strokeStyle=col;ctx.lineWidth=3;ctx.lineCap='round';
+    ctx.shadowColor=glow;ctx.shadowBlur=8;
+    ctx.beginPath();ctx.moveTo(-r,0);ctx.lineTo(r,0);ctx.stroke();
+    return;
+  }
+  ctx.rotate(t*0.01);
+  ctx.beginPath();
+  for(let i=0;i<sides;i++){
+    const a=(i/sides)*Math.PI*2 - Math.PI/2;
+    i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+  }
+  ctx.closePath();
+  const g=ctx.createRadialGradient(-r*0.2,-r*0.2,0,0,0,r);
+  g.addColorStop(0,col+'cc');g.addColorStop(1,col+'22');
+  ctx.fillStyle=g;ctx.fill();
+  ctx.strokeStyle=col;ctx.lineWidth=2;ctx.shadowColor=glow;ctx.shadowBlur=12;ctx.stroke();
+}
+
+function _draw3D(ctx,r,t,col,glow,id){
+  const spin=t*0.02;
+  // Project simple 3D wireframe
+  const vertices3D={
+    7:[[0,-1,0],[.943,.333,0],[-.471,.333,.816],[-.471,.333,-.816]], // tetra
+    8:[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]], // cube
+    9:[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]], // octa
+    10:null,11:null // dodeca/icosa use polygon approximation
+  };
+  const edges3D={
+    7:[[0,1],[0,2],[0,3],[1,2],[2,3],[1,3]],
+    8:[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]],
+    9:[[0,2],[0,3],[0,4],[0,5],[1,2],[1,3],[1,4],[1,5],[2,4],[2,5],[3,4],[3,5]],
+  };
+
+  if(vertices3D[id]){
+    const v=vertices3D[id],e=edges3D[id];
+    const project=(x,y,z)=>{
+      const rx=x*Math.cos(spin)-z*Math.sin(spin);
+      const rz=x*Math.sin(spin)+z*Math.cos(spin);
+      const ry=y*Math.cos(spin*0.7)-rz*Math.sin(spin*0.7);
+      return{x:rx*r*0.7,y:ry*r*0.7,z:rz};
+    };
+    const proj=v.map(([x,y,z])=>project(x,y,z));
+    // fill faces roughly
+    ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.shadowColor=glow;ctx.shadowBlur=10;
+    e.forEach(([a,b])=>{
+      const pa=proj[a],pb=proj[b];
+      const depth=(pa.z+pb.z)/2;
+      ctx.globalAlpha=0.4+depth*0.3;
+      ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.lineTo(pb.x,pb.y);ctx.stroke();
+    });
+    ctx.globalAlpha=1;
+    // glow center
+    const g=ctx.createRadialGradient(0,0,0,0,0,r*0.4);
+    g.addColorStop(0,glow+'66');g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*0.4,0,Math.PI*2);ctx.fill();
+  }else{
+    // Dodeca/icosa — layered polygon approximation
+    const layers=id===10?[{n:5,r:0.8,a:0},{n:10,r:1,a:0.31},{n:5,r:0.8,a:Math.PI}]:
+                         [{n:5,r:0.6,a:0},{n:10,r:1,a:0.31},{n:10,r:0.85,a:0},{n:5,r:0.6,a:Math.PI}];
+    ctx.shadowColor=glow;ctx.shadowBlur=14;
+    layers.forEach((l,li)=>{
+      ctx.save();ctx.rotate(spin*(li%2===0?1:-1)+l.a);
+      ctx.beginPath();
+      for(let i=0;i<l.n;i++){const a=(i/l.n)*Math.PI*2;ctx.lineTo(Math.cos(a)*r*l.r,Math.sin(a)*r*l.r);}
+      ctx.closePath();
+      ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.globalAlpha=0.5+li*0.15;ctx.stroke();
+      ctx.restore();
+    });
+    ctx.globalAlpha=1;
+  }
+}
+
+function _drawImpossible(ctx,r,t,col,glow,sides){
+  const layers=Math.min(Math.floor(Math.log2(sides/12)+2),8);
+  ctx.shadowColor=glow;ctx.shadowBlur=18;
+  for(let l=0;l<layers;l++){
+    const n=3+l*2,rr=r*(0.3+l*0.12),spin=(t*0.015*(l%2===0?1:-1));
+    ctx.save();ctx.rotate(spin);
+    ctx.beginPath();
+    for(let i=0;i<n;i++){
+      const a=(i/n)*Math.PI*2;
+      const wobble=1+Math.sin(t*0.08+l*1.3+i)*0.08;
+      i===0?ctx.moveTo(Math.cos(a)*rr*wobble,Math.sin(a)*rr*wobble):
+             ctx.lineTo(Math.cos(a)*rr*wobble,Math.sin(a)*rr*wobble);
+    }
+    ctx.closePath();
+    ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.globalAlpha=0.35+l*0.08;ctx.stroke();
+    ctx.restore();
+  }
+  ctx.globalAlpha=1;
+  // pulsing core
+  const g=ctx.createRadialGradient(0,0,0,0,0,r*0.35);
+  g.addColorStop(0,glow+'99');g.addColorStop(1,'transparent');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*0.35,0,Math.PI*2);ctx.fill();
+  // impossible edge flicker
+  if(Math.sin(t*0.3)>0.7){
+    ctx.save();ctx.rotate(t*0.04);
+    ctx.beginPath();ctx.arc(0,0,r*0.95,0,Math.PI*2);
+    ctx.strokeStyle=glow+'66';ctx.lineWidth=1;ctx.setLineDash([2,4]);ctx.stroke();
+    ctx.setLineDash([]);ctx.restore();
+  }
+}
+
+function _drawWebNode(ctx,r,t,col,glow,id){
+  const rings=id-17;
+  ctx.shadowColor=glow;ctx.shadowBlur=20;
+  // Pulsing rings
+  for(let i=0;i<3+rings;i++){
+    const rr=r*(0.25+i*0.22),alpha=0.6-i*0.12,spin=t*0.01*(i%2?1:-1);
+    ctx.save();ctx.rotate(spin);
+    ctx.beginPath();ctx.arc(0,0,rr,0,Math.PI*2);
+    ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.globalAlpha=alpha;ctx.stroke();
+    // spokes
+    const spokes=6;
+    for(let s=0;s<spokes;s++){
+      const a=(s/spokes)*Math.PI*2;
+      ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);
+      ctx.globalAlpha=alpha*0.4;ctx.stroke();
+    }
+    ctx.restore();
+  }
+  ctx.globalAlpha=1;
+  const g=ctx.createRadialGradient(0,0,0,0,0,r*0.3);
+  g.addColorStop(0,'#fff');g.addColorStop(0.4,glow);g.addColorStop(1,'transparent');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*0.28,0,Math.PI*2);ctx.fill();
+}
+
+function _drawMobius(ctx,r,t,col,glow){
+  ctx.shadowColor=glow;ctx.shadowBlur=20;
+  const steps=120;
+  for(let pass=0;pass<2;pass++){
+    ctx.beginPath();
+    for(let i=0;i<=steps;i++){
+      const u=(i/steps)*Math.PI*2+t*0.015;
+      const v=pass===0?0.5:-0.5;
+      const x=(r*0.85+v*Math.cos(u/2)*r*0.22)*Math.cos(u);
+      const y=(r*0.85+v*Math.cos(u/2)*r*0.22)*Math.sin(u)*0.5;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle=col;ctx.lineWidth=pass===0?3:1.5;ctx.globalAlpha=pass===0?0.8:0.4;ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+  // center glow
+  const g=ctx.createRadialGradient(0,0,0,0,0,r*0.25);
+  g.addColorStop(0,glow+'cc');g.addColorStop(1,'transparent');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*0.25,0,Math.PI*2);ctx.fill();
+}
+
+function _drawKlein(ctx,r,t,col,glow){
+  ctx.shadowColor=glow;ctx.shadowBlur=25;
+  // Two Möbius strips intersecting in torus field
+  for(let strip=0;strip<2;strip++){
+    const offset=strip*Math.PI;
+    const steps=100;
+    ctx.beginPath();
+    for(let i=0;i<=steps;i++){
+      const u=(i/steps)*Math.PI*2+t*0.012*(strip===0?1:-1)+offset;
+      const x=(r*0.75+Math.cos(u/2)*r*0.18)*Math.cos(u);
+      const y=(r*0.75+Math.cos(u/2)*r*0.18)*Math.sin(u)*(strip===0?0.45:0.55);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle=strip===0?col:glow;ctx.lineWidth=2.5;ctx.globalAlpha=0.75;ctx.stroke();
+  }
+  // Torus outline
+  ctx.beginPath();ctx.ellipse(0,0,r*0.9,r*0.48,t*0.008,0,Math.PI*2);
+  ctx.strokeStyle=glow+'44';ctx.lineWidth=1;ctx.globalAlpha=0.4;ctx.stroke();
+  ctx.globalAlpha=1;
+  const g=ctx.createRadialGradient(0,0,0,0,0,r*0.3);
+  g.addColorStop(0,glow+'ee');g.addColorStop(1,'transparent');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*0.25,0,Math.PI*2);ctx.fill();
+}
+
+function _drawUniverse(ctx,r,t,col,glow){
+  ctx.shadowColor=glow;ctx.shadowBlur=30;
+  // The Klein bottle / universe — two Möbius in torus, ship inside
+  // Outer torus field
+  for(let ring=0;ring<3;ring++){
+    const rr=r*(0.5+ring*0.18),spin=t*0.006*(ring%2?1:-1);
+    ctx.save();ctx.rotate(spin);
+    ctx.beginPath();ctx.ellipse(0,0,rr,rr*0.45,0,0,Math.PI*2);
+    ctx.strokeStyle=glow;ctx.lineWidth=1;ctx.globalAlpha=0.2+ring*0.08;ctx.stroke();
+    ctx.restore();
+  }
+  // Two Möbius strips
+  for(let strip=0;strip<2;strip++){
+    const off=strip*Math.PI*0.5;
+    const steps=140;
+    ctx.beginPath();
+    for(let i=0;i<=steps;i++){
+      const u=(i/steps)*Math.PI*2+t*0.01*(strip===0?1:-1.2)+off;
+      const x=(r*0.7+Math.cos(u/2)*r*0.2)*Math.cos(u);
+      const y=(r*0.7+Math.cos(u/2)*r*0.2)*Math.sin(u)*0.5;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle=strip===0?'#ff88cc':'#88ccff';ctx.lineWidth=2;ctx.globalAlpha=0.7;ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+  // "Ship inside" — small geometric form at center
+  ctx.save();ctx.rotate(t*0.03);
+  ctx.beginPath();
+  for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;i===0?ctx.moveTo(Math.cos(a)*r*0.18,Math.sin(a)*r*0.18):ctx.lineTo(Math.cos(a)*r*0.18,Math.sin(a)*r*0.18);}
+  ctx.closePath();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.globalAlpha=0.9;ctx.stroke();
+  ctx.restore();
+  // Core
+  const g=ctx.createRadialGradient(0,0,0,0,0,r*0.15);
+  g.addColorStop(0,'#fff');g.addColorStop(0.5,glow);g.addColorStop(1,'transparent');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*0.15,0,Math.PI*2);ctx.fill();
+  // Cosmic web threads
+  for(let i=0;i<12;i++){
+    const a=(i/12)*Math.PI*2+t*0.005;
+    ctx.beginPath();ctx.moveTo(Math.cos(a)*r*0.18,Math.sin(a)*r*0.18);
+    ctx.lineTo(Math.cos(a)*r*0.88,Math.sin(a)*r*0.48);
+    ctx.strokeStyle=glow+'33';ctx.lineWidth=0.5;ctx.globalAlpha=0.3;ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COSMIC BACKGROUND
+// ═══════════════════════════════════════════════════════════════════════════
+function initCosmos(){
+  const canvas=document.getElementById('cosmos');
+  const ctx=canvas.getContext('2d');
+  const stars=Array(180).fill(0).map(()=>({
+    x:Math.random(),y:Math.random(),r:Math.random()*1.5,
+    speed:0.2+Math.random()*0.3,phase:Math.random()*Math.PI*2
+  }));
+  function draw(){
+    canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+    ctx.fillStyle='#000008';ctx.fillRect(0,0,canvas.width,canvas.height);
+    // Nebula gradient based on game phase
+    const phaseColors={1:'#0a0020',2:'#100030',3:'#080028',4:'#180018',5:'#200010'};
+    const nebCol=phaseColors[gamePhase]||'#0a0020';
+    const ng=ctx.createRadialGradient(canvas.width*0.5,canvas.height*0.4,0,canvas.width*0.5,canvas.height*0.4,canvas.width*0.6);
+    ng.addColorStop(0,nebCol);ng.addColorStop(1,'transparent');
+    ctx.fillStyle=ng;ctx.fillRect(0,0,canvas.width,canvas.height);
+    // Stars
+    stars.forEach(s=>{
+      const alpha=0.3+Math.sin(tick*0.02+s.phase)*0.4;
+      ctx.beginPath();ctx.arc(s.x*canvas.width,s.y*canvas.height,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${alpha})`;ctx.fill();
+    });
+  }
+  window.addEventListener('resize',draw);
+  return draw;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GRID & GAME LOGIC
+// ═══════════════════════════════════════════════════════════════════════════
+function initGrid(){
+  const wrap=document.getElementById('grid-wrap');
+  const gridEl=document.getElementById('grid');
+  const ww=wrap.clientWidth,wh=wrap.clientHeight;
+  const maxCell=Math.floor(Math.min(ww,wh)/GRID)-6;
+  cellPx=Math.max(52,Math.min(maxCell,90));
+  gridEl.style.gridTemplateColumns=`repeat(${GRID},${cellPx}px)`;
+  gridEl.innerHTML='<canvas id="web-canvas"></canvas>';
+  board=Array(GRID*GRID).fill(null);
+  // Spawn 2 starting shapes
+  spawnRandom();spawnRandom();
+  renderAll();
+}
+
+function cellEl(i){return document.getElementById('grid').querySelectorAll('.cell')[i];}
+
+function renderAll(){
+  const gridEl=document.getElementById('grid');
+  // Remove old cells, keep web canvas
+  const webCnv=document.getElementById('web-canvas');
+  gridEl.innerHTML='';gridEl.appendChild(webCnv);
+  board.forEach((shape,i)=>{
+    const cell=document.createElement('div');
+    cell.className='cell';
+    cell.style.width=cellPx+'px';cell.style.height=cellPx+'px';
+    if(shape!==null){
+      const s=SHAPES[shape];
+      cell.style.borderColor=s.color+'44';
+      cell.style.boxShadow=`0 0 14px ${s.glow}22`;
+      const canvas=document.createElement('canvas');
+      canvas.width=cellPx;canvas.height=cellPx;
+      cell.appendChild(canvas);
+    }
+    gridEl.appendChild(cell);
+  });
+  // Size web canvas
+  const gridRect=gridEl.getBoundingClientRect();
+  webCnv.width=gridRect.width||cellPx*GRID+12;
+  webCnv.height=gridRect.height||cellPx*GRID+12;
+  webCnv.style.width=webCnv.width+'px';webCnv.style.height=webCnv.height+'px';
+  webCnv.style.position='absolute';webCnv.style.top='0';webCnv.style.left='0';
+  updateStats();
+}
+
+function spawnRandom(){
+  const empty=board.map((v,i)=>v===null?i:-1).filter(i=>i>=0);
+  if(!empty.length)return false;
+  const idx=empty[Math.floor(Math.random()*empty.length)];
+  const pool=SPAWN_POOL.filter(s=>s<=Math.max(0,highestId-1));
+  board[idx]=pool[Math.floor(Math.random()*pool.length)]||0;
+  return true;
+}
+
+function updateStats(){
+  highestId=board.reduce((m,v)=>v!==null?Math.max(m,v):m,0);
+  const s=SHAPES[highestId];
+  gamePhase=s?s.phase:1;
+  document.getElementById('score').textContent=score.toLocaleString();
+  document.getElementById('phase-txt').textContent=
+    ['','PHASE I — THE KNOWN','PHASE II — BEYOND','PHASE III — THE WEB','PHASE IV — MÖBIUS & KLEIN','PHASE V — ∞'][gamePhase]||'';
+  document.getElementById('shape-name').textContent=s?s.name:'—';
+  document.getElementById('shape-name').style.color=s?s.color:'#c8b8ff';
+  // Update next
+  drawShape(document.getElementById('next-canvas').getContext('2d'),nextShape,44,tick);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MOVE & MERGE (2048-style)
+// ═══════════════════════════════════════════════════════════════════════════
+function move(dir){
+  // dir: 0=up,1=right,2=down,3=left
+  let moved=false;
+  const get=(r,c)=>board[r*GRID+c];
+  const set=(r,c,v)=>{board[r*GRID+c]=v;};
+
+  const processLine=(line)=>{
+    // Remove nulls
+    let arr=line.filter(v=>v!==null);
+    // Merge adjacent equal
+    for(let i=0;i<arr.length-1;i++){
+      if(arr[i]===arr[i+1]){
+        const merged=Math.min(arr[i]+1,SHAPES.length-1);
+        arr[i]=merged;arr.splice(i+1,1);
+        score+=Math.pow(2,merged+1);
+        triggerMerge(merged);
+      }
+    }
+    // Pad with nulls
+    while(arr.length<GRID)arr.push(null);
+    return arr;
+  };
+
+  if(dir===3||dir===1){// left or right — process rows
+    for(let r=0;r<GRID;r++){
+      let row=Array(GRID).fill(0).map((_,c)=>get(r,c));
+      if(dir===1)row.reverse();
+      const orig=[...row];
+      row=processLine(row);
+      if(dir===1)row.reverse();
+      if(row.some((v,i)=>v!==orig[i]))moved=true;
+      row.forEach((v,c)=>set(r,c,v));
+    }
+  }else{// up or down — process cols
+    for(let c=0;c<GRID;c++){
+      let col=Array(GRID).fill(0).map((_,r)=>get(r,c));
+      if(dir===2)col.reverse();
+      const orig=[...col];
+      col=processLine(col);
+      if(dir===2)col.reverse();
+      if(col.some((v,i)=>v!==orig[i]))moved=true;
+      col.forEach((v,r)=>set(r,c,v));
+    }
+  }
+
+  if(moved){
+    spawnRandom();
+    renderAll();
+    checkUniverse();
+  }
+}
+
+function triggerMerge(shapeId){
+  const s=SHAPES[shapeId];
+  const flash=document.getElementById('mflash');
+  flash.style.background=s.glow+'22';
+  flash.style.opacity='1';
+  setTimeout(()=>flash.style.opacity='0',300);
+  // Show merge notification
+  if(s.impossible||s.isWeb||s.isMobius||s.isKlein||s.isUniverse){
+    showDiscovery(s);
+  }
+}
+
+function showDiscovery(s){
+  // Brief overlay flash with shape name and description
+  const el=document.createElement('div');
+  el.style.cssText=`position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:300;
+    text-align:center;pointer-events:none;animation:fadeInOut 2.5s forwards`;
+  el.innerHTML=`<div style="font-family:'Cinzel',serif;font-size:1.2rem;color:${s.color};text-shadow:0 0 20px ${s.glow};letter-spacing:0.15em">${s.name}</div>
+    <div style="font-size:0.65rem;color:rgba(255,255,255,0.5);margin-top:6px;max-width:220px;line-height:1.6">${s.desc}</div>`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),2800);
+}
+
+function checkUniverse(){
+  if(board.some(v=>v===23)&&!universeBuilt){
+    universeBuilt=true;
+    setTimeout(()=>triggerUniverseEnd(),1200);
+  }
+}
+
+function triggerUniverseEnd(){
+  const ov=document.getElementById('overlay');
+  const canvas=document.getElementById('ov-canvas');
+  document.getElementById('ov-title').textContent='∞ UNIVERSE BORN';
+  document.getElementById('ov-sub').innerHTML=`YOUR SCORE: <span style="color:#FFD700;font-size:1.4rem">${score.toLocaleString()}</span><br><br>TWO MÖBIUS STRIPS<br>ONE KLEIN BOTTLE<br>YOUR UNIVERSE`;
+  document.getElementById('ov-desc').innerHTML=`
+    The geometry you built from a single Point has become a universe.<br><br>
+    The two Möbius strips intersecting in a toroidal field —<br>
+    this is the shape of what contains everything.<br><br>
+    <em style="color:rgba(200,180,255,0.5)">Möbius Signal Conservation Principle<br>Klein Bottle Universe Framework<br>Presignal Research Initiative</em>`;
+  document.getElementById('ov-btn').textContent='BIRTH ANOTHER';
+  ov.classList.add('show');
+  // Animate universe in overlay canvas
+  let t2=0;
+  const animUniverse=()=>{
+    drawShape(canvas.getContext('2d'),23,160,t2);
+    t2++;
+    if(ov.classList.contains('show'))requestAnimationFrame(animUniverse);
+  };
+  animUniverse();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WEB CANVAS — draw connections between web-phase shapes
+// ═══════════════════════════════════════════════════════════════════════════
+function drawWeb(){
+  const webCnv=document.getElementById('web-canvas');
+  if(!webCnv)return;
+  const ctx=webCnv.getContext('2d');
+  ctx.clearRect(0,0,webCnv.width,webCnv.height);
+  const webPositions=[];
+  board.forEach((v,i)=>{
+    if(v!==null&&SHAPES[v]&&(SHAPES[v].isWeb||SHAPES[v].isMobius||SHAPES[v].isKlein||SHAPES[v].isUniverse)){
+      const r=Math.floor(i/GRID),c=i%GRID;
+      const x=6+c*(cellPx+6)+cellPx/2,y=6+r*(cellPx+6)+cellPx/2;
+      webPositions.push({x,y,v});
+    }
+  });
+  if(webPositions.length<2)return;
+  ctx.shadowBlur=8;
+  webPositions.forEach((a,ai)=>{
+    webPositions.forEach((b,bi)=>{
+      if(bi<=ai)return;
+      const dist=Math.hypot(a.x-b.x,a.y-b.y);
+      if(dist>cellPx*3)return;
+      const alpha=(1-dist/(cellPx*3))*0.6;
+      const grad=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+      grad.addColorStop(0,SHAPES[a.v].glow+Math.floor(alpha*255).toString(16).padStart(2,'0'));
+      grad.addColorStop(1,SHAPES[b.v].glow+Math.floor(alpha*255).toString(16).padStart(2,'0'));
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+      ctx.strokeStyle=grad;ctx.lineWidth=1+alpha*1.5;
+      ctx.shadowColor=SHAPES[a.v].glow;ctx.stroke();
+    });
+  });
+  ctx.shadowBlur=0;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ANIMATION LOOP
+// ═══════════════════════════════════════════════════════════════════════════
+const cosmosDraw=initCosmos();
+function loop(){
+  tick++;
+  cosmosDraw();
+  // Draw all shape canvases
+  document.querySelectorAll('.cell').forEach((cell,i)=>{
+    const v=board[i];
+    if(v===null)return;
+    const canvas=cell.querySelector('canvas');
+    if(!canvas)return;
+    drawShape(canvas.getContext('2d'),v,cellPx,tick);
+  });
+  // Draw next shape
+  const nc=document.getElementById('next-canvas');
+  if(nc)drawShape(nc.getContext('2d'),nextShape,44,tick);
+  // Draw overlay canvas if visible
+  const ov=document.getElementById('overlay');
+  if(ov.classList.contains('show')&&!universeBuilt){
+    const oc=document.getElementById('ov-canvas');
+    if(oc)drawShape(oc.getContext('2d'),11,160,tick);// icosahedron in start screen
+  }
+  // Web connections
+  if(tick%3===0)drawWeb();
+  requestAnimationFrame(loop);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INPUT
+// ═══════════════════════════════════════════════════════════════════════════
+let tx=0,ty=0;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)<8&&Math.abs(dy)<8)return;
+  if(Math.abs(dx)>Math.abs(dy))move(dx<0?3:1);
+  else move(dy<0?0:2);
+},{passive:true});
+document.addEventListener('keydown',e=>{
+  const map={ArrowUp:0,ArrowRight:1,ArrowDown:2,ArrowLeft:3,w:0,d:1,s:2,a:3};
+  if(map[e.key]!==undefined){e.preventDefault();move(map[e.key]);}
+});
+
+// Mouse drag
+let mx=0,my=0,mdown=false;
+document.addEventListener('mousedown',e=>{mx=e.clientX;my=e.clientY;mdown=true;});
+document.addEventListener('mouseup',e=>{
+  if(!mdown)return;mdown=false;
+  const dx=e.clientX-mx,dy=e.clientY-my;
+  if(Math.abs(dx)<8&&Math.abs(dy)<8)return;
+  if(Math.abs(dx)>Math.abs(dy))move(dx<0?3:1);
+  else move(dy<0?0:2);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BUTTONS
+// ═══════════════════════════════════════════════════════════════════════════
+document.getElementById('ov-btn').addEventListener('click',()=>{
+  document.getElementById('overlay').classList.remove('show');
+  nextShape=0;score=0;universeBuilt=false;
+  initGrid();
+});
+document.getElementById('btn-new').addEventListener('click',()=>{
+  if(confirm('Start a new universe?')){score=0;universeBuilt=false;nextShape=0;initGrid();}
+});
+document.getElementById('btn-info').addEventListener('click',()=>{
+  const s=SHAPES[highestId];
+  alert(`GEOMERGE CODEX\n\nCurrent highest: ${s.name}\nPhase: ${s.phase}\nScore: ${score.toLocaleString()}\n\n${s.desc}\n\nMerge path:\nPoint → Line → Triangle → Square → Pentagon → Hexagon → Octagon → Tetrahedron → Cube → Octahedron → Dodecahedron → Icosahedron → [BEYOND] → Nexus Node → Filament → Void Node → Möbius Ring → Klein Manifold → ∞ Universe\n\nBased on:\nMöbius Signal Conservation Principle\nKlein Bottle Universe Framework\nPresignal Research Initiative\nDOI 10.5281/zenodo.20278265`);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CSS ANIMATION for discovery popup
+// ═══════════════════════════════════════════════════════════════════════════
+const style=document.createElement('style');
+style.textContent=`@keyframes fadeInOut{0%{opacity:0;transform:translate(-50%,-60%)}15%{opacity:1;transform:translate(-50%,-50%)}80%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,-40%)}}`;
+document.head.appendChild(style);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+window.addEventListener('resize',()=>{initGrid();});
+initGrid();
+loop();
+</script>
+</body>
+</html>

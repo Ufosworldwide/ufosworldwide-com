@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#030206">
+<title>EMOJI MERGE // Presignal Harmonic Field</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#030206;--neon-cyan:#00f0ff;--neon-gold:#ffaa00;--neon-mag:#ff007f;
+  --phi:1.61803398875;--schumann:7.83;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
+  font-family:'Courier Prime',monospace;color:#fff;touch-action:none;
+  -webkit-font-smoothing:antialiased}
+
+#cosmos{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* HUD */
+#hud{position:fixed;inset:0;z-index:20;pointer-events:none;
+  display:flex;flex-direction:column;justify-content:space-between;padding:10px}
+#hud-top{pointer-events:auto;display:flex;justify-content:space-between;align-items:flex-start;
+  background:rgba(3,2,6,0.82);border-bottom:1px dashed rgba(0,240,255,0.3);
+  padding:8px 12px;backdrop-filter:blur(8px)}
+#game-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.2rem,5vw,1.8rem);
+  letter-spacing:0.15em;color:#fff;text-shadow:0 0 15px var(--neon-cyan);line-height:1}
+#game-sub{font-family:'Courier Prime',monospace;font-size:0.58rem;color:var(--neon-cyan);
+  letter-spacing:0.18em;opacity:0.7;margin-top:2px}
+#stats{display:flex;gap:8px;align-items:flex-start}
+.stat{background:rgba(20,10,35,0.7);border:1px solid rgba(0,240,255,0.2);
+  padding:5px 10px;border-radius:3px;text-align:right}
+.stat-lbl{font-size:0.52rem;color:var(--neon-gold);letter-spacing:0.12em;text-transform:uppercase}
+.stat-val{font-size:1rem;font-weight:700;color:#fff;line-height:1.1}
+
+#hud-bottom{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:6px 12px;background:rgba(3,2,6,0.82);border-top:1px dashed rgba(0,240,255,0.2);
+  backdrop-filter:blur(8px)}
+#next-row{display:flex;align-items:center;gap:10px;font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,255,0.4)}
+#next-hex{width:52px;height:52px;display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(0,240,255,0.25);border-radius:4px;font-size:1.8rem;
+  background:rgba(0,240,255,0.04);position:relative}
+#schumann-bar{width:100%;max-width:360px;height:3px;background:rgba(255,255,255,0.06);
+  border-radius:2px;overflow:hidden}
+#schumann-fill{height:100%;width:50%;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-mag));
+  border-radius:2px;transition:width 0.05s}
+#bottom-labels{display:flex;gap:16px;font-size:0.52rem;color:rgba(255,255,255,0.3);letter-spacing:0.1em}
+
+/* GAME AREA */
+#game-area{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center}
+#hex-board{position:relative}
+#board-canvas{display:block}
+
+/* OVERLAY */
+#overlay{position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;padding:28px;text-align:center;
+  background:rgba(3,2,6,0.97)}
+#ov-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,8vw,3rem);
+  letter-spacing:0.2em;text-shadow:0 0 30px var(--neon-cyan)}
+#ov-canvas{border-radius:50%;border:1px solid rgba(0,240,255,0.2)}
+#ov-sub{font-family:'Bebas Neue',sans-serif;font-size:clamp(0.9rem,4vw,1.3rem);
+  letter-spacing:0.15em;color:var(--neon-cyan);line-height:1.5}
+#ov-desc{font-size:0.68rem;color:rgba(255,255,255,0.38);max-width:300px;line-height:1.9;letter-spacing:0.04em}
+#ov-btn{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.2em;
+  padding:13px 40px;border:2px solid var(--neon-cyan);border-radius:3px;
+  background:rgba(0,240,255,0.06);color:#fff;cursor:pointer;
+  text-shadow:0 0 10px var(--neon-cyan);box-shadow:0 0 20px rgba(0,240,255,0.15);
+  -webkit-tap-highlight-color:transparent}
+#ov-btn:active{background:rgba(0,240,255,0.15)}
+
+/* DISCOVERY POPUP */
+.discovery{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%);z-index:300;
+  text-align:center;pointer-events:none;animation:discAnim 2.6s forwards}
+.disc-emoji{font-size:2.8rem;display:block;animation:discPop 0.4s cubic-bezier(0.17,0.89,0.32,1.28)}
+.disc-name{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.15em;
+  color:var(--neon-cyan);text-shadow:0 0 15px var(--neon-cyan);margin-top:4px}
+.disc-life{font-size:0.62rem;color:rgba(255,255,255,0.45);letter-spacing:0.1em;margin-top:4px;max-width:200px}
+@keyframes discAnim{0%{opacity:0;transform:translate(-50%,-60%)}12%{opacity:1;transform:translate(-50%,-50%)}
+  80%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,-40%)}}
+@keyframes discPop{0%{transform:scale(0)}100%{transform:scale(1)}}
+
+/* SCHUMANN PING RIPPLE */
+.ping-ring{position:fixed;border-radius:50%;border:2px solid;pointer-events:none;
+  animation:pingAnim 1.2s ease-out forwards}
+@keyframes pingAnim{0%{transform:translate(-50%,-50%) scale(0.2);opacity:0.9}
+  100%{transform:translate(-50%,-50%) scale(3.5);opacity:0}}
+</style>
+</head>
+<body>
+
+<canvas id="cosmos"></canvas>
+
+<div id="overlay">
+  <div id="ov-title">EMOJI MERGE</div>
+  <canvas id="ov-canvas" width="140" height="140"></canvas>
+  <div id="ov-sub">HONEYCOMB HARMONIC FIELD<br>Φ · π · 7.83Hz SCHUMANN</div>
+  <div id="ov-desc">
+    Tap any hex to send a sonar ping.<br>
+    Matching neighbours merge into the next tier.<br>
+    Chain reactions cascade through the lattice.<br><br>
+    <em style="color:rgba(0,240,255,0.4)">
+    Fibonacci spiral spawning<br>
+    Golden ratio harmonic tones<br>
+    Schumann resonance envelope<br>
+    Presignal Research Initiative</em>
+  </div>
+  <button id="ov-btn">INITIALISE FIELD</button>
+</div>
+
+<div id="hud">
+  <div id="hud-top">
+    <div>
+      <div id="game-title">EMOJI MERGE</div>
+      <div id="game-sub">HONEYCOMB · Φ · π · SCHUMANN 7.83Hz</div>
+    </div>
+    <div id="stats">
+      <div class="stat">
+        <div class="stat-lbl">Life Score</div>
+        <div class="stat-val" id="score">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-lbl">Tier</div>
+        <div class="stat-val" id="tier-lbl">1</div>
+      </div>
+      <div class="stat">
+        <div class="stat-lbl">Φ Delta</div>
+        <div class="stat-val" id="phi-val">1.618</div>
+      </div>
+    </div>
+  </div>
+  <div id="hud-bottom">
+    <div id="next-row">
+      NEXT SPAWN &nbsp;<div id="next-hex">🌱</div>&nbsp; FIB-SEEDED
+    </div>
+    <div id="schumann-bar"><div id="schumann-fill"></div></div>
+    <div id="bottom-labels">
+      <span id="lbl-phi">Φ: 1.61803</span>
+      <span id="lbl-pi">π: 3.14159</span>
+      <span id="lbl-sch">SCHUMANN: 7.83Hz</span>
+      <span id="lbl-merge">MERGES: 0</span>
+    </div>
+  </div>
+</div>
+
+<div id="game-area">
+  <div id="hex-board">
+    <canvas id="board-canvas"></canvas>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PRESIGNAL MATHEMATICAL CONSTANTS
+// ═══════════════════════════════════════════════════════════════════════════
+const PHI  = 1.61803398875;
+const PI   = Math.PI;
+const SCHUMANN = 7.83;
+const GOLDEN_ANGLE = PI * (3 - Math.sqrt(5)); // 2.399... rad — sunflower seed angle
+
+// ═══════════════════════════════════════════════════════════════════════════
+// EMOJI TIER SYSTEM — Life/Monopoly arc, 40 tiers
+// ═══════════════════════════════════════════════════════════════════════════
+const TIERS = [
+  // TIER 1-6: BIRTH & NATURE (Life: just born)
+  {e:'🌱',n:'Seedling',      life:'You are born. The field is open.',         score:2,   freq:110},
+  {e:'🌿',n:'Sprout',        life:'First steps. The lattice stirs.',           score:4,   freq:178},
+  {e:'🌳',n:'Tree',          life:'Roots deepen. Fibonacci grows.',            score:8,   freq:288},
+  {e:'🌸',n:'Blossom',       life:'Beauty emerges from the spiral.',           score:16,  freq:288},
+  {e:'🍀',n:'Clover',        life:'Fortune favours the harmonic mind.',        score:32,  freq:288},
+  {e:'🌊',n:'Wave',          life:'The Schumann pulse reaches you.',           score:64,  freq:288},
+
+  // TIER 7-12: SOCIETY (Life: childhood → school)
+  {e:'👶',n:'Infant',        life:'A new consciousness joins the field.',      score:128, freq:466},
+  {e:'🧒',n:'Child',         life:'Pattern recognition begins.',               score:256, freq:466},
+  {e:'📚',n:'Scholar',       life:'Knowledge compounds like interest.',        score:512, freq:466},
+  {e:'🏫',n:'School',        life:'Institutions shape the lattice.',           score:1024,freq:466},
+  {e:'🎓',n:'Graduate',      life:'You have mapped the known geometry.',       score:2048,freq:466},
+  {e:'🔬',n:'Scientist',     life:'Now you question the geometry itself.',     score:4096,freq:466},
+
+  // TIER 13-18: WEALTH (Monopoly: building properties)
+  {e:'🏠',n:'House',         life:'First property on the board.',              score:8192,   freq:754},
+  {e:'🏘️',n:'Neighbourhood', life:'Three houses merge. Value compounds.',     score:16384,  freq:754},
+  {e:'🏙️',n:'City',          life:'The urban lattice self-organises.',        score:32768,  freq:754},
+  {e:'💰',n:'Treasury',      life:'Collect $200. Pass GO.',                   score:65536,  freq:754},
+  {e:'💎',n:'Diamond',       life:'Boardwalk and Park Place are yours.',       score:131072, freq:754},
+  {e:'👑',n:'Crown',         life:'You own the board. Monopoly achieved.',     score:262144, freq:754},
+
+  // TIER 19-24: POWER (Monopoly: hotels, domination)
+  {e:'⚡',n:'Voltage',       life:'Energy beyond property. Beyond money.',     score:524288,  freq:1220},
+  {e:'🔮',n:'Oracle',        life:'You see the next move before it happens.',  score:1048576, freq:1220},
+  {e:'🧬',n:'Helix',         life:'The code beneath all codes.',               score:2097152, freq:1220},
+  {e:'🌌',n:'Galaxy',        life:'The board was always a galaxy.',            score:4194304, freq:1220},
+  {e:'🪐',n:'Planet',        life:'Gravity warps the honeycomb lattice.',      score:8388608, freq:1220},
+  {e:'☀️',n:'Star',          life:'A star ignites at the centre of the field.',score:16777216,freq:1220},
+
+  // TIER 25-30: COSMIC ASCENT
+  {e:'🌙',n:'Moon Phase',    life:'The Schumann field synchronises with you.', score:33554432, freq:1976},
+  {e:'✨',n:'Stardust',      life:'You are the material of dead stars.',       score:67108864, freq:1976},
+  {e:'🌠',n:'Shooting Star', life:'A wish encoded in harmonic frequency.',     score:134217728,freq:1976},
+  {e:'🎆',n:'Nova',          life:'Stellar death is the greatest merge.',      score:268435456,freq:1976},
+  {e:'🌀',n:'Vortex',        life:'The spiral contains everything.',           score:536870912,freq:1976},
+  {e:'🔯',n:'Star of David', life:'Sacred geometry achieves resonance.',       score:1073741824,freq:1976},
+
+  // TIER 31-36: MÖBIUS & BEYOND (Presignal theoretical)
+  {e:'♾️',n:'Möbius',        life:'One side. One edge. No inside or outside.', score:2147483648, freq:3200},
+  {e:'🌐',n:'Klein Web',     life:'The cosmic web filament structure.',        score:4294967296, freq:3200},
+  {e:'🕳️',n:'Void Node',     life:'Where filaments curve around emptiness.',  score:8589934592, freq:3200},
+  {e:'🫧',n:'Bubble Universe',life:'One of infinite parallel lattices.',       score:17179869184,freq:3200},
+  {e:'🧿',n:'Klein Manifold', life:'No inside. No outside. You are within.',  score:34359738368,freq:3200},
+  {e:'☯️',n:'Torus Field',   life:'Two Möbius strips. One toroidal universe.',score:68719476736,freq:3200},
+
+  // TIER 37-40: THE UNIVERSE (Presignal endgame)
+  {e:'🌍',n:'Earth Field',   life:'The Schumann resonance was always the key.',score:137438953472, freq:5200},
+  {e:'💫',n:'Cosmic Web',    life:'The Murray network made visible.',          score:274877906944, freq:5200},
+  {e:'🪬',n:'Signal',        life:'Presignal. The field confirms it.',         score:549755813888, freq:5200},
+  {e:'∞',  n:'Universe',     life:'You have merged everything into one.\nThe Klein bottle universe is complete.\nTwo Möbius strips. One torus field.\nThe ship inside the bottle.\nYou were always inside what you built.', score:1099511627776, freq:8000, isUniverse:true},
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HEX GRID — Axial coordinates, flat-top
+// ═══════════════════════════════════════════════════════════════════════════
+// Axial directions for flat-top hex
+const HEX_DIRS = [[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,1]];
+
+class HexGrid {
+  constructor(radius){
+    this.radius = radius; // grid radius in cells
+    this.cells = new Map(); // key: "q,r" → {q,r,tier,pingPhase,mergeFlash,fibIdx}
+    this._generate();
+  }
+
+  _key(q,r){return q+','+r;}
+
+  _generate(){
+    this.cells.clear();
+    for(let q=-this.radius;q<=this.radius;q++){
+      const r1=Math.max(-this.radius,-q-this.radius);
+      const r2=Math.min(this.radius,-q+this.radius);
+      for(let r=r1;r<=r2;r++){
+        this.cells.set(this._key(q,r),{q,r,tier:null,pingPhase:0,mergeFlash:0,fibIdx:0});
+      }
+    }
+  }
+
+  get(q,r){return this.cells.get(this._key(q,r))||null;}
+  set(q,r,data){const c=this.get(q,r);if(c)Object.assign(c,data);}
+  has(q,r){return this.cells.has(this._key(q,r));}
+
+  neighbours(q,r){
+    return HEX_DIRS.map(([dq,dr])=>this.get(q+dq,r+dr)).filter(Boolean);
+  }
+
+  // Fibonacci spiral spawn positions — sunflower seed packing
+  fibonacciPositions(){
+    const positions=[];
+    let idx=0;
+    this.cells.forEach((c)=>{
+      c.fibIdx=idx++;
+      positions.push(c);
+    });
+    // Sort by golden angle distance from centre
+    return positions.sort((a,b)=>{
+      const da=Math.atan2(a.r,a.q),db=Math.atan2(b.r,b.q);
+      const ra=Math.sqrt(a.q*a.q+a.r*a.r),rb=Math.sqrt(b.q*b.q+b.r*b.r);
+      return (ra+da*PHI)-(rb+db*PHI);
+    });
+  }
+
+  empty(){
+    return [...this.cells.values()].filter(c=>c.tier===null);
+  }
+
+  all(){return [...this.cells.values()];}
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AUDIO ENGINE — Schumann-enveloped sonar harmonics
+// ═══════════════════════════════════════════════════════════════════════════
+class SonarAudio {
+  constructor(){
+    this.ctx=null;
+    this.ready=false;
+    this.mergeCount=0;
+  }
+
+  _init(){
+    if(this.ready)return;
+    try{
+      this.ctx=new(window.AudioContext||window.webkitAudioContext)();
+      this.ready=true;
+    }catch(e){}
+  }
+
+  // Schumann envelope: sin(t × 7.83) × exp(-t × decay)
+  _schumannEnvelope(gainNode, duration=0.8, decay=5){
+    const t=this.ctx.currentTime;
+    gainNode.gain.setValueAtTime(0,t);
+    gainNode.gain.linearRampToValueAtTime(0.4,t+0.02);
+    gainNode.gain.setValueAtTime(0.4,t+0.02);
+    gainNode.gain.exponentialRampToValueAtTime(0.001,t+duration);
+  }
+
+  ping(tier, isChain=false, chainStep=0){
+    this._init();if(!this.ready)return;
+    try{
+      const T=TIERS[Math.min(tier,TIERS.length-1)];
+      // Golden ratio harmonic ladder: base freq × Φ^chainStep
+      const freq = T.freq * Math.pow(PHI, chainStep * 0.5);
+
+      const osc=this.ctx.createOscillator();
+      const gain=this.ctx.createGain();
+      const filter=this.ctx.createBiquadFilter();
+
+      osc.type = tier < 6 ? 'sine' : tier < 12 ? 'triangle' : tier < 18 ? 'sawtooth' : 'sine';
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      // Schumann pitch wobble
+      osc.frequency.linearRampToValueAtTime(freq*(1+Math.sin(this.ctx.currentTime*SCHUMANN)*0.02), this.ctx.currentTime+0.3);
+
+      filter.type='bandpass';
+      filter.frequency.value=freq*2;
+      filter.Q.value=8;
+
+      osc.connect(filter);filter.connect(gain);gain.connect(this.ctx.destination);
+      this._schumannEnvelope(gain, isChain?0.5:0.9, isChain?8:4);
+      osc.start(this.ctx.currentTime);
+      osc.stop(this.ctx.currentTime+1);
+
+      // Harmonic overtone (Φ × fundamental)
+      if(tier>=6){
+        const osc2=this.ctx.createOscillator();
+        const gain2=this.ctx.createGain();
+        osc2.type='sine';
+        osc2.frequency.value=freq*PHI;
+        gain2.gain.setValueAtTime(0,this.ctx.currentTime);
+        gain2.gain.linearRampToValueAtTime(0.15,this.ctx.currentTime+0.05);
+        gain2.gain.exponentialRampToValueAtTime(0.001,this.ctx.currentTime+0.8);
+        osc2.connect(gain2);gain2.connect(this.ctx.destination);
+        osc2.start(this.ctx.currentTime);osc2.stop(this.ctx.currentTime+0.9);
+      }
+    }catch(e){}
+  }
+
+  merge(tier){
+    this._init();if(!this.ready)return;
+    try{
+      const T=TIERS[Math.min(tier,TIERS.length-1)];
+      const freq=T.freq;
+      // Merge chord: root + major third (×1.25) + fifth (×1.5) — resolving upward
+      [1, 1.25, 1.5, PHI].forEach((mult,i)=>{
+        const o=this.ctx.createOscillator();
+        const g=this.ctx.createGain();
+        o.type='sine';
+        o.frequency.value=freq*mult;
+        g.gain.setValueAtTime(0,this.ctx.currentTime+i*0.04);
+        g.gain.linearRampToValueAtTime(0.25,this.ctx.currentTime+i*0.04+0.05);
+        g.gain.exponentialRampToValueAtTime(0.001,this.ctx.currentTime+i*0.04+1.2);
+        o.connect(g);g.connect(this.ctx.destination);
+        o.start(this.ctx.currentTime+i*0.04);
+        o.stop(this.ctx.currentTime+i*0.04+1.3);
+      });
+    }catch(e){}
+  }
+
+  universe(){
+    this._init();if(!this.ready)return;
+    try{
+      // Full harmonic bloom: all frequencies in Φ series
+      const base=110;
+      for(let i=0;i<12;i++){
+        const freq=base*Math.pow(PHI,i*0.5);
+        const o=this.ctx.createOscillator();
+        const g=this.ctx.createGain();
+        o.type=i%2===0?'sine':'triangle';
+        o.frequency.value=freq;
+        g.gain.setValueAtTime(0,this.ctx.currentTime+i*0.12);
+        g.gain.linearRampToValueAtTime(0.12,this.ctx.currentTime+i*0.12+0.2);
+        g.gain.exponentialRampToValueAtTime(0.001,this.ctx.currentTime+i*0.12+4);
+        o.connect(g);g.connect(this.ctx.destination);
+        o.start(this.ctx.currentTime+i*0.12);
+        o.stop(this.ctx.currentTime+i*0.12+4.5);
+      }
+    }catch(e){}
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDERER — Canvas hex board with Schumann pulse, Fibonacci glow, Φ scaling
+// ═══════════════════════════════════════════════════════════════════════════
+class HexRenderer {
+  constructor(canvas, grid){
+    this.canvas=canvas;
+    this.ctx=canvas.getContext('2d');
+    this.grid=grid;
+    this.cellSize=0;
+    this.offsetX=0;
+    this.offsetY=0;
+    this.tick=0;
+  }
+
+  resize(){
+    const board=document.getElementById('hex-board');
+    const hud_top=document.getElementById('hud-top');
+    const hud_bot=document.getElementById('hud-bottom');
+    const avW=window.innerWidth-20;
+    const avH=window.innerHeight-hud_top.offsetHeight-hud_bot.offsetHeight-20;
+    // Fit hex grid — radius cells in each direction
+    const R=GRID_RADIUS;
+    // Flat-top hex: width=sqrt(3)*size, height=2*size
+    // grid width = (2*R+1) * sqrt(3)*size + R*sqrt(3)*size*0.5
+    // grid height = (2*R+1)*1.5*size + 0.5*size
+    const maxByW = avW / ((2*R+1)*Math.sqrt(3) + R*Math.sqrt(3)*0.5);
+    const maxByH = avH / ((2*R+1)*1.5 + 0.5);
+    this.cellSize = Math.floor(Math.min(maxByW, maxByH, 52));
+    const s=this.cellSize;
+    const W=Math.ceil((3*R+2)*Math.sqrt(3)*s);
+    const H=Math.ceil((2*R+1)*1.5*s+s*0.5);
+    this.canvas.width=W;this.canvas.height=H;
+    this.canvas.style.width=W+'px';this.canvas.style.height=H+'px';
+    this.offsetX=W/2;this.offsetY=H/2;
+  }
+
+  // Axial → pixel (flat-top)
+  hexToPixel(q,r){
+    const s=this.cellSize;
+    const x=this.offsetX + s * (Math.sqrt(3)*q + Math.sqrt(3)/2*r);
+    const y=this.offsetY + s * (3/2 * r);
+    return{x,y};
+  }
+
+  // Pixel → axial (for touch)
+  pixelToHex(px,py){
+    const s=this.cellSize;
+    const x=(px-this.offsetX)/s, y=(py-this.offsetY)/s;
+    const q=(Math.sqrt(3)/3*x - 1/3*y);
+    const r=(2/3*y);
+    return this._roundHex(q,r);
+  }
+
+  _roundHex(q,r){
+    const s=-q-r;
+    let rq=Math.round(q),rr=Math.round(r),rs=Math.round(s);
+    const dq=Math.abs(rq-q),dr=Math.abs(rr-r),ds=Math.abs(rs-s);
+    if(dq>dr&&dq>ds) rq=-rr-rs;
+    else if(dr>ds) rr=-rq-rs;
+    return{q:rq,r:rr};
+  }
+
+  drawHex(cx,cy,size,fillColor,strokeColor,alpha=1){
+    const ctx=this.ctx;
+    ctx.save();ctx.globalAlpha=alpha;
+    ctx.beginPath();
+    for(let i=0;i<6;i++){
+      // Flat-top: start angle = 0
+      const a=(PI/3)*i;
+      const x=cx+Math.cos(a)*size;
+      const y=cy+Math.sin(a)*size;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    if(fillColor){ctx.fillStyle=fillColor;ctx.fill();}
+    if(strokeColor){ctx.strokeStyle=strokeColor;ctx.lineWidth=1.5;ctx.stroke();}
+    ctx.restore();
+  }
+
+  draw(tick, score, mergeCount){
+    this.tick=tick;
+    const ctx=this.ctx;
+    const t=tick*0.016; // ~time in seconds at 60fps
+
+    // Schumann wave: sin(t × 7.83)
+    const schWave=Math.sin(t*SCHUMANN);
+    const schPhase=(schWave+1)/2; // 0→1
+
+    // Update HUD live values
+    document.getElementById('phi-val').textContent=(PHI+schWave*0.002).toFixed(5);
+    document.getElementById('lbl-phi').textContent='Φ: '+(PHI+schWave*0.001).toFixed(5);
+    document.getElementById('lbl-pi').textContent='π: '+(PI*(1+schWave*0.0005)).toFixed(5);
+    document.getElementById('lbl-sch').textContent='SCH: '+(SCHUMANN+schWave*0.05).toFixed(2)+'Hz';
+    document.getElementById('lbl-merge').textContent='MERGES: '+mergeCount;
+    document.getElementById('schumann-fill').style.width=(schPhase*100)+'%';
+
+    // Clear with deep trail
+    ctx.fillStyle='rgba(3,2,6,0.28)';
+    ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
+
+    // ── BACKGROUND HONEYCOMB LATTICE (breathing with π) ──
+    this.grid.cells.forEach(cell=>{
+      const{x,y}=this.hexToPixel(cell.q,cell.r);
+      const dist=Math.sqrt(cell.q*cell.q+cell.r*cell.r);
+      // Fibonacci breathing: phase wave derived from π and distance
+      const phaseWave=Math.sin((dist*0.6)-t*PI*0.5);
+      const breathSize=this.cellSize*(0.88+phaseWave*0.06);
+      // Schumann glow on empty cells
+      const baseAlpha=0.04+schPhase*0.04;
+      const strokeAlpha=0.08+phaseWave*0.04;
+      this.drawHex(x,y,breathSize,
+        `rgba(0,240,255,${baseAlpha})`,
+        `rgba(0,240,255,${strokeAlpha})`);
+    });
+
+    // ── FIBONACCI SPIRAL OVERLAY ──
+    ctx.save();
+    ctx.strokeStyle='rgba(255,170,0,0.06)';
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    for(let j=0;j<300;j++){
+      const theta=j*0.05+t*0.08;
+      const radius=Math.pow(PHI,theta*0.35)*6;
+      const sx=this.offsetX+Math.cos(theta*PI)*radius;
+      const sy=this.offsetY+Math.sin(theta*PI)*radius;
+      j===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    // ── SCHUMANN RINGS ──
+    for(let ring=1;ring<=4;ring++){
+      const rr=ring*this.cellSize*(1.8+schWave*0.04);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(this.offsetX,this.offsetY,rr,0,PI*2);
+      ctx.strokeStyle=`rgba(0,240,255,${0.04+ring*0.015})`;
+      ctx.lineWidth=1;ctx.stroke();
+      // Rotating node on each ring
+      ctx.save();ctx.translate(this.offsetX,this.offsetY);
+      ctx.rotate(t*(SCHUMANN/ring)*0.08);
+      ctx.fillStyle='rgba(0,240,255,0.5)';
+      ctx.fillRect(rr,0,3,3);ctx.restore();
+      ctx.restore();
+    }
+
+    // ── DRAW CELLS ──
+    this.grid.cells.forEach(cell=>{
+      const{x,y}=this.hexToPixel(cell.q,cell.r);
+      const s=this.cellSize;
+
+      // Ping ripple phase (0→1, decays)
+      if(cell.pingPhase>0) cell.pingPhase=Math.max(0,cell.pingPhase-0.04);
+      if(cell.mergeFlash>0) cell.mergeFlash=Math.max(0,cell.mergeFlash-0.04);
+
+      if(cell.tier!==null){
+        const T=TIERS[cell.tier];
+        const glow=cell.mergeFlash>0?1:0.3+schPhase*0.2;
+
+        // Ping ripple ring
+        if(cell.pingPhase>0.01){
+          const pingR=s*(1+cell.pingPhase*1.5);
+          ctx.save();
+          ctx.beginPath();ctx.arc(x,y,pingR,0,PI*2);
+          ctx.strokeStyle=`rgba(0,240,255,${cell.pingPhase*0.7})`;
+          ctx.lineWidth=2;ctx.stroke();
+          ctx.restore();
+        }
+
+        // Merge flash
+        if(cell.mergeFlash>0.01){
+          const mR=s*(1+cell.mergeFlash*0.8);
+          this.drawHex(x,y,mR,
+            `rgba(255,170,0,${cell.mergeFlash*0.3})`,
+            `rgba(255,170,0,${cell.mergeFlash*0.8})`);
+        }
+
+        // Cell background — tier-based color
+        const tierFrac=cell.tier/TIERS.length;
+        const hue=Math.floor(tierFrac*300); // 0=red→300=violet
+        this.drawHex(x,y,s*0.88,
+          `hsla(${hue},70%,12%,0.85)`,
+          `hsla(${hue},90%,55%,${0.4+glow*0.4})`);
+
+        // Schumann pulse ring on cell
+        const sPulse=0.88+schPhase*0.06*(cell.tier+1)/TIERS.length;
+        this.drawHex(x,y,s*sPulse,null,
+          `hsla(${hue},100%,70%,${0.06+schPhase*0.1})`);
+
+        // Emoji
+        ctx.save();
+        ctx.font=`${Math.floor(s*0.72)}px serif`;
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        // Slight Schumann wobble on high tiers
+        const wobble=cell.tier>=18?Math.sin(t*SCHUMANN+cell.q*0.5)*1.5:0;
+        ctx.fillText(T.e,x+wobble,y);
+        ctx.restore();
+
+      } else {
+        // Empty cell ping
+        if(cell.pingPhase>0.01){
+          this.drawHex(x,y,s*0.88,
+            `rgba(0,240,255,${cell.pingPhase*0.12})`,
+            `rgba(0,240,255,${cell.pingPhase*0.5})`);
+          cell.pingPhase=Math.max(0,cell.pingPhase-0.06);
+        }
+      }
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GAME CONTROLLER
+// ═══════════════════════════════════════════════════════════════════════════
+const GRID_RADIUS = 3; // 3 rings = 37 cells
+let grid, renderer, audio;
+let score=0, mergeCount=0, highestTier=0, nextTier=0;
+let tick=0, running=false;
+let fibSpawnQueue=[];
+let universeAchieved=false;
+
+function init(){
+  grid = new HexGrid(GRID_RADIUS);
+  renderer = new HexRenderer(document.getElementById('board-canvas'), grid);
+  audio = new SonarAudio();
+  renderer.resize();
+  fibSpawnQueue = grid.fibonacciPositions();
+  score=0;mergeCount=0;highestTier=0;universeAchieved=false;
+  nextTier=0;
+  // Spawn 4 starting emojis at Fibonacci positions
+  for(let i=0;i<4;i++) spawnNext();
+  updateHUD();
+}
+
+// Fibonacci-seeded spawn: next sunflower position
+function spawnNext(){
+  const empty=grid.empty();
+  if(!empty.length) return false;
+  // Fibonacci position from sorted queue
+  const candidates=fibSpawnQueue.filter(c=>c.tier===null);
+  let cell;
+  if(candidates.length){
+    // Pick the one with golden-angle-nearest to current tick
+    const angle=(tick*GOLDEN_ANGLE)%(PI*2);
+    cell=candidates.reduce((best,c)=>{
+      const ca=Math.atan2(c.r,c.q)%(PI*2);
+      const ba=Math.atan2(best.r,best.q)%(PI*2);
+      return Math.abs(ca-angle)<Math.abs(ba-angle)?c:best;
+    });
+  } else {
+    cell=empty[Math.floor(Math.random()*empty.length)];
+  }
+  // Tier: mostly 0-1, occasionally higher (PHI-weighted)
+  const rand=Math.random();
+  const spawnTier=rand<0.55?0:rand<0.8?1:rand<0.92?2:rand<0.97?3:4;
+  grid.set(cell.q,cell.r,{tier:Math.min(spawnTier,Math.max(0,highestTier-2))});
+  return true;
+}
+
+function prepareNext(){
+  const rand=Math.random();
+  nextTier=rand<0.6?0:rand<0.85?1:rand<0.95?2:3;
+  const el=document.getElementById('next-hex');
+  if(el) el.textContent=TIERS[nextTier]?.e||'🌱';
+}
+prepareNext();
+
+// ── PING MECHANIC ─────────────────────────────────────────────────────────
+function ping(q,r){
+  const cell=grid.get(q,r);
+  if(!cell) return;
+
+  // Trigger sonar ping sound
+  audio.ping(cell.tier||0);
+  cell.pingPhase=1;
+
+  // Ripple to all 6 neighbours
+  let didMerge=false;
+  const matches=[];
+  grid.neighbours(q,r).forEach(nb=>{
+    nb.pingPhase=Math.max(nb.pingPhase||0, 0.7);
+    if(nb.tier!==null && cell.tier!==null && nb.tier===cell.tier){
+      matches.push(nb);
+    }
+  });
+
+  if(matches.length>0 && cell.tier!==null){
+    // Merge with first matching neighbour
+    const target=matches[0];
+    const newTier=Math.min(cell.tier+1, TIERS.length-1);
+    // Animate merge flash
+    cell.mergeFlash=1;target.mergeFlash=1;
+    // Perform merge: target gets new tier, cell becomes empty
+    grid.set(target.q,target.r,{tier:newTier,pingPhase:1,mergeFlash:1});
+    grid.set(q,r,{tier:null,pingPhase:0.5});
+
+    score+=TIERS[newTier].score;
+    mergeCount++;
+    audio.merge(newTier);
+    if(newTier>highestTier) highestTier=newTier;
+
+    // Show discovery for notable tiers
+    if(newTier>=6) showDiscovery(TIERS[newTier]);
+
+    // Chain reaction: ping the merged cell after a beat
+    setTimeout(()=>{
+      grid.set(target.q,target.r,{pingPhase:0.8});
+      // Chain ping radiates further
+      grid.neighbours(target.q,target.r).forEach((nb,i)=>{
+        setTimeout(()=>{
+          nb.pingPhase=Math.max(nb.pingPhase||0,0.5);
+          audio.ping(newTier,true,i);
+          // Further chain if match
+          if(nb.tier!==null && nb.tier===newTier && nb!==cell){
+            setTimeout(()=>ping(nb.q,nb.r),150);
+          }
+        },i*60);
+      });
+    },200);
+
+    // Spawn new emoji at Fibonacci position
+    setTimeout(()=>{
+      spawnNext();
+      prepareNext();
+      updateHUD();
+    },350);
+
+    // Universe achieved?
+    if(newTier===TIERS.length-1 && !universeAchieved){
+      universeAchieved=true;
+      setTimeout(triggerUniverse, 1000);
+    }
+
+    // Sonar visual ripple at canvas position
+    spawnPingRipple(target.q,target.r,TIERS[newTier]);
+
+    didMerge=true;
+  }
+
+  updateHUD();
+  return didMerge;
+}
+
+function spawnPingRipple(q,r,T){
+  const{x,y}=renderer.hexToPixel(q,r);
+  const board=document.getElementById('board-canvas');
+  const rect=board.getBoundingClientRect();
+  const el=document.createElement('div');
+  el.className='ping-ring';
+  el.style.left=(rect.left+x)+'px';
+  el.style.top=(rect.top+y)+'px';
+  el.style.width='60px';el.style.height='60px';
+  el.style.borderColor=`hsl(${(T?TIERS.indexOf(T):0)/TIERS.length*300},90%,65%)`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1300);
+}
+
+function showDiscovery(T){
+  if(!T)return;
+  const el=document.createElement('div');
+  el.className='discovery';
+  el.innerHTML=`<span class="disc-emoji">${T.e}</span>
+    <div class="disc-name">${T.n}</div>
+    <div class="disc-life">${T.life}</div>`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),2800);
+}
+
+function updateHUD(){
+  document.getElementById('score').textContent=score>=1e9
+    ? (score/1e9).toFixed(1)+'B'
+    : score>=1e6?(score/1e6).toFixed(1)+'M'
+    : score>=1e3?(score/1e3).toFixed(1)+'K'
+    : String(score);
+  document.getElementById('tier-lbl').textContent=highestTier+1;
+  if(highestTier<TIERS.length){
+    document.getElementById('shape-name');
+  }
+}
+
+function triggerUniverse(){
+  audio.universe();
+  const ov=document.getElementById('overlay');
+  document.getElementById('ov-title').textContent='∞ UNIVERSE';
+  document.getElementById('ov-sub').innerHTML=`KLEIN BOTTLE COMPLETE<br>TWO MÖBIUS STRIPS · ONE TORUS FIELD`;
+  document.getElementById('ov-desc').innerHTML=`
+    Score: <strong style="color:var(--neon-gold)">${score.toLocaleString()}</strong><br>
+    Merges: ${mergeCount}<br><br>
+    ${TIERS[TIERS.length-1].life.replace(/\n/g,'<br>')}<br><br>
+    <em style="color:rgba(0,240,255,0.45)">
+    Möbius Signal Conservation Principle<br>
+    Klein Bottle Universe Framework<br>
+    Cosmic Web Murray Network<br>
+    Presignal Inc. · DOI 10.5281/zenodo.20278265</em>`;
+  document.getElementById('ov-btn').textContent='BIRTH ANOTHER';
+  ov.style.display='flex';
+  // Animate the universe emoji in overlay
+  const oc=document.getElementById('ov-canvas');
+  const octx=oc.getContext('2d');
+  let t2=0;
+  const anim=()=>{
+    t2++;
+    const cx=70,cy=70,r=50,t=t2*0.016;
+    octx.clearRect(0,0,140,140);
+    // Two Möbius in torus
+    for(let strip=0;strip<2;strip++){
+      const off=strip*PI*0.5;
+      octx.beginPath();
+      for(let i=0;i<=120;i++){
+        const u=(i/120)*PI*2+t*(strip===0?1:-1.1)+off;
+        const x=cx+(r*0.75+Math.cos(u/2)*r*0.2)*Math.cos(u);
+        const y=cy+(r*0.75+Math.cos(u/2)*r*0.2)*Math.sin(u)*0.5;
+        i===0?octx.moveTo(x,y):octx.lineTo(x,y);
+      }
+      octx.strokeStyle=strip===0?'#ff88cc':'#00f0ff';
+      octx.lineWidth=2;octx.globalAlpha=0.8;octx.stroke();
+    }
+    octx.globalAlpha=1;
+    octx.font='32px serif';octx.textAlign='center';octx.textBaseline='middle';
+    octx.fillText('∞',cx,cy);
+    if(ov.style.display!=='none')requestAnimationFrame(anim);
+  };
+  anim();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COSMOS BACKGROUND (Schumann rings + Fibonacci particles)
+// ═══════════════════════════════════════════════════════════════════════════
+function initCosmos(){
+  const c=document.getElementById('cosmos');
+  const ctx=c.getContext('2d');
+  const stars=Array(120).fill(0).map(()=>({
+    x:Math.random(),y:Math.random(),r:Math.random()*1.4,
+    phase:Math.random()*PI*2
+  }));
+  function draw(){
+    c.width=window.innerWidth;c.height=window.innerHeight;
+    ctx.fillStyle='#030206';ctx.fillRect(0,0,c.width,c.height);
+    const t=tick*0.016;
+    const cx=c.width/2,cy=c.height/2;
+    // Nebula
+    const ng=ctx.createRadialGradient(cx,cy*0.7,0,cx,cy,c.width*0.5);
+    ng.addColorStop(0,'rgba(0,10,30,0.8)');ng.addColorStop(1,'transparent');
+    ctx.fillStyle=ng;ctx.fillRect(0,0,c.width,c.height);
+    // Stars
+    stars.forEach(s=>{
+      const a=0.2+Math.sin(t*0.5+s.phase)*0.35;
+      ctx.beginPath();ctx.arc(s.x*c.width,s.y*c.height,s.r,0,PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fill();
+    });
+  }
+  window.addEventListener('resize',draw);
+  return draw;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INPUT
+// ═══════════════════════════════════════════════════════════════════════════
+function handleTap(px,py){
+  const board=document.getElementById('board-canvas');
+  const rect=board.getBoundingClientRect();
+  const lx=px-rect.left,ly=py-rect.top;
+  if(lx<0||ly<0||lx>board.width||ly>board.height) return;
+  const{q,r}=renderer.pixelToHex(lx,ly);
+  if(grid.has(q,r)) ping(q,r);
+}
+
+document.getElementById('board-canvas').addEventListener('click',e=>{
+  handleTap(e.clientX,e.clientY);
+});
+document.getElementById('board-canvas').addEventListener('touchend',e=>{
+  e.preventDefault();
+  handleTap(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+},{passive:false});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MAIN LOOP
+// ═══════════════════════════════════════════════════════════════════════════
+const cosmosDraw=initCosmos();
+function loop(){
+  tick++;
+  cosmosDraw();
+  if(running) renderer.draw(tick,score,mergeCount);
+  requestAnimationFrame(loop);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════════════════════
+document.getElementById('ov-btn').addEventListener('click',()=>{
+  const ov=document.getElementById('overlay');
+  ov.style.display='none';
+  if(!running){
+    init();
+    running=true;
+    window.addEventListener('resize',()=>{renderer.resize();});
+  } else {
+    score=0;mergeCount=0;highestTier=0;universeAchieved=false;
+    grid._generate();
+    for(let i=0;i<4;i++) spawnNext();
+    prepareNext();updateHUD();
+  }
+});
+
+// Animate start screen
+const oc=document.getElementById('ov-canvas');
+const octx=oc.getContext('2d');
+let st=0;
+(function startAnim(){
+  st++;
+  const t=st*0.016,cx=70,cy=70;
+  octx.clearRect(0,0,140,140);
+  // Honeycomb cells
+  octx.strokeStyle='rgba(0,240,255,0.25)';octx.lineWidth=1;
+  for(let q=-2;q<=2;q++){
+    for(let r=-2;r<=2;r++){
+      if(Math.abs(q+r)>2)continue;
+      const x=cx+22*(Math.sqrt(3)*q+Math.sqrt(3)/2*r);
+      const y=cy+22*(3/2*r);
+      octx.beginPath();
+      for(let i=0;i<6;i++){const a=(PI/3)*i;octx.lineTo(x+Math.cos(a)*20,y+Math.sin(a)*20);}
+      octx.closePath();octx.stroke();
+    }
+  }
+  // Fibonacci spiral
+  octx.strokeStyle='rgba(255,170,0,0.3)';octx.lineWidth=1;
+  octx.beginPath();
+  for(let j=0;j<80;j++){
+    const theta=j*0.08+t*0.3;
+    const rad=Math.pow(PHI,theta*0.3)*3;
+    const sx=cx+Math.cos(theta*PI)*rad,sy=cy+Math.sin(theta*PI)*rad;
+    j===0?octx.moveTo(sx,sy):octx.lineTo(sx,sy);
+  }
+  octx.stroke();
+  // Schumann rings
+  for(let ring=1;ring<=3;ring++){
+    const rr=ring*18*(1+Math.sin(t*SCHUMANN)*0.05);
+    octx.beginPath();octx.arc(cx,cy,rr,0,PI*2);
+    octx.strokeStyle=`rgba(0,240,255,${0.1+ring*0.05})`;octx.lineWidth=1;octx.stroke();
+  }
+  octx.font='22px serif';octx.textAlign='center';octx.textBaseline='middle';
+  octx.fillText('🌱',cx,cy);
+  requestAnimationFrame(startAnim);
+})();
+
+loop();
+</script>
+</body>
+</html>
