@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>SPIROMOJI ∞ Resonance Engine</title>
+
+<style>
+:root{
+  --bg:#04030a;
+  --cyan:#00f0ff;
+  --gold:#ffb300;
+  --mag:#ff006e;
+  --white:#f5f5f5;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#000;
+  touch-action:none;
+  font-family:monospace;
+}
+
+canvas{
+  position:fixed;
+  inset:0;
+}
+
+#hud{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  padding:18px;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+
+.title{
+  font-size:clamp(1.5rem,4vw,2.7rem);
+  letter-spacing:.2em;
+  color:var(--gold);
+  text-shadow:0 0 20px var(--gold);
+}
+
+.subtitle{
+  color:rgba(0,240,255,.6);
+  font-size:.7rem;
+  margin-top:4px;
+  letter-spacing:.18em;
+}
+
+.stats{
+  display:flex;
+  gap:10px;
+}
+
+.stat{
+  background:rgba(0,0,0,.45);
+  border:1px solid rgba(0,240,255,.2);
+  padding:8px 12px;
+  border-radius:4px;
+  backdrop-filter:blur(10px);
+}
+
+.label{
+  font-size:.5rem;
+  color:var(--gold);
+  letter-spacing:.12em;
+}
+
+.value{
+  font-size:1rem;
+  color:white;
+}
+
+.bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+}
+
+.panel{
+  width:min(420px,90vw);
+  background:rgba(0,0,0,.45);
+  border:1px solid rgba(255,179,0,.25);
+  padding:14px;
+  border-radius:4px;
+  backdrop-filter:blur(10px);
+  pointer-events:auto;
+}
+
+button{
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  background:rgba(255,179,0,.08);
+  border:1px solid var(--gold);
+  color:var(--gold);
+  cursor:pointer;
+  font-family:monospace;
+}
+
+button:hover{
+  background:var(--gold);
+  color:black;
+}
+
+#overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.92);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:50;
+  gap:18px;
+  text-align:center;
+  padding:20px;
+}
+
+#overlay h1{
+  color:var(--gold);
+  font-size:clamp(2rem,8vw,5rem);
+  letter-spacing:.25em;
+}
+
+#overlay p{
+  max-width:600px;
+  color:rgba(255,255,255,.65);
+  line-height:1.8;
+  font-size:.9rem;
+}
+
+#start{
+  padding:16px 40px;
+  background:rgba(0,240,255,.08);
+  border:1px solid var(--cyan);
+  color:white;
+  cursor:pointer;
+}
+
+.discovery{
+  position:fixed;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  z-index:100;
+  animation:fade 2.5s forwards;
+}
+
+@keyframes fade{
+  0%{opacity:0;transform:translate(-50%,-58%) scale(.8)}
+  15%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  80%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-40%) scale(.9)}
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+<canvas id="world"></canvas>
+<canvas id="fx"></canvas>
+
+<div id="overlay">
+  <h1>SPIROMOJI</h1>
+  <p>
+  Infinite harmonic bloom engine.<br>
+  Fibonacci growth · Golden ratio geometry · Resonance fields.<br><br>
+  Tap connected cells to evolve the spiral civilization.
+  </p>
+  <button id="start">ENTER THE SPIRAL</button>
+</div>
+
+<div id="hud">
+  <div class="top">
+    <div>
+      <div class="title">SPIROMOJI</div>
+      <div class="subtitle">∞ HARMONIC BLOOM ENGINE</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="label">SCORE</div>
+        <div class="value" id="score">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="label">BLOOMS</div>
+        <div class="value" id="blooms">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="label">RING</div>
+        <div class="value" id="ring">1</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="panel">
+      Fibonacci seeded harmonic expansion system.<br>
+      Merge matching resonance cells to evolve the spiral.
+      <button id="reset">NEW UNIVERSE</button>
+    </div>
+
+    <div style="font-size:.65rem;color:rgba(255,255,255,.3)">
+      Φ · π · Golden Angle Engine
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   CONSTANTS
+========================================================= */
+
+const PHI = 1.61803398875;
+const PI = Math.PI;
+const GOLDEN_ANGLE = PI * (3 - Math.sqrt(5));
+
+const EMOJIS = [
+"🌱","🌿","🌸","🌻","🌳",
+"💧","🌊","❄️","🔥","⚡",
+"🌈","👶","🧒","🎓","🔬",
+"🎨","🎵","🏠","🏙️","💰",
+"💎","👑","🔮","🧬","🌍",
+"🌙","🪐","☀️","🌌","✨",
+"💫","🌠","🎆","🌀","♾️"
+];
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+const bg = document.getElementById("bg");
+const world = document.getElementById("world");
+const fx = document.getElementById("fx");
+
+const bgx = bg.getContext("2d");
+const wx = world.getContext("2d");
+const fxx = fx.getContext("2d");
+
+function resize(){
+  [bg,world,fx].forEach(c=>{
+    c.width = innerWidth;
+    c.height = innerHeight;
+  });
+
+  CENTER.x = innerWidth / 2;
+  CENTER.y = innerHeight / 2;
+
+  HEX_SIZE = Math.max(28, Math.min(innerWidth,innerHeight) * 0.04);
+}
+
+window.addEventListener("resize",resize);
+
+/* =========================================================
+   WORLD
+========================================================= */
+
+let CENTER = {x:0,y:0};
+let HEX_SIZE = 42;
+
+const cells = new Map();
+const ripples = [];
+const stars = [];
+
+let tick = 0;
+let score = 0;
+let blooms = 0;
+let ring = 1;
+
+function key(q,r){
+  return q + "," + r;
+}
+
+function dist(q,r){
+  return Math.max(Math.abs(q),Math.abs(r),Math.abs(q+r));
+}
+
+function hexToPixel(q,r){
+  return {
+    x: CENTER.x + HEX_SIZE * (Math.sqrt(3)*q + Math.sqrt(3)/2*r),
+    y: CENTER.y + HEX_SIZE * (3/2*r)
+  };
+}
+
+function pixelToHex(x,y){
+  const px = (x - CENTER.x) / HEX_SIZE;
+  const py = (y - CENTER.y) / HEX_SIZE;
+
+  const q = (Math.sqrt(3)/3 * px - 1/3 * py);
+  const r = (2/3 * py);
+
+  return roundHex(q,r);
+}
+
+function roundHex(q,r){
+  let s = -q-r;
+
+  let rq = Math.round(q);
+  let rr = Math.round(r);
+  let rs = Math.round(s);
+
+  const qDiff = Math.abs(rq-q);
+  const rDiff = Math.abs(rr-r);
+  const sDiff = Math.abs(rs-s);
+
+  if(qDiff > rDiff && qDiff > sDiff){
+    rq = -rr-rs;
+  } else if(rDiff > sDiff){
+    rr = -rq-rs;
+  }
+
+  return {q:rq,r:rr};
+}
+
+/* =========================================================
+   GRID
+========================================================= */
+
+function build(radius){
+
+  for(let q=-radius;q<=radius;q++){
+
+    for(let r=-radius;r<=radius;r++){
+
+      if(dist(q,r)<=radius){
+
+        const k = key(q,r);
+
+        if(!cells.has(k)){
+
+          cells.set(k,{
+            q,
+            r,
+            tier:null,
+            pulse:0,
+            glow:0
+          });
+
+        }
+      }
+    }
+  }
+}
+
+/* =========================================================
+   SPAWN
+========================================================= */
+
+function spawn(tier=0){
+
+  const empties = [...cells.values()].filter(c=>c.tier===null);
+
+  if(!empties.length) return;
+
+  const index = Math.floor(
+    ((Math.sin(tick*0.01)+1)*0.5) * empties.length
+  );
+
+  empties[index].tier = tier;
+}
+
+function randomTier(){
+
+  const n = Math.random();
+
+  if(n < .55) return 0;
+  if(n < .75) return 1;
+  if(n < .88) return 2;
+  if(n < .95) return 3;
+
+  return 4;
+}
+
+/* =========================================================
+   RIPPLE SYSTEM
+========================================================= */
+
+function ripple(x,y,color){
+
+  ripples.push({
+    x,y,
+    radius:10,
+    alpha:1,
+    color
+  });
+
+}
+
+/* =========================================================
+   MERGING
+========================================================= */
+
+const DIRS = [
+[1,0],
+[-1,0],
+[0,1],
+[0,-1],
+[1,-1],
+[-1,1]
+];
+
+function merge(cell){
+
+  if(cell.tier===null) return;
+
+  const neighbours = [];
+
+  for(const [dq,dr] of DIRS){
+
+    const n = cells.get(
+      key(cell.q+dq,cell.r+dr)
+    );
+
+    if(n && n.tier === cell.tier){
+      neighbours.push(n);
+    }
+  }
+
+  if(!neighbours.length) return;
+
+  const target = neighbours[0];
+
+  target.tier++;
+  cell.tier = null;
+
+  score += Math.pow(2,target.tier) * 100;
+
+  target.glow = 1;
+
+  const p = hexToPixel(target.q,target.r);
+
+  ripple(p.x,p.y,"#00f0ff");
+
+  if(target.tier >= EMOJIS.length-1){
+    target.tier = EMOJIS.length-1;
+  }
+
+  if(target.tier > ring){
+    ring = target.tier;
+    blooms++;
+    build(4 + Math.floor(ring/2));
+  }
+
+  if(Math.random() < .8){
+    spawn(randomTier());
+  }
+
+  updateHUD();
+
+  if(target.tier >= 10){
+    discovery(EMOJIS[target.tier]);
+  }
+}
+
+/* =========================================================
+   DISCOVERY
+========================================================= */
+
+function discovery(e){
+
+  const d = document.createElement("div");
+
+  d.className = "discovery";
+
+  d.innerHTML = `
+  <div style="font-size:4rem">${e}</div>
+  <div style="
+    color:#00f0ff;
+    letter-spacing:.2em;
+    font-size:1.2rem;
+    margin-top:10px">
+    NEW RESONANCE
+  </div>
+  `;
+
+  document.body.appendChild(d);
+
+  setTimeout(()=>{
+    d.remove();
+  },2500);
+
+}
+
+/* =========================================================
+   DRAW
+========================================================= */
+
+function drawHex(ctx,x,y,s){
+
+  ctx.beginPath();
+
+  for(let i=0;i<6;i++){
+
+    const a = PI/3 * i;
+
+    const px = x + Math.cos(a)*s;
+    const py = y + Math.sin(a)*s;
+
+    if(i===0){
+      ctx.moveTo(px,py);
+    }else{
+      ctx.lineTo(px,py);
+    }
+  }
+
+  ctx.closePath();
+}
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
+
+function initStars(){
+
+  for(let i=0;i<140;i++){
+
+    stars.push({
+      x:Math.random(),
+      y:Math.random(),
+      size:Math.random()*2,
+      phase:Math.random()*PI*2
+    });
+
+  }
+}
+
+function drawBG(){
+
+  bgx.fillStyle = "rgba(0,0,5,.12)";
+  bgx.fillRect(0,0,bg.width,bg.height);
+
+  const t = tick * 0.01;
+
+  stars.forEach(s=>{
+
+    const alpha = .15 + Math.sin(t+s.phase)*.3;
+
+    bgx.fillStyle = `rgba(255,255,255,${alpha})`;
+
+    bgx.beginPath();
+
+    bgx.arc(
+      s.x*bg.width,
+      s.y*bg.height,
+      s.size,
+      0,
+      PI*2
+    );
+
+    bgx.fill();
+
+  });
+
+  /* fibonacci spiral */
+
+  bgx.beginPath();
+
+  bgx.strokeStyle = "rgba(255,179,0,.08)";
+  bgx.lineWidth = 1;
+
+  for(let i=0;i<500;i++){
+
+    const theta = i*0.05 + t*0.2;
+
+    const r = Math.pow(PHI,theta*0.35) * 5;
+
+    const x = CENTER.x + Math.cos(theta*PI)*r;
+    const y = CENTER.y + Math.sin(theta*PI)*r;
+
+    if(i===0){
+      bgx.moveTo(x,y);
+    }else{
+      bgx.lineTo(x,y);
+    }
+
+  }
+
+  bgx.stroke();
+
+}
+
+/* =========================================================
+   WORLD DRAW
+========================================================= */
+
+function drawWorld(){
+
+  wx.clearRect(0,0,world.width,world.height);
+
+  const t = tick * 0.01;
+
+  cells.forEach(cell=>{
+
+    const p = hexToPixel(cell.q,cell.r);
+
+    const breath =
+      Math.sin(
+        dist(cell.q,cell.r)*0.7 - t*2
+      );
+
+    const size =
+      HEX_SIZE * (.82 + breath*.04);
+
+    drawHex(wx,p.x,p.y,size);
+
+    if(cell.tier===null){
+
+      wx.fillStyle = "rgba(0,240,255,.03)";
+      wx.strokeStyle = "rgba(0,240,255,.08)";
+
+      wx.fill();
+      wx.stroke();
+
+      return;
+    }
+
+    const hue =
+      (cell.tier / EMOJIS.length) * 360;
+
+    const grad = wx.createRadialGradient(
+      p.x,
+      p.y,
+      0,
+      p.x,
+      p.y,
+      size
+    );
+
+    grad.addColorStop(
+      0,
+      `hsla(${hue},100%,70%,.35)`
+    );
+
+    grad.addColorStop(
+      1,
+      `hsla(${hue},80%,10%,.95)`
+    );
+
+    wx.fillStyle = grad;
+
+    wx.fill();
+
+    wx.strokeStyle =
+      `hsla(${hue},100%,70%,.5)`;
+
+    wx.lineWidth = 1.5 + cell.glow*2;
+
+    wx.stroke();
+
+    wx.font = `${size*.7}px serif`;
+    wx.textAlign = "center";
+    wx.textBaseline = "middle";
+
+    wx.fillText(
+      EMOJIS[cell.tier],
+      p.x,
+      p.y
+    );
+
+    if(cell.glow > 0){
+      cell.glow *= .92;
+    }
+
+  });
+
+}
+
+/* =========================================================
+   FX
+========================================================= */
+
+function drawFX(){
+
+  fxx.clearRect(0,0,fx.width,fx.height);
+
+  for(let i=ripples.length-1;i>=0;i--){
+
+    const r = ripples[i];
+
+    r.radius += 4;
+    r.alpha *= .95;
+
+    fxx.beginPath();
+
+    fxx.arc(
+      r.x,
+      r.y,
+      r.radius,
+      0,
+      PI*2
+    );
+
+    fxx.strokeStyle =
+      `rgba(0,240,255,${r.alpha})`;
+
+    fxx.lineWidth = 2;
+
+    fxx.stroke();
+
+    if(r.alpha < .02){
+      ripples.splice(i,1);
+    }
+
+  }
+
+}
+
+/* =========================================================
+   HUD
+========================================================= */
+
+function updateHUD(){
+
+  document.getElementById("score")
+    .textContent = score;
+
+  document.getElementById("blooms")
+    .textContent = blooms;
+
+  document.getElementById("ring")
+    .textContent = ring;
+
+}
+
+/* =========================================================
+   LOOP
+========================================================= */
+
+function loop(){
+
+  tick++;
+
+  drawBG();
+  drawWorld();
+  drawFX();
+
+  requestAnimationFrame(loop);
+
+}
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+world.addEventListener("click",e=>{
+
+  const h = pixelToHex(
+    e.clientX,
+    e.clientY
+  );
+
+  const c = cells.get(
+    key(h.q,h.r)
+  );
+
+  if(c){
+    merge(c);
+  }
+
+});
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function reset(){
+
+  cells.clear();
+
+  score = 0;
+  blooms = 0;
+  ring = 1;
+
+  build(4);
+
+  cells.get("0,0").tier = 0;
+
+  for(let i=0;i<8;i++){
+    spawn(randomTier());
+  }
+
+  updateHUD();
+
+}
+
+/* =========================================================
+   START
+========================================================= */
+
+document.getElementById("start")
+.addEventListener("click",()=>{
+
+  document.getElementById("overlay")
+  .style.display = "none";
+
+  reset();
+
+});
+
+document.getElementById("reset")
+.addEventListener("click",reset);
+
+resize();
+initStars();
+loop();
+</script>
+
+</body>
+  </html>
