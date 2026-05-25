@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Julie's Cattery & Town</title>
+<style>
+:root {
+  --bg: #e8f5e9;
+  --panel: #fffdf5;
+  --accent: #ff8a80;
+  --accent2: #81c784;
+  --accent3: #4fc3f7;
+  --text: #37474f;
+  --textLight: #78909c;
+  --border: #d7ccc8;
+  --shadow: rgba(0,0,0,0.1);
+  --wood: #8d6e63;
+  --stone: #9e9e9e;
+  --gold: #ffd54f;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: #1b5e20; color: var(--text); }
+
+#game { width: 100%; height: 100%; display: flex; flex-direction: column; position: relative; }
+
+/* ===== HEADER ===== */
+header {
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+  color: white;
+  padding: 8px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px var(--shadow);
+  z-index: 200;
+  flex-shrink: 0;
+}
+header h1 { font-size: 1rem; font-weight: 700; letter-spacing: 0.3px; display: flex; align-items: center; gap: 6px; }
+header .stats { display: flex; gap: 10px; font-size: 0.8rem; }
+header .stat {
+  background: rgba(255,255,255,0.2);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ===== CANVAS AREA ===== */
+#world-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #4caf50;
+  cursor: grab;
+}
+#world-container:active { cursor: grabbing; }
+#game-canvas { display: block; width: 100%; height: 100%; }
+
+/* ===== BOTTOM NAV ===== */
+nav {
+  background: white;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  padding: 6px 0 8px;
+  z-index: 200;
+  flex-shrink: 0;
+}
+nav button {
+  background: none;
+  border: none;
+  font-size: 0.7rem;
+  color: var(--textLight);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 12px;
+  transition: all 0.2s;
+  min-width: 56px;
+}
+nav button .icon { font-size: 1.3rem; }
+nav button.active { color: var(--accent); background: rgba(255,138,128,0.1); }
+
+/* ===== SIDE PANELS ===== */
+.panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 300;
+  padding-bottom: 0;
+}
+.panel-overlay.active { display: flex; }
+.panel {
+  background: var(--panel);
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 20px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+  overflow: hidden;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.panel-header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.panel-title { font-size: 1.1rem; font-weight: 700; }
+.panel-close { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--textLight); padding: 4px; }
+.panel-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
+
+/* ===== CARDS & BUTTONS ===== */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px var(--shadow);
+  border: 1px solid var(--border);
+}
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 24px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,138,128,0.3); }
+.btn:active { transform: scale(0.97); }
+.btn.secondary { background: var(--accent2); }
+.btn.tertiary { background: var(--accent3); color: #01579b; }
+.btn.small { padding: 6px 12px; font-size: 0.8rem; min-height: 36px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+/* ===== SHOP ===== */
+.shop-categories {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0 12px;
+  margin-bottom: 4px;
+}
+.shop-categories::-webkit-scrollbar { display: none; }
+.shop-cat-btn {
+  background: white;
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.shop-cat-btn.active { border-color: var(--accent); background: rgba(255,138,128,0.08); color: var(--accent); }
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.shop-item {
+  background: white;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.shop-item:hover { border-color: var(--accent2); transform: translateY(-2px); }
+.shop-item .si-icon { font-size: 2rem; margin-bottom: 6px; }
+.shop-item .si-name { font-size: 0.8rem; font-weight: 700; line-height: 1.2; }
+.shop-item .si-price { font-size: 0.75rem; color: var(--accent); font-weight: 700; margin-top: 4px; }
+
+/* ===== CAT LIST ===== */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.cat-cell {
+  background: white;
+  border-radius: 14px;
+  padding: 10px 6px;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+.cat-cell:hover { border-color: var(--accent); }
+.cat-cell .cc-canvas { width: 56px; height: 56px; margin: 0 auto 6px; }
+.cat-cell .cc-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 4px;
+}
+.cat-cell .cc-info {
+  font-size: 0.65rem;
+  color: var(--textLight);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cat-cell .cc-tags {
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.tag {
+  font-size: 0.6rem;
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--textLight);
+  font-weight: 600;
+}
+.tag.kitten { background: #c8e6c9; color: #2e7d32; }
+.tag.adult { background: #bbdefb; color: #1565c0; }
+.tag.senior { background: #ffe0b2; color: #e65100; }
+.tag.sick { background: #ffcdd2; color: #c62828; }
+.tag.job { background: #e1bee7; color: #6a1b9a; }
+
+/* ===== CAT DETAIL ===== */
+.detail-canvas-wrap {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 12px;
+  background: rgba(0,0,0,0.03);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.detail-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.detail-sub {
+  font-size: 0.85rem;
+  color: var(--textLight);
+  text-align: center;
+  margin-bottom: 14px;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.stat-box {
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.stat-box .sb-label { font-size: 0.7rem; color: var(--textLight); margin-bottom: 4px; }
+.stat-box .sb-val { font-size: 1.1rem; font-weight: 700; }
+.stat-box .sb-bar {
+  height: 6px;
+  background: var(--bg);
+  border-radius: 3px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.stat-box .sb-bar .fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+
+/* ===== CUSTOMIZATION ===== */
+.color-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+.color-swatch:hover { transform: scale(1.15); }
+.color-swatch.active { border-color: var(--text); transform: scale(1.1); }
+
+.option-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.opt-btn {
+  background: white;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.opt-btn:hover { border-color: var(--accent2); }
+.opt-btn.active { border-color: var(--accent); background: rgba(255,138,128,0.08); }
+
+/* ===== QUEST LOG ===== */
+.quest-item {
+  background: white;
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border: 2px solid var(--border);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.quest-item.complete { border-color: var(--accent2); background: rgba(129,199,132,0.08); }
+.quest-item .q-icon { font-size: 1.6rem; flex-shrink: 0; }
+.quest-item .q-text { flex: 1; }
+.quest-item .q-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 2px; }
+.quest-item .q-desc { font-size: 0.8rem; color: var(--textLight); }
+.quest-item .q-reward { font-size: 0.75rem; color: var(--accent); font-weight: 700; margin-top: 4px; }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: #263238;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+  z-index: 4000;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===== TOOLTIP / LABEL ===== */
+.world-label {
+  position: absolute;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 150;
+  transform: translate(-50%, -100%);
+  margin-top: -8px;
+}
+
+/* ===== PLACE MODE BAR ===== */
+#place-bar {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 24px;
+  padding: 10px 20px;
+  box-shadow: 0 4px 16px var(--shadow);
+  display: none;
+  align-items: center;
+  gap: 12px;
+  z-index: 250;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+#place-bar.active { display: flex; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  header h1 { font-size: 0.85rem; }
+  header .stat { padding: 3px 8px; font-size: 0.75rem; }
+  .shop-grid, .cat-grid { grid-template-columns: repeat(2, 1fr); }
+  .panel { max-height: 90vh; }
+}
+
+/* ===== SCROLLBAR ===== */
+.panel-body::-webkit-scrollbar { width: 6px; }
+.panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="game">
+  <header>
+    <h1>🏡 <span id="town-name">Julie's Town</span></h1>
+    <div class="stats">
+      <div class="stat">💰 $<span id="stat-money">500</span></div>
+      <div class="stat">⭐ <span id="stat-rep">0</span></div>
+      <div class="stat">📅 Day <span id="stat-day">1</span></div>
+      <button class="stat" style="cursor:pointer; background:rgba(255,255,255,0.35); border:none; color:white;" onclick="Game.nextDay()">🌙 End Day</button>
+    </div>
+  </header>
+
+  <div id="world-container">
+    <canvas id="game-canvas"></canvas>
+    <div id="world-labels"></div>
+  </div>
+
+  <!-- Place Mode Bar -->
+  <div id="place-bar">
+    <span id="place-item-name">Placing: Tree</span>
+    <button class="btn small" onclick="PlaceMode.rotate()">🔄 Rotate</button>
+    <button class="btn small secondary" onclick="PlaceMode.cancel()">❌ Cancel</button>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav>
+    <button class="active" onclick="UI.showPanel('cats')">
+      <span class="icon">🐱</span><span>Cats</span>
+    </button>
+    <button onclick="UI.showPanel('shop')">
+      <span class="icon">🛒</span><span>Shop</span>
+    </button>
+    <button onclick="UI.showPanel('quests')">
+      <span class="icon">📜</span><span>Quests</span>
+    </button>
+    <button onclick="UI.showPanel('town')">
+      <span class="icon">🏘️</span><span>Town</span>
+    </button>
+    <button onclick="UI.showPanel('settings')">
+      <span class="icon">⚙️</span><span>Save</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ===== PANELS ===== -->
+
+<!-- CATS PANEL -->
+<div class="panel-overlay" id="panel-cats" onclick="if(event.target===this)UI.closePanel()">
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">🐱 Your Cats (<span id="cat-count">0</span>)</div>
+      <button class="panel-close" onclick="UI.closePanel()">✕</button>
+    </div>
+    <div class="panel-body">
+      <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+        <button class="btn small" onclick="Game.buyCat()">🐈 Adopt ($150)</button>
+        <button class="btn small secondary" onclick="Game.feedAll()">🍖 Feed All</button>
+      </div>
+      <div class="cat-grid" id="cat-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CAT DETAIL PANEL -->
+<div class="panel-overlay" id="panel-catdetail" onclick="if(event.target===this)UI.closePanel()">
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">🐱 Cat Profile</div>
+      <button class="panel-close" onclick="UI.closePanel()">✕</button>
+    </div>
+    <div class="panel-body" id="catdetail-body"></div>
+  </div>
+</div>
+
+<!-- SHOP PANEL -->
+<div class="panel-overlay" id="panel-shop" onclick="if(event.target===this)UI.closePanel()">
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">🛒 Shop</div>
+      <button class="panel-close" onclick="UI.closePanel()">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="shop-categories" id="shop-categories"></div>
+      <div class="shop-grid" id="shop-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTS PANEL -->
+<div class="panel-overlay" id="panel-quests" onclick="if(event.target===this)UI.closePanel()">
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">📜 Quests</div>
+      <button class="panel-close" onclick="UI.closePanel()">✕</button>
+    </div>
+    <div class="panel-body" id="quests-body"></div>
+  </div>
+</div>
+
+<!-- TOWN PANEL -->
+<div class="panel-overlay" id="panel-town" onclick="if(event.target===this)UI.closePanel()">
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">🏘️ Town</div>
+      <button class="panel-close" onclick="UI.closePanel()">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="card">
+        <div class="card-title">🏡 Town Name</div>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="town-name-input" style="flex:1; padding:10px 14px; border:2px solid var(--border); border-radius:14px; font-size:0.9rem; outline:none;" maxlength="20">
+          <button class="btn" onclick="Game.renameTown()">Save</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🌍 Neighbor Towns</div>
+        <div id="neighbor-towns"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Stats</div>
+        <div class="stat-grid">
+          <div class="stat-box"><div class="sb-label">Cats Owned</div><div class="sb-val" id="town-cats">0</div></div>
+          <div class="stat-box"><div class="sb-label">Buildings</div><div class="sb-val" id="town-buildings">0</div></div>
+          <div class="stat-box"><div class="sb-label">Decorations</div><div class="sb-val" id="town-deco">0</div></div>
+          <div class="stat-box"><div class="sb-label">Quests Done</div><div class="sb-val" id="town-quests">0</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS / SAVE PANEL -->
+<div class="panel-overlay" id="panel-settings" onclick="if(event.target===this)UI.closePanel()">
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">⚙️ Settings & Save</div>
+      <button class="panel-close" onclick="UI.closePanel()">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="card">
+        <div class="card-title">💾 Save Game</div>
+        <p style="font-size:0.85rem; color:var(--textLight); margin-bottom:10px;">Your game auto-saves every 30 seconds. You can also export your save to transfer to another device.</p>
+        <div class="btn-row">
+          <button class="btn secondary" onclick="Game.exportSave()">📤 Export Save</button>
+          <button class="btn" onclick="Game.importSavePrompt()">📥 Import Save</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚠️ Danger Zone</div>
+        <button class="btn" style="background:#ef5350;" onclick="Game.resetConfirm()">🗑️ Reset All Progress</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================
+   JULIE'S CATTERY & TOWN — TOP-DOWN RPG
+   Complete rewrite with canvas engine.
+   ============================================ */
+
+// ===== CONSTANTS =====
+const TILE = 32;
+const WORLD_W = 60;
+const WORLD_H = 45;
+const COLORS = {
+  black:'#3e2723', white:'#fafafa', orange:'#ff8a65', cream:'#ffe0b2',
+  blue:'#7986cb', gray:'#9e9e9e', brown:'#8d6e63', chocolate:'#5d4037',
+  lilac:'#b39ddb', red:'#e57373', silver:'#cfd8dc', golden:'#ffd54f',
+  pink:'#f8bbd0', green:'#81c784', yellow:'#fff176', purple:'#ba68c8',
+  tan:'#d7ccc8', rust:'#bf360c', charcoal:'#424242'
+};
+const PATTERNS = ['solid','tabby','bicolor','colorpoint','calico','tortie','ticked','spotted'];
+const FUR_LENGTHS = ['short','medium','long','fluffy'];
+const PERSONALITIES = ['Lap Cat','Hunter','Zoomer','Talker','Shy','Clown','Boss','Gentle','Ninja','Scholar'];
+const JOBS = ['None','Hunter','Therapy','Mouser','Show Cat','Breeder','Ambassador','Guard','Entertainer'];
+const OUTFITS = [
+  {id:'none',name:'None',color:'transparent'},
+  {id:'bowtie',name:'Bow Tie',color:'#ef5350'},
+  {id:'bandana',name:'Bandana',color:'#42a5f5'},
+  {id:'cape',name:'Hero Cape',color:'#ab47bc'},
+  {id:'sweater',name:'Cozy Sweater',color:'#ff8a65'},
+  {id:'vest',name:'Vest',color:'#66bb6a'},
+  {id:'crown',name:'Tiny Crown',color:'#ffd54f'},
+  {id:'scarf',name:'Scarf',color:'#ec407a'},
+  {id:'apron',name:'Apron',color:'#8d6e63'},
+  {id:'uniform',name:'Uniform',color:'#5c6bc0'}
+];
+const SHOP = {
+  buildings: [
+    {id:'house',name:'Small House',icon:'🏠',price:200,size:2},
+    {id:'clinic',name:'Clinic',icon:'🏥',price:300,size:2},
+    {id:'cattery',name:'Cattery',icon:'🐱',price:250,size:2},
+    {id:'lab',name:'Lab',icon:'🔬',price:400,size:2},
+    {id:'barn',name:'Barn',icon:'🌾',price:350,size:3},
+    {id:'tower',name:'Tower',icon:'🗼',price:500,size:2},
+    {id:'shop',name:'Market',icon:'🏪',price:450,size:2},
+    {id:'cafe',name:'Cafe',icon:'☕',price:380,size:2}
+  ],
+  nature: [
+    {id:'oak',name:'Oak Tree',icon:'🌳',price:50,size:1},
+    {id:'pine',name:'Pine Tree',icon:'🌲',price:60,size:1},
+    {id:'palm',name:'Palm Tree',icon:'🌴',price:70,size:1},
+    {id:'bush',name:'Bush',icon:'🌿',price:30,size:1},
+    {id:'flower_red',name:'Red Flowers',icon:'🌹',price:20,size:1},
+    {id:'flower_yellow',name:'Yellow Flowers',icon:'🌻',price:20,size:1},
+    {id:'flower_pink',name:'Pink Flowers',icon:'🌸',price:20,size:1},
+    {id:'rock',name:'Rock',icon:'🪨',price:15,size:1},
+    {id:'pond',name:'Pond',icon:'💧',price:100,size:2},
+    {id:'mushroom',name:'Mushrooms',icon:'🍄',price:25,size:1}
+  ],
+  paths: [
+    {id:'stone',name:'Stone Path',icon:'🪨',price:5,size:1},
+    {id:'wood',name:'Wood Path',icon:'🪵',price:5,size:1},
+    {id:'brick',name:'Brick Path',icon:'🧱',price:8,size:1},
+    {id:'grass',name:'Grass Patch',icon:'🌱',price:3,size:1},
+    {id:'sand',name:'Sand',icon:'🏖️',price:4,size:1}
+  ],
+  fences: [
+    {id:'wood_fence',name:'Wood Fence',icon:'🪵',price:10,size:1},
+    {id:'stone_wall',name:'Stone Wall',icon:'🧱',price:25,size:1},
+    {id:'hedge',name:'Hedge',icon:'🌿',price:15,size:1},
+    {id:'picket',name:'White Picket',icon:'⚪',price:20,size:1},
+    {id:'iron',name:'Iron Fence',icon:'⬛',price:35,size:1}
+  ],
+  furniture: [
+    {id:'bench',name:'Bench',icon:'🪑',price:40,size:1},
+    {id:'lamp',name:'Street Lamp',icon:'💡',price:35,size:1},
+    {id:'fountain',name:'Fountain',icon:'⛲',price:150,size:2},
+    {id:'mailbox',name:'Mailbox',icon:'📬',price:25,size:1},
+    {id:'sign',name:'Signpost',icon:'🪧',price:15,size:1},
+    {id:'well',name:'Well',icon:'🕳️',price:80,size:1},
+    {id:'bridge',name:'Bridge',icon:'🌉',price:120,size:2}
+  ],
+  catitems: [
+    {id:'foodbowl',name:'Food Bowl',icon:'🥣',price:10,size:1},
+    {id:'waterbowl',name:'Water Bowl',icon:'💧',price:10,size:1},
+    {id:'cattree',name:'Cat Tree',icon:'🌲',price:80,size:1},
+    {id:'scratch',name:'Scratch Post',icon:'🪵',price:45,size:1},
+    {id:'catbed',name:'Cat Bed',icon:'🛏️',price:55,size:1},
+    {id:'toymouse',name:'Toy Mouse',icon:'🐭',price:15,size:1},
+    {id:'toyball',name:'Toy Ball',icon:'🔴',price:12,size:1},
+    {id:'laser',name:'Laser Toy',icon:'🔦',price:30,size:1}
+  ]
+};
+const NEIGHBORS = ['Whiskerville','Pawington','Meowtown','Purrbrook','Feline Falls','Tabby Terrace','Calico Cove'];
+const ADULT_NAMES = [
+  'Jojo','Luna','Archie','Milo','Bella','Leo','Lily','Oliver','Lucy','Simba','Chloe','Jack','Nala',
+  'Charlie','Sophie','Tiger','Smokey','Coco','Felix','Molly','Oscar','Daisy','Maple','Willow',
+  'Hazel','Sage','Ivy','Fern','Pebble','River','Stormy','Sunny','Autumn','Birch','Cedar','Dewdrop',
+  'Ember','Frost','Honey','Juniper','Lark','Moss','Mochi','Tofu','Peanut','Cookie','Biscuit',
+  'Muffin','Waffle','Pancake','Pickle','Noodle','Dumpling','Sushi','Bagel','Cinnamon','Nutmeg',
+  'Pumpkin','Peaches','Berry','Clover','Truffle','Artemis','Apollo','Freya','Loki','Athena',
+  'Thor','Juno','Orion','Nova','Stella','Cosmo','Nebula','Aurora','Caspian','Sable','Onyx',
+  'Jasper','Opal','Pearl','Ruby','Ziggy','Scout','Bandit','Rascal','Gizmo','Twitch','Pounce',
+  'Whiskers','Purrlock','Meowcolm','Chairman','Duchess','Baron','Captain','Jester','Pixel','Echo'
+];
+const KITTEN_NAMES = [
+  'Tiny','Pip','Bean','Sprout','Nugget','Muffin','Pebble','Bit','Dot','Puff','Mochi','Tofu',
+  'Peanut','Cookie','Biscuit','Wisp','Fawn','Cub','Kit','Pip','Button','Boo','Mew','Paws',
+  'Squish','Bubbles','Doodle','Fuzz','Glimmer','Hop','Itsy','Jelly','Kip','Lilac','Mite',
+  'Niblet','Olive','Pipkin','Quill','Ruffle','Snip','Tadpole','Umi','Velvet','Whiff','Yarn',
+  'Zest','Binky','Crumbs','Dandelion','Pip-squeak','Niblet','Sprig','Titch','Wren'
+];
+
+// ===== UTILS =====
+const $ = id => document.getElementById(id);
+const rand = (min,max) => Math.floor(Math.random()*(max-min+1))+min;
+const randItem = arr => arr[rand(0,arr.length-1)];
+const clamp = (v,min,max) => Math.max(min,Math.min(max,v));
+const uid = () => 'e_'+Date.now()+'_'+rand(1000,9999);
+const dist = (x1,y1,x2,y2) => Math.hypot(x2-x1,y2-y1);
+const toast = msg => { const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); };
+
+// ===== CLASSES =====
+class Entity {
+  constructor(x,y,type) {
+    this.id=uid(); this.x=x; this.y=y; this.type=type;
+    this.vx=0; this.vy=0; this.targetX=x; this.targetY=y;
+    this.moving=false; this.speed=1; this.size=1;
+    this.angle=0; this.bob=0; this.animFrame=0;
+  }
+  update() {
+    if(this.moving) {
+      const d=dist(this.x,this.y,this.targetX,this.targetY);
+      if(d<2){this.x=this.targetX;this.y=this.targetY;this.moving=false;this.vx=0;this.vy=0;}
+      else {this.vx=(this.targetX-this.x)/d*this.speed; this.vy=(this.targetY-this.y)/d*this.speed;
+        this.x+=this.vx; this.y+=this.vy; this.angle=Math.atan2(this.vy,this.vx);}
+    }
+    this.bob+=0.05; this.animFrame++;
+  }
+}
+
+class Player extends Entity {
+  constructor(x,y) {
+    super(x,y,'player'); this.speed=2.5; this.name='Julie'; this.outfit='default';
+  }
+}
+
+class Cat extends Entity {
+  constructor(x,y,genes,name,ageDays=0) {
+    super(x,y,'cat'); this.speed=0.8+Math.random()*0.6;
+    this.genes=genes; this.name=name; this.ageDays=ageDays;
+    this.health=100; this.hunger=60; this.happiness=70; this.energy=80;
+    this.sick=false; this.job='None'; this.state='idle';
+    this.stateTimer=rand(60,300); this.size=0.9;
+    this.hat='none'; this.collar='none'; this.outfit='none';
+    this.color=genes.color||randItem(Object.values(COLORS));
+    this.stripeColor=genes.stripeColor||randItem(Object.values(COLORS));
+    this.eyeColor=genes.eyeColor||randItem(Object.values(COLORS));
+    this.pattern=genes.pattern||randItem(PATTERNS);
+    this.furLength=genes.furLength||randItem(FUR_LENGTHS);
+    this.personality=genes.personality||randItem(PERSONALITIES);
+    this.gender=genes.gender||(Math.random()<0.5?'F':'M');
+    this.pregnant=false; this.pregnantDays=0;
+    this.wanderRadius=80; this.homeX=x; this.homeY=y;
+  }
+  get stage() { return this.ageDays<14?'kitten':this.ageDays<60?'adult':'senior'; }
+  get canBreed() { return this.stage==='adult' && !this.pregnant && this.health>60 && this.energy>40 && this.gender==='F'; }
+  get isStud() { return this.stage==='adult' && this.health>60 && this.energy>40 && this.gender==='M'; }
+
+  updateAI() {
+    this.stateTimer--;
+    if(this.stateTimer<=0) {
+      const states=['idle','wander','sleep','play','eat'];
+      if(this.job==='Hunter') states.push('hunt');
+      if(this.job==='Guard') states.push('guard');
+      this.state=randItem(states);
+      this.stateTimer=rand(120,400);
+      if(this.state==='wander'||this.state==='hunt') {
+        const r=this.wanderRadius;
+        this.targetX=clamp(this.homeX+rand(-r,r),TILE,WORLD_W*TILE-TILE);
+        this.targetY=clamp(this.homeY+rand(-r,r),TILE,WORLD_H*TILE-TILE);
+        this.moving=true;
+      } else { this.moving=false; }
+    }
+    if(this.state==='sleep') this.energy=clamp(this.energy+0.3,0,100);
+    if(this.state==='play') { this.happiness=clamp(this.happiness+0.2,0,100); this.energy=clamp(this.energy-0.15,0,100); }
+    super.update();
+  }
+
+  age(days=1) {
+    this.ageDays+=days;
+    this.hunger=clamp(this.hunger-rand(5,15),0,100);
+    this.energy=clamp(this.energy-rand(2,8),0,100);
+    if(this.hunger<20||this.energy<20) this.health=clamp(this.health-rand(5,10),0,100);
+    if(this.happiness<30) this.health=clamp(this.health-3,0,100);
+    if(!this.sick && this.health<70 && Math.random()<0.12) {
+      this.sick=true; this.happiness=clamp(this.happiness-20,0,100);
+    }
+    if(this.pregnant) {
+      this.pregnantDays++;
+      if(this.pregnantDays>=3) { this.pregnant=false; this.pregnantDays=0; return true; }
+    }
+    return false;
+  }
+
+  feed() { this.hunger=clamp(this.hunger+35,0,100); this.health=clamp(this.health+5,0,100); this.happiness=clamp(this.happiness+5,0,100); }
+  pet() { this.happiness=clamp(this.happiness+18,0,100); this.energy=clamp(this.energy-5,0,100); }
+  treat() { if(this.sick){this.sick=false; this.health=clamp(this.health+25,0,100); this.happiness=clamp(this.happiness+12,0,100); return true;} this.health=clamp(this.health+10,0,100); return false; }
+
+  getValue() {
+    let v=50;
+    if(this.stage==='kitten') v+=120;
+    if(this.furLength==='fluffy') v+=30;
+    if(this.pattern==='calico'||this.pattern==='colorpoint') v+=40;
+    if(this.outfit!=='none') v+=25;
+    return v;
+  }
+}
+
+class NPC extends Entity {
+  constructor(x,y,name,role) {
+    super(x,y,'npc'); this.name=name; this.role=role;
+    this.speed=0.6; this.dialogue=[]; this.size=1.1;
+    this.color=randItem(['#ffcc80','#90caf9','#a5d6a7','#ce93d8','#ffab91','#80cbc4']);
+    this.hairColor=randItem(['#3e2723','#5d4037','#ffd54f','#e0e0e0','#212121']);
+  }
+  updateAI() {
+    if(rand(0,200)===0) {
+      this.targetX=clamp(this.x+rand(-60,60),TILE,WORLD_W*TILE-TILE);
+      this.targetY=clamp(this.y+rand(-60,60),TILE,WORLD_H*TILE-TILE);
+      this.moving=true;
+    }
+    super.update();
+  }
+}
+
+class Building extends Entity {
+  constructor(x,y,id,name,icon,size,rotation=0) {
+    super(x,y,'building'); this.buildId=id; this.name=name; this.icon=icon; this.size=size; this.rotation=rotation;
+  }
+}
+
+class Deco extends Entity {
+  constructor(x,y,id,name,icon) {
+    super(x,y,'deco'); this.decoId=id; this.name=name; this.icon=icon;
+  }
+}
+
+class Quest {
+  constructor(id,title,desc,requirement,rewardMoney,rewardRep) {
+    this.id=id; this.title=title; this.desc=desc; this.requirement=requirement;
+    this.rewardMoney=rewardMoney; this.rewardRep=rewardRep; this.completed=false; this.progress=0;
+  }
+}
+
+// ===== GAME STATE =====
+const Game = {
+  canvas: null, ctx: null,
+  width:0, height:0, dpr:1,
+  camera: {x:0,y:0},
+  player: null,
+  cats: [],
+  npcs: [],
+  buildings: [],
+  decos: [],
+  money: 500,
+  day: 1,
+  rep: {breeder:0,vet:0},
+  townName: "Julie's Town",
+  quests: [],
+  selectedEntity: null,
+  placeItem: null,
+  placeRotation: 0,
+  lastSave: 0,
+  initialized: false,
+
+  init() {
+    this.canvas=$('game-canvas');
+    this.ctx=this.canvas.getContext('2d');
+    this.resize();
+    window.addEventListener('resize',()=>this.resize());
+
+    const saved=localStorage.getItem('julieTownSave');
+    if(saved) { this.load(JSON.parse(saved)); toast('Welcome back to '+this.townName+'!'); }
+    else { this.newGame(); }
+
+    this.setupInput();
+    this.loop();
+    setInterval(()=>this.autoSave(),30000);
+  },
+
+  newGame() {
+    this.money=500; this.day=1; this.rep={breeder:0,vet:0};
+    this.townName="Julie's Town";
+    this.player=new Player(WORLD_W*TILE/2, WORLD_H*TILE/2);
+    this.cats=[]; this.npcs=[]; this.buildings=[]; this.decos=[]; this.quests=[];
+
+    // Starter cats
+    const starters=[
+      {b:'domestic',n:'Jojo',x:-40,y:-30},
+      {b:'siamese',n:'Luna',x:40,y:-20},
+      {b:'mainecoon',n:'Archie',x:-20,y:40}
+    ];
+    starters.forEach(s=>{
+      const g=this.makeGenes(s.b);
+      const c=new Cat(this.player.x+s.x, this.player.y+s.y, g, s.n, rand(20,40));
+      c.homeX=c.x; c.homeY=c.y; this.cats.push(c);
+    });
+
+    // Starter NPCs
+    this.npcs.push(new NPC(this.player.x+80,this.player.y-60,'Mayor Purr','mayor'));
+    this.npcs.push(new NPC(this.player.x-100,this.player.y+80,'Dr. Whiskers','vet'));
+    this.npcs.push(new NPC(this.player.x+120,this.player.y+100,'Scout Paws','explorer'));
+
+    // Starter buildings
+    this.buildings.push(new Building(this.player.x-48,this.player.y-48,'house','Home','🏠',2));
+    this.buildings.push(new Building(this.player.x+80,this.player.y-48,'cattery','Cattery','🐱',2));
+
+    // Starter decos
+    this.decos.push(new Deco(this.player.x-80,this.player.y+20,'oak','Oak Tree','🌳'));
+    this.decos.push(new Deco(this.player.x+140,this.player.y+20,'bush','Bush','🌿'));
+    this.decos.push(new Deco(this.player.x+20,this.player.y+100,'flower_red','Flowers','🌹'));
+
+    // Starter quests
+    this.quests=[
+      new Quest('q1','Welcome to Town','Place 3 decorations on your farm.',{type:'place',count:3},100,10),
+      new Quest('q2','First Patient','Adopt and heal a sick cat.',{type:'heal',count:1},150,15),
+      new Quest('q3','Breeder Beginnings','Breed your first kitten.',{type:'breed',count:1},200,20),
+      new Quest('q4','Town Builder','Buy and place a building.',{type:'build',count:1},250,25),
+      new Quest('q5','Cat Collector','Own 5 cats.',{type:'ownCats',count:5},300,30),
+    ];
+
+    this.centerCamera();
+    this.save();
+  },
+
+  makeGenes(breed) {
+    return {
+      breed:breed, color:randItem(Object.values(COLORS)),
+      stripeColor:randItem(Object.values(COLORS)),
+      eyeColor:randItem(Object.values(COLORS)),
+      pattern:randItem(PATTERNS), furLength:randItem(FUR_LENGTHS),
+      personality:randItem(PERSONALITIES), gender:Math.random()<0.5?'F':'M'
+    };
+  },
+
+  resize() {
+    const container=$('world-container');
+    this.width=container.clientWidth;
+    this.height=container.clientHeight;
+    this.dpr=Math.min(window.devicePixelRatio||1,2);
+    this.canvas.width=this.width*this.dpr;
+    this.canvas.height=this.height*this.dpr;
+    this.canvas.style.width=this.width+'px';
+    this.canvas.style.height=this.height+'px';
+    this.ctx.setTransform(this.dpr,0,0,this.dpr,0,0);
+  },
+
+  centerCamera() {
+    if(!this.player) return;
+    this.camera.x=this.player.x-this.width/2;
+    this.camera.y=this.player.y-this.height/2;
+  },
+
+  setupInput() {
+    const c=this.canvas;
+    let dragging=false, dragStartX=0, dragStartY=0, camStartX=0, camStartY=0;
+    this.lastMouseX=this.width/2; this.lastMouseY=this.height/2;
+
+    c.addEventListener('mousedown',e=>{
+      dragging=true;
+      dragStartX=e.clientX; dragStartY=e.clientY;
+      camStartX=this.camera.x; camStartY=this.camera.y;
+    });
+    window.addEventListener('mousemove',e=>{
+      if(!dragging) return;
+      this.camera.x=camStartX-(e.clientX-dragStartX);
+      this.camera.y=camStartY-(e.clientY-dragStartY);
+    });
+    window.addEventListener('mouseup',e=>{
+      if(!dragging) return;
+      dragging=false;
+      const dx=e.clientX-dragStartX, dy=e.clientY-dragStartY;
+      if(Math.hypot(dx,dy)<6) this.handleClick(e.clientX,e.clientY);
+    });
+
+    // Touch support
+    c.addEventListener('touchstart',e=>{
+      if(e.touches.length===1) {
+        dragging=true;
+        dragStartX=e.touches[0].clientX; dragStartY=e.touches[0].clientY;
+        camStartX=this.camera.x; camStartY=this.camera.y;
+      }
+    },{passive:false});
+    c.addEventListener('touchmove',e=>{
+      if(dragging && e.touches.length===1) {
+        e.preventDefault();
+        this.camera.x=camStartX-(e.touches[0].clientX-dragStartX);
+        this.camera.y=camStartY-(e.touches[0].clientY-dragStartY);
+      }
+    },{passive:false});
+    c.addEventListener('touchend',e=>{
+      if(!dragging) return;
+      dragging=false;
+      const t=e.changedTouches[0];
+      const dx=t.clientX-dragStartX, dy=t.clientY-dragStartY;
+      if(Math.hypot(dx,dy)<10) this.handleClick(t.clientX,t.clientY);
+    });
+  },
+
+  handleClick(screenX,screenY) {
+    const wx=screenX+this.camera.x;
+    const wy=screenY+this.camera.y;
+
+    // Place mode
+    if(this.placeItem) {
+      this.placeAt(wx,wy);
+      return;
+    }
+
+    // Check entities - cats and NPCs first (smaller, more precise), then buildings/deco
+    const entities=[...this.cats,...this.npcs,...this.decos,...this.buildings];
+    for(let i=entities.length-1;i>=0;i--) {
+      const e=entities[i];
+      const s=this.getEntitySize(e);
+      const hitRadius = e.type==='cat' || e.type==='npc' ? Math.max(s.w,s.h)*0.7 : Math.max(s.w,s.h)*0.5;
+      if(dist(wx,wy,e.x,e.y) < hitRadius) {
+        this.selectEntity(e);
+        return;
+      }
+    }
+
+    // Move player
+    this.player.targetX=wx; this.player.targetY=wy; this.player.moving=true;
+    this.selectedEntity=null;
+    this.hideSelectionMenu();
+  },
+
+  getEntitySize(e) {
+    if(e.type==='cat') return {w:28,h:28};
+    if(e.type==='npc') return {w:32,h:32};
+    if(e.type==='building') return {w:e.size*TILE,h:e.size*TILE};
+    if(e.type==='deco') return {w:TILE,h:TILE};
+    return {w:20,h:20};
+  },
+
+  selectEntity(e) {
+    this.selectedEntity=e;
+    if(e.type==='cat') UI.showCatDetail(e);
+    else if(e.type==='npc') this.talkToNPC(e);
+    else if(e.type==='building') toast(e.name+' — '+e.buildId);
+    else toast(e.name);
+  },
+
+  talkToNPC(npc) {
+    const lines=[
+      `Hello! I'm ${npc.name}. Lovely town you have!`,
+      `Have you checked the shop today? New items arrived!`,
+      `Your cats look happy. Keep up the good work!`,
+      `I heard there's a rare breed in the next town over...`,
+      `Make sure to feed your cats before night falls!`
+    ];
+    toast(npc.name+': "'+randItem(lines)+'"');
+  },
+
+  placeAt(x,y) {
+    if(!this.placeItem) return;
+    const tx=Math.floor(x/TILE)*TILE+TILE/2;
+    const ty=Math.floor(y/TILE)*TILE+TILE/2;
+
+    // Check collision
+    const all=[...this.buildings,...this.decos];
+    for(const e of all) {
+      const d=dist(tx,ty,e.x,e.y);
+      if(d<TILE*0.8) { toast('Too close to '+e.name+'!'); return; }
+    }
+
+    const item=this.placeItem;
+    if(this.money<item.price) { toast('Not enough money!'); return; }
+    this.money-=item.price;
+
+    const cat=Object.keys(SHOP).find(k=>SHOP[k].some(i=>i.id===item.id));
+    if(cat==='buildings') this.buildings.push(new Building(tx,ty,item.id,item.name,item.icon,item.size,this.placeRotation));
+    else this.decos.push(new Deco(tx,ty,item.id,item.name,item.icon));
+
+    this.checkQuest('place'); this.checkQuest('build');
+    toast('Placed '+item.name+'!');
+    this.save(); this.renderUI();
+  },
+
+  checkQuest(type) {
+    this.quests.forEach(q=>{
+      if(q.completed) return;
+      if(q.requirement.type===type) {
+        q.progress++;
+        if(q.progress>=q.requirement.count) {
+          q.completed=true;
+          this.money+=q.rewardMoney;
+          this.rep.breeder+=q.rewardRep;
+          toast(`Quest complete: ${q.title}! +$${q.rewardMoney}`);
+        }
+      }
+      if(q.requirement.type==='ownCats' && this.cats.length>=q.requirement.count) {
+        q.completed=true; this.money+=q.rewardMoney; this.rep.breeder+=q.rewardRep;
+        toast(`Quest complete: ${q.title}! +$${q.rewardMoney}`);
+      }
+    });
+  },
+
+  loop() {
+    this.update();
+    this.draw();
+    requestAnimationFrame(()=>this.loop());
+  },
+
+  update() {
+    if(!this.player) return;
+    this.player.update();
+    this.cats.forEach(c=>c.updateAI());
+    this.npcs.forEach(n=>n.updateAI());
+
+    // Smooth camera follow
+    const tx=this.player.x-this.width/2;
+    const ty=this.player.y-this.height/2;
+    this.camera.x+=(tx-this.camera.x)*0.05;
+    this.camera.y+=(ty-this.camera.y)*0.05;
+
+    // Clamp camera
+    this.camera.x=clamp(this.camera.x,-TILE,WORLD_W*TILE-this.width+TILE);
+    this.camera.y=clamp(this.camera.y,-TILE,WORLD_H*TILE-this.height+TILE);
+  },
+
+  draw() {
+    const ctx=this.ctx;
+    ctx.clearRect(0,0,this.width,this.height);
+    const cx=this.camera.x, cy=this.camera.y;
+
+    // Grass background
+    ctx.fillStyle='#66bb6a';
+    ctx.fillRect(0,0,this.width,this.height);
+
+    // Grid lines (subtle)
+    ctx.strokeStyle='rgba(255,255,255,0.08)';
+    ctx.lineWidth=1;
+    const startTX=Math.floor(cx/TILE)*TILE;
+    const startTY=Math.floor(cy/TILE)*TILE;
+    for(let x=startTX;x<cx+this.width+TILE;x+=TILE) {
+      ctx.beginPath(); ctx.moveTo(x-cx,0); ctx.lineTo(x-cx,this.height); ctx.stroke();
+    }
+    for(let y=startTY;y<cy+this.height+TILE;y+=TILE) {
+      ctx.beginPath(); ctx.moveTo(0,y-cy); ctx.lineTo(this.width,y-cy); ctx.stroke();
+    }
+
+    // Draw entities sorted by Y for depth
+    const all=[...this.buildings,...this.decos,...this.npcs,...this.cats,this.player];
+    all.sort((a,b)=>a.y-b.y);
+
+    all.forEach(e=>{
+      const sx=e.x-cx, sy=e.y-cy;
+      if(sx<-50||sx>this.width+50||sy<-50||sy>this.height+50) return;
+
+      if(e.type==='building') this.drawBuilding(ctx,e,sx,sy);
+      else if(e.type==='deco') this.drawDeco(ctx,e,sx,sy);
+      else if(e.type==='npc') this.drawNPC(ctx,e,sx,sy);
+      else if(e.type==='cat') this.drawCat(ctx,e,sx,sy);
+      else if(e.type==='player') this.drawPlayer(ctx,e,sx,sy);
+    });
+
+    // Selection ring
+    if(this.selectedEntity) {
+      const e=this.selectedEntity;
+      const sx=e.x-cx, sy=e.y-cy;
+      ctx.strokeStyle='rgba(255,255,255,0.8)';
+      ctx.lineWidth=2;
+      ctx.setLineDash([4,4]);
+      ctx.beginPath();
+      ctx.arc(sx,sy,22,0,Math.PI*2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Name label
+      ctx.fillStyle='rgba(0,0,0,0.6)';
+      ctx.beginPath();
+      ctx.roundRect(sx-40,sy-38,80,20,10);
+      ctx.fill();
+      ctx.fillStyle='white';
+      ctx.font='600 11px sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText(e.name||e.type,sx,sy-24);
+    }
+
+    // Place preview
+    if(this.placeItem) {
+      const mx=this.lastMouseX||this.width/2;
+      const my=this.lastMouseY||this.height/2;
+      const tx=Math.floor((mx+cx)/TILE)*TILE+TILE/2-cx;
+      const ty=Math.floor((my+cy)/TILE)*TILE+TILE/2-cy;
+      ctx.globalAlpha=0.5;
+      ctx.fillStyle='white';
+      ctx.beginPath();
+      ctx.arc(tx,ty,16,0,Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha=1;
+    }
+  },
+
+  drawPlayer(ctx,x,y) {
+    const bob=Math.sin(this.player.bob)*2;
+    // Shadow
+    ctx.fillStyle='rgba(0,0,0,0.15)';
+    ctx.beginPath(); ctx.ellipse(x,y+14,12,5,0,0,Math.PI*2); ctx.fill();
+    // Body
+    ctx.fillStyle='#ffcc80';
+    ctx.beginPath(); ctx.arc(x,y+bob,14,0,Math.PI*2); ctx.fill();
+    // Hair
+    ctx.fillStyle='#5d4037';
+    ctx.beginPath(); ctx.arc(x,y+bob-2,10,Math.PI,0); ctx.fill();
+    // Eyes
+    ctx.fillStyle='#3e2723';
+    ctx.beginPath(); ctx.arc(x-4,y+bob-1,2,0,Math.PI*2); ctx.arc(x+4,y+bob-1,2,0,Math.PI*2); ctx.fill();
+    // Smile
+    ctx.strokeStyle='#3e2723'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(x,y+bob+2,5,0.2,Math.PI-0.2); ctx.stroke();
+  },
+
+  drawCat(ctx,cat,x,y) {
+    const s=cat.stage==='kitten'?0.65:cat.stage==='senior'?0.85:0.75;
+    const bob=cat.state==='sleep'?0:Math.sin(cat.bob)*1.5;
+    const sz=22*s;
+
+    // Shadow
+    ctx.fillStyle='rgba(0,0,0,0.12)';
+    ctx.beginPath(); ctx.ellipse(x,y+sz*0.6,sz*0.7,sz*0.25,0,0,Math.PI*2); ctx.fill();
+
+    // Tail
+    if(cat.state!=='sleep') {
+      ctx.strokeStyle=cat.color;
+      ctx.lineWidth=sz*0.25;
+      ctx.lineCap='round';
+      const wag=Math.sin(cat.bob*2)*8;
+      ctx.beginPath();
+      ctx.moveTo(x,y+sz*0.3);
+      ctx.quadraticCurveTo(x+sz*0.8+wag,y+sz*0.5,x+sz*0.5+wag,y-sz*0.2);
+      ctx.stroke();
+    }
+
+    // Body
+    ctx.fillStyle=cat.color;
+    ctx.beginPath();
+    ctx.ellipse(x,y+bob*0.5,sz*0.9,sz*1.1,0,0,Math.PI*2);
+    ctx.fill();
+
+    // Pattern overlay
+    if(cat.pattern==='tabby') {
+      ctx.strokeStyle=cat.stripeColor;
+      ctx.lineWidth=1.5;
+      ctx.globalAlpha=0.5;
+      for(let i=-1;i<=1;i++) {
+        ctx.beginPath();
+        ctx.moveTo(x+i*sz*0.3,y+bob*0.5-sz*0.5);
+        ctx.lineTo(x+i*sz*0.3,y+bob*0.5+sz*0.6);
+        ctx.stroke();
+      }
+      ctx.globalAlpha=1;
+    } else if(cat.pattern==='bicolor') {
+      ctx.fillStyle='white'; ctx.globalAlpha=0.85;
+      ctx.beginPath(); ctx.ellipse(x+sz*0.2,y+bob*0.5+sz*0.3,sz*0.5,sz*0.5,0,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1;
+    } else if(cat.pattern==='colorpoint') {
+      ctx.fillStyle=cat.stripeColor; ctx.globalAlpha=0.6;
+      ctx.beginPath(); ctx.arc(x,y+bob*0.5-sz*0.3,sz*0.5,Math.PI,0); ctx.fill();
+      ctx.globalAlpha=1;
+    } else if(cat.pattern==='calico') {
+      ctx.fillStyle=cat.stripeColor; ctx.globalAlpha=0.5;
+      ctx.beginPath(); ctx.ellipse(x-sz*0.3,y+bob*0.5,sz*0.4,sz*0.6,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='white'; ctx.globalAlpha=0.7;
+      ctx.beginPath(); ctx.ellipse(x+sz*0.3,y+bob*0.5,sz*0.4,sz*0.6,0,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1;
+    } else if(cat.pattern==='spotted') {
+      ctx.fillStyle=cat.stripeColor; ctx.globalAlpha=0.4;
+      for(let i=0;i<5;i++) {
+        const ax=x+rand(-1,1)*sz*0.5;
+        const ay=y+bob*0.5+rand(-1,1)*sz*0.6;
+        ctx.beginPath(); ctx.arc(ax,ay,sz*0.15,0,Math.PI*2); ctx.fill();
+      }
+      ctx.globalAlpha=1;
+    }
+
+    // Fluff overlay
+    if(cat.furLength==='long'||cat.furLength==='fluffy') {
+      ctx.strokeStyle=cat.color; ctx.lineWidth=2; ctx.globalAlpha=0.4;
+      for(let i=0;i<8;i++) {
+        const a=(i/8)*Math.PI*2;
+        ctx.beginPath();
+        ctx.moveTo(x+Math.cos(a)*sz*0.7,y+bob*0.5+Math.sin(a)*sz*0.9);
+        ctx.lineTo(x+Math.cos(a)*sz*1.1,y+bob*0.5+Math.sin(a)*sz*1.3);
+        ctx.stroke();
+      }
+      ctx.globalAlpha=1;
+    }
+
+    // Head
+    ctx.fillStyle=cat.color;
+    ctx.beginPath();
+    ctx.arc(x,y+bob*0.5-sz*0.85,sz*0.65,0,Math.PI*2);
+    ctx.fill();
+
+    // Ears
+    ctx.fillStyle=cat.color;
+    ctx.beginPath();
+    ctx.moveTo(x-sz*0.5,y+bob*0.5-sz*1.2);
+    ctx.lineTo(x-sz*0.7,y+bob*0.5-sz*0.6);
+    ctx.lineTo(x-sz*0.15,y+bob*0.5-sz*0.75);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x+sz*0.5,y+bob*0.5-sz*1.2);
+    ctx.lineTo(x+sz*0.7,y+bob*0.5-sz*0.6);
+    ctx.lineTo(x+sz*0.15,y+bob*0.5-sz*0.75);
+    ctx.fill();
+
+    // Inner ears
+    ctx.fillStyle='rgba(255,200,200,0.5)';
+    ctx.beginPath();
+    ctx.moveTo(x-sz*0.5,y+bob*0.5-sz*1.1);
+    ctx.lineTo(x-sz*0.6,y+bob*0.5-sz*0.7);
+    ctx.lineTo(x-sz*0.25,y+bob*0.5-sz*0.78);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x+sz*0.5,y+bob*0.5-sz*1.1);
+    ctx.lineTo(x+sz*0.6,y+bob*0.5-sz*0.7);
+    ctx.lineTo(x+sz*0.25,y+bob*0.5-sz*0.78);
+    ctx.fill();
+
+    // Eyes
+    if(cat.state==='sleep') {
+      ctx.strokeStyle='#333'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(x-sz*0.25,y+bob*0.5-sz*0.85); ctx.lineTo(x-sz*0.1,y+bob*0.5-sz*0.85); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x+sz*0.1,y+bob*0.5-sz*0.85); ctx.lineTo(x+sz*0.25,y+bob*0.5-sz*0.85); ctx.stroke();
+    } else {
+      ctx.fillStyle='white';
+      ctx.beginPath(); ctx.ellipse(x-sz*0.2,y+bob*0.5-sz*0.88,sz*0.18,sz*0.2,0,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x+sz*0.2,y+bob*0.5-sz*0.88,sz*0.18,sz*0.2,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle=cat.eyeColor;
+      ctx.beginPath(); ctx.arc(x-sz*0.2,y+bob*0.5-sz*0.86,sz*0.1,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x+sz*0.2,y+bob*0.5-sz*0.86,sz*0.1,0,Math.PI*2); ctx.fill();
+      // Shine
+      ctx.fillStyle='white';
+      ctx.beginPath(); ctx.arc(x-sz*0.15,y+bob*0.5-sz*0.9,sz*0.04,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x+sz*0.25,y+bob*0.5-sz*0.9,sz*0.04,0,Math.PI*2); ctx.fill();
+    }
+
+    // Nose
+    ctx.fillStyle='#ff9999';
+    ctx.beginPath(); ctx.arc(x,y+bob*0.5-sz*0.72,sz*0.08,0,Math.PI*2); ctx.fill();
+
+    // Mouth
+    ctx.strokeStyle='#333'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(x,y+bob*0.5-sz*0.68,sz*0.12,0.1,Math.PI-0.1); ctx.stroke();
+
+    // Outfit
+    if(cat.outfit&&cat.outfit!=='none') {
+      const outfit=OUTFITS.find(o=>o.id===cat.outfit);
+      if(outfit) {
+        ctx.fillStyle=outfit.color; ctx.globalAlpha=0.85;
+        ctx.beginPath(); ctx.ellipse(x,y+bob*0.5,sz*0.7,sz*0.5,0,0,Math.PI*2); ctx.fill();
+        ctx.globalAlpha=1;
+      }
+    }
+
+    // Sick indicator
+    if(cat.sick) {
+      ctx.fillStyle='#ef5350';
+      ctx.beginPath(); ctx.arc(x+sz*0.6,y+bob*0.5-sz*1.1,sz*0.15,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='white'; ctx.font=`bold ${sz*0.2}px sans-serif`; ctx.textAlign='center';
+      ctx.fillText('×',x+sz*0.6,y+bob*0.5-sz*1.05);
+    }
+
+    // Job indicator
+    if(cat.job&&cat.job!=='None') {
+      ctx.fillStyle='#ab47bc';
+      ctx.beginPath(); ctx.arc(x-sz*0.6,y+bob*0.5-sz*1.1,sz*0.15,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='white'; ctx.font=`${sz*0.15}px sans-serif`; ctx.textAlign='center';
+      ctx.fillText('★',x-sz*0.6,y+bob*0.5-sz*1.05);
+    }
+  },
+
+  drawNPC(ctx,npc,x,y) {
+    const bob=Math.sin(npc.bob)*1;
+    ctx.fillStyle='rgba(0,0,0,0.12)';
+    ctx.beginPath(); ctx.ellipse(x,y+16,14,5,0,0,Math.PI*2); ctx.fill();
+
+    // Body
+    ctx.fillStyle=npc.color;
+    ctx.beginPath(); ctx.arc(x,y+bob,16,0,Math.PI*2); ctx.fill();
+
+    // Hair
+    ctx.fillStyle=npc.hairColor;
+    ctx.beginPath(); ctx.arc(x,y+bob-2,12,Math.PI,0); ctx.fill();
+
+    // Eyes
+    ctx.fillStyle='#333';
+    ctx.beginPath(); ctx.arc(x-5,y+bob-1,2.5,0,Math.PI*2); ctx.arc(x+5,y+bob-1,2.5,0,Math.PI*2); ctx.fill();
+
+    // Smile
+    ctx.strokeStyle='#333'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(x,y+bob+3,5,0.2,Math.PI-0.2); ctx.stroke();
+
+    // Role badge
+    ctx.fillStyle='rgba(255,255,255,0.9)';
+    ctx.beginPath(); ctx.roundRect(x-18,y-26,36,14,7); ctx.fill();
+    ctx.fillStyle='#555'; ctx.font='600 8px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(npc.role,x,y-17);
+  },
+
+  drawBuilding(ctx,b,x,y) {
+    const sz=b.size*TILE;
+    ctx.fillStyle='rgba(0,0,0,0.1)';
+    ctx.beginPath(); ctx.ellipse(x,y+sz*0.4,sz*0.5,sz*0.15,0,0,Math.PI*2); ctx.fill();
+
+    // Base
+    ctx.fillStyle='#d7ccc8';
+    ctx.beginPath(); ctx.roundRect(x-sz/2,y-sz/2,sz,sz,8); ctx.fill();
+    ctx.strokeStyle='#8d6e63'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.roundRect(x-sz/2,y-sz/2,sz,sz,8); ctx.stroke();
+
+    // Roof
+    ctx.fillStyle='#a1887f';
+    ctx.beginPath();
+    ctx.moveTo(x-sz/2-4,y-sz/2+8);
+    ctx.lineTo(x,y-sz/2-12);
+    ctx.lineTo(x+sz/2+4,y-sz/2+8);
+    ctx.closePath(); ctx.fill();
+
+    // Door
+    ctx.fillStyle='#5d4037';
+    ctx.beginPath(); ctx.arc(x,y+sz*0.25,sz*0.15,Math.PI,0); ctx.fill();
+
+    // Icon
+    ctx.font=`${sz*0.4}px serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(b.icon,x,y-sz*0.05);
+  },
+
+  drawDeco(ctx,d,x,y) {
+    ctx.font='28px serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(d.icon,x,y);
+    // Shadow
+    ctx.fillStyle='rgba(0,0,0,0.08)';
+    ctx.beginPath(); ctx.ellipse(x,y+14,12,4,0,0,Math.PI*2); ctx.fill();
+    ctx.font='28px serif';
+    ctx.fillText(d.icon,x,y);
+  },
+
+  hideSelectionMenu() {},
+
+  // ===== ACTIONS =====
+  buyCat() {
+    if(this.cats.length>=20) { toast('Max cats reached!'); return; }
+    if(this.money<150) { toast('Need $150!'); return; }
+    const name=randItem(ADULT_NAMES);
+    const g=this.makeGenes(randItem(Object.keys(BREEDS).slice(0,5)));
+    const c=new Cat(this.player.x+rand(-40,40),this.player.y+rand(-40,40),g,name,rand(20,50));
+    c.homeX=c.x; c.homeY=c.y;
+    this.cats.push(c); this.money-=150;
+    toast('Adopted '+name+'!');
+    this.checkQuest('ownCats');
+    this.save(); this.renderUI();
+  },
+
+  feedAll() {
+    let cost=0;
+    this.cats.forEach(c=>{ if(c.hunger<80){c.feed(); cost+=5;} });
+    if(cost>0){this.money=Math.max(0,this.money-cost); toast('Fed all cats (-$'+cost+')'); this.save(); this.renderUI();}
+    else toast('All cats are full!');
+  },
+
+  renameTown() {
+    const name=$('town-name-input').value.trim();
+    if(name){this.townName=name; $('town-name').textContent=name; toast('Town renamed to '+name+'!'); this.save();}
+  },
+
+  nextDay() {
+    this.day++;
+    const newKittens=[];
+    this.cats.forEach(c=>{
+      if(c.age()) {
+        const dad=this.cats.find(x=>x.gender==='M'&&x.id!==c.id)||this.cats[0];
+        const g=this.mergeGenes(c.genes,dad?dad.genes:c.genes);
+        const k=new Cat(c.x+rand(-20,20),c.y+rand(-20,20),g,randItem(KITTEN_NAMES),0);
+        k.homeX=k.x; k.homeY=k.y; newKittens.push(k);
+        this.rep.breeder+=15; toast(c.name+' had a kitten: '+k.name+'!');
+      }
+    });
+    newKittens.forEach(k=>{if(this.cats.length<20) this.cats.push(k);});
+    this.save(); this.renderUI();
+    toast('Day '+this.day+' begins!');
+  },
+
+  mergeGenes(mom,dad) {
+    return {
+      breed:Math.random()<0.5?mom.breed:dad.breed,
+      color:Math.random()<0.5?mom.color:dad.color,
+      stripeColor:Math.random()<0.5?mom.stripeColor:dad.stripeColor,
+      eyeColor:Math.random()<0.5?mom.eyeColor:dad.eyeColor,
+      pattern:Math.random()<0.7?(Math.random()<0.5?mom.pattern:dad.pattern):randItem(PATTERNS),
+      furLength:Math.random()<0.5?mom.furLength:dad.furLength,
+      personality:randItem(PERSONALITIES), gender:Math.random()<0.5?'F':'M'
+    };
+  },
+
+  // ===== SAVE / LOAD =====
+  save() {
+    const data={
+      money:this.money, day:this.day, rep:this.rep, townName:this.townName,
+      player:{x:this.player.x,y:this.player.y},
+      cats:this.cats.map(c=>({id:c.id,genes:c.genes,name:c.name,ageDays:c.ageDays,health:c.health,hunger:c.hunger,happiness:c.happiness,energy:c.energy,sick:c.sick,job:c.job,state:c.state,x:c.x,y:c.y,hat:c.hat,collar:c.collar,outfit:c.outfit,color:c.color,stripeColor:c.stripeColor,eyeColor:c.eyeColor,pattern:c.pattern,furLength:c.furLength,personality:c.personality,gender:c.gender,pregnant:c.pregnant})),
+      npcs:this.npcs.map(n=>({id:n.id,name:n.name,role:n.role,x:n.x,y:n.y,color:n.color,hairColor:n.hairColor})),
+      buildings:this.buildings.map(b=>({id:b.id,buildId:b.buildId,name:b.name,icon:b.icon,x:b.x,y:b.y,size:b.size,rotation:b.rotation})),
+      decos:this.decos.map(d=>({id:d.id,decoId:d.decoId,name:d.name,icon:d.icon,x:d.x,y:d.y})),
+      quests:this.quests.map(q=>({id:q.id,title:q.title,desc:q.desc,requirement:q.requirement,rewardMoney:q.rewardMoney,rewardRep:q.rewardRep,completed:q.completed,progress:q.progress}))
+    };
+    localStorage.setItem('julieTownSave',JSON.stringify(data));
+    this.lastSave=Date.now();
+  },
+
+  load(data) {
+    this.money=data.money||500; this.day=data.day||1;
+    this.rep=data.rep||{breeder:0,vet:0}; this.townName=data.townName||"Julie's Town";
+    $('town-name').textContent=this.townName;
+    const pd=data.player||{x:WORLD_W*TILE/2,y:WORLD_H*TILE/2};
+    this.player=new Player(pd.x,pd.y);
+
+    this.cats=(data.cats||[]).map(c=>{
+      const cat=new Cat(c.x,c.y,c.genes,c.name,c.ageDays);
+      Object.assign(cat,c); cat.homeX=c.x; cat.homeY=c.y; return cat;
+    });
+    this.npcs=(data.npcs||[]).map(n=>{
+      const npc=new NPC(n.x,n.y,n.name,n.role);
+      npc.color=n.color; npc.hairColor=n.hairColor; npc.id=n.id; return npc;
+    });
+    this.buildings=(data.buildings||[]).map(b=>new Building(b.x,b.y,b.buildId,b.name,b.icon,b.size,b.rotation));
+    this.decos=(data.decos||[]).map(d=>new Deco(d.x,d.y,d.decoId,d.name,d.icon));
+    this.quests=(data.quests||[]).map(q=>new Quest(q.id,q.title,q.desc,q.requirement,q.rewardMoney,q.rewardRep));
+    this.quests.forEach((q,i)=>{ if(data.quests[i]){q.completed=data.quests[i].completed; q.progress=data.quests[i].progress;} });
+    this.centerCamera();
+  },
+
+  autoSave() { this.save(); },
+
+  exportSave() {
+    const data=localStorage.getItem('julieTownSave');
+    if(!data){toast('No save found!');return;}
+    const blob=new Blob([data],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='julie-town-save.json';
+    a.click(); URL.revokeObjectURL(url);
+    toast('Save exported!');
+  },
+
+  importSavePrompt() {
+    const input=document.createElement('input');
+    input.type='file'; input.accept='.json';
+    input.onchange=e=>{
+      const file=e.target.files[0];
+      if(!file)return;
+      const reader=new FileReader();
+      reader.onload=ev=>{
+        try{const data=JSON.parse(ev.target.result); this.load(data); this.save(); this.renderUI(); toast('Save imported!');}
+        catch(err){toast('Invalid save file!');}
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  },
+
+  resetConfirm() {
+    if(confirm('DELETE ALL PROGRESS? This cannot be undone!')) {
+      localStorage.removeItem('julieTownSave');
+      location.reload();
+    }
+  },
+
+  renderUI() {
+    $('stat-money').textContent=this.money;
+    $('stat-rep').textContent=this.rep.breeder+this.rep.vet;
+    $('stat-day').textContent=this.day;
+    $('cat-count').textContent=this.cats.length;
+    $('town-cats').textContent=this.cats.length;
+    $('town-buildings').textContent=this.buildings.length;
+    $('town-deco').textContent=this.decos.length;
+    $('town-quests').textContent=this.quests.filter(q=>q.completed).length;
+    $('town-name-input').value=this.townName;
+
+    // Cat grid
+    $('cat-grid').innerHTML=this.cats.map(c=>{
+      const tags=[`<span class="tag ${c.stage}">${c.stage}</span>`];
+      if(c.sick) tags.push('<span class="tag sick">sick</span>');
+      if(c.job!=='None') tags.push(`<span class="tag job">${c.job}</span>`);
+      return `<div class="cat-cell" onclick="UI.showCatDetailById('${c.id}')">
+        <canvas class="cc-canvas" id="cc-${c.id}" width="56" height="56"></canvas>
+        <div class="cc-name">${c.name}</div>
+        <div class="cc-info">${c.pattern} • ${c.furLength}</div>
+        <div class="cc-tags">${tags.join('')}</div>
+      </div>`;
+    }).join('');
+
+    // Draw mini cat canvases
+    setTimeout(()=>{
+      this.cats.forEach(c=>{
+        const canvas=$(`cc-${c.id}`);
+        if(!canvas) return;
+        const ctx=canvas.getContext('2d');
+        ctx.clearRect(0,0,56,56);
+        ctx.save();
+        ctx.translate(28,32);
+        this.drawCat(ctx,c,0,0);
+        ctx.restore();
+      });
+    },50);
+
+    // Quests
+    $('quests-body').innerHTML=this.quests.map(q=>`
+      <div class="quest-item ${q.completed?'complete':''}">
+        <div class="q-icon">${q.completed?'✅':'📜'}</div>
+        <div class="q-text">
+          <div class="q-title">${q.title}</div>
+          <div class="q-desc">${q.desc}</div>
+          <div class="q-reward">${q.completed?'Completed!':'Reward: $'+q.rewardMoney+' +'+q.rewardRep+' Rep'}</div>
+        </div>
+      </div>
+    `).join('');
+
+    // Neighbors
+    $('neighbor-towns').innerHTML=NEIGHBORS.map(n=>`
+      <div style="display:flex; align-items:center; gap:10px; padding:8px; background:white; border-radius:12px; margin-bottom:8px;">
+        <div style="font-size:1.5rem;">🏘️</div>
+        <div style="flex:1;">
+          <div style="font-weight:700; font-size:0.9rem;">${n}</div>
+          <div style="font-size:0.75rem; color:var(--textLight);">Trade routes open • Friendly</div>
+        </div>
+        <button class="btn small" onclick="toast('Traveling to ${n}... (coming soon!)')">Visit</button>
+      </div>
+    `).join('');
+  }
+};
+
+// ===== UI MANAGER =====
+const UI = {
+  currentPanel: null,
+
+  showPanel(id) {
+    this.closePanel();
+    this.currentPanel=id;
+    $(`panel-${id}`).classList.add('active');
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+    const btn=Array.from(document.querySelectorAll('nav button')).find(b=>b.onclick&&b.onclick.toString().includes(id));
+    if(btn) btn.classList.add('active');
+    Game.renderUI();
+  },
+
+  closePanel() {
+    if(this.currentPanel) $(`panel-${this.currentPanel}`).classList.remove('active');
+    this.currentPanel=null;
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  },
+
+  showCatDetailById(id) {
+    const cat=Game.cats.find(c=>c.id===id);
+    if(cat) this.showCatDetail(cat);
+  },
+
+  showCatDetail(cat) {
+    this.closePanel();
+    $('panel-catdetail').classList.add('active');
+    CatActions.setCurrent(cat.id);
+    this.renderCatDetail(cat);
+  },
+
+  renderCatDetail(cat) {
+    CatActions.setCurrent(cat.id);
+    const body=$('catdetail-body');
+    body.innerHTML=`
+      <div class="detail-canvas-wrap">
+        <canvas id="detail-cat-canvas" width="120" height="120"></canvas>
+      </div>
+      <div class="detail-name">${cat.name}</div>
+      <div class="detail-sub">${cat.pattern} ${cat.furLength} hair • ${cat.gender==='F'?'♀️':'♂️'} ${cat.stage} • Day ${cat.ageDays}</div>
+
+      <div class="stat-grid">
+        <div class="stat-box"><div class="sb-label">❤️ Health</div><div class="sb-val">${cat.health}</div><div class="sb-bar"><div class="fill health" style="width:${cat.health}%; background:#ef5350;"></div></div></div>
+        <div class="stat-box"><div class="sb-label">🍗 Hunger</div><div class="sb-val">${cat.hunger}</div><div class="sb-bar"><div class="fill hunger" style="width:${cat.hunger}%; background:#ffa726;"></div></div></div>
+        <div class="stat-box"><div class="sb-label">😊 Happy</div><div class="sb-val">${cat.happiness}</div><div class="sb-bar"><div class="fill happy" style="width:${cat.happiness}%; background:#66bb6a;"></div></div></div>
+        <div class="stat-box"><div class="sb-label">⚡ Energy</div><div class="sb-val">${cat.energy}</div><div class="sb-bar"><div class="fill energy" style="width:${cat.energy}%; background:#42a5f5;"></div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎨 Customize</div>
+        <div style="font-size:0.8rem; color:var(--textLight); margin-bottom:6px;">Base Color</div>
+        <div class="color-row" id="cd-colors"></div>
+        <div style="font-size:0.8rem; color:var(--textLight); margin-bottom:6px;">Stripe/Spot Color</div>
+        <div class="color-row" id="cd-stripes"></div>
+        <div style="font-size:0.8rem; color:var(--textLight); margin-bottom:6px;">Eye Color</div>
+        <div class="color-row" id="cd-eyes"></div>
+        <div style="font-size:0.8rem; color:var(--textLight); margin-bottom:6px;">Pattern</div>
+        <div class="option-row" id="cd-patterns"></div>
+        <div style="font-size:0.8rem; color:var(--textLight); margin-bottom:6px;">Fur Length</div>
+        <div class="option-row" id="cd-fur"></div>
+        <div style="font-size:0.8rem; color:var(--textLight); margin-bottom:6px;">Outfit</div>
+        <div class="option-row" id="cd-outfits"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💕 Breeding</div>
+        <div id="breed-section">
+          ${cat.gender==='F' && cat.stage==='adult' ? `
+            <div style="font-size:0.85rem; color:var(--textLight); margin-bottom:8px;">Select a male partner:</div>
+            <div class="option-row" id="breed-partners"></div>
+            <div class="btn-row" style="margin-top:8px;">
+              <button class="btn" id="breed-btn" onclick="CatActions.breed('${cat.id}')" disabled>💕 Breed ($50)</button>
+            </div>
+          ` : cat.stage==='kitten' ? `<div style="font-size:0.85rem; color:var(--textLight);">Too young to breed! 🍼</div>` : cat.gender==='M' ? `<div style="font-size:0.85rem; color:var(--textLight);">Males can breed when selected by a female. ♂️</div>` : `<div style="font-size:0.85rem; color:var(--textLight);">Seniors are retired from breeding. 👴</div>`}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚙️ Actions</div>
+        <div class="btn-row">
+          <button class="btn" onclick="CatActions.pet('${cat.id}')">🤍 Pet</button>
+          <button class="btn" onclick="CatActions.feed('${cat.id}')">🍖 Feed</button>
+          <button class="btn" onclick="CatActions.treat('${cat.id}')">💊 Treat</button>
+          <button class="btn secondary" onclick="CatActions.rename('${cat.id}')">✏️ Rename</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn tertiary" onclick="CatActions.adopt('${cat.id}')">🏠 Adopt Out ($${cat.getValue()})</button>
+          <button class="btn small secondary" onclick="CatActions.assignJob('${cat.id}')">⭐ Assign Job</button>
+        </div>
+      </div>
+    `;
+
+    // Draw big cat
+    setTimeout(()=>{
+      const cvs=$('detail-cat-canvas');
+      if(!cvs) return;
+      const ctx=cvs.getContext('2d');
+      ctx.clearRect(0,0,120,120);
+      ctx.save(); ctx.translate(60,65); Game.drawCat(ctx,cat,0,0); ctx.restore();
+
+      // Populate breed partners if applicable
+      const partnersEl=$('breed-partners');
+      if(partnersEl && cat.gender==='F' && cat.stage==='adult') {
+        const males=Game.cats.filter(c=>c.id!==cat.id && c.gender==='M' && c.stage==='adult');
+        if(males.length===0) {
+          partnersEl.innerHTML='<div style="font-size:0.8rem; color:var(--textLight);">No adult males available.</div>';
+          const btn=$('breed-btn'); if(btn) btn.disabled=true;
+        } else {
+          partnersEl.innerHTML=males.map(m=>`
+            <button class="opt-btn" data-id="${m.id}" onclick="CatActions.selectBreedPartner('${m.id}')">
+              ${m.name} (${m.pattern})
+            </button>
+          `).join('');
+        }
+      }
+    },50);
+
+    // Color swatches
+    const makeSwatches=(containerId,current,onClick)=>{
+      $(containerId).innerHTML=Object.entries(COLORS).map(([name,hex])=>`
+        <div class="color-swatch ${current===hex?'active':''}" style="background:${hex};" onclick="${onClick}('${hex}')"></div>
+      `).join('');
+    };
+    makeSwatches('cd-colors',cat.color,`CatActions.setColor`);
+    makeSwatches('cd-stripes',cat.stripeColor,`CatActions.setStripe`);
+    makeSwatches('cd-eyes',cat.eyeColor,`CatActions.setEye`);
+
+    // Patterns
+    $('cd-patterns').innerHTML=PATTERNS.map(p=>`
+      <button class="opt-btn ${cat.pattern===p?'active':''}" onclick="CatActions.setPattern('${p}')">${p}</button>
+    `).join('');
+
+    // Fur
+    $('cd-fur').innerHTML=FUR_LENGTHS.map(f=>`
+      <button class="opt-btn ${cat.furLength===f?'active':''}" onclick="CatActions.setFur('${f}')">${f}</button>
+    `).join('');
+
+    // Outfits
+    $('cd-outfits').innerHTML=OUTFITS.map(o=>`
+      <button class="opt-btn ${cat.outfit===o.id?'active':''}" onclick="CatActions.setOutfit('${o.id}')">${o.name}</button>
+    `).join('');
+  }
+};
+
+// ===== CAT ACTIONS =====
+const CatActions = {
+  _currentId: null,
+  getCat(id) { return Game.cats.find(c=>c.id===id); },
+  setCurrent(id) { this._currentId=id; },
+  current() { return this.getCat(this._currentId); },
+
+  pet(id) {
+    const c=this.getCat(id); if(!c) return;
+    c.pet(); Game.save(); UI.renderCatDetail(c); toast(`You petted ${c.name}!`);
+  },
+  feed(id) {
+    const c=this.getCat(id); if(!c) return;
+    if(Game.money<5){toast('Need $5!');return;}
+    c.feed(); Game.money-=5; Game.save(); UI.renderCatDetail(c); toast(`Fed ${c.name}!`);
+  },
+  treat(id) {
+    const c=this.getCat(id); if(!c) return;
+    if(Game.money<10){toast('Need $10!');return;}
+    if(c.treat()){Game.money-=10; Game.checkQuest('heal');}
+    Game.save(); UI.renderCatDetail(c); toast(`${c.name} feels better!`);
+  },
+  rename(id) {
+    const c=this.getCat(id); if(!c) return;
+    const name=prompt('New name:',c.name);
+    if(name){c.name=name; Game.save(); UI.renderCatDetail(c); toast(`Renamed to ${name}!`);}
+  },
+  adopt(id) {
+    const c=this.getCat(id); if(!c) return;
+    const val=c.getValue();
+    if(confirm(`Adopt out ${c.name} for $${val}?`)) {
+      Game.money+=val; Game.cats=Game.cats.filter(x=>x.id!==id);
+      Game.save(); UI.closePanel(); Game.renderUI(); toast(`Adopted out for $${val}!`);
+    }
+  },
+  assignJob(id) {
+    const c=this.getCat(id); if(!c) return;
+    const job=prompt(`Assign job:
+${JOBS.join(', ')}`,c.job);
+    if(job&&JOBS.includes(job)){c.job=job; Game.save(); UI.renderCatDetail(c); toast(`${c.name} is now a ${job}!`);}
+  },
+  breed(id) {
+    const mom=this.getCat(id); if(!mom) return;
+    const dadId=this._breedPartnerId;
+    const dad=this.getCat(dadId);
+    if(!dad){toast('Select a male partner first!');return;}
+    if(Game.money<50){toast('Need $50!');return;}
+    if(!mom.canBreed){toast(`${mom.name} can't breed right now.`);return;}
+    if(!dad.isStud){toast(`${dad.name} isn't ready to breed.`);return;}
+    if(Game.cats.length>=20){toast('Cattery full!');return;}
+    Game.money-=50;
+    mom.energy-=30; dad.energy-=20; mom.happiness+=10;
+    const g=Game.mergeGenes(mom.genes,dad.genes);
+    const k=new Cat(mom.x+rand(-20,20),mom.y+rand(-20,20),g,randItem(KITTEN_NAMES),0);
+    k.homeX=k.x; k.homeY=k.y;
+    const name=prompt('Name the kitten:',k.name);
+    if(name) k.name=name;
+    Game.cats.push(k);
+    Game.rep.breeder+=10;
+    Game.checkQuest('breed');
+    Game.save(); UI.renderCatDetail(mom);
+    toast(`Welcome, ${k.name}! 🎉`);
+  },
+  selectBreedPartner(dadId) {
+    this._breedPartnerId=dadId;
+    document.querySelectorAll('#breed-partners .opt-btn').forEach(b=>b.classList.remove('active'));
+    const btn=document.querySelector(`#breed-partners .opt-btn[data-id="${dadId}"]`);
+    if(btn) btn.classList.add('active');
+    const btn2=document.getElementById('breed-btn');
+    if(btn2) btn2.disabled=false;
+  },
+  setColor(hex) { const c=this.current(); if(c){c.color=hex; Game.save(); UI.renderCatDetail(c);} },
+  setStripe(hex) { const c=this.current(); if(c){c.stripeColor=hex; Game.save(); UI.renderCatDetail(c);} },
+  setEye(hex) { const c=this.current(); if(c){c.eyeColor=hex; Game.save(); UI.renderCatDetail(c);} },
+  setPattern(p) { const c=this.current(); if(c){c.pattern=p; Game.save(); UI.renderCatDetail(c);} },
+  setFur(f) { const c=this.current(); if(c){c.furLength=f; Game.save(); UI.renderCatDetail(c);} },
+  setOutfit(o) { const c=this.current(); if(c){c.outfit=o; Game.save(); UI.renderCatDetail(c);} },
+};
+
+// ===== SHOP =====
+let shopCategory='buildings';
+
+function renderShop() {
+  const cats=Object.keys(SHOP);
+  $('shop-categories').innerHTML=cats.map(c=>`
+    <button class="shop-cat-btn ${c===shopCategory?'active':''}" onclick="shopCategory='${c}';renderShop();">
+      ${c.charAt(0).toUpperCase()+c.slice(1)}
+    </button>
+  `).join('');
+
+  $('shop-grid').innerHTML=SHOP[shopCategory].map(item=>`
+    <div class="shop-item" onclick="Shop.buy('${shopCategory}','${item.id}')">
+      <div class="si-icon">${item.icon}</div>
+      <div class="si-name">${item.name}</div>
+      <div class="si-price">$${item.price}</div>
+    </div>
+  `).join('');
+}
+
+const Shop = {
+  buy(cat,id) {
+    const item=SHOP[cat].find(i=>i.id===id);
+    if(!item) return;
+    if(Game.money<item.price){toast('Not enough money!');return;}
+    Game.placeItem=item; Game.placeRotation=0;
+    $('place-item-name').textContent='Placing: '+item.name;
+    $('place-bar').classList.add('active');
+    UI.closePanel();
+    toast('Tap anywhere on the farm to place!');
+  }
+};
+
+const PlaceMode = {
+  rotate() {
+    Game.placeRotation=(Game.placeRotation+1)%4;
+    toast('Rotated!');
+  },
+  cancel() {
+    Game.placeItem=null;
+    $('place-bar').classList.remove('active');
+    toast('Placement cancelled.');
+  }
+};
+
+// ===== INIT =====
+window.onload = () => {
+  Game.init();
+  renderShop();
+
+  // Track mouse for place preview
+  const c=$('game-canvas');
+  c.addEventListener('mousemove',e=>{
+    Game.lastMouseX=e.clientX-c.getBoundingClientRect().left;
+    Game.lastMouseY=e.clientY-c.getBoundingClientRect().top;
+  });
+};
+</script>
+</body>
+</html>
