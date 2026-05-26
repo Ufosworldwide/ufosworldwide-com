@@ -28,6 +28,13 @@ Deployed
 - /treasurechest/ - science math math type games and fun 
 - /universe/ - message the universe 
 
+<url>
+  <loc>https://ufosworldwide.com/api/status.json</loc>
+  <lastmod>2026-05-26T10:49:00+00:00</lastmod>
+  <changefreq>hourly</changefreq>
+</url>
+
+
 Contact: jubecrew@gmail.com
 orcid: 0009-0004-1363-304X
 license: CC BY 4.0
