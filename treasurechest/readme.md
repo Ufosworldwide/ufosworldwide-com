@@ -1,3 +1,1 @@
-my trinkets 
-
-will update soon
+ The Treasure Chest is an open collection of interactive science and mathematics tools built by John Ernest Carter as part of the Presignal research program. Each tool explores a distinct geometric, resonance, or combinatorial concept — from spiral visualizations to emoji-driven geometry merges. All tools run fully in-browser with no dependencies. Select any tile below to open it. 
