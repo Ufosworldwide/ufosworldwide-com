@@ -1,0 +1,25 @@
+{
+  "project": "Presignal Research Initiative",
+  "status": "active",
+  "last_updated": "2026-05-26T10:49:00Z",
+  "orcid": "0009-0004-1363-304X",
+  "publications": 25,
+  "active_instruments": [
+    "presignal_sentinel",
+    "field_node_v2",
+    "niagaranode"
+  ],
+  "research_domains": [
+    "earth_lights",
+    "water_intelligence",
+    "quantum_computing",
+    "civilizational_architecture",
+    "anomalous_phenomena"
+  ],
+  "live_dashboards": [
+    "https://anomaly-dashboard-two.vercel.app"
+  ],
+  
+  "contact": "jubecrew@gmail.com",
+  "license": "CC BY 4.0"
+}
