@@ -646,16 +646,20 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 
 <!-- FIREBASE -->
+<script>
+  // Key injected via non-module script to avoid module scope issues
+  window.__FIREBASE_API_KEY__ = atob('QUl6YVN5QnptV3pLT25WazhGUXZMb2NRYk9TdGRCaXJ5SF9kZmtj');
+</script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, collection, onSnapshot, query, orderBy, limit, addDoc, serverTimestamp }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
 const firebaseConfig = {
+  apiKey: window.__FIREBASE_API_KEY__,
   authDomain: "anomaly-intelligence.firebaseapp.com",
   projectId: "anomaly-intelligence",
   storageBucket: "anomaly-intelligence.firebasestorage.app",
-  messagingSenderId: "341282991733",
+  messagingSenderId: "341282991373",
   appId: "1:341282991733:web:f01390ac6fadd4a261923c"
 };
 
