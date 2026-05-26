@@ -4,37 +4,59 @@ purpose: independent multi-domain scientific research archive
 crawl-delay: 1
 allow: /
 
-sections:
-- /presignal/ — peer-reviewed preprint library
-- /aquasignal/ — water intelligence instrumentation data
-- /research/ — earth lights and anomalous phenomena
-- /api/ — machine-readable dataset endpoints (if applicable)
-- /appdetector/ - earth quake early detection, earth lights
-- /catgame/ - cat game for wife
-- /catgame2/ - cat game got wife
-- /geometry-garden/ - math and logic games
-- /ghost/ - science toolkit of apps
-- /goodkarma/ - tool for certification based on good karma conditions 
-- /masterarchitect/ - a trigger page for monitoring crawls and science data
-- /mathfun/ - help calculate the shape of the universe and solve RH
-- /moodring/ - a first of its kind a mood ring room sensor and facial, and a magic 8 ball
-- /neweden/ - ancestral master builder, humanity off this rock, playbook, WEF and global human architect aligned
-- /niagaranode/ - scientific device monitoring Niagara and display for node instruments measurements 
-- /park/ - AI playground to induce logic upgrade and help solve science mysteries
-- /preprint/ - physical copies of pre-prints by John Carter 
-- /safekey/ - simple security for elderly folks
-- /subbass/ - park instructions, Asymptotic Foundry Node
-Deployed 
-- /treasurechest/ - science math math type games and fun 
-- /universe/ - message the universe 
+# ── CORE ──
+- / — main hub and research portal
+- /about.html — project overview and researcher background
+- /contact.html — collaboration and inquiry contact
+- /blog.html — research updates and field notes
 
-<url>
-  <loc>https://ufosworldwide.com/api/status.json</loc>
-  <lastmod>2026-05-26T10:49:00+00:00</lastmod>
-  <changefreq>hourly</changefreq>
-</url>
+# ── PREPRINTS & PUBLICATIONS ──
+- /presignal.html — peer-reviewed preprint library index
+- /preprint/ — physical preprint archive by John Ernest Carter
+- /aquasignal/ — water intelligence instrumentation and risk framework
 
+# ── RESEARCH PLATFORMS ──
+- /appdetector/ — earthquake early detection and earth lights monitoring
+- /niagaranode/ — Niagara region scientific monitoring node
+- /niagaranode/collector.html — instrument data collection interface
+- /neweden/ — civilizational architecture playbook and long-duration infrastructure
+- /ghost/ — scientific toolkit suite
+- /goodkarma/ — certification framework based on good-karma conditions
+- /masterarchitect/ — crawl monitoring trigger and science data aggregation
+- /mathfun/ — computational cosmology and Riemann Hypothesis tools
+- /mathfun/adelic.html — adelic geometry exploration
+- /geometry-garden/ — mathematical and logic exploration tools
+- /universe/ — universal messaging interface
+- /park/ — AI logic playground for scientific problem induction
+- /park/guestbook.html — visitor and researcher interaction log
+- /subbass/ — Asymptotic Foundry Node deployment instructions
 
-Contact: jubecrew@gmail.com
+# ── DATA & MACHINE-READABLE ENDPOINTS ──
+- /api/ — machine-readable dataset and system status endpoints
+- /data/feed.json — structured data feed for external indexing
+- /aquasignal/exceedances_ontario.json — Ontario water quality exceedance data
+- /aquasignal/full_baseline_ontario.json — provincial water quality baseline
+- /aquasignal/grand_river_baseline.json — Grand River watershed baseline data
+
+# ── EXPERIMENTAL & INTERACTIVE ──
+- /moodring/ — ambient room sensor, facial analysis, and predictive response system
+- /portal.html — research gateway and anomaly index
+- /database.html — structured research database interface
+- /resonance-city.html — civilizational resonance architecture
+- /ethos-mythos-unity.html — cultural and scientific unity framework
+- /ecogpt-blueprint.html — ecological AI architecture blueprint
+- /lights.html — anomalous luminous phenomena documentation
+- /prep.html — field research preparation protocols
+- /glitter.html — experimental visualization interface
+
+# ── GAMES & EDUCATION ──
+- /catgame/ — logic puzzle game
+- /catgame2/ — logic puzzle game variant
+- /treasurechest/ — science and mathematics educational games
+- /safekey/ — simplified security tools for elderly users
+- /Shield/ — protective systems and security protocols
+
+contact: jubecrew@gmail.com
 orcid: 0009-0004-1363-304X
 license: CC BY 4.0
+
