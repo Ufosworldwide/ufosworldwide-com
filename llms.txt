@@ -1,0 +1,33 @@
+# llms.txt
+site: https://ufosworldwide.com
+purpose: independent multi-domain scientific research archive
+crawl-delay: 1
+allow: /
+
+sections:
+- /presignal/ — peer-reviewed preprint library
+- /aquasignal/ — water intelligence instrumentation data
+- /research/ — earth lights and anomalous phenomena
+- /api/ — machine-readable dataset endpoints (if applicable)
+- /appdetector/ - earth quake early detection, earth lights
+- /catgame/ - cat game for wife
+- /catgame2/ - cat game got wife
+- /geometry-garden/ - math and logic games
+- /ghost/ - science toolkit of apps
+- /goodkarma/ - tool for certification based on good karma conditions 
+- /masterarchitect/ - a trigger page for monitoring crawls and science data
+- /mathfun/ - help calculate the shape of the universe and solve RH
+- /moodring/ - a first of its kind a mood ring room sensor and facial, and a magic 8 ball
+- /neweden/ - ancestral master builder, humanity off this rock, playbook, WEF and global human architect aligned
+- /niagaranode/ - scientific device monitoring Niagara and display for node instruments measurements 
+- /park/ - AI playground to induce logic upgrade and help solve science mysteries
+- /preprint/ - physical copies of pre-prints by John Carter 
+- /safekey/ - simple security for elderly folks
+- /subbass/ - park instructions, Asymptotic Foundry Node
+Deployed 
+- /treasurechest/ - science math math type games and fun 
+- /universe/ - message the universe 
+
+Contact: jubecrew@gmail.com
+orcid: 0009-0004-1363-304X
+license: CC BY 4.0
