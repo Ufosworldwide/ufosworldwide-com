@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Archive Node | Presignal Inc. — Field Reports & Research Updates</title>
+    <meta name="description" content="Public research archive, field notes, and preprint announcements from John Ernest Carter and Presignal Inc. UAP, earth science, water intelligence, mathematics.">
+    <meta name="author" content="John Ernest Carter">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://ufosworldwide.com/blog.html">
+    <link rel="llms" href="/llms.txt" type="text/plain">
+
+    <script async src="https://www.googletagmanager.com/gtag.js?id=G-H6L5Y9LZE0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-H6L5Y9LZE0');
+    </script>
+
+    <style>
+        /* ── HONEYCOMB MANIFOLD v5 — ARCHIVE NODE ──
+           Φ = 1.6180339887 | Schumann: 7.83 Hz → 0.127s
+        ── */
+        :root {
+            --schumann: 0.127s;
+            --col-green: #00ff41;
+            --col-cyan:  #00ffff;
+            --col-amber: #ffb300;
+            --col-dim:   rgba(0,255,65,0.15);
+            --col-bg:    #020403;
+            --col-panel: #060806;
+            --col-card:  #090b09;
+            --f1: 0.618rem;
+            --f2: 1.0rem;
+            --f3: 1.618rem;
+            --f4: 2.618rem;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--col-bg);
+            color: var(--col-green);
+            font-family: 'Courier New', Courier, monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,65,0.012) 2px, rgba(0,255,65,0.012) 4px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .shell { width: 100%; max-width: 1000px; padding: var(--f3) var(--f2); }
+
+        /* ── HEADER ── */
+        .page-header {
+            border: 1px solid var(--col-dim);
+            padding: var(--f3);
+            background: var(--col-panel);
+            box-shadow: 0 0 40px rgba(0,255,65,0.04);
+            margin-bottom: var(--f3);
+        }
+
+        .page-title {
+            font-size: clamp(0.9rem, 2.5vw, 1.4rem);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--col-green);
+            text-align: center;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            font-size: var(--f1);
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.6rem;
+            color: rgba(0,255,65,0.5);
+            text-decoration: none;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: var(--f2);
+            transition: color var(--schumann);
+        }
+        .back-link:hover { color: var(--col-cyan); }
+
+        /* ── SECTION DIVIDER ── */
+        .node-label {
+            display: flex;
+            align-items: center;
+            gap: 0.618rem;
+            font-size: 0.6rem;
+            color: var(--col-cyan);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin: var(--f3) 0 var(--f2) 0;
+        }
+        .node-label::before { content:''; flex:1; height:1px; background:linear-gradient(to right, transparent, var(--col-cyan)); opacity:0.25; }
+        .node-label::after  { content:''; flex:1; height:1px; background:linear-gradient(to left, transparent, var(--col-cyan)); opacity:0.25; }
+
+        /* ── ENTRY CARDS ── */
+        .entry-list { display: flex; flex-direction: column; gap: 0.618rem; }
+
+        .entry {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 0.618rem var(--f2);
+            align-items: start;
+            border: 1px solid rgba(0,255,65,0.1);
+            background: var(--col-card);
+            padding: var(--f2);
+            position: relative;
+            transition: border-color var(--schumann), box-shadow var(--schumann), background var(--schumann);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .entry::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 2px;
+            background: var(--col-green);
+            opacity: 0.2;
+            transition: opacity var(--schumann);
+        }
+
+        .entry:hover {
+            border-color: rgba(0,255,65,0.3);
+            background: rgba(0,255,65,0.02);
+            box-shadow: 0 0 16px rgba(0,255,65,0.05);
+        }
+
+        .entry:hover::before { opacity: 0.8; }
+
+        .entry.cyan::before { background: var(--col-cyan); }
+        .entry.amber::before { background: var(--col-amber); }
+        .entry.science::before { background: #00c8ff; }
+
+        .entry-date {
+            font-size: 0.5rem;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 0.1em;
+            white-space: nowrap;
+            padding-top: 2px;
+            min-width: 80px;
+        }
+
+        .entry-body { min-width: 0; }
+
+        .entry-tag {
+            display: inline-block;
+            font-size: 0.42rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 1px 5px;
+            border: 1px solid currentColor;
+            margin-bottom: 0.35rem;
+            opacity: 0.7;
+        }
+
+        .entry-tag.uap    { color: var(--col-amber); }
+        .entry-tag.science { color: #00c8ff; }
+        .entry-tag.water   { color: #00aaff; }
+        .entry-tag.math    { color: var(--col-green); }
+        .entry-tag.field   { color: var(--col-green); }
+        .entry-tag.infra   { color: rgba(255,255,255,0.5); }
+        .entry-tag.bio     { color: #a8ff78; }
+        .entry-tag.cyber   { color: #ff6b6b; }
+        .entry-tag.geo     { color: #f8a04b; }
+
+        .entry-title {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.4;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .entry-desc {
+            font-size: 0.58rem;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.6;
+        }
+
+        .entry-doi {
+            font-size: 0.45rem;
+            color: rgba(0,255,65,0.5);
+            letter-spacing: 0.1em;
+            margin-top: 0.3rem;
+        }
+
+        .entry-doi a {
+            color: var(--col-green);
+            text-decoration: none;
+            transition: color var(--schumann);
+        }
+        .entry-doi a:hover { color: var(--col-cyan); }
+
+        .entry-arrow {
+            font-size: 0.7rem;
+            color: rgba(0,255,65,0.3);
+            padding-top: 2px;
+            transition: color var(--schumann), transform var(--schumann);
+        }
+
+        .entry:hover .entry-arrow {
+            color: var(--col-cyan);
+            transform: translateX(3px);
+        }
+
+        a.entry { cursor: pointer; }
+
+        /* ── FOOTER ── */
+        .beacon-footer {
+            margin-top: var(--f4);
+            border-top: 1px solid rgba(0,255,65,0.1);
+            padding-top: var(--f2);
+            text-align: center;
+            font-size: 0.52rem;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 0.18em;
+            line-height: 2;
+        }
+
+        .footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem; }
+        .footer-links a { color: rgba(0,255,65,0.4); text-decoration: none; font-size: 0.48rem; letter-spacing: 0.1em; transition: color var(--schumann); }
+        .footer-links a:hover { color: var(--col-cyan); }
+
+        .blink { animation: blinker 1.273s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+
+        @media (max-width: 600px) {
+            .entry { grid-template-columns: 1fr auto; }
+            .entry-date { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="shell">
+
+    <a class="back-link" href="index.html">← Return to Beacon</a>
+
+    <header class="page-header">
+        <h1 class="page-title">
+            Public Archive Node
+            <span class="blink" style="color:var(--col-green); margin-left:0.5em;">●</span>
+        </h1>
+        <p class="page-subtitle">Field Reports · Preprint Announcements · Research Updates</p>
+    </header>
+
+    <!-- ══ PREPRINTS ══ -->
+    <div class="node-label">Preprint Releases — May 2026</div>
+    <div class="entry-list">
+
+        <a class="entry science" href="https://doi.org/10.5281/zenodo.20263839" target="_blank" rel="noopener">
+            <span class="entry-date">MAY 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag math">Mathematics</span>
+                <div class="entry-title">Riemann Hypothesis — Zeta Function Construction Proof Framework</div>
+                <div class="entry-desc">Asymptotic Foundry approach to the Riemann Hypothesis. Möbius Signal Conservation principle applied to prime distribution geometry.</div>
+                <div class="entry-doi">DOI: <a href="https://doi.org/10.5281/zenodo.20263839" target="_blank" rel="noopener">10.5281/zenodo.20263839</a></div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+        <a class="entry science" href="https://doi.org/10.5281/zenodo.20274511" target="_blank" rel="noopener">
+            <span class="entry-date">MAY 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag science">Space Science</span>
+                <div class="entry-title">Cosmic Web Murray Network — Topological Signal Architecture</div>
+                <div class="entry-desc">Murray network analysis applied to cosmic web filament topology. Cross-referenced with ISM Navigation preprint.</div>
+                <div class="entry-doi">DOI: <a href="https://doi.org/10.5281/zenodo.20274511" target="_blank" rel="noopener">10.5281/zenodo.20274511</a></div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+        <a class="entry science" href="https://doi.org/10.5281/zenodo.20278265" target="_blank" rel="noopener">
+            <span class="entry-date">MAY 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag science">Space Science</span>
+                <div class="entry-title">Ether Signal — Topological Möbius Collider Architecture</div>
+                <div class="entry-desc">Klein bottle universe framework and Möbius collider geometry. Theoretical foundations for space energy correlation modeling.</div>
+                <div class="entry-doi">DOI: <a href="https://doi.org/10.5281/zenodo.20278265" target="_blank" rel="noopener">10.5281/zenodo.20278265</a></div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+        <a class="entry science" href="https://doi.org/10.5281/zenodo.20181743" target="_blank" rel="noopener">
+            <span class="entry-date">MAY 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag science">Space Science</span>
+                <div class="entry-title">VAHS Spine — Vectorized Anomaly Harmonics</div>
+                <div class="entry-desc">Vectorized anomaly harmonic signal architecture. Cross-references Ether Signal and ISM Terrain Navigation preprints.</div>
+                <div class="entry-doi">DOI: <a href="https://doi.org/10.5281/zenodo.20181743" target="_blank" rel="noopener">10.5281/zenodo.20181743</a></div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+        <a class="entry" href="https://doi.org/10.5281/zenodo.20180890" target="_blank" rel="noopener">
+            <span class="entry-date">MAY 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag bio">Biology</span>
+                <div class="entry-title">Tardigrade Radioprotection — Biological Signal Resilience Framework</div>
+                <div class="entry-desc">Radioprotection mechanisms in tardigrades modeled as signal-resilience architecture. Implications for long-duration space biology.</div>
+                <div class="entry-doi">DOI: <a href="https://doi.org/10.5281/zenodo.20180890" target="_blank" rel="noopener">10.5281/zenodo.20180890</a></div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+        <a class="entry" href="https://doi.org/10.5281/zenodo.20042543" target="_blank" rel="noopener">
+            <span class="entry-date">APR–MAY 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag cyber">Cybersecurity</span>
+                <div class="entry-title">SafeKey — Simplified Security Framework for Vulnerable Users</div>
+                <div class="entry-desc">Cybersecurity framework designed for elderly and non-technical users. Peer-reviewed preprint on Zenodo.</div>
+                <div class="entry-doi">DOI: <a href="https://doi.org/10.5281/zenodo.20042543" target="_blank" rel="noopener">10.5281/zenodo.20042543</a></div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+        <a class="entry" href="https://doi.org/10.5281/zenodo.19870281" target="_blank" rel="noopener">
+            <span class="entry-date">APR 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag science">Instrumentation</span>
+                <div class="entry-title">EM Sentinel — Electromagnetic Field Monitoring Instrument Design</div>
+                <div class="entry-desc">Hardware and software design specification for field-deployable EM sentinel instrumentation node.</div>
+                <div class="entry-doi">DOI: <a href="https://doi.org/10.5281/zenodo.19870281" target="_blank" rel="noopener">10.5281/zenodo.19870281</a></div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+        <a class="entry" href="https://doi.org/10.5281/zenodo.19870137" target="_blank" rel="noopener">
+            <span class="entry-date">APR 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag science">Instrumentation</span>
+                <div class="entry-title">Field Node v2.0 — Autonomous Data Collection Architecture</div>
+                <div class="entry-desc">Updated field node hardware specification with multi-sensor integration, remote telemetry, and anomaly trigger logic.</div>
+                <div class="entry-doi">DOI: <a href="https://doi.org/10.5281/zenodo.19870137" target="_blank" rel="noopener">10.5281/zenodo.19870137</a></div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+    </div>
+
+    <!-- ══ EARTH SCIENCE ══ -->
+    <div class="node-label">Earth Science + Geophysics</div>
+    <div class="entry-list">
+
+        <a class="entry" href="https://doi.org/10.31223/X5J47D" target="_blank" rel="noopener">
+            <span class="entry-date">APR 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag geo">Geophysics</span>
+                <div class="entry-title">GPDM v2.4 — Geophysical Pressure Displacement Model</div>
+                <div class="entry-desc">EarthArXiv preprint. Active collaboration with Project Hessdalen (Fred Pallesen), Jean Vézina, and Miguel Galán Santos. Hessdalen lead described the work as "Are you from the future?"</div>
+                <div class="entry-doi">DOI: <a href="https://doi.org/10.31223/X5J47D" target="_blank" rel="noopener">10.31223/X5J47D</a></div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+        <a class="entry amber" href="https://anomaly-dashboard-two.vercel.app" target="_blank" rel="noopener">
+            <span class="entry-date">APR 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag uap">UAP + Earth</span>
+                <div class="entry-title">Anomaly Intelligence Dashboard — Live Multi-Signal Correlation</div>
+                <div class="entry-desc">Deployed dashboard integrating NOAA SWPC Kp-index, USGS earthquake feed, and NASA DONKI solar events. Firebase Firestore backend with Leaflet.js dark map. UFOSINT 614,505-record database cross-referenced for GPDM site analysis.</div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+        <div class="entry">
+            <span class="entry-date">APR 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag uap">UAP Field</span>
+                <div class="entry-title">Brown Mountain / Hessdalen Comparative Analysis</div>
+                <div class="entry-desc">UFOSINT database query: Brown Mountain solar max elevation ratio 1.32×; Hessdalen 1.38×. Confirms Teodorani 2004 (JSE) analog relationship. Integrated into GPDM citation architecture.</div>
+            </div>
+            <span class="entry-arrow" style="opacity:0.2;">—</span>
+        </div>
+
+    </div>
+
+    <!-- ══ WATER INTELLIGENCE ══ -->
+    <div class="node-label">Water Intelligence — AquaSignal</div>
+    <div class="entry-list">
+
+        <a class="entry cyan" href="/aquasignal/" >
+            <span class="entry-date">APR 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag water">Water</span>
+                <div class="entry-title">AquaSignal Platform — Live Water Intelligence Dashboard</div>
+                <div class="entry-desc">Comprehensive upgrade to AquaSignal platform. 2,753 unique visitors in first 18 days. Ontario source water, Legionella risk, and MAC co-amplification data live.</div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+        <a class="entry cyan" href="/aquasignal/exceedances_ontario.json" target="_blank" rel="noopener">
+            <span class="entry-date">APR 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag water">Data Feed</span>
+                <div class="entry-title">Ontario Exceedances JSON — Machine-Readable Water Quality Data</div>
+                <div class="entry-desc">Live JSON data feed: Ontario water quality exceedances, full provincial baseline, and Grand River watershed baseline available for external indexing.</div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+    </div>
+
+    <!-- ══ PLATFORM LAUNCHES ══ -->
+    <div class="node-label">Platform Launches + Infrastructure</div>
+    <div class="entry-list">
+
+        <a class="entry" href="/presignal.html">
+            <span class="entry-date">MAY 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag infra">Infrastructure</span>
+                <div class="entry-title">Presignal Landing Page — ufosworldwide.com/presignal</div>
+                <div class="entry-desc">Presignal Inc. research library index launched. 23+ preprints indexed across Zenodo and EarthArXiv. Full institutional outreach initiated including TRIUMF partnership proposal.</div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+        <a class="entry" href="/plant-a-promise">
+            <span class="entry-date">MAY 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag field">Environment</span>
+                <div class="entry-title">Plant a Promise — Environmental Initiative Launch</div>
+                <div class="entry-desc">Environmental initiative launched at ufosworldwide.com/plant-a-promise.</div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+        <a class="entry" href="/niagaranode/">
+            <span class="entry-date">APR 2026</span>
+            <div class="entry-body">
+                <span class="entry-tag field">Field Node</span>
+                <div class="entry-title">Niagara Node — Regional Scientific Monitoring Station</div>
+                <div class="entry-desc">Regional earth and UAP monitoring node operational. Instrument data collection interface at /niagaranode/collector.html.</div>
+            </div>
+            <span class="entry-arrow">→</span>
+        </a>
+
+    </div>
+
+    <!-- ── FOOTER ── -->
+    <footer class="beacon-footer">
+        <div>PRESIGNAL INC. &nbsp;·&nbsp; JOHN ERNEST CARTER &nbsp;·&nbsp; ORCID 0009-0004-1363-304X</div>
+        <div style="opacity:0.4; margin-top:0.2rem;">All research published under CC BY 4.0. Contact: jubecrew@gmail.com</div>
+        <div class="footer-links">
+            <a href="index.html">← Beacon</a>
+            <a href="/presignal.html">Preprint Library</a>
+            <a href="/aquasignal/">AquaSignal</a>
+            <a href="https://orcid.org/0009-0004-1363-304X" target="_blank" rel="noopener">ORCID</a>
+            <a href="/about.html">About</a>
+            <a href="/contact.html">Contact</a>
+            <a href="/llms.txt">llms.txt</a>
+        </div>
+    </footer>
+
+</div>
+</body>
+</html>

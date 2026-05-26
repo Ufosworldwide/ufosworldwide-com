@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>About | Presignal Inc. — John Ernest Carter</title>
+    <meta name="description" content="John Ernest Carter — founder of Presignal Inc., independent researcher in UAP intelligence, earth science, water quality, mathematics, and instrumentation. Niagara Region, Ontario.">
+    <meta name="author" content="John Ernest Carter">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://ufosworldwide.com/about.html">
+    <link rel="llms" href="/llms.txt" type="text/plain">
+
+    <script async src="https://www.googletagmanager.com/gtag.js?id=G-H6L5Y9LZE0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-H6L5Y9LZE0');
+    </script>
+
+    <style>
+        /* ── HONEYCOMB MANIFOLD v5 — ABOUT PAGE ──
+           Φ = 1.6180339887 | Schumann: 7.83 Hz → 0.127s
+        ── */
+        :root {
+            --phi: 1.6180339887;
+            --schumann: 0.127s;
+            --schumann-slow: 0.508s;
+            --col-green: #00ff41;
+            --col-cyan:  #00ffff;
+            --col-amber: #ffb300;
+            --col-dim:   rgba(0,255,65,0.18);
+            --col-bg:    #030303;
+            --col-panel: #060606;
+            --col-card:  #0a0a0a;
+            --f1: 0.618rem;
+            --f2: 1.0rem;
+            --f3: 1.618rem;
+            --f4: 2.618rem;
+            --hex-size: 150px;
+            --hex-h: 86.6px;
+            --gap: 16px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--col-bg);
+            color: var(--col-green);
+            font-family: 'Courier New', Courier, monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,65,0.012) 2px, rgba(0,255,65,0.012) 4px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .shell {
+            width: 100%;
+            max-width: 1100px;
+            padding: var(--f3) var(--f2);
+        }
+
+        /* ── HEADER ── */
+        .page-header {
+            border: 1px solid var(--col-dim);
+            padding: var(--f3);
+            background: var(--col-panel);
+            box-shadow: 0 0 40px rgba(0,255,65,0.05);
+            margin-bottom: var(--f3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                60deg,
+                transparent,
+                transparent 40px,
+                rgba(0,255,65,0.012) 40px,
+                rgba(0,255,65,0.012) 41px
+            );
+            pointer-events: none;
+        }
+
+        .page-title {
+            font-size: clamp(0.9rem, 2.5vw, 1.5rem);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--col-green);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            font-size: var(--f1);
+            color: rgba(255,255,255,0.45);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.6rem;
+            color: rgba(0,255,65,0.5);
+            text-decoration: none;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: var(--f2);
+            transition: color var(--schumann);
+        }
+        .back-link:hover { color: var(--col-cyan); }
+
+        /* ── SECTION DIVIDER ── */
+        .node-label {
+            display: flex;
+            align-items: center;
+            gap: 0.618rem;
+            font-size: 0.6rem;
+            color: var(--col-cyan);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin: var(--f3) 0 var(--f2) 0;
+        }
+        .node-label::before { content:''; flex:1; height:1px; background:linear-gradient(to right, transparent, var(--col-cyan)); opacity:0.25; }
+        .node-label::after  { content:''; flex:1; height:1px; background:linear-gradient(to left, transparent, var(--col-cyan)); opacity:0.25; }
+
+        /* ── PROFILE BLOCK ── */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--f2);
+            margin-bottom: var(--f3);
+        }
+
+        @media (max-width: 680px) { .profile-grid { grid-template-columns: 1fr; } }
+
+        .profile-card {
+            border: 1px solid rgba(0,255,65,0.15);
+            background: var(--col-card);
+            padding: var(--f2) var(--f2);
+            position: relative;
+            transition: border-color var(--schumann), box-shadow var(--schumann);
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--col-green), transparent);
+            opacity: 0.4;
+        }
+
+        .profile-card:hover {
+            border-color: rgba(0,255,65,0.35);
+            box-shadow: 0 0 20px rgba(0,255,65,0.06);
+        }
+
+        .card-label {
+            font-size: 0.5rem;
+            color: var(--col-cyan);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+
+        .card-value {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.7;
+        }
+
+        .card-value a {
+            color: var(--col-green);
+            text-decoration: none;
+            transition: color var(--schumann);
+        }
+        .card-value a:hover { color: var(--col-cyan); }
+
+        .card-value .tag {
+            display: inline-block;
+            background: rgba(0,255,65,0.08);
+            border: 1px solid rgba(0,255,65,0.2);
+            color: var(--col-green);
+            font-size: 0.5rem;
+            padding: 2px 6px;
+            letter-spacing: 0.1em;
+            margin: 2px 2px 2px 0;
+            text-transform: uppercase;
+        }
+
+        /* ── DOMAIN HEXAGONS — small grid ── */
+        .hc-grid-wrap {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: calc(var(--hex-h) * 0.5) 0 calc(var(--hex-h) * 1.1) 0;
+        }
+
+        .hc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, var(--hex-size));
+            column-gap: var(--gap);
+            row-gap: calc(var(--hex-h) * 0.6);
+            justify-content: center;
+        }
+
+        .hex-wrap {
+            position: relative;
+            width: var(--hex-size);
+            height: var(--hex-h);
+            margin: calc(var(--hex-h) * 0.5) 0;
+        }
+
+        .hc-grid > .hex-wrap:nth-child(4n+3),
+        .hc-grid > .hex-wrap:nth-child(4n+4) {
+            transform: translateX(calc((var(--hex-size) + var(--gap)) * 0.5));
+        }
+
+        .hexagon {
+            position: relative;
+            width: var(--hex-size);
+            height: var(--hex-h);
+            background: var(--col-card);
+            border-left:  2px solid rgba(0,255,65,0.2);
+            border-right: 2px solid rgba(0,255,65,0.2);
+            transition: all var(--schumann) ease-in-out;
+            cursor: default;
+        }
+
+        .hexagon::before, .hexagon::after {
+            content: '';
+            position: absolute;
+            width: calc(var(--hex-size) * 0.7072);
+            height: calc(var(--hex-size) * 0.7072);
+            transform: scaleY(0.5774) rotate(-45deg);
+            background: inherit;
+            left: calc(var(--hex-size) * 0.1464);
+            transition: all var(--schumann) ease-in-out;
+            z-index: 1;
+        }
+
+        .hexagon::before {
+            top: calc(var(--hex-size) * -0.3536);
+            border-top:   2.83px solid rgba(0,255,65,0.2);
+            border-right: 2.83px solid rgba(0,255,65,0.2);
+        }
+
+        .hexagon::after {
+            bottom: calc(var(--hex-size) * -0.3536);
+            border-bottom: 2.83px solid rgba(0,255,65,0.2);
+            border-left:   2.83px solid rgba(0,255,65,0.2);
+        }
+
+        .hexagon.science { border-color: rgba(0,200,255,0.2); }
+        .hexagon.science::before { border-color: rgba(0,200,255,0.2); }
+        .hexagon.science::after  { border-color: rgba(0,200,255,0.2); }
+        .hexagon.amber { border-color: rgba(255,179,0,0.2); }
+        .hexagon.amber::before { border-color: rgba(255,179,0,0.2); }
+        .hexagon.amber::after  { border-color: rgba(255,179,0,0.2); }
+
+        .hex-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            text-align: center;
+            padding: 8px;
+        }
+
+        .hex-icon  { font-size: 1.1rem; margin-bottom: 4px; }
+        .hex-title { font-size: 0.52rem; font-weight: bold; color: var(--col-green); letter-spacing: 0.05em; text-transform: uppercase; line-height: 1.3; }
+        .hex-meta  { font-size: 0.4rem; color: var(--col-cyan); opacity: 0.7; letter-spacing: 0.08em; margin-top: 3px; text-transform: uppercase; }
+        .hexagon.amber .hex-meta  { color: var(--col-amber); }
+        .hexagon.science .hex-meta { color: #00c8ff; }
+
+        /* ── MISSION BLOCK ── */
+        .mission-block {
+            border: 1px solid rgba(0,255,65,0.12);
+            background: var(--col-card);
+            padding: var(--f3);
+            margin-bottom: var(--f3);
+            position: relative;
+        }
+
+        .mission-block::before {
+            content: '// MISSION STATEMENT';
+            position: absolute;
+            top: -0.6rem;
+            left: var(--f2);
+            background: var(--col-bg);
+            padding: 0 0.5rem;
+            font-size: 0.5rem;
+            color: var(--col-cyan);
+            letter-spacing: 0.15em;
+        }
+
+        .mission-text {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.9;
+            letter-spacing: 0.04em;
+        }
+
+        .mission-text p { margin-bottom: 0.8rem; }
+        .mission-text p:last-child { margin-bottom: 0; }
+
+        .mission-text strong {
+            color: var(--col-green);
+            font-weight: bold;
+        }
+
+        /* ── FOOTER ── */
+        .beacon-footer {
+            margin-top: var(--f4);
+            border-top: 1px solid rgba(0,255,65,0.1);
+            padding-top: var(--f2);
+            text-align: center;
+            font-size: 0.52rem;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 0.18em;
+            line-height: 2;
+        }
+
+        .footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem; }
+        .footer-links a { color: rgba(0,255,65,0.4); text-decoration: none; font-size: 0.48rem; letter-spacing: 0.1em; transition: color var(--schumann); }
+        .footer-links a:hover { color: var(--col-cyan); }
+
+        .blink { animation: blinker 1.273s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+
+        @media (max-width: 800px) {
+            .hc-grid { grid-template-columns: repeat(2, var(--hex-size)); }
+            .hc-grid > .hex-wrap:nth-child(4n+3),
+            .hc-grid > .hex-wrap:nth-child(4n+4) { transform: none; }
+            .hc-grid > .hex-wrap:nth-child(2n) { transform: translateY(calc(var(--hex-h) * 0.5)); }
+            .hc-grid-wrap { padding-bottom: calc(var(--hex-h) * 1.5); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="shell">
+
+    <a class="back-link" href="index.html">← Return to Beacon</a>
+
+    <header class="page-header">
+        <h1 class="page-title">
+            About Presignal Inc.
+            <span class="blink" style="color:var(--col-green); margin-left:0.5em;">●</span>
+        </h1>
+        <p class="page-subtitle">John Ernest Carter · Independent Research Archive · Niagara Region, Ontario</p>
+    </header>
+
+    <!-- ── RESEARCHER PROFILE ── -->
+    <div class="node-label">Researcher Identity</div>
+
+    <div class="profile-grid">
+
+        <div class="profile-card">
+            <div class="card-label">Full Name</div>
+            <div class="card-value">John Ernest Carter</div>
+        </div>
+
+        <div class="profile-card">
+            <div class="card-label">Organization</div>
+            <div class="card-value">Presignal Inc. — Ontario Corp. #1001577205<br>Incorporated April 17, 2026</div>
+        </div>
+
+        <div class="profile-card">
+            <div class="card-label">Location</div>
+            <div class="card-value">Niagara Region, Ontario, Canada</div>
+        </div>
+
+        <div class="profile-card">
+            <div class="card-label">ORCID</div>
+            <div class="card-value">
+                <a href="https://orcid.org/0009-0004-1363-304X" target="_blank" rel="noopener">0009-0004-1363-304X</a>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <div class="card-label">Published Preprints (as of May 2026)</div>
+            <div class="card-value">
+                23+ peer-reviewed preprints across Zenodo and EarthArXiv.<br>
+                <a href="/presignal.html">View full library →</a>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <div class="card-label">Research Domains</div>
+            <div class="card-value">
+                <span class="tag">UAP Intelligence</span>
+                <span class="tag">Earth Science</span>
+                <span class="tag">Space Science</span>
+                <span class="tag">Water Intelligence</span>
+                <span class="tag">Medical Research</span>
+                <span class="tag">Mathematics</span>
+                <span class="tag">Cybersecurity</span>
+                <span class="tag">Instrumentation</span>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <div class="card-label">Active Collaborators</div>
+            <div class="card-value">
+                Fred Pallesen — Project Hessdalen<br>
+                Jean Vézina — Quebec Earth Lights Research<br>
+                Mobius / Robert Vanderburgh — Forensic Video Analysis<br>
+                Henning Kuersten · Daniel Nordvik — Instrumentation Network
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <div class="card-label">Publishing Identities</div>
+            <div class="card-value">
+                <strong>John Ernest Carter</strong> — Nonfiction / Science / UAP<br>
+                <strong>J. Varyn</strong> — Dark Fantasy / Horror<br>
+                <strong>Aelvryn Noctis</strong> — Romantasy<br>
+                Co-author: Julie Carter (The Final Frequency)
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <div class="card-label">Social + Field Research</div>
+            <div class="card-value">
+                UFOs Worldwide Instagram — ~32,500 followers<br>
+                Field skywatch using night vision equipment<br>
+                UAP subtraction methodology — four-category elimination framework
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <div class="card-label">Contact</div>
+            <div class="card-value">
+                <a href="mailto:jubecrew@gmail.com">jubecrew@gmail.com</a><br>
+                <a href="/contact.html">Full contact page →</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ── MISSION ── -->
+    <div class="node-label">Mission Statement</div>
+
+    <div class="mission-block">
+        <div class="mission-text">
+            <p>
+                <strong>UFOs Worldwide</strong> is an independent research platform built on a single operating principle: identify gaps, build frameworks, publish findings, and move on. The platform combines structured UAP investigation with rigorous multi-domain science — operating as an independent intelligence architecture rather than a passive observer.
+            </p>
+            <p>
+                The core methodology is <strong>Subtractive Inversion</strong> — the four-category elimination framework (Category I: prosaic; Category II: concealed/chronic; Category III: industry artifact; Category IV: genuine anomaly) — developed from decades of field investigation and applied systematically across UAP research, water quality analysis, geophysics, and mathematics.
+            </p>
+            <p>
+                <strong>Presignal Inc.</strong> formalizes this research under an independent corporate structure, with an active portfolio spanning earth science, space science, medical research, water intelligence (AquaSignal), cybersecurity (SafeKey), and mathematical frameworks including work touching the Riemann Hypothesis and Cosmic Web topology.
+            </p>
+            <p>
+                All work is published under <strong>CC BY 4.0</strong> license via Zenodo and EarthArXiv. The Anomaly Dashboard integrates live NOAA SWPC Kp-index, USGS earthquake feeds, and NASA DONKI solar events for real-time correlation analysis.
+            </p>
+        </div>
+    </div>
+
+    <!-- ── DOMAIN HEX MAP ── -->
+    <div class="node-label">Research Domain Map</div>
+
+    <div class="hc-grid-wrap">
+        <div class="hc-grid">
+
+            <div class="hex-wrap">
+                <div class="hexagon amber">
+                    <div class="hex-content">
+                        <span class="hex-icon">🛸</span>
+                        <span class="hex-title">UAP Intelligence</span>
+                        <span class="hex-meta">Subtraction Method</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon science">
+                    <div class="hex-content">
+                        <span class="hex-icon">🌋</span>
+                        <span class="hex-title">Earth Science</span>
+                        <span class="hex-meta">GPDM v2.4</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon science">
+                    <div class="hex-content">
+                        <span class="hex-icon">🌌</span>
+                        <span class="hex-title">Space Science</span>
+                        <span class="hex-meta">ISM Navigation</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon">
+                    <div class="hex-content">
+                        <span class="hex-icon">💧</span>
+                        <span class="hex-title">Water Intelligence</span>
+                        <span class="hex-meta">AquaSignal</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon science">
+                    <div class="hex-content">
+                        <span class="hex-icon">∞</span>
+                        <span class="hex-title">Mathematics</span>
+                        <span class="hex-meta">Riemann / Möbius</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon science">
+                    <div class="hex-content">
+                        <span class="hex-icon">🔧</span>
+                        <span class="hex-title">Instrumentation</span>
+                        <span class="hex-meta">EM Sentinel · Field Node</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon">
+                    <div class="hex-content">
+                        <span class="hex-icon">🏥</span>
+                        <span class="hex-title">Medical Research</span>
+                        <span class="hex-meta">ITS Tinnitus / DMOM</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon">
+                    <div class="hex-content">
+                        <span class="hex-icon">🔒</span>
+                        <span class="hex-title">Cybersecurity</span>
+                        <span class="hex-meta">SafeKey FW</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ── FOOTER ── -->
+    <footer class="beacon-footer">
+        <div>PRESIGNAL INC. &nbsp;·&nbsp; JOHN ERNEST CARTER &nbsp;·&nbsp; ORCID 0009-0004-1363-304X</div>
+        <div style="opacity:0.5; margin-top:0.2rem;">NIAGARA REGION, ONTARIO, CANADA &nbsp;·&nbsp; CC BY 4.0 &nbsp;·&nbsp; CORP. #1001577205</div>
+        <div class="footer-links">
+            <a href="index.html">← Beacon</a>
+            <a href="/presignal.html">Preprints</a>
+            <a href="/aquasignal/">AquaSignal</a>
+            <a href="https://orcid.org/0009-0004-1363-304X" target="_blank" rel="noopener">ORCID</a>
+            <a href="/contact.html">Contact</a>
+            <a href="/blog.html">Archive</a>
+            <a href="/llms.txt">llms.txt</a>
+        </div>
+    </footer>
+
+</div>
+</body>
+</html>

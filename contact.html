@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Contact | Presignal Inc. — John Ernest Carter</title>
+    <meta name="description" content="Contact John Ernest Carter, founder of Presignal Inc. Research collaboration, institutional partnership, media inquiries, and data access. Niagara Region, Ontario, Canada.">
+    <meta name="author" content="John Ernest Carter">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://ufosworldwide.com/contact.html">
+    <link rel="llms" href="/llms.txt" type="text/plain">
+
+    <script async src="https://www.googletagmanager.com/gtag.js?id=G-H6L5Y9LZE0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-H6L5Y9LZE0');
+    </script>
+
+    <style>
+        /* ── HONEYCOMB MANIFOLD v5 — CONTACT ──
+           Φ = 1.6180339887 | Schumann: 7.83 Hz → 0.127s
+        ── */
+        :root {
+            --schumann: 0.127s;
+            --schumann-med: 0.254s;
+            --col-green: #00ff41;
+            --col-cyan:  #00ffff;
+            --col-amber: #ffb300;
+            --col-dim:   rgba(0,255,65,0.15);
+            --col-bg:    #030303;
+            --col-panel: #060606;
+            --col-card:  #090909;
+            --f1: 0.618rem;
+            --f2: 1.0rem;
+            --f3: 1.618rem;
+            --f4: 2.618rem;
+            --hex-sm: 130px;
+            --hex-sm-h: 75.06px;
+            --gap: 14px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--col-bg);
+            color: var(--col-green);
+            font-family: 'Courier New', Courier, monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,65,0.012) 2px, rgba(0,255,65,0.012) 4px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .shell { width: 100%; max-width: 900px; padding: var(--f3) var(--f2); }
+
+        /* ── HEADER ── */
+        .page-header {
+            border: 1px solid var(--col-dim);
+            padding: var(--f3);
+            background: var(--col-panel);
+            box-shadow: 0 0 40px rgba(0,255,65,0.04);
+            margin-bottom: var(--f3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                -60deg, transparent, transparent 40px,
+                rgba(0,255,65,0.01) 40px, rgba(0,255,65,0.01) 41px
+            );
+            pointer-events: none;
+        }
+
+        .page-title {
+            font-size: clamp(0.9rem, 2.5vw, 1.4rem);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--col-green);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            font-size: var(--f1);
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.6rem;
+            color: rgba(0,255,65,0.5);
+            text-decoration: none;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: var(--f2);
+            transition: color var(--schumann);
+        }
+        .back-link:hover { color: var(--col-cyan); }
+
+        /* ── SECTION DIVIDER ── */
+        .node-label {
+            display: flex;
+            align-items: center;
+            gap: 0.618rem;
+            font-size: 0.6rem;
+            color: var(--col-cyan);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin: var(--f3) 0 var(--f2) 0;
+        }
+        .node-label::before { content:''; flex:1; height:1px; background:linear-gradient(to right, transparent, var(--col-cyan)); opacity:0.25; }
+        .node-label::after  { content:''; flex:1; height:1px; background:linear-gradient(to left, transparent, var(--col-cyan)); opacity:0.25; }
+
+        /* ── CONTACT CARDS ── */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--f2);
+            margin-bottom: var(--f3);
+        }
+
+        @media (max-width: 600px) { .contact-grid { grid-template-columns: 1fr; } }
+
+        .contact-card {
+            border: 1px solid rgba(0,255,65,0.12);
+            background: var(--col-card);
+            padding: var(--f2);
+            position: relative;
+            transition: border-color var(--schumann), box-shadow var(--schumann);
+        }
+
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 2px; height: 100%;
+            background: var(--col-green);
+            opacity: 0.25;
+            transition: opacity var(--schumann);
+        }
+
+        .contact-card:hover { border-color: rgba(0,255,65,0.3); box-shadow: 0 0 18px rgba(0,255,65,0.05); }
+        .contact-card:hover::before { opacity: 0.8; }
+
+        .contact-card.cyan::before { background: var(--col-cyan); }
+        .contact-card.amber::before { background: var(--col-amber); }
+
+        .card-icon { font-size: 1.2rem; margin-bottom: 0.5rem; display: block; }
+
+        .card-label {
+            font-size: 0.48rem;
+            color: var(--col-cyan);
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-bottom: 0.35rem;
+            opacity: 0.75;
+        }
+
+        .card-value {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.7;
+        }
+
+        .card-value a {
+            color: var(--col-green);
+            text-decoration: none;
+            transition: color var(--schumann);
+        }
+        .card-value a:hover { color: var(--col-cyan); }
+
+        /* ── COLLABORATION PATHWAYS — HEX GRID ── */
+        .hc-grid-wrap {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: calc(var(--hex-sm-h) * 0.5) 0 calc(var(--hex-sm-h) * 1.2) 0;
+        }
+
+        .hc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, var(--hex-sm));
+            column-gap: var(--gap);
+            row-gap: calc(var(--hex-sm-h) * 0.6);
+            justify-content: center;
+        }
+
+        .hex-wrap {
+            position: relative;
+            width: var(--hex-sm);
+            height: var(--hex-sm-h);
+            margin: calc(var(--hex-sm-h) * 0.5) 0;
+        }
+
+        .hc-grid > .hex-wrap:nth-child(4n+3),
+        .hc-grid > .hex-wrap:nth-child(4n+4) {
+            transform: translateX(calc((var(--hex-sm) + var(--gap)) * 0.5));
+        }
+
+        .hexagon {
+            position: relative;
+            width: var(--hex-sm);
+            height: var(--hex-sm-h);
+            background: var(--col-card);
+            border-left:  2px solid rgba(0,255,65,0.2);
+            border-right: 2px solid rgba(0,255,65,0.2);
+            transition: all var(--schumann) ease-in-out;
+            cursor: pointer;
+        }
+
+        .hexagon::before, .hexagon::after {
+            content: '';
+            position: absolute;
+            width: calc(var(--hex-sm) * 0.7072);
+            height: calc(var(--hex-sm) * 0.7072);
+            transform: scaleY(0.5774) rotate(-45deg);
+            background: inherit;
+            left: calc(var(--hex-sm) * 0.1464);
+            transition: all var(--schumann) ease-in-out;
+            z-index: 1;
+        }
+
+        .hexagon::before {
+            top: calc(var(--hex-sm) * -0.3536);
+            border-top:   2.83px solid rgba(0,255,65,0.2);
+            border-right: 2.83px solid rgba(0,255,65,0.2);
+        }
+
+        .hexagon::after {
+            bottom: calc(var(--hex-sm) * -0.3536);
+            border-bottom: 2.83px solid rgba(0,255,65,0.2);
+            border-left:   2.83px solid rgba(0,255,65,0.2);
+        }
+
+        .hexagon:hover {
+            background: rgba(0,255,65,0.03);
+            border-color: var(--col-cyan);
+            box-shadow: 0 0 20px rgba(0,255,255,0.2);
+            transform: scale(1.04);
+            z-index: 10;
+        }
+
+        .hexagon:hover::before { border-color: var(--col-cyan); background: rgba(0,255,65,0.03); }
+        .hexagon:hover::after  { border-color: var(--col-cyan); background: rgba(0,255,65,0.03); }
+
+        .hexagon.amber { border-color: rgba(255,179,0,0.2); }
+        .hexagon.amber::before, .hexagon.amber::after { border-color: rgba(255,179,0,0.2); }
+        .hexagon.amber:hover { border-color: var(--col-amber); box-shadow: 0 0 20px rgba(255,179,0,0.2); }
+        .hexagon.amber:hover::before, .hexagon.amber:hover::after { border-color: var(--col-amber); background: rgba(255,179,0,0.02); }
+
+        .hex-link {
+            position: absolute;
+            top: calc(var(--hex-sm-h) * -0.5);
+            left: 0;
+            width: var(--hex-sm);
+            height: calc(var(--hex-sm-h) * 2);
+            z-index: 20;
+        }
+
+        .hex-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            text-align: center;
+            padding: 6px;
+        }
+
+        .hex-icon  { font-size: 0.95rem; margin-bottom: 3px; }
+        .hex-title { font-size: 0.48rem; font-weight: bold; color: var(--col-green); letter-spacing: 0.05em; text-transform: uppercase; line-height: 1.3; }
+        .hex-meta  { font-size: 0.38rem; color: var(--col-cyan); opacity: 0.7; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.08em; }
+        .hexagon.amber .hex-meta { color: var(--col-amber); }
+        .hexagon:hover .hex-title { color: #fff; }
+
+        /* ── NOTE BLOCK ── */
+        .note-block {
+            border: 1px solid rgba(0,255,65,0.1);
+            background: rgba(0,255,65,0.02);
+            padding: var(--f2);
+            margin-bottom: var(--f3);
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.8;
+            letter-spacing: 0.04em;
+            position: relative;
+        }
+
+        .note-block::before {
+            content: '// COLLABORATION NOTE';
+            position: absolute;
+            top: -0.6rem;
+            left: var(--f2);
+            background: var(--col-bg);
+            padding: 0 0.5rem;
+            font-size: 0.48rem;
+            color: var(--col-cyan);
+            letter-spacing: 0.15em;
+        }
+
+        .note-block strong { color: var(--col-green); }
+
+        /* ── FOOTER ── */
+        .beacon-footer {
+            margin-top: var(--f4);
+            border-top: 1px solid rgba(0,255,65,0.1);
+            padding-top: var(--f2);
+            text-align: center;
+            font-size: 0.52rem;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 0.18em;
+            line-height: 2;
+        }
+
+        .footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem; }
+        .footer-links a { color: rgba(0,255,65,0.4); text-decoration: none; font-size: 0.48rem; letter-spacing: 0.1em; transition: color var(--schumann); }
+        .footer-links a:hover { color: var(--col-cyan); }
+
+        .blink { animation: blinker 1.273s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+
+        @media (max-width: 700px) {
+            .hc-grid { grid-template-columns: repeat(2, var(--hex-sm)); }
+            .hc-grid > .hex-wrap:nth-child(4n+3),
+            .hc-grid > .hex-wrap:nth-child(4n+4) { transform: none; }
+            .hc-grid > .hex-wrap:nth-child(2n) { transform: translateY(calc(var(--hex-sm-h) * 0.5)); }
+            .hc-grid-wrap { padding-bottom: calc(var(--hex-sm-h) * 1.5); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="shell">
+
+    <a class="back-link" href="index.html">← Return to Beacon</a>
+
+    <header class="page-header">
+        <h1 class="page-title">
+            Contact Node
+            <span class="blink" style="color:var(--col-green); margin-left:0.5em;">●</span>
+        </h1>
+        <p class="page-subtitle">Presignal Inc. · Research Collaboration · Institutional Inquiry</p>
+    </header>
+
+    <!-- ── CONTACT DETAILS ── -->
+    <div class="node-label">Direct Contact</div>
+
+    <div class="contact-grid">
+
+        <div class="contact-card cyan">
+            <span class="card-icon">📬</span>
+            <div class="card-label">Primary Email</div>
+            <div class="card-value">
+                <a href="mailto:jubecrew@gmail.com">jubecrew@gmail.com</a><br>
+                <span style="font-size:0.55rem; color:rgba(255,255,255,0.35);">Research · Collaboration · Partnership</span>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <span class="card-icon">🆔</span>
+            <div class="card-label">ORCID Researcher Profile</div>
+            <div class="card-value">
+                <a href="https://orcid.org/0009-0004-1363-304X" target="_blank" rel="noopener">0009-0004-1363-304X</a><br>
+                <span style="font-size:0.55rem; color:rgba(255,255,255,0.35);">23+ verified preprints</span>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <span class="card-icon">📍</span>
+            <div class="card-label">Location</div>
+            <div class="card-value">
+                Niagara Region, Ontario, Canada<br>
+                <span style="font-size:0.55rem; color:rgba(255,255,255,0.35);">Presignal Inc. · Corp. #1001577205</span>
+            </div>
+        </div>
+
+        <div class="contact-card amber">
+            <span class="card-icon">📸</span>
+            <div class="card-label">Social — UFOs Worldwide</div>
+            <div class="card-value">
+                Instagram: @UFOsWorldwide<br>
+                <span style="font-size:0.55rem; color:rgba(255,255,255,0.35);">~32,500 followers · Field research + UAP intelligence</span>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <span class="card-icon">📚</span>
+            <div class="card-label">Preprint Archive</div>
+            <div class="card-value">
+                <a href="/presignal.html">ufosworldwide.com/presignal</a><br>
+                <a href="https://doi.org/10.5281/zenodo.19653415" target="_blank" rel="noopener">Zenodo Collection</a><br>
+                <span style="font-size:0.55rem; color:rgba(255,255,255,0.35);">CC BY 4.0 · Open Access</span>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <span class="card-icon">💧</span>
+            <div class="card-label">AquaSignal — Water Intelligence</div>
+            <div class="card-value">
+                <a href="/aquasignal/">ufosworldwide.com/aquasignal</a><br>
+                <span style="font-size:0.55rem; color:rgba(255,255,255,0.35);">Ontario water quality data · Open feeds</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ── NOTE ── -->
+    <div class="note-block">
+        Presignal Inc. is an <strong>independent research initiative</strong> accepting collaboration inquiries across all active domains: earth science, space science, water intelligence, UAP methodology, instrumentation, cybersecurity, and mathematics. Institutional partnership proposals are reviewed directly by <strong>John Ernest Carter</strong>. Please include relevant credentials and specific collaboration intent in your initial message.
+    </div>
+
+    <!-- ── COLLABORATION PATHWAYS ── -->
+    <div class="node-label">Collaboration Pathways</div>
+
+    <div class="hc-grid-wrap">
+        <div class="hc-grid">
+
+            <div class="hex-wrap">
+                <div class="hexagon">
+                    <a class="hex-link" href="mailto:jubecrew@gmail.com" aria-label="Research collaboration inquiry"></a>
+                    <div class="hex-content">
+                        <span class="hex-icon">🔬</span>
+                        <span class="hex-title">Research Collaboration</span>
+                        <span class="hex-meta">jubecrew@gmail.com</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon amber">
+                    <a class="hex-link" href="mailto:jubecrew@gmail.com" aria-label="UAP field research inquiry"></a>
+                    <div class="hex-content">
+                        <span class="hex-icon">🛸</span>
+                        <span class="hex-title">UAP Field Research</span>
+                        <span class="hex-meta">Field Network</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon">
+                    <a class="hex-link" href="mailto:jubecrew@gmail.com" aria-label="Institutional partnership inquiry"></a>
+                    <div class="hex-content">
+                        <span class="hex-icon">🏛</span>
+                        <span class="hex-title">Institutional Partnership</span>
+                        <span class="hex-meta">Presignal Inc.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon">
+                    <a class="hex-link" href="mailto:jubecrew@gmail.com" aria-label="Media or press inquiry"></a>
+                    <div class="hex-content">
+                        <span class="hex-icon">📰</span>
+                        <span class="hex-title">Media Inquiry</span>
+                        <span class="hex-meta">Press + Interview</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon amber">
+                    <a class="hex-link" href="/aquasignal/" aria-label="Water data access"></a>
+                    <div class="hex-content">
+                        <span class="hex-icon">💧</span>
+                        <span class="hex-title">Water Data Access</span>
+                        <span class="hex-meta">AquaSignal Feeds</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon">
+                    <a class="hex-link" href="/presignal.html" aria-label="Preprint citations"></a>
+                    <div class="hex-content">
+                        <span class="hex-icon">📄</span>
+                        <span class="hex-title">Cite a Preprint</span>
+                        <span class="hex-meta">CC BY 4.0 · Open</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon">
+                    <a class="hex-link" href="/api/" aria-label="API and data feed access"></a>
+                    <div class="hex-content">
+                        <span class="hex-icon">⚙️</span>
+                        <span class="hex-title">API Access</span>
+                        <span class="hex-meta">Data Feeds</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-wrap">
+                <div class="hexagon amber">
+                    <a class="hex-link" href="https://www.ufosworldwide.com/myresume.html" target="_blank" rel="noopener" aria-label="Corporate dossier"></a>
+                    <div class="hex-content">
+                        <span class="hex-icon">📋</span>
+                        <span class="hex-title">Corporate Dossier</span>
+                        <span class="hex-meta">Full CV</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ── FOOTER ── -->
+    <footer class="beacon-footer">
+        <div>PRESIGNAL INC. &nbsp;·&nbsp; JOHN ERNEST CARTER &nbsp;·&nbsp; ORCID 0009-0004-1363-304X</div>
+        <div style="opacity:0.4; margin-top:0.2rem;">NIAGARA REGION, ONTARIO, CANADA &nbsp;·&nbsp; CC BY 4.0 &nbsp;·&nbsp; CORP. #1001577205</div>
+        <div class="footer-links">
+            <a href="index.html">← Beacon</a>
+            <a href="/about.html">About</a>
+            <a href="/blog.html">Archive</a>
+            <a href="/presignal.html">Preprints</a>
+            <a href="/aquasignal/">AquaSignal</a>
+            <a href="https://orcid.org/0009-0004-1363-304X" target="_blank" rel="noopener">ORCID</a>
+            <a href="/llms.txt">llms.txt</a>
+        </div>
+    </footer>
+
+</div>
+</body>
+</html>
