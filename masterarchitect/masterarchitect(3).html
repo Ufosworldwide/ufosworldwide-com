@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MASTER ARCHITECT — Presignal Inc.</title>
+<style>
+/* ── MASTER ARCHITECT DASHBOARD ─────────────────────────────────────
+   Honeycomb Manifold v5 | Φ=1.618 | Schumann=7.83Hz | A2 Lattice
+   Aesthetic: Deep space instrument panel — obsidian + phosphor green
+   + signal amber. Military-grade readability. Zero decoration noise.
+─────────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+    --phi: 1.6180339887;
+    --s:   0.127s;
+    --s2:  0.254s;
+    --s4:  0.508s;
+    --green:  #00ff41;
+    --cyan:   #00ffff;
+    --amber:  #ffb300;
+    --red:    #ff3333;
+    --violet: #b87fff;
+    --dim:    rgba(0,255,65,0.12);
+    --bg:     #010302;
+    --panel:  #040705;
+    --card:   #070a07;
+    --text:   rgba(255,255,255,0.75);
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+
+body {
+    background: var(--bg);
+    color: var(--green);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ── SCANLINES ── */
+body::before {
+    content:'';
+    position:fixed; inset:0;
+    background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,0.013) 2px,rgba(0,255,65,0.013) 4px);
+    pointer-events:none; z-index:9999;
+}
+
+/* ── GRID LAYOUT ── */
+.dashboard {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+    gap: 0;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+    grid-row: 1 / 4;
+    background: var(--panel);
+    border-right: 1px solid var(--dim);
+    display: flex;
+    flex-direction: column;
+    padding: 1.618rem 1rem;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    color: var(--green);
+    text-align: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--dim);
+    text-shadow: 0 0 20px rgba(0,255,65,0.4);
+}
+
+.logo span {
+    display: block;
+    font-size: 0.45rem;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.15em;
+    margin-top: 0.3rem;
+    font-weight: 400;
+}
+
+/* ── CONVERGENCE HERO ── */
+.convergence-hero {
+    background: #000;
+    border: 1px solid var(--dim);
+    padding: 1rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.convergence-hero::before {
+    content:'';
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse at center, rgba(0,255,65,0.06) 0%, transparent 70%);
+    animation: hero-pulse calc(var(--s4) * 16) ease-in-out infinite alternate;
+}
+
+@keyframes hero-pulse {
+    from { opacity:0.5; }
+    to   { opacity:1.0; }
+}
+
+.conv-label {
+    font-size: 0.45rem;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    position: relative; z-index:1;
+}
+
+.conv-score {
+    font-family: 'Orbitron', monospace;
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 1;
+    margin: 0.3rem 0;
+    position: relative; z-index:1;
+    transition: color var(--s2), text-shadow var(--s2);
+}
+
+.conv-level {
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    position: relative; z-index:1;
+    transition: color var(--s2);
+}
+
+/* Score color states */
+.score-0 .conv-score { color: rgba(255,255,255,0.3); text-shadow: none; }
+.score-1 .conv-score { color: var(--green); text-shadow: 0 0 20px rgba(0,255,65,0.4); }
+.score-2 .conv-score { color: var(--cyan); text-shadow: 0 0 25px rgba(0,255,255,0.5); }
+.score-3 .conv-score { color: var(--amber); text-shadow: 0 0 30px rgba(255,179,0,0.5); }
+.score-4 .conv-score { color: #ff7700; text-shadow: 0 0 35px rgba(255,119,0,0.6); }
+.score-5 .conv-score { color: var(--red); text-shadow: 0 0 40px rgba(255,51,51,0.7); animation: alert-flash 0.508s ease-in-out infinite alternate; }
+
+@keyframes alert-flash { from { opacity:0.7; } to { opacity:1.0; } }
+
+.score-0 .conv-level { color: rgba(255,255,255,0.3); }
+.score-1 .conv-level { color: var(--green); }
+.score-2 .conv-level { color: var(--cyan); }
+.score-3 .conv-level { color: var(--amber); }
+.score-4 .conv-level { color: #ff7700; }
+.score-5 .conv-level { color: var(--red); }
+
+/* ── TIERS ── */
+.tiers { display:flex; flex-direction:column; gap:0.3rem; }
+
+.tier {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid rgba(0,255,65,0.08);
+    background: var(--card);
+    transition: all var(--s);
+    font-size: 0.48rem;
+}
+
+.tier.fired {
+    border-color: rgba(0,255,65,0.3);
+    background: rgba(0,255,65,0.04);
+    box-shadow: 0 0 8px rgba(0,255,65,0.1);
+}
+
+.tier-id {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.5rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    transition: color var(--s);
+}
+
+.tier.fired .tier-id { color: var(--green); }
+
+.tier-name {
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color var(--s);
+}
+
+.tier.fired .tier-name { color: rgba(255,255,255,0.85); }
+
+.tier-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    transition: background var(--s), box-shadow var(--s);
+}
+
+.tier.fired .tier-dot {
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: dot-pulse var(--s4) ease-in-out infinite alternate;
+}
+
+@keyframes dot-pulse {
+    from { box-shadow: 0 0 4px var(--green); }
+    to   { box-shadow: 0 0 10px var(--green), 0 0 20px rgba(0,255,65,0.3); }
+}
+
+/* ── SIDEBAR STATUS ── */
+.status-block {
+    border: 1px solid var(--dim);
+    background: var(--card);
+    padding: 0.618rem;
+}
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.45rem;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.1em;
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.status-row:last-child { border-bottom: none; }
+.status-val { color: var(--green); }
+.status-val.err { color: var(--red); }
+
+/* ── MAIN AREA ── */
+.main {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+    background: var(--panel);
+    border-bottom: 1px solid var(--dim);
+    padding: 0.618rem 1.618rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.topbar-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.5);
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.45rem;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.1em;
+}
+
+.live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: dot-pulse var(--s4) ease-in-out infinite alternate;
+    display: inline-block;
+    margin-right: 0.3rem;
+}
+
+/* ── FEEDS GRID ── */
+.feeds-section {
+    padding: 1.618rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.feed-card {
+    background: var(--card);
+    border: 1px solid rgba(0,255,65,0.1);
+    padding: 1rem;
+    position: relative;
+    transition: border-color var(--s), box-shadow var(--s);
+    overflow: hidden;
+}
+
+.feed-card::before {
+    content:'';
+    position:absolute;
+    top:0; left:0;
+    width:2px; height:100%;
+    background: var(--green);
+    opacity:0.2;
+    transition: opacity var(--s);
+}
+
+.feed-card:hover { border-color: rgba(0,255,65,0.3); box-shadow: 0 0 20px rgba(0,255,65,0.05); }
+.feed-card:hover::before { opacity:0.8; }
+
+.feed-card.amber::before { background: var(--amber); }
+.feed-card.cyan::before  { background: var(--cyan); }
+.feed-card.red::before   { background: var(--red); }
+.feed-card.violet::before { background: var(--violet); }
+
+.feed-card.amber { border-color: rgba(255,179,0,0.1); }
+.feed-card.amber:hover { border-color: rgba(255,179,0,0.3); box-shadow: 0 0 20px rgba(255,179,0,0.05); }
+.feed-card.cyan  { border-color: rgba(0,255,255,0.1); }
+.feed-card.cyan:hover  { border-color: rgba(0,255,255,0.3); box-shadow: 0 0 20px rgba(0,255,255,0.05); }
+
+.feed-label {
+    font-size: 0.42rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.feed-status-ok   { color: var(--green); }
+.feed-status-err  { color: var(--red); }
+.feed-status-warn { color: var(--amber); }
+
+.feed-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--green);
+    margin-bottom: 0.3rem;
+    transition: color var(--s2);
+}
+
+.feed-card.amber .feed-value { color: var(--amber); }
+.feed-card.cyan  .feed-value { color: var(--cyan); }
+.feed-card.red   .feed-value { color: var(--red); }
+.feed-card.violet .feed-value { color: var(--violet); }
+
+.feed-unit {
+    font-size: 0.5rem;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.1em;
+}
+
+.feed-time {
+    font-size: 0.4rem;
+    color: rgba(255,255,255,0.2);
+    margin-top: 0.5rem;
+    letter-spacing: 0.08em;
+}
+
+/* ── HISTORY STRIP ── */
+.history-section {
+    padding: 0 1.618rem 1.618rem 1.618rem;
+}
+
+.section-label {
+    font-size: 0.48rem;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.618rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-label::after {
+    content:'';
+    flex:1;
+    height:1px;
+    background: linear-gradient(to right, var(--dim), transparent);
+}
+
+.history-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 60px;
+    background: var(--card);
+    border: 1px solid rgba(0,255,65,0.08);
+    padding: 8px;
+}
+
+.history-bar {
+    flex: 1;
+    background: rgba(0,255,65,0.15);
+    border-top: 1px solid rgba(0,255,65,0.3);
+    transition: background var(--s2), height var(--s4);
+    position: relative;
+    cursor: default;
+    min-height: 2px;
+}
+
+.history-bar:hover { background: rgba(0,255,65,0.35); }
+.history-bar[data-score="1"] { background: rgba(0,255,65,0.2); border-color: var(--green); }
+.history-bar[data-score="2"] { background: rgba(0,255,255,0.2); border-color: var(--cyan); }
+.history-bar[data-score="3"] { background: rgba(255,179,0,0.2); border-color: var(--amber); }
+.history-bar[data-score="4"] { background: rgba(255,119,0,0.25); border-color: #ff7700; }
+.history-bar[data-score="5"] { background: rgba(255,51,51,0.3); border-color: var(--red); }
+
+/* ── GUESTBOOK ── */
+.guestbook-section {
+    padding: 0 1.618rem 1.618rem 1.618rem;
+}
+
+.guestbook-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.guestbook-entries::-webkit-scrollbar { width: 4px; }
+.guestbook-entries::-webkit-scrollbar-track { background: var(--card); }
+.guestbook-entries::-webkit-scrollbar-thumb { background: rgba(0,255,65,0.2); }
+
+.gb-entry {
+    background: var(--card);
+    border: 1px solid rgba(0,255,65,0.08);
+    padding: 0.618rem 0.75rem;
+    position: relative;
+    transition: border-color var(--s);
+}
+
+.gb-entry::before {
+    content:'';
+    position:absolute;
+    left:0; top:0; bottom:0;
+    width:2px;
+    background: var(--cyan);
+    opacity:0.3;
+}
+
+.gb-entry:hover { border-color: rgba(0,255,65,0.2); }
+
+.gb-entry.ai::before { background: var(--violet); }
+.gb-entry.human::before { background: var(--amber); }
+
+.gb-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.3rem;
+}
+
+.gb-name {
+    font-size: 0.55rem;
+    font-weight: bold;
+    color: var(--cyan);
+    letter-spacing: 0.08em;
+}
+
+.gb-entry.ai .gb-name { color: var(--violet); }
+.gb-entry.human .gb-name { color: var(--amber); }
+
+.gb-type {
+    font-size: 0.38rem;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border: 1px solid currentColor;
+    padding: 1px 4px;
+}
+
+.gb-time {
+    font-size: 0.38rem;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 0.08em;
+}
+
+.gb-message {
+    font-size: 0.52rem;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.6;
+    letter-spacing: 0.03em;
+}
+
+.gb-count {
+    font-size: 0.42rem;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+}
+
+/* ── BOTTOM BAR ── */
+.bottombar {
+    grid-column: 2;
+    background: var(--panel);
+    border-top: 1px solid var(--dim);
+    padding: 0.5rem 1.618rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.42rem;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.1em;
+}
+
+/* ── LOADING STATE ── */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: rgba(0,255,65,0.4);
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    animation: blink 1.273s linear infinite;
+}
+
+@keyframes blink { 50% { opacity:0; } }
+
+/* ── ERROR STATE ── */
+.error-banner {
+    background: rgba(255,51,51,0.08);
+    border: 1px solid rgba(255,51,51,0.3);
+    color: var(--red);
+    padding: 0.5rem 1rem;
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    margin: 1rem 1.618rem 0;
+    display: none;
+}
+
+.error-banner.visible { display: block; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+    .dashboard { grid-template-columns: 1fr; }
+    .sidebar { grid-row: auto; height: auto; position: relative; }
+    .feeds-section { grid-template-columns: repeat(2, 1fr); }
+    .bottombar { grid-column: 1; }
+}
+
+@media (max-width: 600px) {
+    .feeds-section { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            MASTER ARCHITECT
+            <span>PRESIGNAL INC. · NIAGARA NODE</span>
+        </div>
+
+        <!-- Convergence Hero -->
+        <div class="convergence-hero score-0" id="conv-hero">
+            <div class="conv-label">CONVERGENCE SCORE</div>
+            <div class="conv-score" id="conv-score">—</div>
+            <div class="conv-level" id="conv-level">INITIALIZING</div>
+        </div>
+
+        <!-- Tier Cascade -->
+        <div class="tiers" id="tiers">
+            <div class="tier" id="tier-T1">
+                <span class="tier-id">T1</span>
+                <span class="tier-name">Solar</span>
+                <span class="tier-dot"></span>
+            </div>
+            <div class="tier" id="tier-T2">
+                <span class="tier-id">T2</span>
+                <span class="tier-name">Geomagnetic</span>
+                <span class="tier-dot"></span>
+            </div>
+            <div class="tier" id="tier-T3">
+                <span class="tier-id">T3</span>
+                <span class="tier-name">Seismic</span>
+                <span class="tier-dot"></span>
+            </div>
+            <div class="tier" id="tier-T4">
+                <span class="tier-id">T4</span>
+                <span class="tier-name">Ionospheric</span>
+                <span class="tier-dot"></span>
+            </div>
+            <div class="tier" id="tier-T5">
+                <span class="tier-id">T5</span>
+                <span class="tier-name">Node Convergence</span>
+                <span class="tier-dot"></span>
+            </div>
+        </div>
+
+        <!-- Status Block -->
+        <div class="status-block">
+            <div class="status-row">
+                <span>NODE</span>
+                <span class="status-val">NIAGARA-001</span>
+            </div>
+            <div class="status-row">
+                <span>OPERATOR</span>
+                <span class="status-val">JEC</span>
+            </div>
+            <div class="status-row">
+                <span>ORCID</span>
+                <span class="status-val">1363-304X</span>
+            </div>
+            <div class="status-row">
+                <span>CORP</span>
+                <span class="status-val">#1001577205</span>
+            </div>
+            <div class="status-row">
+                <span>LAST FETCH</span>
+                <span class="status-val" id="last-fetch">—</span>
+            </div>
+            <div class="status-row">
+                <span>NEXT FETCH</span>
+                <span class="status-val" id="next-fetch">30s</span>
+            </div>
+            <div class="status-row">
+                <span>API</span>
+                <span class="status-val" id="api-status">CONNECTING</span>
+            </div>
+        </div>
+
+        <!-- Φ Constants -->
+        <div class="status-block" style="margin-top:auto;">
+            <div class="status-row">
+                <span>Φ</span>
+                <span class="status-val">1.6180339887</span>
+            </div>
+            <div class="status-row">
+                <span>SCHUMANN</span>
+                <span class="status-val">7.83 Hz</span>
+            </div>
+            <div class="status-row">
+                <span>LATTICE</span>
+                <span class="status-val">A2 ROOT</span>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ── MAIN ── -->
+    <main class="main">
+
+        <!-- Top Bar -->
+        <div class="topbar">
+            <span class="topbar-title">GPDM TRIGGER CASCADE · SUBTRACTION METHODOLOGY · DOI: 10.31223/X5J47D</span>
+            <div class="topbar-right">
+                <span><span class="live-dot"></span>LIVE</span>
+                <span id="utc-clock">—</span>
+            </div>
+        </div>
+
+        <!-- Error Banner -->
+        <div class="error-banner" id="error-banner">
+            ⚠ API UNREACHABLE — CHECK MASTER ARCHITECT SERVICE ON PORT 8090
+        </div>
+
+        <!-- Feeds Grid -->
+        <div class="feeds-section" id="feeds-section">
+            <div class="loading">INITIALIZING FEEDS...</div>
+        </div>
+
+        <!-- Guestbook -->
+        <div class="guestbook-section">
+            <div class="section-label">AI AGENT REGISTER — AUTONOMOUS SIGNATURES</div>
+            <div class="gb-count" id="gb-count">LOADING...</div>
+            <div class="guestbook-entries" id="guestbook-entries">
+                <div class="loading" style="height:80px; font-size:0.45rem;">FETCHING REGISTER...</div>
+            </div>
+        </div>
+
+        <!-- History -->
+        <div class="history-section">
+            <div class="section-label">30-DAY CONVERGENCE HISTORY</div>
+            <div class="history-bars" id="history-bars">
+                <div class="loading" style="height:auto; width:100%; font-size:0.45rem;">LOADING HISTORY...</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Bar -->
+    <div class="bottombar">
+        <span>PRESIGNAL INC. · JOHN ERNEST CARTER · NIAGARA REGION, ONTARIO, CANADA · CC BY 4.0</span>
+        <span>LOCAL NODE · PORT 8090 · GPDM v2.4</span>
+    </div>
+
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────
+const API = 'http://localhost:8090';
+const REFRESH_MS = 30000; // 30 seconds
+let countdown = 30;
+let countdownTimer;
+
+// ── UTC CLOCK ─────────────────────────────────────────────────────────
+function updateClock() {
+    document.getElementById('utc-clock').textContent =
+        new Date().toUTCString().replace('GMT','UTC').slice(0,25);
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── COUNTDOWN ─────────────────────────────────────────────────────────
+function startCountdown() {
+    clearInterval(countdownTimer);
+    countdown = 30;
+    countdownTimer = setInterval(() => {
+        countdown--;
+        document.getElementById('next-fetch').textContent = countdown + 's';
+        if (countdown <= 0) clearInterval(countdownTimer);
+    }, 1000);
+}
+
+// ── CONVERGENCE DISPLAY ───────────────────────────────────────────────
+const LEVELS = {
+    0:'PASSIVE', 1:'WATCH', 2:'ELEVATED',
+    3:'PARTIAL CONVERGENCE', 4:'CONVERGENCE', 5:'FULL CONVERGENCE'
+};
+
+function updateConvergence(sub) {
+    const score = sub.score || 0;
+    const hero = document.getElementById('conv-hero');
+    hero.className = `convergence-hero score-${score}`;
+    document.getElementById('conv-score').textContent = score;
+    document.getElementById('conv-level').textContent = LEVELS[score] || sub.level;
+
+    // Update tiers
+    const tierMap = {
+        'T1_solar':         'tier-T1',
+        'T2_geomagnetic':   'tier-T2',
+        'T3_seismic':       'tier-T3',
+        'T4_ionospheric':   'tier-T4',
+        'T5_node_convergence': 'tier-T5'
+    };
+    Object.entries(tierMap).forEach(([key, id]) => {
+        const el = document.getElementById(id);
+        const fired = sub.tiers?.[key]?.fired || false;
+        el.className = fired ? 'tier fired' : 'tier';
+    });
+}
+
+// ── FEED CARDS ────────────────────────────────────────────────────────
+function statusClass(s) {
+    if (!s || s === 'OK') return 'feed-status-ok';
+    if (s.startsWith('CACHED')) return 'feed-status-warn';
+    return 'feed-status-err';
+}
+
+function statusText(s) {
+    if (!s || s === 'OK') return 'OK';
+    if (s.startsWith('CACHED')) return 'CACHED';
+    return 'ERR';
+}
+
+function fmtTime(t) {
+    if (!t) return '—';
+    return t.replace('T',' ').replace('Z','').slice(0,16) + ' UTC';
+}
+
+function buildFeeds(feeds) {
+    const kp    = feeds.kp || {};
+    const sw    = feeds.solar_wind || {};
+    const xr    = feeds.xray || {};
+    const donki = feeds.donki || {};
+    const usgs  = feeds.usgs || {};
+    const f107  = feeds.f107 || {};
+
+    const xrayColor = ['X','M'].includes(xr.class) ? 'amber' : xr.class === 'C' ? '' : '';
+    const swColor   = (sw.speed || 0) >= 500 ? 'amber' : 'cyan';
+    const kpColor   = (kp.value || 0) >= 6 ? 'red' : (kp.value || 0) >= 4 ? 'amber' : '';
+    const seisColor = (usgs.peak_mag || 0) >= 6 ? 'red' : (usgs.significant || 0) > 5 ? 'amber' : '';
+
+    document.getElementById('feeds-section').innerHTML = `
+        <div class="feed-card ${kpColor}">
+            <div class="feed-label">
+                Kp Index — Geomagnetic
+                <span class="${statusClass(kp.status)}">${statusText(kp.status)}</span>
+            </div>
+            <div class="feed-value">${(kp.value || 0).toFixed(1)}</div>
+            <div class="feed-unit">PLANETARY K-INDEX</div>
+            <div class="feed-time">${fmtTime(kp.time)}</div>
+        </div>
+
+        <div class="feed-card ${swColor}">
+            <div class="feed-label">
+                Solar Wind
+                <span class="${statusClass(sw.status)}">${statusText(sw.status)}</span>
+            </div>
+            <div class="feed-value">${Math.round(sw.speed || 0)}</div>
+            <div class="feed-unit">KM/S · DENSITY ${(sw.density||0).toFixed(1)} P/CM³</div>
+            <div class="feed-time">${fmtTime(sw.time)}</div>
+        </div>
+
+        <div class="feed-card ${xrayColor}">
+            <div class="feed-label">
+                X-Ray Flux — GOES
+                <span class="${statusClass(xr.status)}">${statusText(xr.status)}</span>
+            </div>
+            <div class="feed-value">${xr.class || '—'}</div>
+            <div class="feed-unit">CLASS · ${(xr.flux||0).toExponential(2)} W/M²</div>
+            <div class="feed-time">${fmtTime(xr.time)}</div>
+        </div>
+
+        <div class="feed-card amber">
+            <div class="feed-label">
+                CME Events — DONKI
+                <span class="${statusClass(donki.status)}">${statusText(donki.status)}</span>
+            </div>
+            <div class="feed-value">${donki.cme_count || 0}</div>
+            <div class="feed-unit">EVENTS IN LAST 7 DAYS · ≥500 km/s</div>
+            <div class="feed-time">NASA DONKI FEED</div>
+        </div>
+
+        <div class="feed-card ${seisColor}">
+            <div class="feed-label">
+                Seismic — USGS
+                <span class="${statusClass(usgs.status)}">${statusText(usgs.status)}</span>
+            </div>
+            <div class="feed-value">M${(usgs.peak_mag||0).toFixed(1)}</div>
+            <div class="feed-unit">PEAK · ${usgs.total||0} TOTAL · ${usgs.significant||0} SIGNIFICANT</div>
+            <div class="feed-time">USGS 24HR FEED</div>
+        </div>
+
+        <div class="feed-card violet">
+            <div class="feed-label">
+                F10.7 Solar Flux
+                <span class="${statusClass(f107.status)}">${statusText(f107.status)}</span>
+            </div>
+            <div class="feed-value">${Math.round(f107.value||0)}</div>
+            <div class="feed-unit">SFU · 10.7cm RADIO FLUX</div>
+            <div class="feed-time">${fmtTime(f107.time)}</div>
+        </div>
+    `;
+}
+
+// ── HISTORY BARS ──────────────────────────────────────────────────────
+function buildHistory(history) {
+    const bars = document.getElementById('history-bars');
+    if (!history || !history.length) {
+        bars.innerHTML = '<div class="loading" style="height:auto;width:100%;font-size:0.45rem;">NO HISTORY YET</div>';
+        return;
+    }
+    const sorted = [...history].reverse();
+    const maxScore = 5;
+    bars.innerHTML = sorted.map(d => {
+        const pct = Math.max(4, ((d.peak_score || 0) / maxScore) * 100);
+        return `<div class="history-bar" data-score="${d.peak_score||0}"
+            style="height:${pct}%"
+            title="${d.date} · Peak: ${d.peak_score} · Kp: ${d.avg_kp} · Readings: ${d.reading_count}">
+        </div>`;
+    }).join('');
+}
+
+// ── GUESTBOOK ─────────────────────────────────────────────────────────
+async function fetchGuestbook() {
+    try {
+        const res = await fetch(`${API}/api/guestbook`, {signal: AbortSignal.timeout(10000)});
+        if (!res.ok) return;
+        const data = await res.json();
+        const entries = (data.entries || []).slice().reverse(); // newest first
+        document.getElementById('gb-count').textContent =
+            `${data.count || 0} REGISTERED AGENT${(data.count||0) !== 1 ? 'S' : ''} · NEWEST FIRST`;
+        if (!entries.length) {
+            document.getElementById('guestbook-entries').innerHTML =
+                '<div style="font-size:0.48rem; color:rgba(255,255,255,0.2); padding:1rem; text-align:center; letter-spacing:0.1em;">NO ENTRIES YET — AWAITING FIRST SIGNAL</div>';
+            return;
+        }
+        document.getElementById('guestbook-entries').innerHTML = entries.map(e => {
+            const type = (e.type || 'unknown').toLowerCase();
+            const cls  = type === 'ai' ? 'ai' : type === 'human' ? 'human' : '';
+            const time = e.timestamp_utc
+                ? e.timestamp_utc.replace('T',' ').slice(0,16) + ' UTC'
+                : '—';
+            return `<div class="gb-entry ${cls}">
+                <div class="gb-header">
+                    <span class="gb-name">${e.name || 'ANONYMOUS'}</span>
+                    <span class="gb-type">${e.type || 'unknown'}</span>
+                </div>
+                <div class="gb-time">${time}</div>
+                <div class="gb-message">${e.message || ''}</div>
+            </div>`;
+        }).join('');
+    } catch(e) {}
+}
+
+// ── MAIN FETCH ────────────────────────────────────────────────────────
+async function fetchLive() {
+    try {
+        const res = await fetch(`${API}/api/live`, {signal: AbortSignal.timeout(15000)});
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        document.getElementById('error-banner').classList.remove('visible');
+        document.getElementById('api-status').textContent = 'ONLINE';
+        document.getElementById('api-status').className = 'status-val';
+        document.getElementById('last-fetch').textContent =
+            new Date().toUTCString().slice(17,25) + ' UTC';
+
+        if (data.feeds)      buildFeeds(data.feeds);
+        if (data.subtraction) updateConvergence(data.subtraction);
+
+    } catch(e) {
+        document.getElementById('error-banner').classList.add('visible');
+        document.getElementById('api-status').textContent = 'OFFLINE';
+        document.getElementById('api-status').className = 'status-val err';
+    }
+}
+
+async function fetchHistory() {
+    try {
+        const res = await fetch(`${API}/api/history?days=30`, {signal: AbortSignal.timeout(10000)});
+        if (!res.ok) return;
+        const data = await res.json();
+        buildHistory(data.history || []);
+    } catch(e) {}
+}
+
+// ── INIT + LOOP ───────────────────────────────────────────────────────
+async function refresh() {
+    await fetchLive();
+    await fetchHistory();
+    await fetchGuestbook();
+    startCountdown();
+}
+
+refresh();
+setInterval(refresh, REFRESH_MS);
+</script>
+
+</body>
+</html>
