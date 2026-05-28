@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WILDTRACK — Global Animal Tracking</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0b1218;
+  --panel-bg: rgba(11,18,24,0.96);
+  --border: rgba(255,255,255,0.08);
+  --text: #d4e8f0;
+  --muted: #526878;
+  --header-h: 52px;
+  --panel-w: 300px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; background:#0b1218; }
+
+/* ── HEADER ── */
+#hdr {
+  position:fixed; top:0; left:0; right:0; height:var(--header-h);
+  background:var(--panel-bg);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:24px; padding:0 20px;
+  z-index:1000; backdrop-filter:blur(12px);
+}
+#logo {
+  font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:5px;
+  color:#fff; white-space:nowrap;
+}
+#logo em { color:#3ecf8e; font-style:normal; }
+.hdr-stat { font-family:'Space Mono',monospace; font-size:9px; color:var(--muted); line-height:1.6; }
+.hdr-stat b { color:#3ecf8e; font-size:13px; display:block; }
+#live-pill {
+  margin-left:auto; display:flex; align-items:center; gap:7px;
+  font-family:'Space Mono',monospace; font-size:9px; color:#3ecf8e; letter-spacing:1px;
+  border:1px solid rgba(62,207,142,0.3); border-radius:20px; padding:4px 12px;
+}
+#live-dot { width:6px; height:6px; border-radius:50%; background:#3ecf8e;
+  box-shadow:0 0 6px #3ecf8e; animation:blink 1.4s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── MAP ── */
+#map {
+  position:fixed; top:var(--header-h); left:var(--panel-w); right:0; bottom:72px;
+  z-index:1;
+}
+
+/* ── LEFT PANEL ── */
+#panel {
+  position:fixed; top:var(--header-h); left:0; bottom:72px;
+  width:var(--panel-w);
+  background:var(--panel-bg);
+  border-right:1px solid var(--border);
+  z-index:500; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+#panel-top {
+  padding:14px 16px 10px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+#panel-title { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:3px; color:var(--muted); margin-bottom:10px; }
+#search-box {
+  width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border);
+  border-radius:6px; padding:7px 11px; color:var(--text); font-family:'Outfit',sans-serif;
+  font-size:12px; outline:none;
+}
+#search-box::placeholder { color:var(--muted); }
+#search-box:focus { border-color:rgba(62,207,142,0.4); }
+
+#species-scroll { overflow-y:auto; flex:1; padding:8px 0; }
+#species-scroll::-webkit-scrollbar { width:3px; }
+#species-scroll::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+/* ── SPECIES BLOCK ── */
+.sp-block { border-bottom:1px solid var(--border); }
+
+.sp-header {
+  display:flex; align-items:center; gap:10px;
+  padding:11px 16px; cursor:pointer;
+  transition:background 0.15s;
+  user-select:none;
+}
+.sp-header:hover { background:rgba(255,255,255,0.03); }
+.sp-header.all-on { }
+
+.sp-swatch { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+.sp-emoji { font-size:18px; line-height:1; }
+.sp-label { flex:1; }
+.sp-name { font-family:'Outfit',sans-serif; font-size:13px; font-weight:600; color:var(--text); }
+.sp-sci { font-family:'Space Mono',monospace; font-size:8px; color:var(--muted); font-style:italic; }
+.sp-count { font-family:'Space Mono',monospace; font-size:9px; color:var(--muted); }
+.sp-toggle {
+  width:22px; height:22px; border-radius:4px; border:1px solid var(--border);
+  background:none; color:var(--muted); cursor:pointer; font-size:10px;
+  display:flex; align-items:center; justify-content:center; transition:all 0.15s;
+  flex-shrink:0;
+}
+.sp-toggle.on { background:rgba(62,207,142,0.15); border-color:rgba(62,207,142,0.4); color:#3ecf8e; }
+.sp-chevron { font-size:10px; color:var(--muted); transition:transform 0.2s; flex-shrink:0; }
+.sp-chevron.open { transform:rotate(90deg); }
+
+/* ── INDIVIDUAL ANIMALS ── */
+.animals-list { display:none; padding:0 0 6px 0; }
+.animals-list.open { display:block; }
+
+.all-row {
+  display:flex; align-items:center; gap:8px;
+  padding:5px 16px 5px 38px; cursor:pointer;
+  font-family:'Space Mono',monospace; font-size:9px; color:var(--muted);
+  transition:color 0.15s;
+}
+.all-row:hover { color:var(--text); }
+
+.animal-row {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 16px 6px 38px; cursor:pointer;
+  transition:background 0.15s; border-radius:0;
+}
+.animal-row:hover { background:rgba(255,255,255,0.03); }
+.animal-row.selected { background:rgba(255,255,255,0.05); }
+
+.ani-color { width:8px; height:8px; border-radius:50%; flex-shrink:0; box-shadow:0 0 5px currentColor; }
+.ani-name { font-family:'Outfit',sans-serif; font-size:12px; font-weight:500; color:var(--text); flex:1; }
+.ani-id { font-family:'Space Mono',monospace; font-size:8px; color:var(--muted); }
+.ani-check {
+  width:16px; height:16px; border-radius:3px; border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; transition:all 0.15s; flex-shrink:0; color:transparent;
+}
+.animal-row.selected .ani-check { border-color:currentColor; color:var(--text); background:rgba(255,255,255,0.1); }
+
+/* ── CROSSINGS BADGE ── */
+#crossings-bar {
+  position:fixed; top:calc(var(--header-h) + 12px); left:calc(var(--panel-w) + 12px);
+  z-index:800; display:none;
+  background:rgba(11,18,24,0.92); border:1px solid rgba(255,180,0,0.5);
+  border-radius:8px; padding:8px 14px;
+  font-family:'Space Mono',monospace; font-size:10px; color:#ffb400;
+  backdrop-filter:blur(8px);
+  box-shadow:0 0 20px rgba(255,180,0,0.15);
+}
+#crossings-bar b { font-size:18px; display:inline-block; margin-right:6px; }
+
+/* ── DETAIL POPUP (custom, not leaflet) ── */
+#detail-card {
+  position:fixed; right:16px; top:calc(var(--header-h) + 16px);
+  width:260px; background:var(--panel-bg); border:1px solid var(--border);
+  border-radius:10px; padding:18px; z-index:900;
+  transform:translateX(300px); transition:transform 0.35s cubic-bezier(0.16,1,0.3,1);
+  backdrop-filter:blur(12px);
+}
+#detail-card.open { transform:translateX(0); }
+#dc-close {
+  position:absolute; top:12px; right:12px; background:none;
+  border:1px solid var(--border); color:var(--muted); width:24px; height:24px;
+  border-radius:4px; cursor:pointer; font-size:11px; display:flex;
+  align-items:center; justify-content:center; transition:all 0.15s;
+}
+#dc-close:hover { border-color:#fff; color:#fff; }
+#dc-emoji { font-size:36px; display:block; margin-bottom:8px; }
+#dc-name { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:1px; margin-bottom:2px; }
+#dc-id { font-family:'Space Mono',monospace; font-size:8px; color:var(--muted); margin-bottom:14px; }
+.dc-row { padding:8px 0; border-bottom:1px solid var(--border); }
+.dc-label { font-family:'Space Mono',monospace; font-size:8px; letter-spacing:2px; color:var(--muted); margin-bottom:3px; }
+.dc-val { font-family:'Outfit',sans-serif; font-size:13px; color:var(--text); font-weight:500; }
+.dc-val.big { font-family:'Space Mono',monospace; font-size:20px; }
+
+/* ── TIMELINE ── */
+#timeline {
+  position:fixed; bottom:0; left:var(--panel-w); right:0; height:72px;
+  background:var(--panel-bg); border-top:1px solid var(--border);
+  z-index:1000; display:flex; align-items:center; gap:16px; padding:0 24px;
+  backdrop-filter:blur(8px);
+}
+#tl-label { font-family:'Space Mono',monospace; font-size:9px; color:var(--muted); white-space:nowrap; letter-spacing:1px; }
+#play-btn {
+  width:34px; height:34px; border-radius:6px; border:1px solid var(--border);
+  background:none; color:var(--text); font-size:13px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:all 0.15s;
+  flex-shrink:0;
+}
+#play-btn:hover { border-color:#3ecf8e; color:#3ecf8e; box-shadow:0 0 10px rgba(62,207,142,0.2); }
+#tl-slider {
+  flex:1; -webkit-appearance:none; appearance:none;
+  height:2px; background:var(--border); border-radius:1px; outline:none; cursor:pointer;
+}
+#tl-slider::-webkit-slider-thumb {
+  -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+  background:#3ecf8e; box-shadow:0 0 10px rgba(62,207,142,0.6); cursor:pointer;
+}
+#tl-date {
+  font-family:'Space Mono',monospace; font-size:12px; color:#3ecf8e;
+  white-space:nowrap; min-width:90px; text-align:right;
+}
+#tl-speed {
+  font-family:'Space Mono',monospace; font-size:9px; color:var(--muted);
+  background:none; border:1px solid var(--border); border-radius:4px;
+  padding:4px 8px; cursor:pointer; color:var(--muted); transition:all 0.15s;
+  white-space:nowrap;
+}
+#tl-speed:hover { border-color:var(--muted); color:var(--text); }
+
+/* ── LEAFLET OVERRIDES ── */
+.leaflet-container { background:#1a3a5c !important; }
+.crossing-marker {
+  background:rgba(255,180,0,0.9); border:2px solid #fff;
+  border-radius:50%; width:14px; height:14px;
+  box-shadow:0 0 12px rgba(255,180,0,0.8);
+  animation:cross-pulse 1.5s ease-in-out infinite;
+}
+@keyframes cross-pulse {
+  0%,100%{ box-shadow:0 0 12px rgba(255,180,0,0.8); transform:scale(1); }
+  50%{ box-shadow:0 0 24px rgba(255,180,0,0.4); transform:scale(1.3); }
+}
+.leaflet-popup-content-wrapper {
+  background:rgba(11,18,24,0.95) !important;
+  border:1px solid rgba(255,255,255,0.1) !important;
+  border-radius:8px !important;
+  color:#d4e8f0 !important;
+  font-family:'Outfit',sans-serif !important;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5) !important;
+  backdrop-filter:blur(8px);
+}
+.leaflet-popup-tip { background:rgba(11,18,24,0.95) !important; }
+.leaflet-popup-content { font-family:'Outfit',sans-serif !important; font-size:13px !important; color:#d4e8f0 !important; }
+.leaflet-control-zoom a { background:rgba(11,18,24,0.9) !important; color:#d4e8f0 !important; border-color:rgba(255,255,255,0.1) !important; }
+.leaflet-control-zoom a:hover { background:rgba(62,207,142,0.2) !important; color:#3ecf8e !important; }
+
+/* ── LOADING ── */
+#loader {
+  position:fixed; inset:0; background:#0b1218;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:16px; z-index:9999; transition:opacity 0.6s;
+}
+#loader.gone { opacity:0; pointer-events:none; }
+#loader-logo { font-family:'Bebas Neue',sans-serif; font-size:72px; letter-spacing:8px; color:#3ecf8e;
+  text-shadow:0 0 40px rgba(62,207,142,0.5); animation:logopulse 2s ease-in-out infinite; }
+@keyframes logopulse { 0%,100%{text-shadow:0 0 40px rgba(62,207,142,0.4)} 50%{text-shadow:0 0 80px rgba(62,207,142,0.9)} }
+#loader-sub { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:4px; color:#526878; }
+#loader-bar-wrap { width:200px; height:1px; background:rgba(255,255,255,0.08); overflow:hidden; }
+#loader-bar { height:100%; background:#3ecf8e; box-shadow:0 0 8px #3ecf8e; width:0; transition:width 0.08s linear; }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div id="loader-logo">WILDTRACK</div>
+  <div id="loader-sub">GLOBAL ANIMAL INTELLIGENCE</div>
+  <div id="loader-bar-wrap"><div id="loader-bar"></div></div>
+</div>
+
+<!-- HEADER -->
+<div id="hdr">
+  <div id="logo">WILD<em>TRACK</em></div>
+  <div class="hdr-stat"><b id="h-animals">0</b>ANIMALS TRACKED</div>
+  <div class="hdr-stat"><b id="h-selected">0</b>SELECTED</div>
+  <div class="hdr-stat"><b id="h-species">6</b>SPECIES</div>
+  <div class="hdr-stat"><b id="h-crossings">0</b>CROSSINGS</div>
+  <div id="live-pill"><div id="live-dot"></div>MOVEBANK NETWORK</div>
+</div>
+
+<!-- LEFT PANEL -->
+<div id="panel">
+  <div id="panel-top">
+    <div id="panel-title">SPECIES & INDIVIDUALS</div>
+    <input id="search-box" placeholder="Search animals..." type="text">
+  </div>
+  <div id="species-scroll"></div>
+</div>
+
+<!-- MAP -->
+<div id="map"></div>
+
+<!-- CROSSINGS INDICATOR -->
+<div id="crossings-bar"></div>
+
+<!-- DETAIL CARD -->
+<div id="detail-card">
+  <button id="dc-close">✕</button>
+  <span id="dc-emoji">🐺</span>
+  <div id="dc-name">ANIMAL</div>
+  <div id="dc-id">TAG ID —</div>
+  <div class="dc-row"><div class="dc-label">DISTANCE TRAVELED</div><div class="dc-val big" id="dc-dist">—</div></div>
+  <div class="dc-row"><div class="dc-label">REGION</div><div class="dc-val" id="dc-region">—</div></div>
+  <div class="dc-row"><div class="dc-label">TRACKING PERIOD</div><div class="dc-val" id="dc-period">—</div></div>
+  <div class="dc-row"><div class="dc-label">INSTITUTION</div><div class="dc-val" id="dc-inst">—</div></div>
+  <div class="dc-row"><div class="dc-label">STATUS</div><div class="dc-val" id="dc-status">—</div></div>
+  <div class="dc-row" style="border:none"><div class="dc-label">FIELD NOTE</div><div class="dc-val" style="font-size:12px;line-height:1.5" id="dc-fact">—</div></div>
+</div>
+
+<!-- TIMELINE -->
+<div id="timeline">
+  <div id="tl-label">TIMELINE</div>
+  <button id="play-btn">▶</button>
+  <input id="tl-slider" type="range" min="0" max="100" value="100">
+  <div id="tl-date">2024</div>
+  <button id="tl-speed">1×</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+
+const SPECIES = [
+  {
+    id:'wolf', name:'Grey Wolf', scientific:'Canis lupus', emoji:'🐺',
+    baseColor:'#4fc3f7',
+    individuals:[
+      { id:'W-2847', name:'Aspen', region:'Yellowstone, Wyoming', inst:'US Fish & Wildlife', period:'2019–2024', dist:'12,400 km', status:'Active', fact:'Leads a pack of 11. Crossed into Canada 3 times. First tracked using satellite-solar GPS collar.', track:[[-110.5,44.7],[-112,45.2],[-113.8,46],[-115.2,47],[-116.1,47.8],[-114.5,48.2],[-112.3,47.6],[-110.8,46.9],[-109.2,46],[-110.5,44.7]] },
+      { id:'W-3102', name:'Kodiak', region:'Alaska Interior', inst:'UAF Arctic Biology', period:'2020–2024', dist:'8,200 km', status:'Active', fact:'Survived two winters above the Arctic Circle without a pack. Range spans 180,000 km².', track:[[-148,64.2],[-150.5,65],[-152.1,66],[-154,65.5],[-155.2,64.8],[-153.5,63.5],[-151,63],[-148,64.2]] },
+      { id:'W-1991', name:'Freki', region:'Scandinavia', inst:'Norwegian Inst. Nature Research', period:'2018–2023', dist:'15,800 km', status:'Deceased', fact:'Traveled from Norway to Finland and back in a single year. Died 2023, age 9.', track:[[11.5,60.8],[14,61.8],[16.5,63],[18.2,63.8],[20,65],[22,64.5],[20.5,63],[18,62],[15.5,61],[11.5,60.8]] },
+      { id:'W-4201', name:'Luna', region:'Rocky Mtns, Colorado', inst:'Colorado State University', period:'2021–2024', dist:'6,700 km', status:'Active', fact:'First confirmed wolf in Colorado in 70 years. Arrived from Wyoming without human assistance.', track:[[-106.2,39.1],[-107.5,40],[-108.8,41.2],[-107.5,42],[-106.2,41.5],[-104.8,40.5],[-106.2,39.1]] },
+      { id:'W-2550', name:'Tundra', region:'Siberia, Russia', inst:'Russian Academy of Sciences', period:'2019–2024', dist:'19,200 km', status:'Active', fact:'Longest tracked wolf journey on record in Asia. Covered 3 time zones in one winter.', track:[[90,62.2],[95,63],[100.5,64.2],[105,65],[110,64.5],[112.5,62.8],[108,61.5],[102,61],[96,62],[90,62.2]] },
+      { id:'W-3388', name:'Cascade', region:'Pacific Northwest', inst:'Oregon Dept Fish & Wildlife', period:'2020–2024', dist:'9,100 km', status:'Active', fact:'Swam the Columbia River 12 confirmed times. Has GPS fix every 4 hours.', track:[[-121.2,46],[-120,47],[-118.8,48],[-117.5,47.8],[-118.5,46.5],[-120,45.5],[-121.2,46]] },
+      { id:'W-5001', name:'Boreas', region:'Northern Canada', inst:'University of Alberta', period:'2022–2024', dist:'11,300 km', status:'Active', fact:'Roams the largest recorded wolf territory in Canadian history — 68,000 km².', track:[[-115,57],[-118,58.5],[-121,60],[-123,61.5],[-121,62.5],[-118,61],[-115,59.5],[-112,58],[-115,57]] },
+    ]
+  },
+  {
+    id:'osprey', name:'Osprey', scientific:'Pandion haliaetus', emoji:'🦅',
+    baseColor:'#ff8a65',
+    individuals:[
+      { id:'O-881', name:'Scotia', region:'Scotland → West Africa', inst:'RSPB', period:'2018–2024', dist:'42,000 km', status:'Active', fact:'Crosses the Sahara Desert twice a year without stopping for water. Detected via solar GPS.', track:[[-4.2,57.5],[-1,52],[3,46],[2,38],[-3,30],[-8,22],[-12,15],[-15,10],[-14.5,5],[-15,10],[-12,15],[-8,22],[-3,30],[2,38],[3,46],[-1,52],[-4.2,57.5]] },
+      { id:'O-1047', name:'Malawi', region:'Finland → Malawi', inst:'University of Helsinki', period:'2019–2024', dist:'38,500 km', status:'Active', fact:'Uses the same thermal columns over Libya every autumn. Identified by wing-tag since 2017.', track:[[25,62],[25,55],[27,47],[29,35],[31,22],[33,12],[35,2],[36,-5],[36,-10],[36,-5],[35,2],[33,12],[31,22],[29,35],[27,47],[25,55],[25,62]] },
+      { id:'O-2201', name:'Chesapeake', region:'Maryland → Venezuela', inst:'College of William & Mary', period:'2020–2024', dist:'31,200 km', status:'Active', fact:'Returns to the same nest post within 2 days every year for 5 consecutive seasons.', track:[[-76.5,39],[-75,35],[-74,30],[-72,24],[-70,18],[-67,13],[-64,8],[-62,6],[-64,8],[-67,13],[-70,18],[-72,24],[-74,30],[-75,35],[-76.5,39]] },
+      { id:'O-445', name:'Kielder', region:'England → Gambia', inst:'Northumbria University', period:'2017–2022', dist:'29,800 km', status:'Deceased', fact:'Died in Gambia after 5 successful trans-Saharan migrations. Mourned internationally on Twitter.', track:[[-2.2,55],[0,50],[1,44],[-1,36],[-5,28],[-10,20],[-14,13],[-15.5,8],[-14,13],[-10,20],[-5,28],[-1,36],[1,44],[0,50],[-2.2,55]] },
+      { id:'O-3300', name:'Tay', region:'Scotland → Ghana', inst:'University of Stirling', period:'2021–2024', dist:'26,500 km', status:'Active', fact:'Named after the River Tay where she was ringed as a chick. Youngest in the study cohort.', track:[[-3.8,56.4],[-2,51],[0,44],[0,35],[-2,25],[-5,15],[-1,8],[0,5],[-1,8],[-5,15],[-2,25],[0,35],[0,44],[-2,51],[-3.8,56.4]] },
+    ]
+  },
+  {
+    id:'monarch', name:'Monarch Butterfly', scientific:'Danaus plexippus', emoji:'🦋',
+    baseColor:'#ffb300',
+    individuals:[
+      { id:'M-10042', name:'Monarch #10042', region:'Ontario → Michoacán', inst:'University of Guelph', period:'2022–2024', dist:'8,900 km', status:'Active', fact:'One of 300 million. Weighs 0.5 grams yet crossed Lake Erie. Tagged with nano radio transmitter.', track:[[-79.4,43.7],[-82,42.5],[-85,40.5],[-87,38],[-89.5,35],[-91,31],[-94,26],[-97.5,21],[-100.5,19.6],[-97.5,21],[-94,26],[-91,31],[-89.5,35],[-87,38],[-85,40.5],[-82,42.5],[-79.4,43.7]] },
+      { id:'M-8871', name:'Monarch #8871', region:'Minnesota → Mexico', inst:'University of Minnesota', period:'2021–2024', dist:'9,200 km', status:'Active', fact:'Navigates using the sun as a compass, correcting for time of day using a circadian clock.', track:[[-94.5,45],[-95,42],[-95.5,38],[-96.5,34],[-97.5,29],[-98.5,24],[-99.5,20.5],[-100.5,19.6],[-99.5,20.5],[-98.5,24],[-97.5,29],[-96.5,34],[-95.5,38],[-95,42],[-94.5,45]] },
+      { id:'M-5532', name:'Monarch #5532', region:'Quebec → Michoacán', inst:'Université de Montréal', period:'2023–2024', dist:'7,800 km', status:'Active', fact:'Fourth generation to make this exact journey. No individual butterfly ever does it twice.', track:[[-73.5,46],[-77,44],[-81,41.5],[-87,37.5],[-92,32],[-96.5,26],[-99,20.5],[-100.5,19.6],[-99,20.5],[-96.5,26],[-92,32],[-87,37.5],[-81,41.5],[-77,44],[-73.5,46]] },
+      { id:'M-3301', name:'Monarch #3301', region:'British Columbia → Mexico', inst:'UBC', period:'2022–2024', dist:'11,200 km', status:'Active', fact:'Western population — rarer than eastern. Takes the coastal mountain route.', track:[[-123,49.5],[-120,46],[-118,42],[-116,38],[-115,34],[-110,28],[-106,24],[-103,21],[-100.5,19.6],[-103,21],[-106,24],[-110,28],[-115,34],[-116,38],[-118,42],[-120,46],[-123,49.5]] },
+    ]
+  },
+  {
+    id:'whale', name:'Humpback Whale', scientific:'Megaptera novaeangliae', emoji:'🐋',
+    baseColor:'#26c6da',
+    individuals:[
+      { id:'HW-441', name:'Noa', region:'Hawaii → Alaska', inst:'NOAA Fisheries', period:'2018–2024', dist:'98,000 km', status:'Active', fact:'Recorded singing a completely novel song not heard from any other whale. ID confirmed by fluke pattern.', track:[[-157.8,21],[-155,25],[-153,30],[-152,35],[-151,42],[-149,50],[-148,57],[-149,50],[-151,42],[-152,35],[-153,30],[-155,25],[-157.8,21]] },
+      { id:'HW-892', name:'Antarctic Blue', region:'Antarctica → Tropics', inst:'Australian Antarctic Division', period:'2019–2024', dist:'112,000 km', status:'Active', fact:'Longest migration of any mammal ever recorded. Swam 18,840 km in one leg without feeding.', track:[[165,-68],[162,-58],[158,-45],[154,-30],[150,-15],[148,-5],[148,-15],[150,-30],[154,-45],[158,-58],[162,-68],[165,-68]] },
+      { id:'HW-203', name:'Bering', region:'Bering Sea → Mexico', inst:'Alaska Whale Foundation', period:'2020–2024', dist:'67,000 km', status:'Active', fact:'Travels 8,000 km to breed in warm water and eats absolutely nothing the entire journey.', track:[[-170.5,60],[-165,55],[-160,50],[-152,42],[-142,32],[-128,22],[-112,16],[-128,22],[-142,32],[-152,42],[-160,50],[-165,55],[-170.5,60]] },
+      { id:'HW-668', name:'Pacific Queen', region:'California → Hawaii', inst:'Cascadia Research', period:'2021–2024', dist:'55,000 km', status:'Active', fact:'Photo-identified by unique black-and-white fluke pattern since 1998. At least 26 years old.', track:[[-122.5,37.5],[-126,35],[-132,30],[-140,26],[-148,22],[-155,20],[-158,20.5],[-155,20],[-148,22],[-140,26],[-132,30],[-126,35],[-122.5,37.5]] },
+    ]
+  },
+  {
+    id:'elephant', name:'African Elephant', scientific:'Loxodonta africana', emoji:'🐘',
+    baseColor:'#ab47bc',
+    individuals:[
+      { id:'E-2019', name:'Amboseli Queen', region:'Kenya–Tanzania', inst:'Amboseli Trust for Elephants', period:'2015–2024', dist:'24,000 km', status:'Active', fact:'Matriarch of 47. Avoids poaching zones with 95% accuracy — possibly detecting human scent.', track:[[37.2,-2.5],[37.8,-2],[37.5,-1.2],[36.8,-0.5],[36.2,-1.1],[36,-2.2],[36.5,-3.1],[37,-3.8],[37.5,-3.2],[37.2,-2.5]] },
+      { id:'E-3341', name:'Samburu Bull', region:'Northern Kenya', inst:'Save the Elephants', period:'2017–2024', dist:'18,500 km', status:'Active', fact:'Walked 300 km in 5 days following drought — predicted the dry spell before environmental sensors did.', track:[[37.2,1.2],[37.8,0.8],[38.3,0.2],[38.8,-0.3],[38.3,0.2],[37.8,0.8],[37.2,1.2],[36.8,1.8],[36.2,1.3],[36.8,0.8],[37.2,1.2]] },
+      { id:'E-1205', name:'Zakouma Elder', region:'Chad', inst:'African Parks Network', period:'2018–2024', dist:'21,000 km', status:'Active', fact:'One of 500 survivors of the catastrophic 2000s poaching crisis that killed 90% of Chad elephants.', track:[[19.2,11.2],[20,11.8],[21,12.3],[20.5,13],[19.8,13.5],[19,13],[18.5,12.3],[18.2,11.5],[18.8,11],[19.2,11.2]] },
+      { id:'E-4401', name:'Gorongosa F4', region:'Mozambique', inst:'Gorongosa Restoration', period:'2019–2024', dist:'16,200 km', status:'Active', fact:'Part of a population that grew from 200 to 700 in the park restoration. Born during the recovery.', track:[[34.5,-18.2],[35,-18.8],[35.5,-19.3],[35,-19.8],[34.5,-19.3],[34,-18.8],[33.8,-18.2],[34.2,-17.8],[34.5,-18.2]] },
+      { id:'E-5501', name:'Selous Giant', region:'Tanzania', inst:'Wildlife Conservation Society', period:'2020–2024', dist:'13,800 km', status:'Active', fact:'Largest tusk length in current study cohort — 180 cm per side. Estimated age 55 years.', track:[[37.8,-8.5],[38.3,-8],[38.8,-7.5],[38.5,-7],[38,-7.5],[37.5,-8],[37.8,-8.5]] },
+    ]
+  },
+  {
+    id:'shark', name:'Great White Shark', scientific:'Carcharodon carcharias', emoji:'🦈',
+    baseColor:'#ef5350',
+    individuals:[
+      { id:'GW-117', name:'Deep Blue', region:'Pacific Ocean', inst:'OCEARCH', period:'2013–2024', dist:'82,000 km', status:'Active', fact:'Largest great white ever tagged at ~6m and ~2,000kg. Estimated 50 years old. Pinged near Guadalupe Island.', track:[[-116,29],[-122,34],[-130,32],[-140,28],[-150,22],[-158,18],[-165,20],[-175,24],[-178,20],[-165,16],[-155,18],[-145,22],[-135,26],[-125,28],[-116,29]] },
+      { id:'GW-334', name:"Unama'ki", region:'Nova Scotia → Gulf of Mexico', inst:'OCEARCH', period:'2019–2024', dist:'44,000 km', status:'Active', fact:"Her pings trended globally on Twitter when she dove to 1,500m depth. She's 4.5m and ~1,000kg.", track:[[-63,45],[-65,42],[-68,38],[-70,32],[-72,26],[-75,22],[-79,19],[-82,25],[-80,30],[-76,36],[-72,40],[-67,43],[-63,45]] },
+      { id:'GW-008', name:'Lydia', region:'North Atlantic → Mediterranean', inst:'OCEARCH', period:'2013–2024', dist:'76,000 km', status:'Active', fact:'First great white tracked crossing the Atlantic Ocean. Has now crossed it 3 times.', track:[[-80,30],[-72,35],[-62,38],[-50,40],[-40,42],[-28,41],[-18,38],[-8,36],[2,36],[8,37],[12,38],[8,37],[2,36],[-8,36],[-18,38],[-28,41],[-40,42],[-50,40],[-62,38],[-72,35],[-80,30]] },
+      { id:'GW-501', name:'Katharine', region:'Cape Cod → Bahamas', inst:'OCEARCH', period:'2012–2024', dist:'51,000 km', status:'Active', fact:'Most pinged shark in OCEARCH history. Has her own Twitter following of 130,000+.', track:[[-70,42],[-71,40],[-72,37],[-73,34],[-74,30],[-75,26],[-76,23],[-77,22],[-76,23],[-75,26],[-74,30],[-73,34],[-72,37],[-71,40],[-70,42]] },
+      { id:'GW-222', name:'Nukumi', region:'Nova Scotia → Caribbean', inst:'OCEARCH', period:'2020–2024', dist:'38,000 km', status:'Active', fact:'Largest female in the Nova Scotia white shark population. Named for Mi\'kmaw grandmother figure.', track:[[-64,44],[-66,41],[-68,37],[-70,33],[-71,29],[-72,25],[-73,22],[-74,19],[-73,22],[-72,25],[-71,29],[-70,33],[-68,37],[-66,41],[-64,44]] },
+    ]
+  },
+];
+
+// Generate individual colors within species family
+function shadeColor(hex, factor) {
+  // shift hue slightly for each animal in species
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  const nr = Math.min(255, Math.max(0, r + factor * 40));
+  const ng = Math.min(255, Math.max(0, g + factor * 25));
+  const nb = Math.min(255, Math.max(0, b + factor * 35));
+  return `rgb(${Math.round(nr)},${Math.round(ng)},${Math.round(nb)})`;
+}
+
+SPECIES.forEach(sp => {
+  sp.individuals.forEach((ani, i) => {
+    const factors = [-1.5,-0.8,-0.2,0.4,1.0,1.6,2.2];
+    ani.color = shadeColor(sp.baseColor, factors[i] || 0);
+    ani.spId = sp.id;
+    ani.spEmoji = sp.emoji;
+    ani.selected = false;
+  });
+});
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let map, tlValue = 100, isPlaying = false, playIv = null, playSpeed = 1;
+const layerMap = {}; // animalId → {trail, dot, pulse}
+const crossingMarkers = [];
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+function init() {
+  let pct = 0;
+  const bar = document.getElementById('loader-bar');
+  const iv = setInterval(() => {
+    pct += Math.random() * 18;
+    if (pct >= 100) { pct = 100; bar.style.width = '100%'; clearInterval(iv);
+      setTimeout(startApp, 400); }
+    else bar.style.width = pct + '%';
+  }, 100);
+}
+
+function startApp() {
+  document.getElementById('loader').classList.add('gone');
+  initMap();
+  buildPanel();
+  updateHeader();
+  // Select all by default
+  SPECIES.forEach(sp => sp.individuals.forEach(a => { a.selected = true; }));
+  renderAll();
+  updateHeader();
+  setupTimeline();
+}
+
+// ═══════════════════════════════════════
+// MAP
+// ═══════════════════════════════════════
+function initMap() {
+  map = L.map('map', {
+    center: [20, 0], zoom: 2,
+    minZoom: 1, maxZoom: 8,
+    worldCopyJump: true,
+    zoomControl: true,
+  });
+
+  // Satellite/terrain tiles from Esri — real blue ocean + green land
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri',
+    maxZoom: 8
+  }).addTo(map);
+}
+
+// ═══════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════
+function renderAll() {
+  // Clear existing
+  Object.values(layerMap).forEach(layers => {
+    Object.values(layers).forEach(l => { if (l && map.hasLayer(l)) map.removeLayer(l); });
+  });
+  Object.keys(layerMap).forEach(k => delete layerMap[k]);
+  clearCrossingMarkers();
+
+  const selected = getAllSelected();
+  selected.forEach(ani => renderAnimal(ani));
+
+  if (selected.length >= 2) detectCrossings(selected);
+  updateHeader();
+}
+
+function renderAnimal(ani) {
+  const pts = getVisibleTrack(ani.track);
+  if (pts.length < 2) return;
+
+  const latLngs = pts.map(([lng, lat]) => [lat, lng]);
+
+  // Trail
+  const trail = L.polyline(latLngs, {
+    color: ani.color,
+    weight: 2.5,
+    opacity: 0.75,
+    smoothFactor: 1.5,
+    dashArray: null,
+  }).addTo(map);
+
+  // Endpoint dot
+  const lastPt = latLngs[latLngs.length - 1];
+  const sp = SPECIES.find(s => s.id === ani.spId);
+
+  const dotIcon = L.divIcon({
+    className: '',
+    html: `<div style="
+      width:12px;height:12px;border-radius:50%;
+      background:${ani.color};
+      border:2px solid rgba(255,255,255,0.8);
+      box-shadow:0 0 10px ${ani.color}, 0 0 20px ${ani.color}55;
+      cursor:pointer;
+    "></div>`,
+    iconSize: [12, 12],
+    iconAnchor: [6, 6],
+  });
+
+  const dot = L.marker(lastPt, { icon: dotIcon, zIndexOffset: 100 })
+    .addTo(map)
+    .on('click', () => openDetail(ani, sp))
+    .on('mouseover', (e) => {
+      L.popup({ closeButton:false, offset:[0,-6] })
+        .setLatLng(e.latlng)
+        .setContent(`<b style="color:${ani.color}">${ani.name}</b><br><span style="opacity:0.6;font-size:11px">${sp.emoji} ${sp.name} · ${ani.id}</span>`)
+        .openOn(map);
+    })
+    .on('mouseout', () => map.closePopup());
+
+  layerMap[ani.id] = { trail, dot };
+}
+
+function getVisibleTrack(track) {
+  const count = Math.max(2, Math.round(track.length * tlValue / 100));
+  return track.slice(0, count);
+}
+
+// ═══════════════════════════════════════
+// CROSSING DETECTION
+// ═══════════════════════════════════════
+function detectCrossings(animals) {
+  clearCrossingMarkers();
+  const crossings = [];
+  const THRESHOLD = 3.5; // degrees (~350km)
+
+  for (let i = 0; i < animals.length; i++) {
+    for (let j = i + 1; j < animals.length; j++) {
+      const a = animals[i], b = animals[j];
+      const aTrack = getVisibleTrack(a.track);
+      const bTrack = getVisibleTrack(b.track);
+
+      aTrack.forEach(([aLon, aLat]) => {
+        bTrack.forEach(([bLon, bLat]) => {
+          const dist = Math.sqrt(Math.pow(aLon - bLon, 2) + Math.pow(aLat - bLat, 2));
+          if (dist < THRESHOLD) {
+            const midLat = (aLat + bLat) / 2;
+            const midLon = (aLon + bLon) / 2;
+            // Dedupe
+            const tooClose = crossings.some(c => Math.abs(c[0] - midLat) < 2 && Math.abs(c[1] - midLon) < 2);
+            if (!tooClose) {
+              crossings.push([midLat, midLon, a, b]);
+            }
+          }
+        });
+      });
+    }
+  }
+
+  crossings.forEach(([lat, lon, a, b]) => {
+    const icon = L.divIcon({
+      className: 'crossing-marker',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7],
+    });
+    const marker = L.marker([lat, lon], { icon, zIndexOffset: 500 })
+      .addTo(map)
+      .on('click', () => {
+        L.popup()
+          .setLatLng([lat, lon])
+          .setContent(`
+            <div style="line-height:1.7">
+              <b style="color:#ffb400;font-size:12px">⚡ PATH CROSSING DETECTED</b><br>
+              <span style="color:${a.color}">● ${a.name}</span> (${a.id})<br>
+              <span style="color:${b.color}">● ${b.name}</span> (${b.id})<br>
+              <span style="opacity:0.5;font-size:10px">${lat.toFixed(2)}°, ${lon.toFixed(2)}°</span>
+            </div>
+          `)
+          .openOn(map);
+      });
+    crossingMarkers.push(marker);
+  });
+
+  // Update crossings bar
+  const bar = document.getElementById('crossings-bar');
+  if (crossings.length > 0) {
+    bar.style.display = 'block';
+    bar.innerHTML = `<b>${crossings.length}</b> PATH CROSSING${crossings.length > 1 ? 'S' : ''} DETECTED — click <span style="color:#ffb400">●</span> on map`;
+  } else {
+    bar.style.display = 'none';
+  }
+  document.getElementById('h-crossings').textContent = crossings.length;
+}
+
+function clearCrossingMarkers() {
+  crossingMarkers.forEach(m => { if (map.hasLayer(m)) map.removeLayer(m); });
+  crossingMarkers.length = 0;
+  document.getElementById('crossings-bar').style.display = 'none';
+  document.getElementById('h-crossings').textContent = 0;
+}
+
+// ═══════════════════════════════════════
+// PANEL
+// ═══════════════════════════════════════
+function buildPanel() {
+  const scroll = document.getElementById('species-scroll');
+  scroll.innerHTML = '';
+
+  SPECIES.forEach(sp => {
+    const block = document.createElement('div');
+    block.className = 'sp-block';
+    block.id = `sp-block-${sp.id}`;
+
+    const hdr = document.createElement('div');
+    hdr.className = 'sp-header';
+    hdr.innerHTML = `
+      <div class="sp-swatch" style="background:${sp.baseColor};box-shadow:0 0 6px ${sp.baseColor}"></div>
+      <span class="sp-emoji">${sp.emoji}</span>
+      <div class="sp-label">
+        <div class="sp-name">${sp.name}</div>
+        <div class="sp-sci">${sp.scientific}</div>
+      </div>
+      <div class="sp-count">${sp.individuals.length} tracked</div>
+      <button class="sp-toggle on" id="sptog-${sp.id}" title="Toggle all">✓</button>
+      <span class="sp-chevron" id="chev-${sp.id}">›</span>
+    `;
+
+    const list = document.createElement('div');
+    list.className = 'animals-list';
+    list.id = `anlist-${sp.id}`;
+
+    // "Select All / None" row
+    const allRow = document.createElement('div');
+    allRow.className = 'all-row';
+    allRow.innerHTML = `<span>SELECT: </span><span style="color:var(--text);margin-left:4px;text-decoration:underline" id="sel-all-${sp.id}">ALL</span><span style="margin:0 4px">/</span><span style="color:var(--text);text-decoration:underline" id="sel-none-${sp.id}">NONE</span>`;
+    list.appendChild(allRow);
+
+    document.getElementById(`sel-all-${sp.id}`) && null; // will bind after append
+
+    sp.individuals.forEach(ani => {
+      const row = document.createElement('div');
+      row.className = 'animal-row selected';
+      row.id = `anirow-${ani.id}`;
+      row.innerHTML = `
+        <div class="ani-color" style="background:${ani.color};color:${ani.color};box-shadow:0 0 5px ${ani.color}"></div>
+        <div class="ani-name">${ani.name}</div>
+        <div class="ani-id">${ani.id}</div>
+        <div class="ani-check">✓</div>
+      `;
+      row.addEventListener('click', () => toggleAnimal(ani, row));
+      list.appendChild(row);
+    });
+
+    block.appendChild(hdr);
+    block.appendChild(list);
+    scroll.appendChild(block);
+
+    // Chevron expand/collapse
+    hdr.addEventListener('click', (e) => {
+      if (e.target.closest('.sp-toggle')) return;
+      const listEl = document.getElementById(`anlist-${sp.id}`);
+      const chev = document.getElementById(`chev-${sp.id}`);
+      listEl.classList.toggle('open');
+      chev.classList.toggle('open');
+    });
+
+    // Species master toggle
+    document.getElementById(`sptog-${sp.id}`).addEventListener('click', (e) => {
+      e.stopPropagation();
+      const allOn = sp.individuals.every(a => a.selected);
+      sp.individuals.forEach(a => {
+        a.selected = !allOn;
+        const row = document.getElementById(`anirow-${a.id}`);
+        if (row) row.classList.toggle('selected', a.selected);
+      });
+      const tog = document.getElementById(`sptog-${sp.id}`);
+      tog.classList.toggle('on', !allOn);
+      tog.textContent = !allOn ? '✓' : '○';
+      renderAll();
+    });
+
+    // Bind select all/none after DOM exists
+    setTimeout(() => {
+      const sa = document.getElementById(`sel-all-${sp.id}`);
+      const sn = document.getElementById(`sel-none-${sp.id}`);
+      if (sa) sa.addEventListener('click', (e) => { e.stopPropagation(); sp.individuals.forEach(a => { a.selected = true; const r = document.getElementById(`anirow-${a.id}`); if(r) r.classList.add('selected'); }); renderAll(); });
+      if (sn) sn.addEventListener('click', (e) => { e.stopPropagation(); sp.individuals.forEach(a => { a.selected = false; const r = document.getElementById(`anirow-${a.id}`); if(r) r.classList.remove('selected'); }); renderAll(); });
+    }, 0);
+  });
+
+  // Search
+  document.getElementById('search-box').addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    SPECIES.forEach(sp => {
+      sp.individuals.forEach(ani => {
+        const row = document.getElementById(`anirow-${ani.id}`);
+        if (!row) return;
+        const match = ani.name.toLowerCase().includes(q) || ani.id.toLowerCase().includes(q) || sp.name.toLowerCase().includes(q);
+        row.style.display = match || !q ? '' : 'none';
+      });
+      // Auto-expand if search matches
+      if (q) {
+        const hasMatch = sp.individuals.some(a => a.name.toLowerCase().includes(q) || sp.name.toLowerCase().includes(q));
+        if (hasMatch) {
+          document.getElementById(`anlist-${sp.id}`).classList.add('open');
+          document.getElementById(`chev-${sp.id}`).classList.add('open');
+        }
+      }
+    });
+  });
+}
+
+function toggleAnimal(ani, row) {
+  ani.selected = !ani.selected;
+  row.classList.toggle('selected', ani.selected);
+  // Update species master toggle state
+  const sp = SPECIES.find(s => s.id === ani.spId);
+  const tog = document.getElementById(`sptog-${sp.id}`);
+  const allOn = sp.individuals.every(a => a.selected);
+  tog.classList.toggle('on', allOn);
+  tog.textContent = allOn ? '✓' : '○';
+  renderAll();
+}
+
+function getAllSelected() {
+  return SPECIES.flatMap(sp => sp.individuals.filter(a => a.selected));
+}
+
+// ═══════════════════════════════════════
+// DETAIL CARD
+// ═══════════════════════════════════════
+function openDetail(ani, sp) {
+  document.getElementById('dc-emoji').textContent = sp.emoji;
+  document.getElementById('dc-name').textContent = ani.name.toUpperCase();
+  document.getElementById('dc-name').style.color = ani.color;
+  document.getElementById('dc-id').textContent = `TAG: ${ani.id} · ${sp.scientific}`;
+  document.getElementById('dc-dist').textContent = ani.dist;
+  document.getElementById('dc-dist').style.color = ani.color;
+  document.getElementById('dc-region').textContent = ani.region;
+  document.getElementById('dc-period').textContent = ani.period;
+  document.getElementById('dc-inst').textContent = ani.inst;
+  document.getElementById('dc-status').textContent = ani.status;
+  document.getElementById('dc-status').style.color = ani.status === 'Active' ? '#3ecf8e' : '#ef5350';
+  document.getElementById('dc-fact').textContent = ani.fact;
+  document.getElementById('detail-card').classList.add('open');
+}
+document.getElementById('dc-close').addEventListener('click', () => document.getElementById('detail-card').classList.remove('open'));
+
+// ═══════════════════════════════════════
+// HEADER STATS
+// ═══════════════════════════════════════
+function updateHeader() {
+  const sel = getAllSelected();
+  document.getElementById('h-selected').textContent = sel.length;
+  document.getElementById('h-animals').textContent = SPECIES.reduce((n, sp) => n + sp.individuals.length, 0);
+}
+
+// ═══════════════════════════════════════
+// TIMELINE
+// ═══════════════════════════════════════
+const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
+function setupTimeline() {
+  const slider = document.getElementById('tl-slider');
+  const dateEl = document.getElementById('tl-date');
+  const playBtn = document.getElementById('play-btn');
+  const speedBtn = document.getElementById('tl-speed');
+  const speeds = [1,2,4];
+  let speedIdx = 0;
+
+  function updateDate(v) {
+    const totalMonths = 72; // 6 years
+    const m = Math.floor(v / 100 * totalMonths);
+    const year = 2018 + Math.floor(m / 12);
+    const month = m % 12;
+    dateEl.textContent = `${MONTHS[month]} ${year}`;
+  }
+
+  slider.addEventListener('input', () => {
+    tlValue = parseInt(slider.value);
+    updateDate(tlValue);
+    renderAll();
+  });
+
+  playBtn.addEventListener('click', () => {
+    if (isPlaying) {
+      isPlaying = false; playBtn.textContent = '▶'; clearInterval(playIv);
+    } else {
+      isPlaying = true; playBtn.textContent = '⏸';
+      if (tlValue >= 100) { slider.value = 0; tlValue = 0; }
+      playIv = setInterval(() => {
+        tlValue = Math.min(100, tlValue + 0.4 * playSpeed);
+        slider.value = tlValue;
+        updateDate(tlValue);
+        renderAll();
+        if (tlValue >= 100) { isPlaying = false; playBtn.textContent = '▶'; clearInterval(playIv); }
+      }, 50);
+    }
+  });
+
+  speedBtn.addEventListener('click', () => {
+    speedIdx = (speedIdx + 1) % speeds.length;
+    playSpeed = speeds[speedIdx];
+    speedBtn.textContent = `${playSpeed}×`;
+  });
+
+  updateDate(100);
+}
+
+init();
+</script>
+</body>
+</html>
