@@ -379,13 +379,12 @@ body::after {
 .log-line.info { color:rgba(0,255,255,0.5); }
 
 /* ── LEAFLET MAP ── */
-#sentinel-map-wrap {
-    position:relative;
+#sentinel-map {
     width:100%;
-    border-top:1px solid rgba(0,255,255,0.1);
-    border-bottom:1px solid rgba(0,255,255,0.1);
-    overflow:hidden;
+    height:380px;  /* already there */
     background:#000;
+    z-index:1;
+    display:block; /* ADD THIS */
 }
 
 #sentinel-map {
@@ -1273,6 +1272,9 @@ function initMap() {
         subdomains: 'abcd',
         maxZoom: 19
     }).addTo(map);
+    
+    // Force Leaflet to recalculate size after render
+    setTimeout(() => map.invalidateSize(), 100);
 }
 
 function isStale(lastSeen) {
@@ -1430,9 +1432,11 @@ fetchGuestbook();
 setInterval(fetchGuestbook, 30000);
 
 window.addEventListener('load', () => {
-    initMap();
-    fetchNodes();
-    setInterval(fetchNodes, 60000);
+    setTimeout(() => {
+        initMap();
+        fetchNodes();
+        setInterval(fetchNodes, 60000);
+    }, 500);
 });
 </script>
 
