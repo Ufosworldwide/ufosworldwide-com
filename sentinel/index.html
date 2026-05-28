@@ -1429,18 +1429,11 @@ async function fetchNodes() {
 fetchGuestbook();
 setInterval(fetchGuestbook, 30000);
 
-// Init map after DOM ready, then fetch nodes
-if (typeof L !== 'undefined') {
+window.addEventListener('load', () => {
     initMap();
     fetchNodes();
     setInterval(fetchNodes, 60000);
-} else {
-    window.addEventListener('load', () => {
-        initMap();
-        fetchNodes();
-        setInterval(fetchNodes, 60000);
-    });
-}
+});
 </script>
 
 </body>
