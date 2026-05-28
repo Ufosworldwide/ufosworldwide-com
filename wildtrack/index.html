@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WILDTRACK — Global Animal Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #030508;
+    --deep: #070d14;
+    --panel: #0a1520;
+    --border: #0f2035;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --accent3: #39ff14;
+    --accent4: #ff3de8;
+    --text: #c8dde8;
+    --muted: #4a6578;
+    --wolf: #4fc3f7;
+    --osprey: #ff8a65;
+    --monarch: #ffb300;
+    --whale: #80cbc4;
+    --elephant: #ce93d8;
+    --shark: #ef5350;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--void);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* GRAIN OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* HEADER */
+  #header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    background: linear-gradient(180deg, rgba(3,5,8,0.98) 0%, rgba(3,5,8,0.8) 100%);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 32px;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  #logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(0,229,255,0.5);
+  }
+
+  #logo span {
+    color: var(--text);
+    opacity: 0.4;
+    font-size: 12px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 2px;
+    margin-left: 12px;
+    vertical-align: middle;
+  }
+
+  #live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent3);
+    letter-spacing: 1px;
+    margin-left: auto;
+  }
+
+  #live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent3);
+    box-shadow: 0 0 8px var(--accent3);
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  #stats-bar {
+    display: flex;
+    gap: 24px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  #stats-bar span { color: var(--accent); }
+
+  /* MAP CANVAS */
+  #map-container {
+    position: fixed;
+    inset: 0;
+    background: var(--void);
+  }
+
+  #world-map {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* LEFT PANEL — SPECIES SELECTOR */
+  #species-panel {
+    position: fixed;
+    left: 0; top: 56px; bottom: 0;
+    width: 260px;
+    background: linear-gradient(90deg, rgba(7,13,20,0.97) 0%, rgba(7,13,20,0.85) 100%);
+    border-right: 1px solid var(--border);
+    z-index: 50;
+    overflow-y: auto;
+    padding: 20px 0;
+    backdrop-filter: blur(8px);
+  }
+
+  #species-panel::-webkit-scrollbar { width: 3px; }
+  #species-panel::-webkit-scrollbar-track { background: transparent; }
+  #species-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .panel-section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    padding: 0 20px 12px;
+    text-transform: uppercase;
+  }
+
+  .species-card {
+    padding: 14px 20px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+    user-select: none;
+  }
+
+  .species-card:hover {
+    background: rgba(255,255,255,0.03);
+  }
+
+  .species-card.active {
+    background: rgba(255,255,255,0.05);
+  }
+
+  .species-card .sp-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .species-card .sp-scientific {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .species-card .sp-meta {
+    display: flex;
+    gap: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+  }
+
+  .species-card .sp-meta strong {
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  .sp-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    position: absolute;
+    right: 20px; top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  /* RIGHT PANEL — ANIMAL DETAIL */
+  #detail-panel {
+    position: fixed;
+    right: 0; top: 56px; bottom: 0;
+    width: 280px;
+    background: linear-gradient(270deg, rgba(7,13,20,0.97) 0%, rgba(7,13,20,0.85) 100%);
+    border-left: 1px solid var(--border);
+    z-index: 50;
+    padding: 24px 20px;
+    backdrop-filter: blur(8px);
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  #detail-panel.open {
+    transform: translateX(0);
+  }
+
+  #detail-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 28px; height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+
+  #detail-close:hover { border-color: var(--accent); color: var(--accent); }
+
+  #detail-emoji { font-size: 48px; margin-bottom: 12px; display: block; }
+
+  #detail-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 2px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  #detail-id {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .detail-stat {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .detail-stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .detail-stat-value {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .detail-stat-value.highlight {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    color: var(--accent);
+  }
+
+  /* BOTTOM TIMELINE */
+  #timeline {
+    position: fixed;
+    bottom: 0; left: 260px; right: 0;
+    height: 60px;
+    background: linear-gradient(0deg, rgba(3,5,8,0.98) 0%, rgba(3,5,8,0.7) 100%);
+    border-top: 1px solid var(--border);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    gap: 20px;
+    backdrop-filter: blur(8px);
+  }
+
+  #timeline-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    white-space: nowrap;
+  }
+
+  #timeline-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 2px;
+    background: var(--border);
+    outline: none;
+    border-radius: 1px;
+    cursor: pointer;
+  }
+
+  #timeline-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+    cursor: pointer;
+  }
+
+  #timeline-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    white-space: nowrap;
+    min-width: 80px;
+    text-align: right;
+  }
+
+  #play-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 32px; height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  #play-btn:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 10px rgba(0,229,255,0.2); }
+
+  /* LOADING */
+  #loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--void);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    transition: opacity 0.8s ease;
+  }
+
+  #loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #loading-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    letter-spacing: 8px;
+    color: var(--accent);
+    text-shadow: 0 0 40px rgba(0,229,255,0.4);
+    animation: logo-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes logo-pulse {
+    0%, 100% { text-shadow: 0 0 40px rgba(0,229,255,0.4); }
+    50% { text-shadow: 0 0 80px rgba(0,229,255,0.8); }
+  }
+
+  #loading-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--muted);
+  }
+
+  #loading-bar-wrap {
+    width: 240px;
+    height: 1px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #loading-bar {
+    height: 100%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  /* LEGEND */
+  #legend {
+    position: fixed;
+    bottom: 72px;
+    left: 272px;
+    display: flex;
+    gap: 16px;
+    z-index: 50;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 6px 10px;
+    background: rgba(3,5,8,0.8);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .legend-item:hover { border-color: var(--muted); color: var(--text); }
+  .legend-item.active { border-color: currentColor; }
+
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 6px currentColor;
+  }
+
+  /* TOOLTIP */
+  #tooltip {
+    position: fixed;
+    background: rgba(10,21,32,0.95);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text);
+    pointer-events: none;
+    z-index: 150;
+    display: none;
+    backdrop-filter: blur(8px);
+    max-width: 200px;
+    line-height: 1.6;
+  }
+
+  /* SVG MAP STYLES */
+  .land { fill: #0d1f2d; stroke: #162a3d; stroke-width: 0.3; }
+  .graticule { fill: none; stroke: #0a1520; stroke-width: 0.3; }
+  .sphere { fill: #030d18; }
+
+  .animal-dot {
+    cursor: pointer;
+    transition: r 0.2s;
+  }
+  .animal-dot:hover { filter: brightness(1.5); }
+
+  .animal-trail {
+    fill: none;
+    stroke-width: 1.2;
+    opacity: 0.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .pulse-ring {
+    fill: none;
+    stroke-width: 1;
+    animation: ring-expand 2s ease-out infinite;
+  }
+
+  @keyframes ring-expand {
+    0% { r: 4; opacity: 0.8; }
+    100% { r: 14; opacity: 0; }
+  }
+
+  .study-marker {
+    cursor: pointer;
+  }
+
+  /* COUNTER */
+  #active-count {
+    position: fixed;
+    top: 68px;
+    left: 272px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    z-index: 50;
+    letter-spacing: 1px;
+  }
+
+  #active-count span { color: var(--accent); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading-overlay">
+  <div id="loading-logo">WILDTRACK</div>
+  <div id="loading-sub">GLOBAL ANIMAL INTELLIGENCE SYSTEM</div>
+  <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
+</div>
+
+<!-- HEADER -->
+<div id="header">
+  <div id="logo">WILDTRACK <span>// GLOBAL TRACKING NETWORK</span></div>
+  <div id="stats-bar">
+    <div>SPECIES: <span id="stat-species">6</span></div>
+    <div>ANIMALS: <span id="stat-animals">0</span></div>
+    <div>STUDIES: <span id="stat-studies">0</span></div>
+    <div>DATA PTS: <span id="stat-datapts">0</span></div>
+  </div>
+  <div id="live-indicator">
+    <div id="live-dot"></div>
+    MOVEBANK NETWORK
+  </div>
+</div>
+
+<!-- MAP -->
+<div id="map-container">
+  <svg id="world-map"></svg>
+</div>
+
+<!-- SPECIES PANEL -->
+<div id="species-panel">
+  <div class="panel-section-title">SELECT SPECIES</div>
+  <div id="species-list"></div>
+</div>
+
+<!-- DETAIL PANEL -->
+<div id="detail-panel">
+  <button id="detail-close">✕</button>
+  <span id="detail-emoji">🐺</span>
+  <div id="detail-name">ANIMAL NAME</div>
+  <div id="detail-id">TAG ID: —</div>
+  <div class="detail-stat">
+    <div class="detail-stat-label">Distance Traveled</div>
+    <div class="detail-stat-value highlight" id="d-distance">—</div>
+  </div>
+  <div class="detail-stat">
+    <div class="detail-stat-label">Study Region</div>
+    <div class="detail-stat-value" id="d-region">—</div>
+  </div>
+  <div class="detail-stat">
+    <div class="detail-stat-label">Tracking Period</div>
+    <div class="detail-stat-value" id="d-period">—</div>
+  </div>
+  <div class="detail-stat">
+    <div class="detail-stat-label">Research Institution</div>
+    <div class="detail-stat-value" id="d-institution">—</div>
+  </div>
+  <div class="detail-stat">
+    <div class="detail-stat-label">Status</div>
+    <div class="detail-stat-value" id="d-status">—</div>
+  </div>
+  <div class="detail-stat">
+    <div class="detail-stat-label">Fun Fact</div>
+    <div class="detail-stat-value" style="font-size:13px; line-height:1.5" id="d-fact">—</div>
+  </div>
+</div>
+
+<!-- ACTIVE COUNT -->
+<div id="active-count">SHOWING <span id="count-num">0</span> TRACKED ANIMALS</div>
+
+<!-- LEGEND -->
+<div id="legend"></div>
+
+<!-- BOTTOM TIMELINE -->
+<div id="timeline">
+  <div id="timeline-label">TIME RANGE</div>
+  <button id="play-btn">▶</button>
+  <input type="range" id="timeline-slider" min="0" max="100" value="100">
+  <div id="timeline-date">2024</div>
+</div>
+
+<!-- TOOLTIP -->
+<div id="tooltip"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA: Rich simulated animal tracking data
+// (In production: pull from Movebank API)
+// ═══════════════════════════════════════════════
+
+const SPECIES = [
+  {
+    id: 'wolf',
+    name: 'GREY WOLF',
+    scientific: 'Canis lupus',
+    emoji: '🐺',
+    color: '#4fc3f7',
+    count: 847,
+    studies: 23,
+    dataPoints: 1240000,
+    description: 'Tracked across North America and Eurasia'
+  },
+  {
+    id: 'osprey',
+    name: 'OSPREY',
+    scientific: 'Pandion haliaetus',
+    emoji: '🦅',
+    color: '#ff8a65',
+    count: 312,
+    studies: 18,
+    dataPoints: 890000,
+    description: 'Annual migrations spanning continents'
+  },
+  {
+    id: 'monarch',
+    name: 'MONARCH BUTTERFLY',
+    scientific: 'Danaus plexippus',
+    emoji: '🦋',
+    color: '#ffb300',
+    count: 2847,
+    studies: 41,
+    dataPoints: 3200000,
+    description: 'Mass migration corridors across Americas'
+  },
+  {
+    id: 'whale',
+    name: 'HUMPBACK WHALE',
+    scientific: 'Megaptera novaeangliae',
+    emoji: '🐋',
+    color: '#80cbc4',
+    count: 156,
+    studies: 12,
+    dataPoints: 540000,
+    description: 'Ocean-wide migration routes tracked'
+  },
+  {
+    id: 'elephant',
+    name: 'AFRICAN ELEPHANT',
+    scientific: 'Loxodonta africana',
+    emoji: '🐘',
+    color: '#ce93d8',
+    count: 423,
+    studies: 29,
+    dataPoints: 980000,
+    description: 'Savanna and forest range mapping'
+  },
+  {
+    id: 'shark',
+    name: 'GREAT WHITE SHARK',
+    scientific: 'Carcharodon carcharias',
+    emoji: '🦈',
+    color: '#ef5350',
+    count: 89,
+    studies: 8,
+    dataPoints: 320000,
+    description: 'Deep ocean migration tracking'
+  }
+];
+
+// Animal individual data
+const ANIMALS = {
+  wolf: [
+    { id: 'W-2847', name: 'Aspen', region: 'Yellowstone, Wyoming', institution: 'US Fish & Wildlife Service', period: '2019–2024', distance: '12,400 km', status: 'Active', fact: 'Crossed into Canada 3 times. Leads a pack of 11.', trails: [[-110,44.7],[-112,45.2],[-114,46.1],[-116,47.2],[-114,48.1],[-112,47.5],[-110,46.8],[-109,45.9],[-110,44.7]] },
+    { id: 'W-3102', name: 'Kodiak', region: 'Alaska Interior', institution: 'UAF Institute of Arctic Biology', period: '2020–2024', distance: '8,200 km', status: 'Active', fact: 'Survived two winters above the Arctic Circle solo.', trails: [[-148,64],[-150,65],[-152,66],[-154,65.5],[-152,64.8],[-150,63.5],[-148,64]] },
+    { id: 'W-1991', name: 'Freki', region: 'Scandinavia', institution: 'Norwegian Institute for Nature Research', period: '2018–2023', distance: '15,800 km', status: 'Deceased', fact: 'Traveled from Norway to Finland and back in a single year.', trails: [[12,61],[14,62],[16,63],[18,64],[20,65],[22,64],[20,63],[18,62],[16,61],[12,61]] },
+    { id: 'W-4201', name: 'Luna', region: 'Rocky Mountains, Colorado', institution: 'Colorado State University', period: '2021–2024', distance: '6,700 km', status: 'Active', fact: 'First wolf confirmed in Colorado in 70 years.', trails: [[-106,39],[-107,40],[-108,41],[-107,42],[-106,41.5],[-105,40.5],[-106,39]] },
+    { id: 'W-2550', name: 'Tundra', region: 'Siberia, Russia', institution: 'Russian Academy of Sciences', period: '2019–2024', distance: '19,200 km', status: 'Active', fact: 'Longest tracked wolf journey on record in Asia.', trails: [[90,62],[95,63],[100,64],[105,65],[110,64],[108,62],[103,61],[97,62],[90,62]] },
+    { id: 'W-3388', name: 'Cascade', region: 'Pacific Northwest', institution: 'Oregon Dept of Fish & Wildlife', period: '2020–2024', distance: '9,100 km', status: 'Active', fact: 'Swam the Columbia River 12 times.', trails: [[-121,46],[-120,47],[-119,48],[-118,47.5],[-119,46.5],[-120,45.5],[-121,46]] },
+  ],
+  osprey: [
+    { id: 'O-881', name: 'Scotia', region: 'Scotland → West Africa', institution: 'Royal Society for the Protection of Birds', period: '2018–2024', distance: '42,000 km', status: 'Active', fact: 'Crosses the Sahara Desert twice a year without stopping.', trails: [[-4,57],[0,50],[5,45],[0,35],[-5,25],[-10,15],[-14,10],[-15,5],[-14,10],[-10,15],[-5,25],[0,35],[5,45],[0,50],[-4,57]] },
+    { id: 'O-1047', name: 'Malawi', region: 'Finland → Malawi', institution: 'University of Helsinki', period: '2019–2024', distance: '38,500 km', status: 'Active', fact: 'Uses the same thermal columns over Libya every autumn.', trails: [[25,62],[25,55],[25,45],[30,30],[32,20],[34,10],[35,0],[35,-5],[35,0],[34,10],[32,20],[30,30],[25,45],[25,55],[25,62]] },
+    { id: 'O-2201', name: 'Chesapeake', region: 'Maryland → Venezuela', institution: 'College of William & Mary', period: '2020–2024', distance: '31,200 km', status: 'Active', fact: 'Returns to the same nest post within 2 days every year.', trails: [[-76,39],[-75,35],[-74,30],[-72,25],[-68,18],[-65,12],[-63,8],[-65,12],[-68,18],[-72,25],[-74,30],[-75,35],[-76,39]] },
+    { id: 'O-445', name: 'Kielder', region: 'England → Gambia', institution: 'Northumbria University', period: '2017–2022', distance: '29,800 km', status: 'Deceased', fact: 'Died in Gambia after 5 successful migrations. Mourned internationally.', trails: [[-2,55],[0,50],[0,40],[-5,30],[-10,20],[-14,12],[-15,8],[-14,12],[-10,20],[-5,30],[0,40],[0,50],[-2,55]] },
+  ],
+  monarch: [
+    { id: 'M-10042', name: 'Monarch #10042', region: 'Ontario → Michoacán', institution: 'University of Guelph', period: '2022–2024', distance: '8,900 km', status: 'Active', fact: 'One of 300 million. Weighs 0.5 grams. Crossed Lake Erie.', trails: [[-79,43],[-82,42],[-85,40],[-87,38],[-90,35],[-92,30],[-95,25],[-97,20],[-100,19.5],[-97,20],[-95,25],[-92,30],[-90,35],[-87,38],[-85,40],[-82,42],[-79,43]] },
+    { id: 'M-8871', name: 'Monarch #8871', region: 'Minnesota → Mexico', institution: 'University of Minnesota', period: '2021–2024', distance: '9,200 km', status: 'Active', fact: 'Navigates using the sun as a compass, correcting for time of day.', trails: [[-94,45],[-95,42],[-96,38],[-97,34],[-98,28],[-99,22],[-100,19.5],[-99,22],[-98,28],[-97,34],[-96,38],[-95,42],[-94,45]] },
+    { id: 'M-5532', name: 'Monarch #5532', region: 'Quebec → Michoacán', institution: 'Université de Montréal', period: '2023–2024', distance: '7,800 km', status: 'Active', fact: 'Fourth generation to make this exact journey. No individual does it twice.', trails: [[-73,46],[-78,44],[-82,41],[-88,37],[-93,32],[-97,26],[-100,19.5],[-97,26],[-93,32],[-88,37],[-82,41],[-78,44],[-73,46]] },
+  ],
+  whale: [
+    { id: 'HW-441', name: 'Noa', region: 'Hawaii → Alaska', institution: 'NOAA Fisheries', period: '2018–2024', distance: '98,000 km', status: 'Active', fact: 'Recorded singing a song not heard from any other whale.', trails: [[-157,21],[-155,25],[-153,30],[-152,35],[-151,42],[-148,50],[-147,55],[-148,50],[-151,42],[-153,30],[-155,25],[-157,21]] },
+    { id: 'HW-892', name: 'Orca Prime', region: 'Antarctic → Tropics', institution: 'Australian Antarctic Division', period: '2019–2024', distance: '112,000 km', status: 'Active', fact: 'Longest migration of any mammal ever recorded.', trails: [[170,-70],[165,-60],[160,-45],[155,-30],[150,-15],[148,-5],[148,-15],[150,-30],[155,-45],[160,-60],[170,-70]] },
+    { id: 'HW-203', name: 'Bering', region: 'Bering Sea → Mexico', institution: 'Alaska Whale Foundation', period: '2020–2024', distance: '67,000 km', status: 'Active', fact: 'Travels 8,000 km to breed in warm water, eats nothing the entire time.', trails: [[-170,60],[-165,55],[-160,50],[-150,40],[-140,30],[-125,20],[-110,15],[-125,20],[-140,30],[-150,40],[-160,50],[-165,55],[-170,60]] },
+  ],
+  elephant: [
+    { id: 'E-2019', name: 'Amboseli Queen', region: 'Kenya–Tanzania border', institution: 'Amboseli Trust for Elephants', period: '2015–2024', distance: '24,000 km', status: 'Active', fact: 'Matriarch of 47. Avoids poaching zones with 95% accuracy.', trails: [[37,-2.5],[38,-2],[37.5,-1],[37,-0.5],[36.5,-1],[36,-2],[36.5,-3],[37,-3.5],[37.5,-3],[37,-2.5]] },
+    { id: 'E-3341', name: 'Samburu Bull', region: 'Northern Kenya', institution: 'Save the Elephants', period: '2017–2024', distance: '18,500 km', status: 'Active', fact: 'Walked 300km in 5 days following drought — predicted it before sensors.', trails: [[37,1],[37.5,0.5],[38,0],[38.5,-0.5],[38,0],[37.5,0.5],[37,1],[36.5,1.5],[36,1],[36.5,0.5],[37,1]] },
+    { id: 'E-1205', name: 'Zakouma Elder', region: 'Chad', institution: 'African Parks Network', period: '2018–2024', distance: '21,000 km', status: 'Active', fact: 'One of 500 survivors of the 2000s poaching crisis in Chad.', trails: [[19,11],[20,11.5],[21,12],[20.5,12.5],[20,13],[19.5,12.5],[19,12],[18.5,11.5],[19,11]] },
+    { id: 'E-4401', name: 'Gorongosa Female', region: 'Mozambique', institution: 'Gorongosa Restoration Project', period: '2019–2024', distance: '16,200 km', status: 'Active', fact: 'Part of a population that grew from 200 to 700 in the restoration.', trails: [[34.5,-18],[35,-18.5],[35.5,-19],[35,-19.5],[34.5,-19],[34,-18.5],[34.5,-18]] },
+  ],
+  shark: [
+    { id: 'GW-117', name: 'Deep Blue', region: 'Pacific Ocean', institution: 'OCEARCH', period: '2013–2024', distance: '82,000 km', status: 'Active', fact: 'Largest great white ever tagged. ~6m, ~2,000kg. 50 years old.', trails: [[-120,28],[-130,25],[-140,20],[-150,15],[-155,10],[-160,15],[-165,20],[-170,25],[-175,20],[-170,15],[-160,10],[-155,15],[-150,20],[-140,25],[-130,28],[-120,28]] },
+    { id: 'GW-334', name: 'Unama\'ki', region: 'Nova Scotia → Gulf of Mexico', institution: 'OCEARCH', period: '2019–2024', distance: '44,000 km', status: 'Active', fact: 'Her pings trended globally on Twitter when she dove to 1,500m depth.', trails: [[-62,45],[-65,42],[-68,38],[-70,32],[-72,26],[-75,22],[-80,18],[-82,25],[-80,30],[-75,35],[-70,40],[-65,43],[-62,45]] },
+    { id: 'GW-008', name: 'Lydia', region: 'North Atlantic → Mediterranean', institution: 'OCEARCH', period: '2013–2024', distance: '76,000 km', status: 'Active', fact: 'First great white to be tracked crossing the Atlantic Ocean.', trails: [[-80,30],[-70,35],[-60,38],[-50,40],[-40,42],[-30,41],[-20,38],[-10,36],[0,36],[5,37],[10,38],[0,36],[-10,36],[-20,38],[-30,41],[-40,42],[-50,40],[-60,38],[-70,35],[-80,30]] },
+  ]
+};
+
+// ═══════════════════════════════════════════════
+// WORLD MAP SVG (Simplified Mercator projection)
+// ═══════════════════════════════════════════════
+
+function lonLatToXY(lon, lat, w, h) {
+  const x = (lon + 180) / 360 * w;
+  const latRad = lat * Math.PI / 180;
+  const mercN = Math.log(Math.tan(Math.PI / 4 + latRad / 2));
+  const y = (Math.PI - mercN) / (2 * Math.PI) * h;
+  return [x, y];
+}
+
+// Simplified world land masses as path data (key countries/continents)
+const LAND_PATHS = [
+  // North America
+  "M 220,95 L 210,100 L 195,115 L 185,130 L 170,145 L 155,155 L 145,165 L 130,175 L 125,190 L 130,205 L 145,215 L 160,220 L 170,230 L 165,245 L 150,260 L 140,275 L 145,290 L 160,295 L 175,285 L 190,275 L 200,265 L 210,255 L 215,240 L 225,230 L 235,225 L 245,215 L 250,200 L 255,185 L 250,170 L 245,155 L 240,140 L 235,125 L 225,110 Z",
+  // Greenland
+  "M 310,60 L 325,55 L 340,60 L 345,75 L 340,90 L 325,95 L 310,90 L 305,75 Z",
+  // South America
+  "M 235,295 L 225,310 L 215,330 L 210,350 L 215,370 L 225,385 L 235,395 L 240,410 L 238,425 L 232,438 L 240,395 L 245,375 L 250,355 L 255,335 L 258,315 L 252,298 Z",
+  // Europe
+  "M 455,90 L 460,85 L 470,80 L 480,82 L 490,88 L 495,95 L 490,102 L 480,108 L 470,112 L 465,120 L 470,128 L 475,135 L 480,130 L 488,125 L 495,120 L 500,112 L 505,120 L 500,130 L 492,138 L 485,145 L 478,142 L 470,140 L 462,138 L 455,132 L 450,125 L 448,115 L 450,105 Z",
+  // Africa
+  "M 458,150 L 465,145 L 475,142 L 485,145 L 492,152 L 495,165 L 492,180 L 488,195 L 490,210 L 492,225 L 490,240 L 485,255 L 478,268 L 472,278 L 468,290 L 468,302 L 472,312 L 470,320 L 462,318 L 456,308 L 450,295 L 448,280 L 450,265 L 452,250 L 450,235 L 448,220 L 446,205 L 446,190 L 448,175 L 452,162 Z",
+  // Asia main
+  "M 500,80 L 520,75 L 545,72 L 570,70 L 595,72 L 620,78 L 645,82 L 665,88 L 680,95 L 690,105 L 695,115 L 690,125 L 680,132 L 668,138 L 655,142 L 640,148 L 625,155 L 615,162 L 605,168 L 595,162 L 585,155 L 572,152 L 558,155 L 545,160 L 532,162 L 520,158 L 510,150 L 505,140 L 502,128 L 500,115 L 498,102 Z",
+  // India
+  "M 565,160 L 572,158 L 580,162 L 585,170 L 588,180 L 585,192 L 578,202 L 570,208 L 562,202 L 558,190 L 558,178 L 560,168 Z",
+  // SE Asia
+  "M 625,165 L 635,162 L 645,165 L 652,172 L 655,182 L 650,190 L 640,195 L 630,190 L 622,182 L 620,172 Z",
+  // Japan
+  "M 680,108 L 688,105 L 694,110 L 692,118 L 685,122 L 678,118 Z",
+  // Australia
+  "M 650,265 L 665,260 L 682,258 L 698,262 L 710,270 L 718,282 L 720,295 L 715,308 L 705,318 L 690,322 L 675,320 L 660,315 L 648,305 L 642,292 L 642,278 Z",
+  // UK/Ireland
+  "M 448,100 L 452,96 L 458,98 L 460,105 L 455,110 L 450,108 Z",
+  // Madagascar
+  "M 510,248 L 515,242 L 520,248 L 522,258 L 520,268 L 514,272 L 510,265 L 508,255 Z",
+];
+
+// ═══════════════════════════════════════════════
+// APP STATE
+// ═══════════════════════════════════════════════
+
+let activeSpecies = new Set(['wolf', 'osprey', 'monarch', 'whale', 'elephant', 'shark']);
+let selectedAnimal = null;
+let isPlaying = false;
+let playInterval = null;
+let timelineValue = 100;
+const NS = 'http://www.w3.org/2000/svg';
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+
+function init() {
+  buildLoadingSequence();
+}
+
+function buildLoadingSequence() {
+  const bar = document.getElementById('loading-bar');
+  let pct = 0;
+  const interval = setInterval(() => {
+    pct += Math.random() * 15;
+    if (pct >= 100) {
+      pct = 100;
+      bar.style.width = '100%';
+      clearInterval(interval);
+      setTimeout(() => {
+        document.getElementById('loading-overlay').classList.add('hidden');
+        buildApp();
+      }, 400);
+    } else {
+      bar.style.width = pct + '%';
+    }
+  }, 120);
+}
+
+function buildApp() {
+  buildMap();
+  buildSpeciesPanel();
+  buildLegend();
+  updateStats();
+  renderAnimals();
+  setupTimeline();
+}
+
+// ═══════════════════════════════════════════════
+// MAP
+// ═══════════════════════════════════════════════
+
+function buildMap() {
+  const svg = document.getElementById('world-map');
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+
+  // Ocean background
+  const bg = document.createElementNS(NS, 'rect');
+  bg.setAttribute('width', W); bg.setAttribute('height', H);
+  bg.setAttribute('fill', '#030d18');
+  svg.appendChild(bg);
+
+  // Grid lines
+  const grid = document.createElementNS(NS, 'g');
+  grid.setAttribute('class', 'graticule');
+  for (let lon = -180; lon <= 180; lon += 30) {
+    const [x] = lonLatToXY(lon, 0, W, H);
+    const line = document.createElementNS(NS, 'line');
+    line.setAttribute('x1', x); line.setAttribute('y1', 0);
+    line.setAttribute('x2', x); line.setAttribute('y2', H);
+    line.setAttribute('stroke', '#0a1825'); line.setAttribute('stroke-width', '0.5');
+    grid.appendChild(line);
+  }
+  for (let lat = -60; lat <= 80; lat += 20) {
+    const [, y] = lonLatToXY(0, lat, W, H);
+    const line = document.createElementNS(NS, 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', y);
+    line.setAttribute('x2', W); line.setAttribute('y2', y);
+    line.setAttribute('stroke', '#0a1825'); line.setAttribute('stroke-width', '0.5');
+    grid.appendChild(line);
+  }
+  svg.appendChild(grid);
+
+  // Equator highlight
+  const [, eqY] = lonLatToXY(0, 0, W, H);
+  const eq = document.createElementNS(NS, 'line');
+  eq.setAttribute('x1', 0); eq.setAttribute('y1', eqY);
+  eq.setAttribute('x2', W); eq.setAttribute('y2', eqY);
+  eq.setAttribute('stroke', '#0f2035'); eq.setAttribute('stroke-width', '1');
+  svg.appendChild(eq);
+
+  // Land masses — scaled to screen
+  const scaleX = W / 800;
+  const scaleY = H / 450;
+  const landGroup = document.createElementNS(NS, 'g');
+  landGroup.setAttribute('transform', `scale(${scaleX}, ${scaleY})`);
+
+  LAND_PATHS.forEach(d => {
+    const path = document.createElementNS(NS, 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('class', 'land');
+    landGroup.appendChild(path);
+  });
+  svg.appendChild(landGroup);
+
+  // Trails layer
+  const trailsGroup = document.createElementNS(NS, 'g');
+  trailsGroup.setAttribute('id', 'trails-layer');
+  svg.appendChild(trailsGroup);
+
+  // Dots layer
+  const dotsGroup = document.createElementNS(NS, 'g');
+  dotsGroup.setAttribute('id', 'dots-layer');
+  svg.appendChild(dotsGroup);
+}
+
+// ═══════════════════════════════════════════════
+// RENDER ANIMALS
+// ═══════════════════════════════════════════════
+
+function renderAnimals() {
+  const svg = document.getElementById('world-map');
+  const W = parseInt(svg.getAttribute('width'));
+  const H = parseInt(svg.getAttribute('height'));
+  const trailsLayer = document.getElementById('trails-layer');
+  const dotsLayer = document.getElementById('dots-layer');
+
+  trailsLayer.innerHTML = '';
+  dotsLayer.innerHTML = '';
+
+  let totalAnimals = 0;
+
+  SPECIES.forEach(sp => {
+    if (!activeSpecies.has(sp.id)) return;
+    const animals = ANIMALS[sp.id] || [];
+    totalAnimals += animals.length;
+
+    animals.forEach(animal => {
+      // Draw trail
+      if (animal.trails && animal.trails.length > 1) {
+        const pointCount = Math.floor(animal.trails.length * (timelineValue / 100));
+        const visibleTrail = animal.trails.slice(0, Math.max(2, pointCount));
+
+        const points = visibleTrail.map(([lon, lat]) => lonLatToXY(lon, lat, W, H));
+        const pathD = 'M ' + points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' L ');
+
+        const trail = document.createElementNS(NS, 'path');
+        trail.setAttribute('d', pathD);
+        trail.setAttribute('class', 'animal-trail');
+        trail.setAttribute('stroke', sp.color);
+        trail.setAttribute('opacity', '0.35');
+        trailsLayer.appendChild(trail);
+      }
+
+      // Draw dot at last position
+      const trailPos = animal.trails[Math.min(animal.trails.length - 1, Math.max(0, Math.floor(animal.trails.length * timelineValue / 100) - 1))];
+      const [lon, lat] = trailPos;
+      const [x, y] = lonLatToXY(lon, lat, W, H);
+
+      // Pulse ring
+      const ring = document.createElementNS(NS, 'circle');
+      ring.setAttribute('cx', x); ring.setAttribute('cy', y);
+      ring.setAttribute('r', 4);
+      ring.setAttribute('class', 'pulse-ring');
+      ring.setAttribute('stroke', sp.color);
+      ring.style.animationDelay = (Math.random() * 2) + 's';
+      dotsLayer.appendChild(ring);
+
+      // Main dot
+      const dot = document.createElementNS(NS, 'circle');
+      dot.setAttribute('cx', x); dot.setAttribute('cy', y);
+      dot.setAttribute('r', 4.5);
+      dot.setAttribute('fill', sp.color);
+      dot.setAttribute('class', 'animal-dot');
+      dot.setAttribute('filter', `drop-shadow(0 0 4px ${sp.color})`);
+
+      dot.addEventListener('mouseenter', (e) => showTooltip(e, animal, sp));
+      dot.addEventListener('mouseleave', hideTooltip);
+      dot.addEventListener('click', () => showDetail(animal, sp));
+
+      dotsLayer.appendChild(dot);
+    });
+  });
+
+  document.getElementById('count-num').textContent = totalAnimals;
+
+  // Also add heatmap-style extra dots for density
+  SPECIES.forEach(sp => {
+    if (!activeSpecies.has(sp.id)) return;
+    const extraCount = Math.floor(sp.count / 15);
+    for (let i = 0; i < extraCount; i++) {
+      const [baseLon, baseLat] = getSpeciesCenter(sp.id);
+      const lon = baseLon + (Math.random() - 0.5) * getSpeciesSpread(sp.id) * 2;
+      const lat = baseLat + (Math.random() - 0.5) * getSpeciesSpread(sp.id);
+      const [x, y] = lonLatToXY(lon, lat, W, H);
+
+      if (x < 0 || x > W || y < 0 || y > H) continue;
+
+      const dot = document.createElementNS(NS, 'circle');
+      dot.setAttribute('cx', x); dot.setAttribute('cy', y);
+      dot.setAttribute('r', 2);
+      dot.setAttribute('fill', sp.color);
+      dot.setAttribute('opacity', '0.2');
+      dotsLayer.appendChild(dot);
+    }
+  });
+}
+
+function getSpeciesCenter(id) {
+  const centers = {
+    wolf: [-100, 52], osprey: [0, 45], monarch: [-95, 30],
+    whale: [-160, 30], elephant: [30, 0], shark: [-100, 30]
+  };
+  return centers[id] || [0, 0];
+}
+
+function getSpeciesSpread(id) {
+  const spreads = {
+    wolf: 30, osprey: 40, monarch: 25,
+    whale: 50, elephant: 25, shark: 60
+  };
+  return spreads[id] || 20;
+}
+
+// ═══════════════════════════════════════════════
+// TOOLTIP
+// ═══════════════════════════════════════════════
+
+function showTooltip(e, animal, sp) {
+  const tt = document.getElementById('tooltip');
+  tt.style.display = 'block';
+  tt.innerHTML = `<strong style="color:${sp.color}">${animal.name}</strong><br>ID: ${animal.id}<br>${sp.name}<br><span style="color:var(--muted)">${animal.region}</span>`;
+  tt.style.left = (e.clientX + 14) + 'px';
+  tt.style.top = (e.clientY - 10) + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════════════════════
+
+function showDetail(animal, sp) {
+  document.getElementById('detail-emoji').textContent = sp.emoji;
+  document.getElementById('detail-name').textContent = animal.name.toUpperCase();
+  document.getElementById('detail-name').style.color = sp.color;
+  document.getElementById('detail-id').textContent = `TAG ID: ${animal.id} · ${sp.scientific}`;
+  document.getElementById('d-distance').textContent = animal.distance;
+  document.getElementById('d-distance').style.color = sp.color;
+  document.getElementById('d-region').textContent = animal.region;
+  document.getElementById('d-period').textContent = animal.period;
+  document.getElementById('d-institution').textContent = animal.institution;
+  document.getElementById('d-status').textContent = animal.status;
+  document.getElementById('d-status').style.color = animal.status === 'Active' ? '#39ff14' : '#ef5350';
+  document.getElementById('d-fact').textContent = animal.fact;
+  document.getElementById('detail-panel').classList.add('open');
+}
+
+document.getElementById('detail-close').addEventListener('click', () => {
+  document.getElementById('detail-panel').classList.remove('open');
+});
+
+// ═══════════════════════════════════════════════
+// SPECIES PANEL
+// ═══════════════════════════════════════════════
+
+function buildSpeciesPanel() {
+  const list = document.getElementById('species-list');
+  SPECIES.forEach(sp => {
+    const card = document.createElement('div');
+    card.className = 'species-card active';
+    card.style.borderLeftColor = sp.color;
+    card.innerHTML = `
+      <div class="sp-name" style="color:${sp.color}">${sp.emoji} ${sp.name}</div>
+      <div class="sp-scientific">${sp.scientific}</div>
+      <div class="sp-meta">
+        <div><strong>${sp.count.toLocaleString()}</strong> tagged</div>
+        <div><strong>${sp.studies}</strong> studies</div>
+      </div>
+      <div class="sp-dot" style="background:${sp.color}; color:${sp.color}"></div>
+    `;
+    card.addEventListener('click', () => toggleSpecies(sp.id, card));
+    list.appendChild(card);
+  });
+}
+
+function toggleSpecies(id, card) {
+  if (activeSpecies.has(id)) {
+    activeSpecies.delete(id);
+    card.classList.remove('active');
+    card.style.borderLeftColor = 'transparent';
+    card.style.opacity = '0.4';
+  } else {
+    activeSpecies.add(id);
+    card.classList.add('active');
+    const sp = SPECIES.find(s => s.id === id);
+    card.style.borderLeftColor = sp.color;
+    card.style.opacity = '1';
+  }
+  renderAnimals();
+  updateStats();
+}
+
+// ═══════════════════════════════════════════════
+// LEGEND
+// ═══════════════════════════════════════════════
+
+function buildLegend() {
+  const legend = document.getElementById('legend');
+  SPECIES.forEach(sp => {
+    const item = document.createElement('div');
+    item.className = 'legend-item active';
+    item.style.color = sp.color;
+    item.innerHTML = `<div class="legend-dot" style="background:${sp.color}; color:${sp.color}"></div>${sp.emoji} ${sp.name}`;
+    legend.appendChild(item);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════
+
+function updateStats() {
+  let animals = 0, studies = 0, datapts = 0;
+  SPECIES.forEach(sp => {
+    if (activeSpecies.has(sp.id)) {
+      animals += sp.count;
+      studies += sp.studies;
+      datapts += sp.dataPoints;
+    }
+  });
+  animateCounter('stat-animals', animals);
+  animateCounter('stat-studies', studies);
+  animateCounter('stat-datapts', datapts);
+}
+
+function animateCounter(id, target) {
+  const el = document.getElementById(id);
+  const current = parseInt(el.textContent.replace(/,/g, '')) || 0;
+  const diff = target - current;
+  const steps = 20;
+  let step = 0;
+  const iv = setInterval(() => {
+    step++;
+    const val = Math.round(current + diff * (step / steps));
+    el.textContent = val.toLocaleString();
+    if (step >= steps) clearInterval(iv);
+  }, 30);
+}
+
+// ═══════════════════════════════════════════════
+// TIMELINE
+// ═══════════════════════════════════════════════
+
+function setupTimeline() {
+  const slider = document.getElementById('timeline-slider');
+  const dateEl = document.getElementById('timeline-date');
+  const playBtn = document.getElementById('play-btn');
+
+  slider.addEventListener('input', () => {
+    timelineValue = parseInt(slider.value);
+    const year = Math.floor(2018 + (timelineValue / 100) * 6);
+    const month = Math.floor((timelineValue % (100/6)) / (100/6) * 12) + 1;
+    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    dateEl.textContent = `${months[month-1]} ${year}`;
+    renderAnimals();
+  });
+
+  playBtn.addEventListener('click', () => {
+    if (isPlaying) {
+      isPlaying = false;
+      playBtn.textContent = '▶';
+      clearInterval(playInterval);
+    } else {
+      isPlaying = true;
+      playBtn.textContent = '⏸';
+      if (timelineValue >= 100) { slider.value = 0; timelineValue = 0; }
+      playInterval = setInterval(() => {
+        timelineValue = Math.min(100, timelineValue + 0.5);
+        slider.value = timelineValue;
+        slider.dispatchEvent(new Event('input'));
+        if (timelineValue >= 100) {
+          isPlaying = false;
+          playBtn.textContent = '▶';
+          clearInterval(playInterval);
+        }
+      }, 50);
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════
+// RESIZE
+// ═══════════════════════════════════════════════
+
+window.addEventListener('resize', () => {
+  const svg = document.getElementById('world-map');
+  svg.innerHTML = '';
+  buildMap();
+  renderAnimals();
+});
+
+// GO
+init();
+</script>
+</body>
+</html>
