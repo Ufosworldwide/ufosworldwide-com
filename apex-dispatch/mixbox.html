@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>MixBox Scanner</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600&display=swap');
+:root{--bg:#0b0e12;--surface:#131820;--surface2:#1a2230;--surface3:#212d3d;--orange:#f97316;--green:#22c55e;--red:#ef4444;--text:#f1f5f9;--text-dim:#64748b;--border:#1e2d3d;--mono:'Share Tech Mono',monospace;--head:'Barlow Condensed',sans-serif;--body:'Barlow',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;max-width:480px;margin:0 auto}
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex;flex-direction:column}
+#screen-login{align-items:center;justify-content:center;padding:40px 24px;background:var(--bg)}
+.login-logo{font-family:var(--head);font-weight:900;font-size:56px;letter-spacing:4px;color:var(--orange);text-align:center;line-height:1}
+.login-sub{font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:4px;text-align:center;margin-top:6px;margin-bottom:56px;text-transform:uppercase}
+.login-card{background:var(--surface);border:1px solid var(--border);border-top:4px solid var(--orange);border-radius:16px;padding:28px 24px;width:100%}
+.login-instruction{font-family:var(--head);font-weight:700;font-size:18px;letter-spacing:2px;text-align:center;color:var(--text-dim);text-transform:uppercase;margin-bottom:24px}
+.email-input{width:100%;background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 18px;color:var(--text);font-family:var(--body);font-size:17px;outline:none;margin-bottom:16px;transition:border-color 0.2s}
+.email-input:focus{border-color:var(--orange)}
+.email-input::placeholder{color:var(--text-dim)}
+.big-btn{width:100%;padding:18px;border:none;border-radius:10px;font-family:var(--head);font-weight:900;font-size:20px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:10px}
+.big-btn:active{transform:scale(0.97)}
+.big-btn-orange{background:var(--orange);color:#000}
+.big-btn-green{background:var(--green);color:#000}
+.big-btn-ghost{background:var(--surface2);color:var(--text-dim);border:2px solid var(--border)}
+.scan-header{background:var(--surface);border-bottom:3px solid var(--orange);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.scan-header-left{font-family:var(--head);font-weight:900;font-size:22px;letter-spacing:3px;color:var(--orange)}
+.scan-header-left span{display:block;font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:2px;font-weight:400;margin-top:1px}
+.scan-header-right{text-align:right;font-family:var(--mono);font-size:11px;color:var(--text-dim)}
+.scan-header-right .packer{font-family:var(--head);font-weight:700;font-size:14px;color:var(--text);letter-spacing:1px}
+.scan-hero{padding:24px 20px 16px}
+.scan-big-btn{width:100%;background:var(--surface2);border:3px dashed var(--orange);border-radius:16px;padding:36px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;gap:10px}
+.scan-big-btn:active{background:var(--surface3);border-style:solid}
+.scan-big-icon{font-size:64px;line-height:1}
+.scan-big-label{font-family:var(--head);font-weight:900;font-size:26px;letter-spacing:3px;color:var(--orange);text-transform:uppercase}
+.scan-big-sub{font-family:var(--mono);font-size:12px;color:var(--text-dim);text-align:center;letter-spacing:1px}
+.manual-row{display:flex;gap:10px;padding:0 20px 16px}
+.manual-input{flex:1;background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:14px 16px;color:var(--text);font-family:var(--mono);font-size:16px;outline:none;transition:border-color 0.2s;text-transform:uppercase}
+.manual-input:focus{border-color:var(--orange)}
+.manual-input::placeholder{color:var(--text-dim);text-transform:none;font-size:14px}
+.add-btn{background:var(--orange);color:#000;border:none;border-radius:10px;padding:14px 20px;font-family:var(--head);font-weight:900;font-size:18px;letter-spacing:2px;cursor:pointer;white-space:nowrap}
+.add-btn:active{transform:scale(0.95)}
+.parts-section{padding:0 20px;flex:1}
+.parts-count-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.parts-count-label{font-family:var(--head);font-weight:700;font-size:16px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase}
+.parts-count-num{background:var(--orange);color:#000;font-family:var(--mono);font-weight:bold;font-size:14px;padding:4px 12px;border-radius:20px;letter-spacing:1px}
+.part-row{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--green);border-radius:8px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;animation:slideIn 0.2s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+.part-row-left{display:flex;align-items:center;gap:12px}
+.part-row-num{font-family:var(--mono);font-size:11px;color:var(--text-dim);background:var(--surface2);padding:3px 7px;border-radius:4px;min-width:28px;text-align:center}
+.part-row-code{font-family:var(--mono);font-size:17px;color:var(--orange);letter-spacing:2px}
+.part-remove{background:none;border:none;color:var(--text-dim);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1;border-radius:4px;transition:color 0.15s}
+.part-remove:hover{color:var(--red)}
+.empty-parts{text-align:center;padding:32px 20px;color:var(--text-dim);font-family:var(--mono);font-size:13px;line-height:2}
+.empty-parts .icon{font-size:48px;margin-bottom:8px}
+.done-area{padding:16px 20px 32px;position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 30%)}
+#screen-done{align-items:center;justify-content:center;padding:40px 24px;text-align:center}
+.done-icon{font-size:80px;margin-bottom:16px}
+.done-title{font-family:var(--head);font-weight:900;font-size:40px;letter-spacing:4px;color:var(--green);text-transform:uppercase;margin-bottom:8px}
+.done-sub{font-family:var(--mono);font-size:13px;color:var(--text-dim);letter-spacing:1px;margin-bottom:32px;line-height:2}
+.done-box-id{background:var(--surface);border:2px solid var(--orange);border-radius:12px;padding:20px 28px;margin-bottom:32px;width:100%}
+.done-box-id-label{font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+.done-box-id-value{font-family:var(--mono);font-size:24px;color:var(--orange);letter-spacing:4px;font-weight:bold}
+.done-instructions{background:var(--surface2);border-radius:10px;padding:16px 20px;margin-bottom:28px;width:100%;text-align:left}
+.done-instruction-item{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:15px;line-height:1.4}
+.done-instruction-item:last-child{border-bottom:none}
+.done-step{background:var(--orange);color:#000;font-family:var(--mono);font-weight:bold;font-size:13px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 24px;font-family:var(--mono);font-size:14px;color:var(--text);z-index:999;transition:transform 0.3s;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:var(--green);color:var(--green)}
+.toast.error{border-color:var(--red);color:var(--red)}
+.scan-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:200;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.scan-overlay.open{display:flex}
+.scan-overlay-title{font-family:var(--head);font-weight:900;font-size:24px;letter-spacing:3px;color:var(--orange);text-transform:uppercase;margin-bottom:16px}
+.scan-overlay-sub{font-family:var(--mono);font-size:12px;color:var(--text-dim);text-align:center;margin-bottom:20px;letter-spacing:1px}
+#scan-preview{width:100%;max-width:360px;border-radius:10px;border:3px solid var(--orange);background:#000;margin-bottom:16px;display:none}
+.scan-result-area{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;width:100%;max-width:360px;font-family:var(--mono);font-size:13px;color:var(--text-dim);min-height:60px;margin-bottom:16px;text-align:center}
+input[type="file"]{display:none}
+</style>
+</head>
+<body>
+<div class="screen active" id="screen-login">
+  <div class="login-logo">📦</div>
+  <div style="font-family:var(--head);font-weight:900;font-size:48px;letter-spacing:4px;color:var(--orange);text-align:center;">MIXBOX</div>
+  <div class="login-sub">Parts Packing Scanner</div>
+  <div class="login-card">
+    <div class="login-instruction">Enter Your Work Email</div>
+    <input type="email" class="email-input" id="login-email" placeholder="firstname.lastname@performance.ca" autocomplete="email" inputmode="email" onkeydown="if(event.key==='Enter')doLogin()">
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-align:center;margin-bottom:20px;letter-spacing:1px;">Label will be emailed here</div>
+    <button class="big-btn big-btn-orange" onclick="doLogin()">▶ &nbsp; START PACKING</button>
+  </div>
+</div>
+<div class="screen" id="screen-scan">
+  <div class="scan-header">
+    <div class="scan-header-left">MIXBOX<span id="box-id-display">—</span></div>
+    <div class="scan-header-right"><div class="packer" id="header-packer">—</div><div id="header-time">—</div></div>
+  </div>
+  <div class="scan-hero">
+    <div class="scan-big-btn" onclick="triggerScan()">
+      <div class="scan-big-icon">📷</div>
+      <div class="scan-big-label">Scan Part</div>
+      <div class="scan-big-sub">Tap here · Point camera at part number</div>
+    </div>
+  </div>
+  <div class="manual-row">
+    <input type="text" class="manual-input" id="manual-input" placeholder="Or type part number here" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" onkeydown="if(event.key==='Enter')addManual()">
+    <button class="add-btn" onclick="addManual()">ADD</button>
+  </div>
+  <div class="parts-section">
+    <div class="parts-count-bar">
+      <div class="parts-count-label">Parts in this box</div>
+      <div class="parts-count-num" id="parts-count">0</div>
+    </div>
+    <div id="parts-list"><div class="empty-parts"><div class="icon">📭</div>No parts yet.<br>Tap the button above to scan.</div></div>
+  </div>
+  <div class="done-area">
+    <button class="big-btn big-btn-green" onclick="finishBox()" id="done-btn" disabled style="opacity:0.4;">✓ &nbsp; DONE — SEND EMAIL</button>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-align:center;margin-top:10px;letter-spacing:1px;">Scan all parts first, then tap done</div>
+  </div>
+</div>
+<div class="screen" id="screen-done">
+  <div class="done-icon">✅</div>
+  <div class="done-title">Email Sent!</div>
+  <div class="done-sub" id="done-sub">Check your inbox and print the label</div>
+  <div class="done-box-id"><div class="done-box-id-label">Box ID</div><div class="done-box-id-value" id="done-box-id-value">—</div></div>
+  <div class="done-instructions">
+    <div class="done-instruction-item"><div class="done-step">1</div><div>Open your email on the computer</div></div>
+    <div class="done-instruction-item"><div class="done-step">2</div><div>Print <strong>two copies</strong> of the label</div></div>
+    <div class="done-instruction-item"><div class="done-step">3</div><div>Put <strong>one label inside</strong> the box</div></div>
+    <div class="done-instruction-item"><div class="done-step">4</div><div>Stick <strong>one label on the outside</strong></div></div>
+    <div class="done-instruction-item"><div class="done-step">5</div><div>Driver scans outside label — whole box loads automatically</div></div>
+  </div>
+  <button class="big-btn big-btn-orange" onclick="startNewBox()" style="width:100%;margin-bottom:12px;">📦 &nbsp; PACK ANOTHER BOX</button>
+  <button class="big-btn big-btn-ghost" onclick="logOut()" style="width:100%;">Sign Out</button>
+</div>
+<div class="scan-overlay" id="scan-overlay">
+  <div class="scan-overlay-title">Scan Part Number</div>
+  <div class="scan-overlay-sub">Point camera at the part number label</div>
+  <img id="scan-preview" alt="Scan preview">
+  <div class="scan-result-area" id="scan-result-area">Waiting for scan...</div>
+  <button class="big-btn big-btn-orange" onclick="triggerCamera()" style="width:100%;max-width:360px;margin-bottom:10px;">📷 &nbsp; OPEN CAMERA</button>
+  <button class="big-btn big-btn-ghost" onclick="closeScanOverlay()" style="width:100%;max-width:360px;">Cancel</button>
+  <input type="file" id="scan-file-input" accept="image/*" capture="environment" onchange="processScanImage(event)">
+</div>
+<div id="qr-holder" style="position:absolute;left:-9999px;top:-9999px;"></div>
+<div class="toast" id="toast"></div>
+<script>
+let packerEmail='',packerName='',boxId='',parts=[],sessionStart=null;
+function doLogin(){const email=document.getElementById('login-email').value.trim().toLowerCase();if(!email||!email.includes('@')){showToast('Enter a valid email','error');return;}packerEmail=email;const local=email.split('@')[0];packerName=local.split('.').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');startNewBox();showScreen('screen-scan');}
+function startNewBox(){parts=[];sessionStart=new Date();boxId=generateBoxId();document.getElementById('box-id-display').textContent=boxId;document.getElementById('header-packer').textContent=packerName;document.getElementById('header-time').textContent=sessionStart.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});renderParts();showScreen('screen-scan');}
+function generateBoxId(){const now=new Date();const date=now.toISOString().slice(2,10).replace(/-/g,'');const rand=Math.random().toString(36).substring(2,5).toUpperCase();return`MB-${date}-${rand}`;}
+function triggerScan(){document.getElementById('scan-result-area').textContent='Waiting for scan...';document.getElementById('scan-preview').style.display='none';document.getElementById('scan-overlay').classList.add('open');}
+function triggerCamera(){document.getElementById('scan-file-input').click();}
+function closeScanOverlay(){document.getElementById('scan-overlay').classList.remove('open');}
+async function processScanImage(event){const file=event.target.files[0];if(!file)return;const url=URL.createObjectURL(file);const preview=document.getElementById('scan-preview');preview.src=url;preview.style.display='block';document.getElementById('scan-result-area').textContent='🔍 Reading...';try{const result=await Tesseract.recognize(file,'eng',{logger:()=>{}});const extracted=extractPartNumbers(result.data.text);if(extracted.length>0){extracted.forEach(p=>addPart(p));document.getElementById('scan-result-area').textContent='✓ Found: '+extracted.join(', ');closeScanOverlay();showToast('✓ '+extracted.join(', ')+' added','success');}else{document.getElementById('scan-result-area').textContent='⚠ No part number found. Type it below.';showToast('No part number detected','error');}}catch(e){document.getElementById('scan-result-area').textContent='⚠ Scan failed. Type it below.';showToast('Scan failed — type it in','error');}event.target.value='';}
+function extractPartNumbers(text){const cleaned=text.replace(/[-\s*#|]/g,' ');const matches=[...cleaned.matchAll(/\b[A-Z0-9]{4,20}\b/g)].map(m=>m[0]).filter(p=>/[0-9]/.test(p)&&/[A-Z]/.test(p));return[...new Set(matches)];}
+function addManual(){const input=document.getElementById('manual-input');const val=input.value.trim().replace(/[\s\-*#]/g,'').toUpperCase();if(!val){showToast('Enter a part number','error');return;}addPart(val);input.value='';input.focus();}
+function addPart(num){if(parts.includes(num)){showToast(num+' already in box','error');return;}parts.push(num);renderParts();updateDoneBtn();}
+function removePart(idx){parts.splice(idx,1);renderParts();updateDoneBtn();}
+function renderParts(){const el=document.getElementById('parts-list');document.getElementById('parts-count').textContent=parts.length;if(parts.length===0){el.innerHTML='<div class="empty-parts"><div class="icon">📭</div>No parts yet.<br>Tap the button above to scan.</div>';return;}el.innerHTML=parts.map((p,i)=>`<div class="part-row"><div class="part-row-left"><div class="part-row-num">${i+1}</div><div class="part-row-code">${p}</div></div><button class="part-remove" onclick="removePart(${i})">✕</button></div>`).join('');}
+function updateDoneBtn(){const btn=document.getElementById('done-btn');btn.disabled=parts.length===0;btn.style.opacity=parts.length>0?'1':'0.4';}
+function finishBox(){if(parts.length===0){showToast('Scan at least one part','error');return;}const qrHolder=document.getElementById('qr-holder');qrHolder.innerHTML='';const qrData=JSON.stringify({boxId,packedBy:packerName,email:packerEmail,packedAt:new Date().toISOString(),parts});new QRCode(qrHolder,{text:qrData,width:200,height:200,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});setTimeout(()=>{const subject=encodeURIComponent(`MIXBOX LABEL — ${boxId} — ${parts.length} parts`);const body=encodeURIComponent(`MIXBOX LABEL\nBox ID: ${boxId}\nPacked by: ${packerName}\nDate: ${new Date().toLocaleDateString('en-CA')}\nTime: ${new Date().toLocaleTimeString()}\nParts (${parts.length}):\n${parts.map((p,i)=>`  ${i+1}. ${p}`).join('\n')}\n\nPRINT TWO COPIES:\n  - One goes INSIDE the box\n  - One goes on the OUTSIDE`);window.location.href=`mailto:${packerEmail}?subject=${subject}&body=${body}`;document.getElementById('done-box-id-value').textContent=boxId;document.getElementById('done-sub').textContent=`Email opened for ${packerEmail}`;showScreen('screen-done');showToast('Done! Check your email','success');},500);}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');setTimeout(()=>t.className='toast',3000);}
+function logOut(){packerEmail='';packerName='';parts=[];document.getElementById('login-email').value='';showScreen('screen-login');}
+</script>
+</body>
+</html>
