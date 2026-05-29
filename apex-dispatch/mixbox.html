@@ -4,169 +4,351 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>MixBox Scanner</title>
+<title>MixBox — Parts Scanner</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600&display=swap');
-:root{--bg:#0b0e12;--surface:#131820;--surface2:#1a2230;--surface3:#212d3d;--orange:#f97316;--green:#22c55e;--red:#ef4444;--text:#f1f5f9;--text-dim:#64748b;--border:#1e2d3d;--mono:'Share Tech Mono',monospace;--head:'Barlow Condensed',sans-serif;--body:'Barlow',sans-serif}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f8f9fc;--white:#ffffff;
+  --blue:#0a3d8f;--blue-mid:#1a5cb8;--blue-light:#e8f0fc;--blue-border:#c5d6f5;
+  --green:#16a34a;--green-light:#f0fdf4;--green-border:#bbf7d0;
+  --red:#dc2626;--red-light:#fef2f2;
+  --text:#0d1117;--text-mid:#374151;--text-dim:#6b7280;
+  --border:#e5e9f0;
+  --shadow:0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.1);
+  --mono:'Roboto Mono',monospace;--font:'Inter',sans-serif;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;max-width:480px;margin:0 auto}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;max-width:480px;margin:0 auto}
 .screen{display:none;min-height:100vh}
 .screen.active{display:flex;flex-direction:column}
-#screen-login{align-items:center;justify-content:center;padding:40px 24px;background:var(--bg)}
-.login-logo{font-family:var(--head);font-weight:900;font-size:56px;letter-spacing:4px;color:var(--orange);text-align:center;line-height:1}
-.login-sub{font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:4px;text-align:center;margin-top:6px;margin-bottom:56px;text-transform:uppercase}
-.login-card{background:var(--surface);border:1px solid var(--border);border-top:4px solid var(--orange);border-radius:16px;padding:28px 24px;width:100%}
-.login-instruction{font-family:var(--head);font-weight:700;font-size:18px;letter-spacing:2px;text-align:center;color:var(--text-dim);text-transform:uppercase;margin-bottom:24px}
-.email-input{width:100%;background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 18px;color:var(--text);font-family:var(--body);font-size:17px;outline:none;margin-bottom:16px;transition:border-color 0.2s}
-.email-input:focus{border-color:var(--orange)}
+
+/* LOGIN */
+#screen-login{align-items:center;justify-content:center;padding:40px 24px;background:var(--blue)}
+.login-logo{font-size:64px;text-align:center;margin-bottom:8px}
+.login-title{font-size:36px;font-weight:900;letter-spacing:4px;color:#fff;text-align:center}
+.login-sub{font-size:11px;color:rgba(255,255,255,0.6);letter-spacing:3px;text-align:center;margin-top:4px;margin-bottom:48px;text-transform:uppercase}
+.login-card{background:#fff;border-radius:16px;padding:28px 24px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.login-instruction{font-size:16px;font-weight:700;color:var(--text-mid);text-align:center;margin-bottom:20px}
+.email-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:16px 18px;color:var(--text);font-family:var(--font);font-size:16px;outline:none;margin-bottom:12px;transition:border-color 0.2s}
+.email-input:focus{border-color:var(--blue);background:#fff}
 .email-input::placeholder{color:var(--text-dim)}
-.big-btn{width:100%;padding:18px;border:none;border-radius:10px;font-family:var(--head);font-weight:900;font-size:20px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:10px}
+.hint{font-size:11px;color:var(--text-dim);text-align:center;margin-bottom:20px;letter-spacing:0.5px}
+
+/* BIG BUTTONS */
+.big-btn{width:100%;padding:16px;border:none;border-radius:10px;font-family:var(--font);font-weight:700;font-size:17px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
 .big-btn:active{transform:scale(0.97)}
-.big-btn-orange{background:var(--orange);color:#000}
-.big-btn-green{background:var(--green);color:#000}
-.big-btn-ghost{background:var(--surface2);color:var(--text-dim);border:2px solid var(--border)}
-.scan-header{background:var(--surface);border-bottom:3px solid var(--orange);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
-.scan-header-left{font-family:var(--head);font-weight:900;font-size:22px;letter-spacing:3px;color:var(--orange)}
-.scan-header-left span{display:block;font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:2px;font-weight:400;margin-top:1px}
-.scan-header-right{text-align:right;font-family:var(--mono);font-size:11px;color:var(--text-dim)}
-.scan-header-right .packer{font-family:var(--head);font-weight:700;font-size:14px;color:var(--text);letter-spacing:1px}
-.scan-hero{padding:24px 20px 16px}
-.scan-big-btn{width:100%;background:var(--surface2);border:3px dashed var(--orange);border-radius:16px;padding:36px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;gap:10px}
-.scan-big-btn:active{background:var(--surface3);border-style:solid}
-.scan-big-icon{font-size:64px;line-height:1}
-.scan-big-label{font-family:var(--head);font-weight:900;font-size:26px;letter-spacing:3px;color:var(--orange);text-transform:uppercase}
-.scan-big-sub{font-family:var(--mono);font-size:12px;color:var(--text-dim);text-align:center;letter-spacing:1px}
-.manual-row{display:flex;gap:10px;padding:0 20px 16px}
-.manual-input{flex:1;background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:14px 16px;color:var(--text);font-family:var(--mono);font-size:16px;outline:none;transition:border-color 0.2s;text-transform:uppercase}
-.manual-input:focus{border-color:var(--orange)}
-.manual-input::placeholder{color:var(--text-dim);text-transform:none;font-size:14px}
-.add-btn{background:var(--orange);color:#000;border:none;border-radius:10px;padding:14px 20px;font-family:var(--head);font-weight:900;font-size:18px;letter-spacing:2px;cursor:pointer;white-space:nowrap}
+.big-btn-blue{background:var(--blue);color:#fff}
+.big-btn-green{background:var(--green);color:#fff}
+.big-btn-outline{background:#fff;color:var(--text-mid);border:1.5px solid var(--border)}
+
+/* SCAN SCREEN */
+.scan-header{background:var(--blue);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.scan-header-left{color:#fff}
+.scan-header-title{font-size:20px;font-weight:800;letter-spacing:2px}
+.scan-header-sub{font-size:10px;color:rgba(255,255,255,0.6);letter-spacing:1px;margin-top:1px;font-family:var(--mono)}
+.scan-header-right{text-align:right}
+.packer-name{font-size:14px;font-weight:600;color:#fff}
+.packer-time{font-size:10px;color:rgba(255,255,255,0.6);font-family:var(--mono)}
+
+/* SCAN BIG BUTTON */
+.scan-hero{padding:20px 20px 12px}
+.scan-big{width:100%;background:#fff;border:2.5px dashed var(--blue-border);border-radius:14px;padding:32px 20px;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:all 0.15s;gap:8px;box-shadow:var(--shadow)}
+.scan-big:active{background:var(--blue-light);border-style:solid}
+.scan-big-icon{font-size:60px;line-height:1}
+.scan-big-label{font-size:22px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:2px}
+.scan-big-sub{font-size:12px;color:var(--text-dim);text-align:center}
+
+/* MANUAL ROW */
+.manual-row{display:flex;gap:10px;padding:0 20px 14px}
+.manual-input{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:13px 16px;color:var(--text);font-family:var(--mono);font-size:15px;outline:none;transition:border-color 0.2s;text-transform:uppercase}
+.manual-input:focus{border-color:var(--blue)}
+.manual-input::placeholder{text-transform:none;color:var(--text-dim);font-size:13px}
+.add-btn{background:var(--blue);color:#fff;border:none;border-radius:10px;padding:13px 20px;font-family:var(--font);font-weight:700;font-size:16px;cursor:pointer;white-space:nowrap}
 .add-btn:active{transform:scale(0.95)}
+
+/* PARTS SECTION */
 .parts-section{padding:0 20px;flex:1}
-.parts-count-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.parts-count-label{font-family:var(--head);font-weight:700;font-size:16px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase}
-.parts-count-num{background:var(--orange);color:#000;font-family:var(--mono);font-weight:bold;font-size:14px;padding:4px 12px;border-radius:20px;letter-spacing:1px}
-.part-row{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--green);border-radius:8px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;animation:slideIn 0.2s ease}
-@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+.parts-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.parts-bar-label{font-size:13px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:1px}
+.parts-count-badge{background:var(--blue);color:#fff;font-family:var(--mono);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px}
+
+.part-row{background:#fff;border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:8px;padding:13px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);animation:slideIn 0.2s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
 .part-row-left{display:flex;align-items:center;gap:12px}
-.part-row-num{font-family:var(--mono);font-size:11px;color:var(--text-dim);background:var(--surface2);padding:3px 7px;border-radius:4px;min-width:28px;text-align:center}
-.part-row-code{font-family:var(--mono);font-size:17px;color:var(--orange);letter-spacing:2px}
-.part-remove{background:none;border:none;color:var(--text-dim);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1;border-radius:4px;transition:color 0.15s}
+.part-num{font-family:var(--mono);font-size:10px;color:var(--text-dim);background:var(--bg);padding:3px 7px;border-radius:4px;min-width:26px;text-align:center;font-weight:500}
+.part-code{font-family:var(--mono);font-size:16px;color:var(--blue);font-weight:600;letter-spacing:1px}
+.part-remove{background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:4px;line-height:1}
 .part-remove:hover{color:var(--red)}
-.empty-parts{text-align:center;padding:32px 20px;color:var(--text-dim);font-family:var(--mono);font-size:13px;line-height:2}
-.empty-parts .icon{font-size:48px;margin-bottom:8px}
-.done-area{padding:16px 20px 32px;position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 30%)}
+
+.empty-parts{text-align:center;padding:32px 20px;color:var(--text-dim)}
+.empty-parts .icon{font-size:44px;margin-bottom:10px}
+.empty-parts .msg{font-size:13px;line-height:1.8}
+
+/* DONE BUTTON */
+.done-area{padding:14px 20px 32px;position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 25%)}
+.done-note{font-size:11px;color:var(--text-dim);text-align:center;margin-top:8px;letter-spacing:0.5px}
+
+/* DONE SCREEN */
 #screen-done{align-items:center;justify-content:center;padding:40px 24px;text-align:center}
 .done-icon{font-size:80px;margin-bottom:16px}
-.done-title{font-family:var(--head);font-weight:900;font-size:40px;letter-spacing:4px;color:var(--green);text-transform:uppercase;margin-bottom:8px}
-.done-sub{font-family:var(--mono);font-size:13px;color:var(--text-dim);letter-spacing:1px;margin-bottom:32px;line-height:2}
-.done-box-id{background:var(--surface);border:2px solid var(--orange);border-radius:12px;padding:20px 28px;margin-bottom:32px;width:100%}
-.done-box-id-label{font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
-.done-box-id-value{font-family:var(--mono);font-size:24px;color:var(--orange);letter-spacing:4px;font-weight:bold}
-.done-instructions{background:var(--surface2);border-radius:10px;padding:16px 20px;margin-bottom:28px;width:100%;text-align:left}
-.done-instruction-item{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:15px;line-height:1.4}
-.done-instruction-item:last-child{border-bottom:none}
-.done-step{background:var(--orange);color:#000;font-family:var(--mono);font-weight:bold;font-size:13px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 24px;font-family:var(--mono);font-size:14px;color:var(--text);z-index:999;transition:transform 0.3s;white-space:nowrap;max-width:90vw;text-align:center}
-.toast.show{transform:translateX(-50%) translateY(0)}
-.toast.success{border-color:var(--green);color:var(--green)}
-.toast.error{border-color:var(--red);color:var(--red)}
-.scan-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:200;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.done-title{font-size:36px;font-weight:900;color:var(--green);text-transform:uppercase;letter-spacing:3px;margin-bottom:8px}
+.done-sub{font-size:13px;color:var(--text-dim);margin-bottom:32px;line-height:2}
+.done-box-card{background:#fff;border:2px solid var(--blue);border-radius:14px;padding:20px 28px;margin-bottom:28px;width:100%;box-shadow:var(--shadow-md)}
+.done-box-label{font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+.done-box-id{font-family:var(--mono);font-size:22px;color:var(--blue);font-weight:700;letter-spacing:4px}
+.steps-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:28px;width:100%;text-align:left;box-shadow:var(--shadow)}
+.step-row{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;line-height:1.5}
+.step-row:last-child{border-bottom:none}
+.step-num{background:var(--blue);color:#fff;font-weight:700;font-size:12px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+
+/* SCAN OVERLAY */
+.scan-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;flex-direction:column;align-items:center;justify-content:center;padding:24px}
 .scan-overlay.open{display:flex}
-.scan-overlay-title{font-family:var(--head);font-weight:900;font-size:24px;letter-spacing:3px;color:var(--orange);text-transform:uppercase;margin-bottom:16px}
-.scan-overlay-sub{font-family:var(--mono);font-size:12px;color:var(--text-dim);text-align:center;margin-bottom:20px;letter-spacing:1px}
-#scan-preview{width:100%;max-width:360px;border-radius:10px;border:3px solid var(--orange);background:#000;margin-bottom:16px;display:none}
-.scan-result-area{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;width:100%;max-width:360px;font-family:var(--mono);font-size:13px;color:var(--text-dim);min-height:60px;margin-bottom:16px;text-align:center}
+.scan-overlay-title{font-size:22px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.scan-overlay-sub{font-size:12px;color:rgba(255,255,255,0.6);text-align:center;margin-bottom:20px}
+#scan-preview{width:100%;max-width:360px;border-radius:10px;border:3px solid var(--blue);background:#000;margin-bottom:14px;display:none}
+.scan-result{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:12px 16px;width:100%;max-width:360px;font-family:var(--mono);font-size:13px;color:rgba(255,255,255,0.7);min-height:52px;margin-bottom:16px;text-align:center}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--text);color:#fff;border-radius:10px;padding:12px 24px;font-size:13px;font-weight:500;z-index:999;transition:transform 0.3s;white-space:nowrap;max-width:90vw;text-align:center;box-shadow:var(--shadow-md)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
 input[type="file"]{display:none}
 </style>
 </head>
 <body>
+
+<!-- LOGIN -->
 <div class="screen active" id="screen-login">
   <div class="login-logo">📦</div>
-  <div style="font-family:var(--head);font-weight:900;font-size:48px;letter-spacing:4px;color:var(--orange);text-align:center;">MIXBOX</div>
-  <div class="login-sub">Parts Packing Scanner</div>
+  <div class="login-title">MIXBOX</div>
+  <div class="login-sub">Parts Packing · Performance</div>
   <div class="login-card">
-    <div class="login-instruction">Enter Your Work Email</div>
+    <div class="login-instruction">Sign in with your work email</div>
     <input type="email" class="email-input" id="login-email" placeholder="firstname.lastname@performance.ca" autocomplete="email" inputmode="email" onkeydown="if(event.key==='Enter')doLogin()">
-    <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-align:center;margin-bottom:20px;letter-spacing:1px;">Label will be emailed here</div>
-    <button class="big-btn big-btn-orange" onclick="doLogin()">▶ &nbsp; START PACKING</button>
+    <div class="hint">Your label will be emailed here automatically</div>
+    <button class="big-btn big-btn-blue" onclick="doLogin()">Start Packing →</button>
   </div>
 </div>
+
+<!-- SCAN -->
 <div class="screen" id="screen-scan">
   <div class="scan-header">
-    <div class="scan-header-left">MIXBOX<span id="box-id-display">—</span></div>
-    <div class="scan-header-right"><div class="packer" id="header-packer">—</div><div id="header-time">—</div></div>
+    <div class="scan-header-left">
+      <div class="scan-header-title">MIXBOX</div>
+      <div class="scan-header-sub" id="box-id-display">—</div>
+    </div>
+    <div class="scan-header-right">
+      <div class="packer-name" id="header-packer">—</div>
+      <div class="packer-time" id="header-time">—</div>
+    </div>
   </div>
+
   <div class="scan-hero">
-    <div class="scan-big-btn" onclick="triggerScan()">
+    <div class="scan-big" onclick="triggerScan()">
       <div class="scan-big-icon">📷</div>
       <div class="scan-big-label">Scan Part</div>
-      <div class="scan-big-sub">Tap here · Point camera at part number</div>
+      <div class="scan-big-sub">Tap here — point camera at part number label</div>
     </div>
   </div>
+
   <div class="manual-row">
-    <input type="text" class="manual-input" id="manual-input" placeholder="Or type part number here" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" onkeydown="if(event.key==='Enter')addManual()">
+    <input type="text" class="manual-input" id="manual-input" placeholder="Or type part number" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" onkeydown="if(event.key==='Enter')addManual()">
     <button class="add-btn" onclick="addManual()">ADD</button>
   </div>
+
   <div class="parts-section">
-    <div class="parts-count-bar">
-      <div class="parts-count-label">Parts in this box</div>
-      <div class="parts-count-num" id="parts-count">0</div>
+    <div class="parts-bar">
+      <div class="parts-bar-label">Parts in this box</div>
+      <div class="parts-count-badge" id="parts-count">0</div>
     </div>
-    <div id="parts-list"><div class="empty-parts"><div class="icon">📭</div>No parts yet.<br>Tap the button above to scan.</div></div>
+    <div id="parts-list">
+      <div class="empty-parts"><div class="icon">📭</div><div class="msg">No parts scanned yet.<br>Tap the button above to start.</div></div>
+    </div>
   </div>
+
   <div class="done-area">
-    <button class="big-btn big-btn-green" onclick="finishBox()" id="done-btn" disabled style="opacity:0.4;">✓ &nbsp; DONE — SEND EMAIL</button>
-    <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-align:center;margin-top:10px;letter-spacing:1px;">Scan all parts first, then tap done</div>
+    <button class="big-btn big-btn-green" onclick="finishBox()" id="done-btn" disabled style="opacity:0.4;">✓ Done — Send Label Email</button>
+    <div class="done-note">Scan all parts first, then tap Done</div>
   </div>
 </div>
+
+<!-- DONE -->
 <div class="screen" id="screen-done">
   <div class="done-icon">✅</div>
-  <div class="done-title">Email Sent!</div>
-  <div class="done-sub" id="done-sub">Check your inbox and print the label</div>
-  <div class="done-box-id"><div class="done-box-id-label">Box ID</div><div class="done-box-id-value" id="done-box-id-value">—</div></div>
-  <div class="done-instructions">
-    <div class="done-instruction-item"><div class="done-step">1</div><div>Open your email on the computer</div></div>
-    <div class="done-instruction-item"><div class="done-step">2</div><div>Print <strong>two copies</strong> of the label</div></div>
-    <div class="done-instruction-item"><div class="done-step">3</div><div>Put <strong>one label inside</strong> the box</div></div>
-    <div class="done-instruction-item"><div class="done-step">4</div><div>Stick <strong>one label on the outside</strong></div></div>
-    <div class="done-instruction-item"><div class="done-step">5</div><div>Driver scans outside label — whole box loads automatically</div></div>
+  <div class="done-title">Label Sent!</div>
+  <div class="done-sub" id="done-sub">Check your inbox and print two copies</div>
+  <div class="done-box-card">
+    <div class="done-box-label">Box ID</div>
+    <div class="done-box-id" id="done-box-id">—</div>
   </div>
-  <button class="big-btn big-btn-orange" onclick="startNewBox()" style="width:100%;margin-bottom:12px;">📦 &nbsp; PACK ANOTHER BOX</button>
-  <button class="big-btn big-btn-ghost" onclick="logOut()" style="width:100%;">Sign Out</button>
+  <div class="steps-card">
+    <div class="step-row"><div class="step-num">1</div><div>Open your email on the computer</div></div>
+    <div class="step-row"><div class="step-num">2</div><div>Print <strong>two copies</strong> of the label</div></div>
+    <div class="step-row"><div class="step-num">3</div><div>Place <strong>one label inside</strong> the box with the parts</div></div>
+    <div class="step-row"><div class="step-num">4</div><div>Stick <strong>one label on the outside</strong> of the sealed box</div></div>
+    <div class="step-row"><div class="step-num">5</div><div>Driver scans the outside label — all parts load automatically</div></div>
+  </div>
+  <button class="big-btn big-btn-blue" onclick="startNewBox()" style="width:100%;margin-bottom:10px;">📦 Pack Another Box</button>
+  <button class="big-btn big-btn-outline" onclick="logOut()" style="width:100%;">Sign Out</button>
 </div>
+
+<!-- SCAN OVERLAY -->
 <div class="scan-overlay" id="scan-overlay">
   <div class="scan-overlay-title">Scan Part Number</div>
-  <div class="scan-overlay-sub">Point camera at the part number label</div>
-  <img id="scan-preview" alt="Scan preview">
-  <div class="scan-result-area" id="scan-result-area">Waiting for scan...</div>
-  <button class="big-btn big-btn-orange" onclick="triggerCamera()" style="width:100%;max-width:360px;margin-bottom:10px;">📷 &nbsp; OPEN CAMERA</button>
-  <button class="big-btn big-btn-ghost" onclick="closeScanOverlay()" style="width:100%;max-width:360px;">Cancel</button>
-  <input type="file" id="scan-file-input" accept="image/*" capture="environment" onchange="processScanImage(event)">
+  <div class="scan-overlay-sub">Point camera directly at the part number label</div>
+  <img id="scan-preview" alt="Scan">
+  <div class="scan-result" id="scan-result">Waiting for scan...</div>
+  <button class="big-btn big-btn-blue" onclick="triggerCamera()" style="width:100%;max-width:360px;margin-bottom:10px;">📷 Open Camera</button>
+  <button class="big-btn big-btn-outline" onclick="closeScan()" style="width:100%;max-width:360px;color:#fff;border-color:rgba(255,255,255,0.3);">Cancel</button>
+  <input type="file" id="scan-file-input" accept="image/*" capture="environment" onchange="processScan(event)">
 </div>
+
 <div id="qr-holder" style="position:absolute;left:-9999px;top:-9999px;"></div>
 <div class="toast" id="toast"></div>
+
 <script>
-let packerEmail='',packerName='',boxId='',parts=[],sessionStart=null;
-function doLogin(){const email=document.getElementById('login-email').value.trim().toLowerCase();if(!email||!email.includes('@')){showToast('Enter a valid email','error');return;}packerEmail=email;const local=email.split('@')[0];packerName=local.split('.').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');startNewBox();showScreen('screen-scan');}
-function startNewBox(){parts=[];sessionStart=new Date();boxId=generateBoxId();document.getElementById('box-id-display').textContent=boxId;document.getElementById('header-packer').textContent=packerName;document.getElementById('header-time').textContent=sessionStart.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});renderParts();showScreen('screen-scan');}
-function generateBoxId(){const now=new Date();const date=now.toISOString().slice(2,10).replace(/-/g,'');const rand=Math.random().toString(36).substring(2,5).toUpperCase();return`MB-${date}-${rand}`;}
-function triggerScan(){document.getElementById('scan-result-area').textContent='Waiting for scan...';document.getElementById('scan-preview').style.display='none';document.getElementById('scan-overlay').classList.add('open');}
+let packerEmail='',packerName='',boxId='',parts=[];
+
+function doLogin(){
+  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  if(!email||!email.includes('@')){showToast('Enter a valid email','error');return;}
+  packerEmail=email;
+  const local=email.split('@')[0];
+  packerName=local.split('.').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+  startNewBox();
+}
+
+function startNewBox(){
+  parts=[];
+  const now=new Date();
+  const date=now.toISOString().slice(2,10).replace(/-/g,'');
+  const rand=Math.random().toString(36).substring(2,5).toUpperCase();
+  boxId=`MB-${date}-${rand}`;
+  document.getElementById('box-id-display').textContent=boxId;
+  document.getElementById('header-packer').textContent=packerName;
+  document.getElementById('header-time').textContent=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  renderParts();
+  showScreen('screen-scan');
+}
+
+function triggerScan(){document.getElementById('scan-result').textContent='Waiting for scan...';document.getElementById('scan-preview').style.display='none';document.getElementById('scan-overlay').classList.add('open');}
 function triggerCamera(){document.getElementById('scan-file-input').click();}
-function closeScanOverlay(){document.getElementById('scan-overlay').classList.remove('open');}
-async function processScanImage(event){const file=event.target.files[0];if(!file)return;const url=URL.createObjectURL(file);const preview=document.getElementById('scan-preview');preview.src=url;preview.style.display='block';document.getElementById('scan-result-area').textContent='🔍 Reading...';try{const result=await Tesseract.recognize(file,'eng',{logger:()=>{}});const extracted=extractPartNumbers(result.data.text);if(extracted.length>0){extracted.forEach(p=>addPart(p));document.getElementById('scan-result-area').textContent='✓ Found: '+extracted.join(', ');closeScanOverlay();showToast('✓ '+extracted.join(', ')+' added','success');}else{document.getElementById('scan-result-area').textContent='⚠ No part number found. Type it below.';showToast('No part number detected','error');}}catch(e){document.getElementById('scan-result-area').textContent='⚠ Scan failed. Type it below.';showToast('Scan failed — type it in','error');}event.target.value='';}
-function extractPartNumbers(text){const cleaned=text.replace(/[-\s*#|]/g,' ');const matches=[...cleaned.matchAll(/\b[A-Z0-9]{4,20}\b/g)].map(m=>m[0]).filter(p=>/[0-9]/.test(p)&&/[A-Z]/.test(p));return[...new Set(matches)];}
-function addManual(){const input=document.getElementById('manual-input');const val=input.value.trim().replace(/[\s\-*#]/g,'').toUpperCase();if(!val){showToast('Enter a part number','error');return;}addPart(val);input.value='';input.focus();}
-function addPart(num){if(parts.includes(num)){showToast(num+' already in box','error');return;}parts.push(num);renderParts();updateDoneBtn();}
-function removePart(idx){parts.splice(idx,1);renderParts();updateDoneBtn();}
-function renderParts(){const el=document.getElementById('parts-list');document.getElementById('parts-count').textContent=parts.length;if(parts.length===0){el.innerHTML='<div class="empty-parts"><div class="icon">📭</div>No parts yet.<br>Tap the button above to scan.</div>';return;}el.innerHTML=parts.map((p,i)=>`<div class="part-row"><div class="part-row-left"><div class="part-row-num">${i+1}</div><div class="part-row-code">${p}</div></div><button class="part-remove" onclick="removePart(${i})">✕</button></div>`).join('');}
-function updateDoneBtn(){const btn=document.getElementById('done-btn');btn.disabled=parts.length===0;btn.style.opacity=parts.length>0?'1':'0.4';}
-function finishBox(){if(parts.length===0){showToast('Scan at least one part','error');return;}const qrHolder=document.getElementById('qr-holder');qrHolder.innerHTML='';const qrData=JSON.stringify({boxId,packedBy:packerName,email:packerEmail,packedAt:new Date().toISOString(),parts});new QRCode(qrHolder,{text:qrData,width:200,height:200,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});setTimeout(()=>{const subject=encodeURIComponent(`MIXBOX LABEL — ${boxId} — ${parts.length} parts`);const body=encodeURIComponent(`MIXBOX LABEL\nBox ID: ${boxId}\nPacked by: ${packerName}\nDate: ${new Date().toLocaleDateString('en-CA')}\nTime: ${new Date().toLocaleTimeString()}\nParts (${parts.length}):\n${parts.map((p,i)=>`  ${i+1}. ${p}`).join('\n')}\n\nPRINT TWO COPIES:\n  - One goes INSIDE the box\n  - One goes on the OUTSIDE`);window.location.href=`mailto:${packerEmail}?subject=${subject}&body=${body}`;document.getElementById('done-box-id-value').textContent=boxId;document.getElementById('done-sub').textContent=`Email opened for ${packerEmail}`;showScreen('screen-done');showToast('Done! Check your email','success');},500);}
+function closeScan(){document.getElementById('scan-overlay').classList.remove('open');}
+
+async function processScan(e){
+  const file=e.target.files[0];if(!file)return;
+  const url=URL.createObjectURL(file);
+  const preview=document.getElementById('scan-preview');preview.src=url;preview.style.display='block';
+  document.getElementById('scan-result').textContent='🔍 Reading...';
+  try{
+    const r=await Tesseract.recognize(file,'eng',{logger:()=>{}});
+    const found=extractPartNumbers(r.data.text);
+    if(found.length>0){found.forEach(p=>addPart(p));document.getElementById('scan-result').textContent='✓ Found: '+found.join(', ');closeScan();showToast('✓ '+found.join(', '),'success');}
+    else{document.getElementById('scan-result').textContent='⚠ No part number found — type it below';showToast('No part number detected','error');}
+  }catch(err){document.getElementById('scan-result').textContent='⚠ Scan failed — type it below';showToast('Scan failed','error');}
+  e.target.value='';
+}
+
+function extractPartNumbers(text){const c=text.replace(/[-\s*#|]/g,' ');return[...new Set([...c.matchAll(/\b[A-Z0-9]{4,20}\b/g)].map(m=>m[0]).filter(p=>/[0-9]/.test(p)&&/[A-Z]/.test(p)))];}
+
+function addManual(){const i=document.getElementById('manual-input');const v=i.value.trim().replace(/[\s\-*#]/g,'').toUpperCase();if(!v){showToast('Enter a part number','error');return;}addPart(v);i.value='';i.focus();}
+function addPart(num){if(parts.includes(num)){showToast(num+' already in box','error');return;}parts.push(num);renderParts();updateBtn();}
+function removePart(i){parts.splice(i,1);renderParts();updateBtn();}
+
+function renderParts(){
+  const el=document.getElementById('parts-list');
+  document.getElementById('parts-count').textContent=parts.length;
+  if(parts.length===0){el.innerHTML='<div class="empty-parts"><div class="icon">📭</div><div class="msg">No parts scanned yet.<br>Tap the button above to start.</div></div>';return;}
+  el.innerHTML=parts.map((p,i)=>`<div class="part-row"><div class="part-row-left"><div class="part-num">${i+1}</div><div class="part-code">${p}</div></div><button class="part-remove" onclick="removePart(${i})">✕</button></div>`).join('');
+}
+
+function updateBtn(){const btn=document.getElementById('done-btn');btn.disabled=parts.length===0;btn.style.opacity=parts.length>0?'1':'0.4';}
+
+function finishBox(){
+  if(parts.length===0){showToast('Scan at least one part','error');return;}
+  const qrHolder=document.getElementById('qr-holder');qrHolder.innerHTML='';
+  const qrData=JSON.stringify({boxId,packedBy:packerName,email:packerEmail,packedAt:new Date().toISOString(),parts});
+  new QRCode(qrHolder,{text:qrData,width:200,height:200,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+  setTimeout(()=>{
+    const subject=encodeURIComponent(`MIXBOX LABEL — ${boxId} — ${parts.length} parts`);
+    const body=encodeURIComponent(`PERFORMANCE AUTO GROUP — MIXBOX LABEL\n${'='.repeat(40)}\nBox ID: ${boxId}\nPacked by: ${packerName}\nDate: ${new Date().toLocaleDateString('en-CA')}\nTime: ${new Date().toLocaleTimeString()}\nTotal parts: ${parts.length}\n\nPARTS IN THIS BOX:\n${parts.map((p,i)=>`  ${i+1}. ${p}`).join('\n')}\n\n${'='.repeat(40)}\nPRINT TWO COPIES:\n  → One goes INSIDE the box\n  → One goes on the OUTSIDE of the sealed box\n\nDriver scans outside QR code — all parts load automatically into their manifest.\n${'='.repeat(40)}`);
+    window.location.href=`mailto:${packerEmail}?subject=${subject}&body=${body}`;
+    // Also fire EmailJS to packer + dispatch
+    sendMixboxEmail(packerEmail, packerName, boxId, parts);
+    document.getElementById('done-box-id').textContent=boxId;
+    document.getElementById('done-sub').textContent=`Label email sent to ${packerEmail}`;
+    showScreen('screen-done');
+    showToast('Done! Check your inbox','success');
+  },500);
+}
+
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
 function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');setTimeout(()=>t.className='toast',3000);}
 function logOut(){packerEmail='';packerName='';parts=[];document.getElementById('login-email').value='';showScreen('screen-login');}
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+const EMAILJS_SERVICE = 'service_53tsuzt';
+const EMAILJS_TEMPLATE = 'template_qz1f4i7';
+const EMAILJS_KEY = '6dgwBRJOa8AY5dsOh';
+const NOTIFY_EMAIL = 'johnernestcarter@gmail.com';
+
+emailjs.init(EMAILJS_KEY);
+
+async function sendMixboxEmail(packerEmail, packerName, boxId, parts) {
+  const time = new Date().toLocaleString('en-CA');
+  const partList = parts.map((p, i) => `  ${i+1}. ${p}`).join('\n');
+
+  const msg = `MIXBOX PACKED — LABEL READY TO PRINT
+${'='.repeat(44)}
+Box ID: ${boxId}
+Packed By: ${packerName}
+Packed At: ${time}
+Total Parts: ${parts.length}
+
+PARTS IN THIS BOX:
+${partList}
+
+${'='.repeat(44)}
+PRINT TWO COPIES OF THIS EMAIL:
+  → One label goes INSIDE the box with the parts
+  → One label goes on the OUTSIDE of the sealed box
+
+Driver scans the outside label — all ${parts.length} parts load
+automatically into their delivery manifest.
+${'='.repeat(44)}`;
+
+  // Send to packer's own email
+  try {
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+      subject: `MIXBOX LABEL — ${boxId} — ${parts.length} parts`,
+      message: msg,
+      to_email: packerEmail
+    });
+    console.log('Label sent to packer:', packerEmail);
+  } catch(e) {
+    console.warn('Packer email failed:', e);
+  }
+
+  // Also notify dispatch
+  try {
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+      subject: `📦 MIXBOX PACKED — ${boxId} by ${packerName}`,
+      message: msg,
+      to_email: NOTIFY_EMAIL
+    });
+    console.log('Dispatch notified');
+  } catch(e) {
+    console.warn('Dispatch email failed:', e);
+  }
+}
+</script>
+
 </body>
 </html>
