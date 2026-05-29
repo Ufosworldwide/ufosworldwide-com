@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>APEX Dispatch</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap');
+:root{--bg:#080a0d;--surface:#0f1318;--surface2:#161c24;--surface3:#1e2733;--orange:#f97316;--green:#22c55e;--green-dim:#166534;--red:#ef4444;--red-dim:#7f1d1d;--blue:#3b82f6;--text:#e2e8f0;--text-dim:#64748b;--border:#1e2733;--mono:'Share Tech Mono',monospace;--head:'Barlow Condensed',sans-serif;--body:'Barlow',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden}
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+#screen-login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 20px}
+.login-logo{font-family:var(--head);font-weight:900;font-size:52px;letter-spacing:8px;color:var(--orange);text-align:center}
+.login-sub{font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:3px;text-align:center;margin-top:4px;margin-bottom:48px;text-transform:uppercase}
+.login-card{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--orange);border-radius:12px;padding:24px;width:100%;max-width:400px}
+.field{margin-bottom:14px}
+.field label{display:block;font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.field input,.field select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;color:var(--text);font-family:var(--body);font-size:15px;outline:none;transition:border-color 0.2s}
+.field input:focus,.field select:focus{border-color:var(--orange)}
+.field select{appearance:none;cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border:none;border-radius:6px;font-family:var(--head);font-weight:700;font-size:14px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;width:100%;margin-bottom:8px}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:var(--orange);color:#000}
+.btn-success{background:var(--green);color:#000}
+.btn-danger{background:var(--red);color:#fff}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-sm{padding:8px 14px;font-size:12px;margin-bottom:0;width:auto}
+.app-header{background:var(--surface);border-bottom:2px solid var(--orange);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.app-logo{font-family:var(--head);font-weight:900;font-size:28px;letter-spacing:4px;color:var(--orange)}
+.app-logo span{color:var(--text-dim);font-weight:400;font-size:12px;display:block;letter-spacing:3px;margin-top:-4px}
+.driver-badge{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-family:var(--mono);font-size:11px;color:var(--green);cursor:pointer;text-align:right}
+.driver-badge .name{font-size:13px;color:var(--text);font-family:var(--head);font-weight:600;letter-spacing:1px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border-bottom:1px solid var(--border)}
+.tab{padding:12px 8px;text-align:center;font-family:var(--head);font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s}
+.tab.active{color:var(--orange);border-bottom-color:var(--orange);background:var(--surface2)}
+.tab-count{font-family:var(--mono);font-size:11px;background:var(--surface3);border-radius:10px;padding:1px 6px;margin-left:4px}
+.tab.active .tab-count{background:var(--orange);color:#000}
+.screen-inner{display:none;padding:16px}
+.screen-inner.active{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden}
+.card-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--surface2)}
+.card-title{font-family:var(--head);font-weight:700;font-size:16px;letter-spacing:2px;text-transform:uppercase;color:var(--orange)}
+.card-body{padding:16px}
+.gps-status{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-bottom:16px;padding:8px 12px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)}
+.gps-dot{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0}
+.gps-dot.active{background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.stat-num{font-family:var(--head);font-weight:900;font-size:28px;color:var(--orange);line-height:1}
+.stat-label{font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+.manifest-item{background:var(--surface);border-radius:8px;margin-bottom:10px;border-left:4px solid var(--green);overflow:hidden}
+.manifest-item.return-item{border-left-color:var(--red)}
+.manifest-item-header{padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.manifest-item-title{font-family:var(--head);font-weight:700;font-size:15px;letter-spacing:1px}
+.manifest-item-meta{font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:3px}
+.status-badge{font-family:var(--mono);font-size:10px;letter-spacing:1px;padding:4px 8px;border-radius:4px;text-transform:uppercase;font-weight:bold}
+.status-pending{background:var(--surface3);color:var(--text-dim)}
+.status-delivered{background:var(--green-dim);color:var(--green)}
+.status-return{background:var(--red-dim);color:var(--red)}
+.type-delivery{background:var(--green-dim);color:var(--green);font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:3px;margin-right:8px}
+.type-return{background:var(--red-dim);color:var(--red);font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:3px;margin-right:8px}
+.manifest-item-actions{padding:0 14px 12px;display:flex;gap:8px;flex-wrap:wrap}
+.scan-box{background:var(--surface2);border:2px dashed var(--border);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.2s;margin-bottom:12px}
+.scan-box:hover,.scan-box.active{border-color:var(--orange)}
+.scan-box .icon{font-size:40px;margin-bottom:8px}
+.scan-box .label{font-family:var(--head);font-weight:700;font-size:14px;letter-spacing:2px;color:var(--orange);text-transform:uppercase}
+.scan-box .sublabel{font-size:12px;color:var(--text-dim);margin-top:4px}
+.parts-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.part-chip{background:var(--surface3);border:1px solid var(--border);border-radius:4px;padding:6px 10px;font-family:var(--mono);font-size:12px;color:var(--orange);display:flex;align-items:center;gap:6px}
+.part-chip .remove{cursor:pointer;color:var(--red);font-size:14px;line-height:1}
+#ocr-preview{width:100%;max-height:200px;object-fit:cover;border-radius:6px;border:1px solid var(--border);margin-bottom:10px;display:none}
+.ocr-status{font-family:var(--mono);font-size:12px;color:var(--text-dim);text-align:center;padding:8px}
+.progress-bar-wrap{height:4px;background:var(--surface3);border-radius:2px;margin:8px 0;overflow:hidden}
+.progress-bar{height:100%;background:var(--orange);border-radius:2px;transition:width 0.3s;width:0%}
+.search-wrap{position:relative}
+.search-wrap input{padding-left:40px}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:16px}
+.search-results{background:var(--surface2);border:1px solid var(--orange);border-top:none;border-radius:0 0 6px 6px;max-height:200px;overflow-y:auto;display:none}
+.search-results.open{display:block}
+.search-result-item{padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px}
+.search-result-item:hover{background:var(--surface3)}
+.search-result-item .addr{font-size:11px;color:var(--text-dim);font-family:var(--mono);margin-top:2px}
+.email-confirm-box{background:var(--surface3);border:1px solid var(--orange);border-radius:8px;padding:14px;margin-top:10px;display:none}
+.email-confirm-box.show{display:block}
+.email-readback{font-family:var(--mono);font-size:16px;color:var(--orange);text-align:center;padding:10px;letter-spacing:2px;word-break:break-all}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--orange);border-radius:16px 16px 0 0;padding:20px;width:100%;max-height:90vh;overflow-y:auto;animation:slideUp 0.25s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-title{font-family:var(--head);font-weight:900;font-size:22px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.section-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--text-dim);text-transform:uppercase;margin-bottom:8px;padding-left:4px}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-dim);font-family:var(--mono);font-size:13px}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-family:var(--mono);font-size:13px;color:var(--text);z-index:999;transition:transform 0.3s;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:var(--green);color:var(--green)}
+.toast.error{border-color:var(--red);color:var(--red)}
+input[type="file"]{display:none}
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+</style>
+</head>
+<body>
+
+<div id="screen-login" class="screen active">
+  <div class="login-logo">APEX</div>
+  <div class="login-sub">Dispatch · Parts Intelligence</div>
+  <div class="login-card">
+    <div class="field"><label>Driver Name</label><input type="text" id="login-name" placeholder="Your full name" autocomplete="name"></div>
+    <div class="field"><label>Company Email</label><input type="email" id="login-email" placeholder="firstname.lastname@performance.ca" autocomplete="email"></div>
+    <div class="field"><label>Hub Location</label>
+      <select id="login-hub">
+        <option value="">Select your hub...</option>
+        <option value="Niagara">Niagara Hub</option>
+        <option value="GTA Brampton">GTA Brampton Hub</option>
+        <option value="Huntsville">Huntsville Hub</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()">▶ BEGIN SHIFT</button>
+  </div>
+</div>
+
+<div id="screen-app" class="screen">
+  <div class="app-header">
+    <div class="app-logo">APEX<span>DISPATCH</span></div>
+    <div class="driver-badge" onclick="showDriverInfo()">
+      <div class="name" id="header-driver-name">—</div>
+      <div id="header-hub">—</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('manifest')" id="tab-manifest">Manifest <span class="tab-count" id="count-manifest">0</span></div>
+    <div class="tab" onclick="switchTab('new-order')" id="tab-new-order">+ Order</div>
+    <div class="tab" onclick="switchTab('return')" id="tab-return">Return <span class="tab-count" id="count-return">0</span></div>
+  </div>
+
+  <!-- MANIFEST -->
+  <div class="screen-inner active" id="screen-manifest">
+    <div class="gps-status"><div class="gps-dot" id="gps-dot"></div><span id="gps-label">GPS: Acquiring...</span></div>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num" id="stat-pending">0</div><div class="stat-label">Pending</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-delivered">0</div><div class="stat-label">Delivered</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-returns">0</div><div class="stat-label">Returns</div></div>
+    </div>
+    <div class="section-label">DELIVERIES</div>
+    <div id="manifest-deliveries"><div class="empty-state"><div class="icon">📦</div>No orders yet.<br>Tap + Order to add.</div></div>
+    <div class="section-label" style="margin-top:16px;">RETURNS</div>
+    <div id="manifest-returns"><div class="empty-state"><div class="icon">🔄</div>No returns yet.</div></div>
+  </div>
+
+  <!-- NEW ORDER -->
+  <div class="screen-inner" id="screen-new-order">
+    <div class="card" style="border-color:var(--blue);margin-bottom:12px;">
+      <div class="card-header" style="background:#0f1e35;">
+        <div class="card-title" style="color:var(--blue);">📦 Scan MixBox Label</div>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--text-dim);">FASTEST</span>
+      </div>
+      <div class="card-body">
+        <div class="scan-box" onclick="triggerMixboxScan()" style="border-color:var(--blue);">
+          <div class="icon">🔲</div>
+          <div class="label" style="color:var(--blue);">Scan Box QR Code</div>
+          <div class="sublabel">One scan loads all parts instantly</div>
+        </div>
+        <input type="file" id="mixbox-file-input" accept="image/*" capture="environment" onchange="processMixboxQR(event)">
+      </div>
+    </div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-align:center;margin-bottom:12px;letter-spacing:1px;">— OR SCAN INVOICE —</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📄 Scan Invoice</div>
+        <button class="btn btn-sm btn-ghost" onclick="showToast('Fill in fields below','')">Manual</button>
+      </div>
+      <div class="card-body">
+        <div class="scan-box" onclick="triggerInvoiceScan()">
+          <div class="icon">📷</div>
+          <div class="label">Tap to Scan Invoice</div>
+          <div class="sublabel">Camera reads part numbers automatically</div>
+        </div>
+        <img id="ocr-preview" alt="Invoice preview">
+        <div class="progress-bar-wrap" id="ocr-progress-wrap" style="display:none;"><div class="progress-bar" id="ocr-progress-bar"></div></div>
+        <div class="ocr-status" id="ocr-status"></div>
+        <input type="file" id="invoice-file-input" accept="image/*" capture="environment" onchange="processInvoiceImage(event)">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🏪 Customer</div></div>
+      <div class="card-body">
+        <div class="field">
+          <label>Search Customer</label>
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="customer-search" placeholder="Type company name..." oninput="searchCustomers(this.value)" autocomplete="off">
+          </div>
+          <div class="search-results" id="customer-results"></div>
+        </div>
+        <div id="selected-customer-display" style="display:none;">
+          <div style="background:var(--surface2);border:1px solid var(--green);border-radius:6px;padding:12px;margin-bottom:12px;">
+            <div style="font-family:var(--head);font-weight:700;font-size:15px;" id="sel-cust-name">—</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:4px;" id="sel-cust-addr">—</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);" id="sel-cust-phone">—</div>
+          </div>
+        </div>
+        <div class="field"><label>Invoice Number</label><input type="text" id="invoice-number" placeholder="e.g. INV-123456" autocomplete="off"></div>
+        <div class="field"><label>Part Count</label><input type="number" id="part-count" placeholder="Number of parts" min="1"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🔢 Part Numbers</div>
+        <button class="btn btn-sm btn-ghost" onclick="triggerPartScan()">📷 Scan</button>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label>Manual Part Entry</label>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="manual-part-input" placeholder="Enter part number" style="flex:1;" onkeydown="if(event.key==='Enter')addManualPart()">
+            <button class="btn btn-sm btn-primary" onclick="addManualPart()">ADD</button>
+          </div>
+        </div>
+        <input type="file" id="part-file-input" accept="image/*" capture="environment" onchange="processPartImage(event)">
+        <div class="parts-list" id="parts-list"></div>
+      </div>
+    </div>
+    <button class="btn btn-success" onclick="addToManifest()" style="margin-top:8px;">✓ ADD TO MANIFEST</button>
+    <button class="btn btn-ghost" onclick="clearOrderForm()">✕ Clear Form</button>
+  </div>
+
+  <!-- RETURN -->
+  <div class="screen-inner" id="screen-return">
+    <div class="card">
+      <div class="card-header"><div class="card-title">🔄 Create Return</div></div>
+      <div class="card-body">
+        <div class="field">
+          <label>Search Customer</label>
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="return-customer-search" placeholder="Type shop name..." oninput="searchCustomersReturn(this.value)" autocomplete="off">
+          </div>
+          <div class="search-results" id="return-customer-results"></div>
+        </div>
+        <div id="return-customer-selected" style="display:none;background:var(--surface2);border:1px solid var(--red);border-radius:6px;padding:12px;margin-bottom:12px;">
+          <div style="font-family:var(--head);font-weight:700;font-size:15px;" id="ret-cust-name">—</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);" id="ret-cust-addr">—</div>
+        </div>
+        <div class="field"><label>Originating Dealership</label>
+          <select id="return-dealership">
+            <option value="">Select dealership...</option>
+            <option>Performance Toyota Niagara</option><option>Performance Honda Niagara</option>
+            <option>Performance Chevrolet Niagara</option><option>Performance Ford Niagara</option>
+            <option>Performance Nissan Niagara</option><option>Performance Hyundai Niagara</option>
+            <option>Performance Kia Niagara</option><option>Performance Mazda Niagara</option>
+            <option>Performance Subaru Niagara</option><option>Performance VW Niagara</option>
+            <option>Performance Toyota Brampton</option><option>Performance Honda Brampton</option>
+            <option>Performance Chevrolet Brampton</option><option>Performance Ford Brampton</option>
+            <option>Performance Nissan Brampton</option><option>Performance Hyundai Brampton</option>
+            <option>Performance Kia Brampton</option><option>Performance Mazda Brampton</option>
+            <option>Performance Subaru Brampton</option><option>Performance VW Brampton</option>
+            <option>Performance Toyota Huntsville</option><option>Performance Honda Huntsville</option>
+            <option>Performance Chevrolet Huntsville</option>
+          </select>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-header"><div class="card-title" style="font-size:13px;">🔢 Return Parts</div><button class="btn btn-sm btn-ghost" onclick="triggerReturnPartScan()">📷 Scan</button></div>
+          <div class="card-body">
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+              <input type="text" id="return-part-input" placeholder="Enter part number" style="flex:1;" onkeydown="if(event.key==='Enter')addReturnPart()">
+              <button class="btn btn-sm btn-primary" onclick="addReturnPart()">ADD</button>
+            </div>
+            <input type="file" id="return-part-file-input" accept="image/*" capture="environment" onchange="processReturnPartImage(event)">
+            <div class="parts-list" id="return-parts-list"></div>
+          </div>
+        </div>
+        <div class="field"><label>Customer Email (receipt)</label><input type="email" id="return-email-1" placeholder="customer@shop.com" oninput="checkEmailMatch()"></div>
+        <div class="field"><label>Confirm Customer Email</label><input type="email" id="return-email-2" placeholder="Retype to confirm" oninput="checkEmailMatch()"></div>
+        <div class="email-confirm-box" id="email-confirm-box">
+          <div style="font-family:var(--head);font-weight:700;font-size:12px;letter-spacing:2px;color:var(--text-dim);text-align:center;text-transform:uppercase;margin-bottom:6px;">⚠ READ TO CUSTOMER BEFORE SUBMITTING</div>
+          <div class="email-readback" id="email-readback">—</div>
+        </div>
+        <button class="btn btn-danger" onclick="createReturn()" style="margin-top:12px;">🔄 CREATE RETURN</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELIVERY MODAL -->
+<div class="modal-overlay" id="delivery-modal">
+  <div class="modal">
+    <div class="modal-title">📦 Confirm Delivery</div>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:16px;">
+      <div style="font-family:var(--head);font-weight:700;font-size:18px;" id="dm-customer">—</div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--text-dim);margin-top:4px;" id="dm-address">—</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--orange);margin-top:4px;" id="dm-invoice">—</div>
+    </div>
+    <div class="field"><label>Recipient Name</label><input type="text" id="dm-recipient-name" placeholder="Name of person receiving order"></div>
+    <div class="field"><label>Recipient Email (optional)</label><input type="email" id="dm-recipient-email" placeholder="optional@shop.com"></div>
+    <div class="section-label" style="margin-bottom:8px;">PROOF OF DELIVERY PHOTO</div>
+    <img id="dm-photo-preview" style="width:100%;border-radius:6px;border:1px solid var(--border);margin-bottom:10px;display:none;" alt="Delivery photo">
+    <button class="btn btn-ghost" onclick="triggerDeliveryPhoto()">📷 Take Delivery Photo</button>
+    <input type="file" id="dm-photo-file" accept="image/*" capture="environment" onchange="previewDeliveryPhoto(event)">
+    <hr class="divider">
+    <button class="btn btn-success" onclick="confirmDelivery()">✓ CONFIRM DELIVERY</button>
+    <button class="btn btn-ghost" onclick="closeModal('delivery-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- DRIVER MODAL -->
+<div class="modal-overlay" id="driver-modal">
+  <div class="modal">
+    <div class="modal-title">👤 Driver Info</div>
+    <div style="font-family:var(--mono);font-size:13px;color:var(--text-dim);line-height:2;">
+      <div>Name: <span style="color:var(--text);" id="di-name">—</span></div>
+      <div>Email: <span style="color:var(--text);" id="di-email">—</span></div>
+      <div>Hub: <span style="color:var(--orange);" id="di-hub">—</span></div>
+      <div>Shift Start: <span style="color:var(--text);" id="di-shift">—</span></div>
+    </div>
+    <hr class="divider">
+    <button class="btn btn-ghost" onclick="closeModal('driver-modal')">Close</button>
+    <button class="btn btn-danger" onclick="endShift()">End Shift</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CONFIG={SHEETS_WEBHOOK:'',GPS_INTERVAL_MS:300000,MAPS_LINK:(addr)=>`https://maps.google.com/?q=${encodeURIComponent(addr)}`};
+const CUSTOMERS=[
+  {id:'C001',name:'Niagara Falls Auto Repair',address:'1234 Lundy\'s Lane, Niagara Falls, ON',phone:'905-555-0101'},
+  {id:'C002',name:'St. Catharines Tire & Auto',address:'456 Ontario St, St. Catharines, ON',phone:'905-555-0102'},
+  {id:'C003',name:'Welland Muffler & Brakes',address:'789 King St, Welland, ON',phone:'905-555-0103'},
+  {id:'C004',name:'Grimsby Auto Service',address:'321 Main St E, Grimsby, ON',phone:'905-555-0104'},
+  {id:'C005',name:'Thorold Transmission',address:'654 Front St N, Thorold, ON',phone:'905-555-0105'},
+  {id:'C006',name:'Fort Erie Car Care',address:'987 Garrison Rd, Fort Erie, ON',phone:'905-555-0106'},
+  {id:'C007',name:'Fonthill Automotive',address:'147 Highway 20 W, Fonthill, ON',phone:'905-555-0107'},
+  {id:'C008',name:'Ridgeway Service Centre',address:'258 Ridge Rd N, Ridgeway, ON',phone:'905-555-0108'},
+  {id:'C009',name:'Crystal Beach Auto',address:'369 Erie Rd, Crystal Beach, ON',phone:'905-555-0109'},
+  {id:'C010',name:'Port Colborne Garage',address:'741 King St, Port Colborne, ON',phone:'905-555-0110'},
+  {id:'C011',name:'Beamsville Automotive',address:'852 Ontario St, Beamsville, ON',phone:'905-555-0111'},
+  {id:'C012',name:'Lincoln Auto Centre',address:'963 Victoria Ave, Vineland, ON',phone:'905-555-0112'},
+];
+let driver=null,manifest=[],currentParts=[],returnParts=[],selectedCustomer=null,returnSelectedCustomer=null,activeDeliveryId=null,deliveryPhotoBase64=null,lastLocation=null,pingCount=0,shiftStart=null,gpsInterval=null;
+
+function doLogin(){const name=document.getElementById('login-name').value.trim();const email=document.getElementById('login-email').value.trim();const hub=document.getElementById('login-hub').value;if(!name||!email||!hub){showToast('Fill in all fields','error');return;}driver={name,email,hub};shiftStart=new Date();document.getElementById('screen-login').classList.remove('active');document.getElementById('screen-app').classList.add('active');document.getElementById('header-driver-name').textContent=name;document.getElementById('header-hub').textContent=hub;startGPS();showToast('Shift started — good driving, '+name.split(' ')[0],'success');}
+
+function startGPS(){if(!navigator.geolocation){document.getElementById('gps-label').textContent='GPS: Not supported';return;}navigator.geolocation.getCurrentPosition(pos=>{onLocation(pos);},err=>{document.getElementById('gps-label').textContent='GPS: Enable location permission';});gpsInterval=setInterval(()=>{navigator.geolocation.getCurrentPosition(pos=>{onLocation(pos);});},CONFIG.GPS_INTERVAL_MS);}
+function onLocation(pos){lastLocation={lat:pos.coords.latitude,lng:pos.coords.longitude};document.getElementById('gps-dot').classList.add('active');document.getElementById('gps-label').textContent=`GPS: ${lastLocation.lat.toFixed(4)}, ${lastLocation.lng.toFixed(4)}`;}
+
+function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.screen-inner').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');document.getElementById('screen-'+tab).classList.add('active');}
+
+function searchCustomers(query){const results=document.getElementById('customer-results');if(!query||query.length<2){results.classList.remove('open');return;}const matches=CUSTOMERS.filter(c=>c.name.toLowerCase().includes(query.toLowerCase())).slice(0,8);if(matches.length===0){results.classList.remove('open');return;}results.innerHTML=matches.map(c=>`<div class="search-result-item" onclick="selectCustomer('${c.id}')"><strong>${c.name}</strong><div class="addr">${c.address}</div></div>`).join('');results.classList.add('open');}
+function selectCustomer(id){const c=CUSTOMERS.find(x=>x.id===id);if(!c)return;selectedCustomer=c;document.getElementById('customer-search').value=c.name;document.getElementById('customer-results').classList.remove('open');document.getElementById('sel-cust-name').textContent=c.name;document.getElementById('sel-cust-addr').textContent=c.address;document.getElementById('sel-cust-phone').textContent='📞 '+c.phone;document.getElementById('selected-customer-display').style.display='block';}
+function searchCustomersReturn(query){const results=document.getElementById('return-customer-results');if(!query||query.length<2){results.classList.remove('open');return;}const matches=CUSTOMERS.filter(c=>c.name.toLowerCase().includes(query.toLowerCase())).slice(0,8);if(matches.length===0){results.classList.remove('open');return;}results.innerHTML=matches.map(c=>`<div class="search-result-item" onclick="selectReturnCustomer('${c.id}')"><strong>${c.name}</strong><div class="addr">${c.address}</div></div>`).join('');results.classList.add('open');}
+function selectReturnCustomer(id){const c=CUSTOMERS.find(x=>x.id===id);if(!c)return;returnSelectedCustomer=c;document.getElementById('return-customer-search').value=c.name;document.getElementById('return-customer-results').classList.remove('open');document.getElementById('ret-cust-name').textContent=c.name;document.getElementById('ret-cust-addr').textContent=c.address;document.getElementById('return-customer-selected').style.display='block';}
+
+function triggerMixboxScan(){document.getElementById('mixbox-file-input').click();}
+async function processMixboxQR(event){const file=event.target.files[0];if(!file)return;showToast('Reading MixBox label...','');try{const result=await Tesseract.recognize(file,'eng');const text=result.data.text;const jsonMatch=text.match(/\{[\s\S]*\}/);if(jsonMatch){const data=JSON.parse(jsonMatch[0]);if(data.boxId&&data.parts){data.parts.forEach(p=>addPart(p));showToast(`📦 ${data.parts.length} parts loaded from ${data.boxId}`,'success');document.getElementById('ocr-status').textContent=`MixBox ${data.boxId} · ${data.parts.length} parts loaded`;return;}}showToast('QR not readable — scan invoice instead','error');}catch(e){showToast('Could not read MixBox label','error');}event.target.value='';}
+
+function triggerInvoiceScan(){document.getElementById('invoice-file-input').click();}
+async function processInvoiceImage(event){const file=event.target.files[0];if(!file)return;const url=URL.createObjectURL(file);const preview=document.getElementById('ocr-preview');preview.src=url;preview.style.display='block';document.getElementById('ocr-progress-wrap').style.display='block';document.getElementById('ocr-status').textContent='Reading invoice...';try{const result=await Tesseract.recognize(file,'eng',{logger:m=>{if(m.status==='recognizing text')document.getElementById('ocr-progress-bar').style.width=(m.progress*100)+'%';}});const text=result.data.text;const partNumbers=extractPartNumbers(text);document.getElementById('ocr-status').textContent=`Found ${partNumbers.length} part number(s)`;document.getElementById('ocr-progress-wrap').style.display='none';partNumbers.forEach(p=>addPart(p));if(partNumbers.length>0)showToast(`${partNumbers.length} part(s) extracted`,'success');else showToast('No parts detected — add manually','error');}catch(e){document.getElementById('ocr-status').textContent='Scan failed — enter manually';showToast('OCR failed','error');}event.target.value='';}
+
+function extractPartNumbers(text){const cleaned=text.replace(/[-\s*#|]/g,' ');const matches=[...cleaned.matchAll(/\b[A-Z0-9]{4,20}\b/g)].map(m=>m[0]).filter(p=>/[0-9]/.test(p)&&/[A-Z]/.test(p));return[...new Set(matches)];}
+function triggerPartScan(){document.getElementById('part-file-input').click();}
+async function processPartImage(event){const file=event.target.files[0];if(!file)return;showToast('Scanning part...','');try{const result=await Tesseract.recognize(file,'eng');const parts=extractPartNumbers(result.data.text);parts.forEach(p=>addPart(p));showToast(parts.length>0?`${parts.length} part(s) found`:'No part found',parts.length>0?'success':'error');}catch(e){showToast('Scan failed','error');}event.target.value='';}
+function addManualPart(){const input=document.getElementById('manual-part-input');const val=input.value.trim().replace(/[\s\-*#]/g,'').toUpperCase();if(!val)return;addPart(val);input.value='';}
+function addPart(num){if(currentParts.includes(num)){showToast(num+' already added','error');return;}currentParts.push(num);renderParts();}
+function removePart(num){currentParts=currentParts.filter(p=>p!==num);renderParts();}
+function renderParts(){const list=document.getElementById('parts-list');list.innerHTML=currentParts.map(p=>`<div class="part-chip">${p}<span class="remove" onclick="removePart('${p}')">✕</span></div>`).join('');}
+
+function triggerReturnPartScan(){document.getElementById('return-part-file-input').click();}
+async function processReturnPartImage(event){const file=event.target.files[0];if(!file)return;try{const result=await Tesseract.recognize(file,'eng');const parts=extractPartNumbers(result.data.text);parts.forEach(p=>addReturnPartNum(p));showToast(parts.length>0?`${parts.length} part(s) found`:'No part found',parts.length>0?'success':'error');}catch(e){showToast('Scan failed','error');}event.target.value='';}
+function addReturnPart(){const input=document.getElementById('return-part-input');const val=input.value.trim().replace(/[\s\-*#]/g,'').toUpperCase();if(!val)return;addReturnPartNum(val);input.value='';}
+function addReturnPartNum(num){if(returnParts.includes(num)){showToast(num+' already added','error');return;}returnParts.push(num);renderReturnParts();}
+function removeReturnPart(num){returnParts=returnParts.filter(p=>p!==num);renderReturnParts();}
+function renderReturnParts(){document.getElementById('return-parts-list').innerHTML=returnParts.map(p=>`<div class="part-chip" style="border-color:var(--red-dim);">${p}<span class="remove" onclick="removeReturnPart('${p}')">✕</span></div>`).join('');}
+
+function checkEmailMatch(){const e1=document.getElementById('return-email-1').value.trim();const e2=document.getElementById('return-email-2').value.trim();const box=document.getElementById('email-confirm-box');if(e1&&e1===e2){box.classList.add('show');document.getElementById('email-readback').textContent=e1;}else{box.classList.remove('show');}}
+
+function addToManifest(){if(!selectedCustomer){showToast('Select a customer first','error');return;}if(currentParts.length===0){showToast('Add at least one part number','error');return;}const order={id:'ORD-'+Date.now(),type:'delivery',customer:selectedCustomer,parts:[...currentParts],invoiceNumber:document.getElementById('invoice-number').value.trim(),partCount:parseInt(document.getElementById('part-count').value)||currentParts.length,status:'pending',createdAt:new Date().toISOString(),driver:driver.name,hub:driver.hub};manifest.push(order);renderManifest();updateCounts();clearOrderForm();switchTab('manifest');showToast('Order added to manifest','success');sendToSheets({type:'ORDER_CREATED',...order});}
+
+function createReturn(){if(!returnSelectedCustomer){showToast('Select customer','error');return;}const dealership=document.getElementById('return-dealership').value;if(!dealership){showToast('Select dealership','error');return;}if(returnParts.length===0){showToast('Scan at least one part','error');return;}const e1=document.getElementById('return-email-1').value.trim();const e2=document.getElementById('return-email-2').value.trim();if(!e1||e1!==e2){showToast('Email addresses must match','error');return;}const ret={id:'RET-'+Date.now(),type:'return',customer:returnSelectedCustomer,dealership,parts:[...returnParts],customerEmail:e1,status:'pending',createdAt:new Date().toISOString(),driver:driver.name,hub:driver.hub};manifest.push(ret);renderManifest();updateCounts();returnParts=[];returnSelectedCustomer=null;document.getElementById('return-customer-search').value='';document.getElementById('return-customer-selected').style.display='none';document.getElementById('return-dealership').value='';document.getElementById('return-email-1').value='';document.getElementById('return-email-2').value='';document.getElementById('email-confirm-box').classList.remove('show');renderReturnParts();switchTab('manifest');showToast('Return created','success');sendToSheets({type:'RETURN_CREATED',...ret});}
+
+function renderManifest(){const deliveries=manifest.filter(o=>o.type==='delivery');const returns=manifest.filter(o=>o.type==='return');const dEl=document.getElementById('manifest-deliveries');const rEl=document.getElementById('manifest-returns');dEl.innerHTML=deliveries.length===0?'<div class="empty-state"><div class="icon">📦</div>No deliveries.<br>Tap + Order to add.</div>':deliveries.map(o=>renderManifestItem(o)).join('');rEl.innerHTML=returns.length===0?'<div class="empty-state"><div class="icon">🔄</div>No returns.</div>':returns.map(o=>renderManifestItem(o)).join('');document.getElementById('stat-pending').textContent=manifest.filter(o=>o.type==='delivery'&&o.status==='pending').length;document.getElementById('stat-delivered').textContent=manifest.filter(o=>o.status==='delivered').length;document.getElementById('stat-returns').textContent=returns.length;}
+
+function renderManifestItem(o){const isReturn=o.type==='return';const statusClass=o.status==='delivered'?'status-delivered':isReturn?'status-return':'status-pending';const statusLabel=o.status==='delivered'?'DELIVERED':isReturn?'RETURN':'PENDING';const mapsLink=CONFIG.MAPS_LINK(o.customer.address);return`<div class="manifest-item ${isReturn?'return-item':''}" id="item-${o.id}"><div class="manifest-item-header"><div><span class="${isReturn?'type-return':'type-delivery'}">${isReturn?'RETURN':'DELIVERY'}</span><div class="manifest-item-title">${o.customer.name}</div><div class="manifest-item-meta">${o.parts.length} part(s)${o.invoiceNumber?' · INV: '+o.invoiceNumber:''} · ${new Date(o.createdAt).toLocaleTimeString()}</div>${isReturn?`<div class="manifest-item-meta" style="color:var(--red);">→ ${o.dealership}</div>`:''}</div><span class="status-badge ${statusClass}">${statusLabel}</span></div><div class="manifest-item-actions"><a href="${mapsLink}" target="_blank" class="btn btn-ghost btn-sm">🗺 Navigate</a>${o.status!=='delivered'?`<button class="btn btn-primary btn-sm" onclick="openDeliveryModal('${o.id}')">📦 Deliver</button>`:''}<a href="tel:${o.customer.phone}" class="btn btn-ghost btn-sm">📞 Call</a></div></div>`;}
+
+function updateCounts(){document.getElementById('count-manifest').textContent=manifest.filter(o=>o.status!=='delivered').length;document.getElementById('count-return').textContent=manifest.filter(o=>o.type==='return'&&o.status!=='delivered').length;}
+
+function openDeliveryModal(id){const order=manifest.find(o=>o.id===id);if(!order)return;activeDeliveryId=id;deliveryPhotoBase64=null;document.getElementById('dm-customer').textContent=order.customer.name;document.getElementById('dm-address').textContent=order.customer.address;document.getElementById('dm-invoice').textContent=order.invoiceNumber?'Invoice: '+order.invoiceNumber:'';document.getElementById('dm-recipient-name').value='';document.getElementById('dm-recipient-email').value='';document.getElementById('dm-photo-preview').style.display='none';document.getElementById('delivery-modal').classList.add('open');}
+function triggerDeliveryPhoto(){document.getElementById('dm-photo-file').click();}
+function previewDeliveryPhoto(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{deliveryPhotoBase64=e.target.result;const img=document.getElementById('dm-photo-preview');img.src=e.target.result;img.style.display='block';showToast('Photo captured','success');};reader.readAsDataURL(file);}
+function confirmDelivery(){const recipientName=document.getElementById('dm-recipient-name').value.trim();if(!recipientName){showToast('Enter recipient name','error');return;}const order=manifest.find(o=>o.id===activeDeliveryId);if(!order)return;order.status='delivered';order.deliveredAt=new Date().toISOString();order.recipientName=recipientName;order.recipientEmail=document.getElementById('dm-recipient-email').value.trim();order.hasPhoto=!!deliveryPhotoBase64;if(lastLocation){order.deliveryLat=lastLocation.lat;order.deliveryLng=lastLocation.lng;}renderManifest();updateCounts();closeModal('delivery-modal');showToast('Delivery confirmed ✓','success');sendToSheets({type:order.type==='return'?'RETURN_DELIVERED':'DELIVERY_CONFIRMED',...order});}
+
+function clearOrderForm(){currentParts=[];selectedCustomer=null;document.getElementById('customer-search').value='';document.getElementById('customer-results').classList.remove('open');document.getElementById('selected-customer-display').style.display='none';document.getElementById('invoice-number').value='';document.getElementById('part-count').value='';document.getElementById('manual-part-input').value='';document.getElementById('ocr-preview').style.display='none';document.getElementById('ocr-status').textContent='';document.getElementById('ocr-progress-wrap').style.display='none';document.getElementById('ocr-progress-bar').style.width='0%';renderParts();}
+
+function showDriverInfo(){if(!driver)return;document.getElementById('di-name').textContent=driver.name;document.getElementById('di-email').textContent=driver.email;document.getElementById('di-hub').textContent=driver.hub;document.getElementById('di-shift').textContent=shiftStart?shiftStart.toLocaleTimeString():'—';document.getElementById('driver-modal').classList.add('open');}
+function endShift(){if(manifest.filter(o=>o.status==='pending').length>0){if(!confirm('You still have pending deliveries. End shift anyway?'))return;}clearInterval(gpsInterval);sendToSheets({type:'SHIFT_END',driver:driver.name,hub:driver.hub,timestamp:new Date().toISOString()});driver=null;manifest=[];currentParts=[];returnParts=[];document.getElementById('screen-app').classList.remove('active');document.getElementById('screen-login').classList.add('active');closeModal('driver-modal');showToast('Shift ended. Good work.','success');}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');setTimeout(()=>t.className='toast',3000);}
+async function sendToSheets(payload){if(!CONFIG.SHEETS_WEBHOOK)return;try{await fetch(CONFIG.SHEETS_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});}catch(e){console.warn('Sheets failed:',e);}}
+document.querySelectorAll('.modal-overlay').forEach(overlay=>{overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.classList.remove('open');});});
+</script>
+</body>
+</html>
