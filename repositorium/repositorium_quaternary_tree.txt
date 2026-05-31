@@ -1,0 +1,231 @@
+
+REPOSITORIUM/
+│
+├── 📁 00_SOURCE_NODE/
+│   ├── manifest.json                        # Genesis: John Carter, Ontario, 2026-05-31
+│   ├── elemental_charter.md                 # Why four pillars, why these four
+│   ├── golden_spiral.map                    # Polar coordinates for all 32+ papers
+│   ├── fibonacci_quadrant_index.json        # Spiral params per domain
+│   └── 📁 00A_CURATOR_IDENTITY/
+│       ├── profile.json                     # Who you are, what you owe
+│       ├── research_philosophy.md           # The Presignal doctrine
+│       └── master_hypothesis.md             # Earth Lights unification + Subtraction Methodology
+│
+├── 📁 01_ETHOS/                           [🔥 FIRE — Purpose, Stewardship, Legacy]
+│   ├── pillar_manifest.json                 # Element: Fire | Essence: Why we know
+│   ├── 📁 01A_ONTOLOGY/
+│   │   ├── what_it_is.md                    # Ethics as first philosophy
+│   │   ├── scope_boundary.md                # Excludes nihilism, includes stewardship
+│   │   └── keywords.taxonomy              # service_to_others, civilizational_continuity, legacy
+│   ├── 📁 01B_CORPUS/
+│   │   ├── what_weve_learned.md             # All ethical frameworks distilled
+│   │   ├── core_theories/
+│   │   │   ├── T-ETH-001_prime_signal_convergence.md
+│   │   │   ├── T-ETH-002_extinction_stewardship.md
+│   │   │   └── T-ETH-003_science_reform_ethics.md
+│   │   ├── verified_findings/
+│   │   │   └── F-ETH-001_systematic_exclusion_cost.md
+│   │   └── bibliography.bib
+│   ├── 📁 01C_INVENTORY/
+│   │   ├── completed_studies.json
+│   │   ├── datasets_catalogued.json
+│   │   └── methodologies.md
+│   ├── 📁 01D_GAP_ANALYSIS/
+│   │   ├── research_gaps/                   # What moral frameworks are missing
+│   │   ├── rd_gaps/                         # What ethical infrastructure needs building
+│   │   └── closure_pathways/
+│   ├── 📁 01E_HUMAN_CAPITAL/
+│   │   ├── profound_thinkers.json           # Philosophers, ethicists, spiritual teachers
+│   │   ├── groundwork_operatives.json       # Field workers operating from moral clarity
+│   │   └── needed_expertise.md
+│   ├── 📁 01F_LINE_ITEMS/
+│   │   ├── LI-ETH-001_cross_cultural_ethics_synthesis.md
+│   │   ├── LI-ETH-002_civilizational_resilience_metrics.md
+│   │   └── LI-ETH-003_genealogy_as_moral_narrative.md
+│   ├── 📁 01G_SUBMISSIONS/
+│   │   ├── inbox/
+│   │   ├── validated/
+│   │   └── lineage/
+│   ├── 📁 01H_GEOMETRY/
+│   │   ├── spiral_position.json             # r=2.0φ, θ=90°, level=3
+│   │   └── sub_node_map.json
+│   └── 📁 01I_PAPERS/
+│       ├── P-005_prime_signal.md            # [MYTHOS secondary link]
+│       ├── P-006_geometry_garden.md         # [METAPHYSICAL secondary link]
+│       ├── P-010_ants_horizon.md            # [METAPHYSICAL, PHYSICAL secondary]
+│       ├── P-014_extinction_codex.md        # [PHYSICAL secondary]
+│       ├── P-018_asymptotic_foundry.md      # [METAPHYSICAL secondary]
+│       ├── P-019_four_pillars.md            # [PHYSICAL, METAPHYSICAL secondary]
+│       └── P-022_uel_genealogy.md         # [MYTHOS secondary]
+│
+├── 📁 02_MYTHOS/                          [💧 WATER — Symbolism, Narrative, Pattern]
+│   ├── pillar_manifest.json                 # Element: Water | Essence: What stories repeat
+│   ├── 📁 02A_ONTOLOGY/
+│   │   ├── what_it_is.md                    # Myth as compressed survival data
+│   │   ├── scope_boundary.md                # Excludes fiction, includes folklore with physical correlates
+│   │   └── keywords.taxonomy              # presignal, folklore, numerical_sequence, cross_cultural
+│   ├── 📁 02B_CORPUS/
+│   │   ├── what_weve_learned.md             # The repeating patterns across civilizations
+│   │   ├── core_theories/
+│   │   │   ├── T-MYT-001_presignal_archetype_pattern.md
+│   │   │   ├── T-MYT-002_numerical_sequence_signatures.md
+│   │   │   └── T-MYT-003_earth_light_folklore_correlation.md
+│   │   ├── verified_findings/
+│   │   │   └── F-MYT-001_wolf_horse_bear_triad.md
+│   │   └── bibliography.bib
+│   ├── 📁 02C_INVENTORY/
+│   ├── 📁 02D_GAP_ANALYSIS/
+│   ├── 📁 02E_HUMAN_CAPITAL/
+│   ├── 📁 02F_LINE_ITEMS/
+│   │   ├── LI-MYT-001_cross_culture_presignal_study.md
+│   │   ├── LI-MYT-002_numerical_sequence_universal_grammar.md
+│   │   └── LI-MYT-003_ism_navigable_terrain_mythography.md
+│   ├── 📁 02G_SUBMISSIONS/
+│   ├── 📁 02H_GEOMETRY/
+│   │   ├── spiral_position.json             # r=2.0φ, θ=0°, level=3
+│   │   └── sub_node_map.json
+│   └── 📁 02I_PAPERS/
+│       ├── P-005_prime_signal.md            # [ETHOS secondary link]
+│       ├── P-013_numerical_sequence.md      # [METAPHYSICAL secondary]
+│       ├── P-025_em_sentinel.md             # [PHYSICAL secondary]
+│       ├── P-026_field_node_v2.md           # [PHYSICAL secondary]
+│       ├── P-027_ism_terrain.md             # [PHYSICAL secondary]
+│       ├── P-028_traveling_system.md        # [PHYSICAL secondary]
+│       └── P-032_gpdm.md                    # [PHYSICAL, METAPHYSICAL secondary]
+│
+├── 📁 03_PHYSICAL/                          [🜃 EARTH — Matter, Measurement, Engineering]
+│   ├── pillar_manifest.json                 # Element: Earth | Essence: What can be held
+│   ├── 📁 03A_ONTOLOGY/
+│   │   ├── what_it_is.md                    # Falsifiable, instrumented, measurable
+│   │   ├── scope_boundary.md                # Excludes untestable claims, includes all hardware
+│   │   └── keywords.taxonomy              # thermal_management, water_quality, electrode, geospatial, radiation
+│   ├── 📁 03B_CORPUS/
+│   │   ├── what_weve_learned.md             # Consolidated physical findings
+│   │   ├── core_theories/
+│   │   │   ├── T-PHY-001_murray_network_cosmic_web.md
+│   │   │   ├── T-PHY-002_murray_electrode_porosity.md
+│   │   │   ├── T-PHY-003_thermal_vo2_stack.md
+│   │   │   └── T-PHY-004_legionella_temperature_correlation.md
+│   │   ├── verified_findings/
+│   │   │   └── F-PHY-001_grand_river_exceedances.md
+│   │   └── bibliography.bib
+│   ├── 📁 03C_INVENTORY/
+│   │   ├── completed_studies.json
+│   │   ├── datasets_catalogued.json         # PWQMN, Hessdalen spectroscopy, CERN dimuon, etc.
+│   │   ├── instruments.json               # EM Sentinel, Field Node v2.0, Spectrometer
+│   │   └── methodologies.md
+│   ├── 📁 03D_GAP_ANALYSIS/
+│   │   ├── research_gaps/
+│   │   │   ├── G-R-PHY-001_colombia_phole_mapping.md
+│   │   │   └── G-R-PHY-002_spectral_signature_database.md
+│   │   ├── rd_gaps/
+│   │   │   └── G-D-PHY-001_portable_phole_detector.md
+│   │   └── closure_pathways/
+│   ├── 📁 03E_HUMAN_CAPITAL/
+│   │   ├── profound_thinkers.json           # Teodorani, Strand, materials scientists
+│   │   ├── groundwork_operatives.json       # Field technicians, lab techs
+│   │   └── needed_expertise.md              # Colombian geologist, plasma spectroscopist
+│   ├── 📁 03F_LINE_ITEMS/
+│   │   ├── LI-PHY-001_quartz_vein_mapping_juaica.md
+│   │   ├── LI-PHY-002_vahs_pilot_scale.md
+│   │   ├── LI-PHY-003_dsup_clinical_trial.md
+│   │   ├── LI-PHY-004_ggi_canadian_shield.md
+│   │   └── LI-PHY-005_tmlca_beam_dynamics.md
+│   ├── 📁 03G_SUBMISSIONS/
+│   │   ├── inbox/
+│   │   ├── validated/
+│   │   └── lineage/
+│   ├── 📁 03H_GEOMETRY/
+│   │   ├── spiral_position.json             # r=3.0φ, θ=270°, level=5
+│   │   └── sub_node_map.json
+│   └── 📁 03I_PAPERS/
+│       ├── P-001_thermal_management.md
+│       ├── P-011_cosmic_web_murray.md      # [METAPHYSICAL secondary]
+│       ├── P-012_electrode_murray.md       # [METAPHYSICAL secondary]
+│       ├── P-016_tmlca.md                  # [METAPHYSICAL, MYTHOS secondary]
+│       ├── P-017_ggi.md                    # [ETHOS secondary]
+│       ├── P-020_water_bears.md            # [ETHOS secondary]
+│       ├── P-021_vahs.md                   # [ETHOS, METAPHYSICAL secondary]
+│       ├── P-023_legionella_multi.md
+│       ├── P-024_legionella_seasonal.md
+│       ├── P-029_legionella_watershed.md
+│       ├── P-030_grand_river_ai.md         # [ETHOS secondary]
+│       ├── P-031_its_tinnitus.md           # [METAPHYSICAL secondary]
+│       └── P-032_gpdm.md                   # [MYTHOS, METAPHYSICAL secondary]
+│
+├── 📁 04_METAPHYSICAL/                    [☁️ AIR / ETHER / PSY / MANA]
+│   ├── pillar_manifest.json                 # Element: Air | Essence: What connects without touching
+│   ├── 📁 04A_ONTOLOGY/
+│   │   ├── what_it_is.md                    # Consciousness, topology, hidden variables, geometry
+│   │   ├── scope_boundary.md                # Excludes superstition, includes mathematically rigorous liminal phenomena
+│   │   └── keywords.taxonomy              # subtraction_methodology, hidden_variables, quantum, topology, ether, consciousness
+│   ├── 📁 04B_CORPUS/
+│   │   ├── what_weve_learned.md             # What remains when known physics is subtracted
+│   │   ├── core_theories/
+│   │   │   ├── T-META-001_subtraction_methodology.md
+│   │   │   ├── T-META-002_adele_class_space_rh.md
+│   │   │   ├── T-META-003_quantum_hidden_variable_extraction.md
+│   │   │   └── T-META-004_nested_topological_universe.md
+│   │   ├── verified_findings/
+│   │   │   └── F-META-001_residual_anomaly_catalogue.md
+│   │   └── bibliography.bib
+│   ├── 📁 04C_INVENTORY/
+│   │   ├── completed_studies.json
+│   │   ├── datasets_catalogued.json         # Residual anomaly datasets from TESS, LIGO, CERN, USGS
+│   │   ├── instruments.json               # ETHER sensor architecture, Q-HVE quantum simulator
+│   │   └── methodologies.md               # Subtraction methodology, TSC pipeline
+│   ├── 📁 04D_GAP_ANALYSIS/
+│   │   ├── research_gaps/
+│   │   │   ├── G-R-META-001_connes_consani_computational_limit.md
+│   │   │   └── G-R-META-002_consciousness_measurement_protocol.md
+│   │   ├── rd_gaps/
+│   │   │   └── G-D-META-001_room_temp_superconductor_ism_probe.md
+│   │   └── closure_pathways/
+│   ├── 📁 04E_HUMAN_CAPITAL/
+│   │   ├── profound_thinkers.json           # Connes, Consani, Grover, Penrose, Viazovska
+│   │   ├── groundwork_operatives.json       # Quantum sim operators, anomaly reviewers
+│   │   └── needed_expertise.md              # Noncommutative geometer, quantum ethicist
+│   ├── 📁 04F_LINE_ITEMS/
+│   │   ├── LI-META-001_rh_weil_positivity_computation.md
+│   │   ├── LI-META-002_ether_sensor_array_deployment.md
+│   │   ├── LI-META-003_qhve_immunological_application.md
+│   │   └── LI-META-004_universe_shape_tng_validation.md
+│   ├── 📁 04G_SUBMISSIONS/
+│   │   ├── inbox/
+│   │   ├── validated/
+│   │   └── lineage/
+│   ├── 📁 04H_GEOMETRY/
+│   │   ├── spiral_position.json             # r=3.0φ, θ=180°, level=5
+│   │   └── sub_node_map.json
+│   └── 📁 04I_PAPERS/
+│       ├── P-002_jem_in_the_room.md        # [PHYSICAL secondary]
+│       ├── P-003_telegraphic_compression.md # [MYTHOS, PHYSICAL secondary]
+│       ├── P-004_connes_consani_rh.md
+│       ├── P-007_subtraction_rh.md         # [ETHOS secondary]
+│       ├── P-008_ether_sensor.md           # [PHYSICAL secondary]
+│       ├── P-009_quantum_hve.md            # [PHYSICAL, ETHOS secondary]
+│       ├── P-015_universe_shape.md         # [MYTHOS secondary]
+│       └── P-032_gpdm.md                   # [PHYSICAL, MYTHOS secondary]
+│
+├── 📁 99_INFRASTRUCTURE/
+│   ├── 📁 99A_MANA_FLOWS/                 # Cross-domain connection engine
+│   │   ├── mana_registry.json               # Every cross-domain link documented
+│   │   ├── transmutation_rules.md           # Water→Fire, Fire→Earth, Earth→Air, Air→Water
+│   │   ├── dependency_graph.json            # Which paper needs which other to be true
+│   │   └── citation_matrix.md               # Bidirectional references across pillars
+│   ├── 📁 99B_GEOMETRY_ENGINE/
+│   │   ├── fibonacci_quadrant_calculator.py # Auto-assigns spiral coords per domain
+│   │   ├── mana_flow_renderer.js            # Visualizes cross-domain connections
+│   │   └── containment_validator.py         # Enforces max nodes per Fibonacci level
+│   ├── 📁 99C_SUBMISSION_PORTAL/
+│   │   ├── contributor_schema.json
+│   │   ├── validation_pipeline.md           # How data moves from inbox to validated
+│   │   └── lineage_tracker.py               # SHA-256 / DOI provenance chains
+│   ├── 📁 99D_PRESIGNAL_INDEX/            # The connective tissue across all four pillars
+│   │   ├── presignal_master_registry.json   # Every mention of 'presignal' in every paper
+│   │   ├── symbol_correlation_matrix.json   # White wolf, white horse, standing bear
+│   │   └── anomaly_cross_reference.md       # When a physical anomaly matches a mythic symbol
+│   └── 📁 99E_BACKUPS/
+│       └── snapshot_manifest.json
+│
+└── README.md                                # Genesis document — how to navigate the mandala
