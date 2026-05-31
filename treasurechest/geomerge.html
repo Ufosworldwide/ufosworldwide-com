@@ -13,12 +13,14 @@
   --bg:#000008;--grid-bg:rgba(255,255,255,0.03);
   --cell:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);
   --text:#e8e0ff;--accent:#7B6FFF;--gold:#FFD700;
+  --phi-pulse:0;
 }
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);
   font-family:'Share Tech Mono',monospace;-webkit-font-smoothing:antialiased;touch-action:none}
 
-/* COSMIC BG */
+/* HONEYCOMB BG */
 #cosmos{position:fixed;inset:0;z-index:0;pointer-events:none}
+#phi-bg{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0.55}
 
 /* LAYOUT */
 #app{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;padding:0}
@@ -30,7 +32,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 #score-wrap{text-align:right}
 #score-lbl{font-size:0.6rem;opacity:0.45;letter-spacing:0.12em}
-#score{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;color:var(--gold)}
+#score{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;color:var(--gold);
+  transition:transform 0.15s;display:inline-block}
+#score.bump{transform:scale(1.35);color:#fff}
 
 /* PHASE BANNER */
 #phase-banner{width:100%;text-align:center;padding:2px 0 4px;flex-shrink:0}
@@ -41,15 +45,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 /* GRID */
 #grid-wrap{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:center;width:100%;padding:4px 10px}
 #grid{display:grid;gap:6px;padding:6px;background:rgba(255,255,255,0.025);border-radius:16px;
-  border:1px solid rgba(255,255,255,0.06);box-shadow:0 0 60px rgba(123,111,255,0.08)}
+  border:1px solid rgba(255,255,255,0.06);box-shadow:0 0 60px rgba(123,111,255,0.08);
+  transition:box-shadow 0.5s}
 
 .cell{
   border-radius:10px;background:var(--cell);border:1px solid var(--border);
   display:flex;align-items:center;justify-content:center;
   position:relative;overflow:visible;
-  transition:transform 0.1s;cursor:default;
+  transition:transform 0.12s,box-shadow 0.2s;cursor:default;
 }
 .cell canvas{display:block;pointer-events:none}
+.cell.pop{animation:cellPop 0.32s cubic-bezier(.22,1.8,.4,1) forwards}
+@keyframes cellPop{0%{transform:scale(1)}40%{transform:scale(1.28)}100%{transform:scale(1)}}
 
 /* BOTTOM */
 #bottom{width:100%;padding:6px 16px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
@@ -82,11 +89,25 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
 /* MERGE FLASH */
 .merge-flash{position:fixed;inset:0;z-index:400;pointer-events:none;opacity:0;transition:opacity 0.3s}
+
+/* PARTICLES */
+.particle{position:fixed;pointer-events:none;z-index:390;border-radius:50%;
+  animation:particleFly 0.7s ease-out forwards}
+@keyframes particleFly{
+  0%{opacity:1;transform:translate(0,0) scale(1)}
+  100%{opacity:0;transform:var(--tx,0) var(--ty,0) scale(0)}
+}
+
+/* PHASE PULSE ring */
+#phase-ring{position:fixed;inset:0;z-index:398;pointer-events:none;
+  border-radius:0;opacity:0;transition:opacity 0.6s}
 </style>
 </head>
 <body>
 <canvas id="cosmos"></canvas>
+<canvas id="phi-bg"></canvas>
 <div class="merge-flash" id="mflash"></div>
+<div id="phase-ring"></div>
 
 <div id="overlay" class="show">
   <div id="ov-title">GEOMERGE</div>
@@ -138,10 +159,108 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 'use strict';
 
 // ═══════════════════════════════════════════════════════════════════════════
+// GOLDEN RATIO AUDIO ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+const PHI = 1.6180339887;
+const SCHUMANN = 7.83;
+let audioCtx = null;
+
+function getAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+
+// Each tier's base frequency = 55 * PHI^(id/3) — golden ratio harmonic ladder
+function tierFreq(id){ return 55 * Math.pow(PHI, id/3); }
+
+function playMerge(shapeId){
+  try{
+    const ac = getAudio();
+    const freq = tierFreq(shapeId);
+    const s = SHAPES[shapeId];
+    const isSpecial = s.impossible||s.isWeb||s.isMobius||s.isKlein||s.isUniverse;
+
+    // Main tone
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    const filter = ac.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = freq;
+    filter.Q.value = isSpecial ? 0.5 : 2;
+    osc.connect(filter); filter.connect(gain); gain.connect(ac.destination);
+    osc.type = isSpecial ? 'sine' : (shapeId < 7 ? 'triangle' : 'sawtooth');
+    osc.frequency.setValueAtTime(freq, ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(freq*PHI*0.5, ac.currentTime+0.3);
+    gain.gain.setValueAtTime(0,ac.currentTime);
+    gain.gain.linearRampToValueAtTime(isSpecial?0.18:0.12, ac.currentTime+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+(isSpecial?0.8:0.35));
+    osc.start(ac.currentTime); osc.stop(ac.currentTime+(isSpecial?0.85:0.4));
+
+    // Harmonic overtone at PHI * freq
+    if(shapeId>3){
+      const osc2 = ac.createOscillator();
+      const g2 = ac.createGain();
+      osc2.connect(g2); g2.connect(ac.destination);
+      osc2.type='sine';
+      osc2.frequency.setValueAtTime(freq*PHI, ac.currentTime);
+      g2.gain.setValueAtTime(0,ac.currentTime);
+      g2.gain.linearRampToValueAtTime(0.06, ac.currentTime+0.03);
+      g2.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+0.4);
+      osc2.start(ac.currentTime); osc2.stop(ac.currentTime+0.45);
+    }
+
+    // Special: Schumann resonance sub-bass on impossible/phase transitions
+    if(isSpecial){
+      const sub = ac.createOscillator();
+      const sg = ac.createGain();
+      sub.connect(sg); sg.connect(ac.destination);
+      sub.type='sine';
+      sub.frequency.setValueAtTime(SCHUMANN, ac.currentTime);
+      sg.gain.setValueAtTime(0,ac.currentTime);
+      sg.gain.linearRampToValueAtTime(0.09, ac.currentTime+0.05);
+      sg.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+1.2);
+      sub.start(ac.currentTime); sub.stop(ac.currentTime+1.3);
+    }
+  }catch(e){}
+}
+
+function playMove(){
+  try{
+    const ac = getAudio();
+    const osc = ac.createOscillator();
+    const g = ac.createGain();
+    osc.connect(g); g.connect(ac.destination);
+    osc.type='sine'; osc.frequency.value=220;
+    g.gain.setValueAtTime(0,ac.currentTime);
+    g.gain.linearRampToValueAtTime(0.03, ac.currentTime+0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+0.08);
+    osc.start(ac.currentTime); osc.stop(ac.currentTime+0.09);
+  }catch(e){}
+}
+
+function playPhaseUp(phase){
+  try{
+    const ac = getAudio();
+    const freqs=[0,220,277,349,440,554];
+    const baseF=freqs[phase]||440;
+    [0,0.12,0.25,0.4].forEach((delay,i)=>{
+      const osc=ac.createOscillator(),g=ac.createGain();
+      osc.connect(g);g.connect(ac.destination);
+      osc.type='sine';
+      osc.frequency.setValueAtTime(baseF*Math.pow(PHI,i*0.5),ac.currentTime+delay);
+      g.gain.setValueAtTime(0,ac.currentTime+delay);
+      g.gain.linearRampToValueAtTime(0.14,ac.currentTime+delay+0.04);
+      g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+delay+0.5);
+      osc.start(ac.currentTime+delay);osc.stop(ac.currentTime+delay+0.55);
+    });
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // SHAPE DEFINITIONS
 // ═══════════════════════════════════════════════════════════════════════════
 const SHAPES = [
-  // PHASE 1 — THE KNOWN
+  // PHASE 1
   {id:0,  name:'Point',         phase:1, sides:1,  color:'#ffffff', glow:'#ffffff', desc:'The seed of all geometry.'},
   {id:1,  name:'Line',          phase:1, sides:2,  color:'#e0e8ff', glow:'#8899ff', desc:'Direction emerges.'},
   {id:2,  name:'Triangle',      phase:1, sides:3,  color:'#a0c8ff', glow:'#4488ff', desc:'The first closed form.'},
@@ -154,80 +273,172 @@ const SHAPES = [
   {id:9,  name:'Octahedron',    phase:1, sides:8,  color:'#66ffaa', glow:'#00ff88', desc:'Eight equilateral triangles.', is3d:true},
   {id:10, name:'Dodecahedron',  phase:1, sides:12, color:'#ffcc44', glow:'#ff8800', desc:'Twelve pentagonal faces. Plato\'s cosmos.', is3d:true},
   {id:11, name:'Icosahedron',   phase:1, sides:20, color:'#ff4488', glow:'#ff0044', desc:'Twenty triangular faces. The final Platonic solid.', is3d:true},
-
-  // PHASE 2 — BEYOND THE KNOWN
+  // PHASE 2
   {id:12, name:'Tetravortex',   phase:2, sides:24, color:'#ff44ff', glow:'#cc00ff', desc:'This shape has never existed before. Four vortical planes intersecting at impossible angles.', is3d:true, impossible:true},
   {id:13, name:'Omnifacet',     phase:2, sides:32, color:'#44ffff', glow:'#00ccff', desc:'Every face reflects every other face simultaneously. Euclidean space rejects it.', is3d:true, impossible:true},
   {id:14, name:'Nullplex',      phase:2, sides:48, color:'#88ff44', glow:'#44ff00', desc:'A shape that exists only in the moment of observation. Schrödinger\'s polygon.', is3d:true, impossible:true},
   {id:15, name:'Hyperschedron', phase:2, sides:64, color:'#ff8844', glow:'#ff4400', desc:'Projects into 4D space. Its shadow in 3D is what you see here.', is3d:true, impossible:true},
   {id:16, name:'Vortexion',     phase:2, sides:96, color:'#aa44ff', glow:'#7700ff', desc:'Rotates in a direction that has no name. Its edges are probability fields.', is3d:true, impossible:true},
   {id:17, name:'Eigenform',     phase:2, sides:128,color:'#ffff44', glow:'#aaaa00', desc:'Self-referential. Contains its own definition. The shape that proves shapes exist.', is3d:true, impossible:true},
-
-  // PHASE 3 — THE WEB
+  // PHASE 3
   {id:18, name:'Nexus Node',    phase:3, sides:256,color:'#ffffff', glow:'#aaaaff', desc:'A junction in the cosmic web. Threads reach toward adjacent nodes.', is3d:true, isWeb:true},
   {id:19, name:'Filament',      phase:3, sides:512,color:'#ccccff', glow:'#8888ff', desc:'The large-scale structure emerges. You are building the cosmic web.', is3d:true, isWeb:true},
   {id:20, name:'Void Node',     phase:3, sides:1024,color:'#8866ff',glow:'#4422ff', desc:'Where the filaments curve around emptiness. The shape of nothing.', is3d:true, isWeb:true},
-
-  // PHASE 4 — MÖBIUS & KLEIN
+  // PHASE 4
   {id:21, name:'Möbius Ring',   phase:4, sides:0,  color:'#ff88cc', glow:'#ff00aa', desc:'One side. One edge. Merging two creates something that cannot be mapped in three dimensions.', isMobius:true},
   {id:22, name:'Klein Manifold',phase:4, sides:0,  color:'#cc88ff', glow:'#8800ff', desc:'The universe itself has this topology. No inside. No outside. You are building from within.', isKlein:true},
   {id:23, name:'∞ Universe',    phase:5, sides:0,  color:'#ffffff', glow:'#ffffff', desc:'You have built a universe. It contains everything that came before it. Including you.', isUniverse:true},
 ];
 
-const GRID = 5; // 5×5
-const SPAWN_POOL = [0,0,0,1,1,2]; // weighted toward lower shapes
-let board = [], score = 0, highestId = 0, gamePhase = 1;
+const GRID = 5;
+const SPAWN_POOL = [0,0,0,1,1,2];
+let board = [], score = 0, highestId = 0, gamePhase = 1, prevPhase = 1;
 let nextShape = 0;
 let cellPx = 0;
-let webNodes = []; // positions of web-phase shapes
 let universeBuilt = false;
 let tick = 0;
-let animFrame;
+// PHI background state
+let phiBrightness = 0;   // 0..1, boosted on merge/phase-up, decays
+let phiPhaseShift = 0;   // accumulates on phase-up
+let phiHue = 260;        // base hue, shifts with phase
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SHAPE RENDERER
+// HONEYCOMB + FIBONACCI SPIRAL BACKGROUND
+// ═══════════════════════════════════════════════════════════════════════════
+(function initPhiBg(){
+  const canvas = document.getElementById('phi-bg');
+  const ctx = canvas.getContext('2d');
+  let W,H;
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Precompute honeycomb hex centres using golden angle spiral
+  // plus a static hex grid underneath
+  const GOLDEN_ANGLE = Math.PI * 2 / (PHI * PHI); // ~2.399 rad
+
+  function draw(){
+    requestAnimationFrame(draw);
+    ctx.clearRect(0,0,W,H);
+
+    const t = tick * 0.008;
+    const bright = 0.28 + phiBrightness * 0.55;
+    const cx = W/2, cy = H/2;
+
+    // ── 1. Hex tiling ──────────────────────────────────────────
+    const HEX_R = 28 + phiBrightness * 6;        // slightly expand on pulse
+    const HEX_W = HEX_R * 2;
+    const HEX_H = HEX_R * Math.sqrt(3);
+    const cols = Math.ceil(W / HEX_W) + 2;
+    const rows = Math.ceil(H / HEX_H) + 2;
+    const breathe = 1 + Math.sin(t * SCHUMANN * 0.18) * 0.015;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(breathe, breathe);
+    ctx.translate(-cx, -cy);
+
+    for(let row = -1; row < rows; row++){
+      for(let col = -1; col < cols; col++){
+        const xOff = (row % 2 === 0) ? 0 : HEX_R;
+        const hx = col * HEX_W + xOff - HEX_R/2;
+        const hy = row * HEX_H - HEX_H/2;
+        // distance from center for fade
+        const dist = Math.hypot(hx - cx, hy - cy);
+        const maxDist = Math.hypot(W/2, H/2);
+        const fade = Math.max(0, 1 - dist/maxDist * 1.15);
+        if(fade < 0.02) continue;
+
+        // Phase-shift hue
+        const hue = phiHue + (dist / maxDist) * 60 + phiPhaseShift;
+        const alpha = bright * fade * 0.55;
+
+        ctx.beginPath();
+        for(let i=0;i<6;i++){
+          const a = (i/6)*Math.PI*2 - Math.PI/6;
+          const r2 = HEX_R * 0.88;
+          i===0?ctx.moveTo(hx+Math.cos(a)*r2, hy+Math.sin(a)*r2)
+               :ctx.lineTo(hx+Math.cos(a)*r2, hy+Math.sin(a)*r2);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = `hsla(${hue},80%,70%,${alpha})`;
+        ctx.lineWidth = 0.7;
+        ctx.stroke();
+        // subtle fill
+        ctx.fillStyle = `hsla(${hue},60%,50%,${alpha*0.12})`;
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+
+    // ── 2. Fibonacci / golden spiral ───────────────────────────
+    const spiralCount = 4;
+    for(let s=0;s<spiralCount;s++){
+      const spiralOff = (s/spiralCount)*Math.PI*2;
+      ctx.beginPath();
+      let first=true;
+      for(let i=0;i<520;i++){
+        const angle = i * GOLDEN_ANGLE + spiralOff + t * 0.25;
+        const radius = Math.pow(PHI, i*0.055) * 3.2;
+        if(radius > Math.hypot(W,H)*0.72) break;
+        const px = cx + Math.cos(angle)*radius;
+        const py = cy + Math.sin(angle)*radius;
+        const distFade = Math.max(0,1-radius/Math.hypot(W/2,H/2));
+        if(first){ctx.moveTo(px,py);first=false;}
+        else ctx.lineTo(px,py);
+      }
+      const hue2 = phiHue + s*30 + phiPhaseShift;
+      ctx.strokeStyle = `hsla(${hue2},90%,75%,${bright*0.22})`;
+      ctx.lineWidth = 1.1;
+      ctx.stroke();
+    }
+
+    // ── 3. Pulsing ring at center on merge/phase-up ─────────────
+    if(phiBrightness > 0.05){
+      const ringR = (1-phiBrightness) * Math.hypot(W/2,H/2) * 1.1;
+      ctx.beginPath();
+      ctx.arc(cx,cy,ringR,0,Math.PI*2);
+      ctx.strokeStyle = `hsla(${phiHue+phiPhaseShift},100%,85%,${phiBrightness*0.5})`;
+      ctx.lineWidth = 2 + phiBrightness*4;
+      ctx.stroke();
+    }
+
+    // Decay brightness
+    phiBrightness = Math.max(0, phiBrightness - 0.012);
+  }
+  draw();
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SHAPE RENDERER (unchanged from original)
 // ═══════════════════════════════════════════════════════════════════════════
 function drawShape(ctx, shape, size, t=0, bright=1) {
-  if(!shape) return;
+  if(shape===null||shape===undefined) return;
   const cx=size/2, cy=size/2, r=size*0.36;
   const s=SHAPES[shape];
   const col=s.color, glow=s.glow;
   const phase=s.phase||1;
-
   ctx.clearRect(0,0,size,size);
-
-  // Phase-based background glow
   if(phase>=2){
     const g=ctx.createRadialGradient(cx,cy,0,cx,cy,size*0.6);
     g.addColorStop(0,glow+'44');g.addColorStop(1,'transparent');
     ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,size*0.6,0,Math.PI*2);ctx.fill();
   }
-
   const pulse = 1 + Math.sin(t*0.06)*0.04*(phase>=2?1:0.3);
   const rp = r*pulse;
-
-  ctx.save();
-  ctx.translate(cx,cy);
-
-  if(s.isUniverse){
-    _drawUniverse(ctx,rp,t,col,glow);
-  }else if(s.isKlein){
-    _drawKlein(ctx,rp,t,col,glow);
-  }else if(s.isMobius){
-    _drawMobius(ctx,rp,t,col,glow);
-  }else if(s.isWeb){
-    _drawWebNode(ctx,rp,t,col,glow,shape);
-  }else if(s.impossible){
-    _drawImpossible(ctx,rp,t,col,glow,s.sides);
-  }else if(s.is3d){
-    _draw3D(ctx,rp,t,col,glow,s.id);
-  }else{
-    _draw2D(ctx,rp,t,col,glow,s.sides,s.id);
-  }
-
+  ctx.save(); ctx.translate(cx,cy);
+  if(s.isUniverse) _drawUniverse(ctx,rp,t,col,glow);
+  else if(s.isKlein)  _drawKlein(ctx,rp,t,col,glow);
+  else if(s.isMobius) _drawMobius(ctx,rp,t,col,glow);
+  else if(s.isWeb)    _drawWebNode(ctx,rp,t,col,glow,shape);
+  else if(s.impossible) _drawImpossible(ctx,rp,t,col,glow,s.sides);
+  else if(s.is3d)     _draw3D(ctx,rp,t,col,glow,s.id);
+  else                _draw2D(ctx,rp,t,col,glow,s.sides,s.id);
   ctx.restore();
-
-  // Phase 2+ shimmer
   if(phase>=2 && Math.random()<0.05){
     const px=Math.random()*size, py=Math.random()*size;
     ctx.beginPath();ctx.arc(px,py,1+Math.random(),0,Math.PI*2);
@@ -236,22 +447,20 @@ function drawShape(ctx, shape, size, t=0, bright=1) {
 }
 
 function _draw2D(ctx,r,t,col,glow,sides,id){
-  if(id===0){// Point
+  if(id===0){
     const g=ctx.createRadialGradient(0,0,0,0,0,r*0.4);
     g.addColorStop(0,'#fff');g.addColorStop(0.5,glow);g.addColorStop(1,'transparent');
-    ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*0.35,0,Math.PI*2);ctx.fill();
-    return;
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*0.35,0,Math.PI*2);ctx.fill();return;
   }
-  if(id===1){// Line
+  if(id===1){
     ctx.strokeStyle=col;ctx.lineWidth=3;ctx.lineCap='round';
     ctx.shadowColor=glow;ctx.shadowBlur=8;
-    ctx.beginPath();ctx.moveTo(-r,0);ctx.lineTo(r,0);ctx.stroke();
-    return;
+    ctx.beginPath();ctx.moveTo(-r,0);ctx.lineTo(r,0);ctx.stroke();return;
   }
   ctx.rotate(t*0.01);
   ctx.beginPath();
   for(let i=0;i<sides;i++){
-    const a=(i/sides)*Math.PI*2 - Math.PI/2;
+    const a=(i/sides)*Math.PI*2-Math.PI/2;
     i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
   }
   ctx.closePath();
@@ -263,19 +472,17 @@ function _draw2D(ctx,r,t,col,glow,sides,id){
 
 function _draw3D(ctx,r,t,col,glow,id){
   const spin=t*0.02;
-  // Project simple 3D wireframe
   const vertices3D={
-    7:[[0,-1,0],[.943,.333,0],[-.471,.333,.816],[-.471,.333,-.816]], // tetra
-    8:[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]], // cube
-    9:[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]], // octa
-    10:null,11:null // dodeca/icosa use polygon approximation
+    7:[[0,-1,0],[.943,.333,0],[-.471,.333,.816],[-.471,.333,-.816]],
+    8:[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]],
+    9:[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]],
+    10:null,11:null
   };
   const edges3D={
     7:[[0,1],[0,2],[0,3],[1,2],[2,3],[1,3]],
     8:[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]],
     9:[[0,2],[0,3],[0,4],[0,5],[1,2],[1,3],[1,4],[1,5],[2,4],[2,5],[3,4],[3,5]],
   };
-
   if(vertices3D[id]){
     const v=vertices3D[id],e=edges3D[id];
     const project=(x,y,z)=>{
@@ -285,7 +492,6 @@ function _draw3D(ctx,r,t,col,glow,id){
       return{x:rx*r*0.7,y:ry*r*0.7,z:rz};
     };
     const proj=v.map(([x,y,z])=>project(x,y,z));
-    // fill faces roughly
     ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.shadowColor=glow;ctx.shadowBlur=10;
     e.forEach(([a,b])=>{
       const pa=proj[a],pb=proj[b];
@@ -294,12 +500,10 @@ function _draw3D(ctx,r,t,col,glow,id){
       ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.lineTo(pb.x,pb.y);ctx.stroke();
     });
     ctx.globalAlpha=1;
-    // glow center
     const g=ctx.createRadialGradient(0,0,0,0,0,r*0.4);
     g.addColorStop(0,glow+'66');g.addColorStop(1,'transparent');
     ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*0.4,0,Math.PI*2);ctx.fill();
   }else{
-    // Dodeca/icosa — layered polygon approximation
     const layers=id===10?[{n:5,r:0.8,a:0},{n:10,r:1,a:0.31},{n:5,r:0.8,a:Math.PI}]:
                          [{n:5,r:0.6,a:0},{n:10,r:1,a:0.31},{n:10,r:0.85,a:0},{n:5,r:0.6,a:Math.PI}];
     ctx.shadowColor=glow;ctx.shadowBlur=14;
@@ -333,11 +537,9 @@ function _drawImpossible(ctx,r,t,col,glow,sides){
     ctx.restore();
   }
   ctx.globalAlpha=1;
-  // pulsing core
   const g=ctx.createRadialGradient(0,0,0,0,0,r*0.35);
   g.addColorStop(0,glow+'99');g.addColorStop(1,'transparent');
   ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*0.35,0,Math.PI*2);ctx.fill();
-  // impossible edge flicker
   if(Math.sin(t*0.3)>0.7){
     ctx.save();ctx.rotate(t*0.04);
     ctx.beginPath();ctx.arc(0,0,r*0.95,0,Math.PI*2);
@@ -349,13 +551,11 @@ function _drawImpossible(ctx,r,t,col,glow,sides){
 function _drawWebNode(ctx,r,t,col,glow,id){
   const rings=id-17;
   ctx.shadowColor=glow;ctx.shadowBlur=20;
-  // Pulsing rings
   for(let i=0;i<3+rings;i++){
     const rr=r*(0.25+i*0.22),alpha=0.6-i*0.12,spin=t*0.01*(i%2?1:-1);
     ctx.save();ctx.rotate(spin);
     ctx.beginPath();ctx.arc(0,0,rr,0,Math.PI*2);
     ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.globalAlpha=alpha;ctx.stroke();
-    // spokes
     const spokes=6;
     for(let s=0;s<spokes;s++){
       const a=(s/spokes)*Math.PI*2;
@@ -385,7 +585,6 @@ function _drawMobius(ctx,r,t,col,glow){
     ctx.strokeStyle=col;ctx.lineWidth=pass===0?3:1.5;ctx.globalAlpha=pass===0?0.8:0.4;ctx.stroke();
   }
   ctx.globalAlpha=1;
-  // center glow
   const g=ctx.createRadialGradient(0,0,0,0,0,r*0.25);
   g.addColorStop(0,glow+'cc');g.addColorStop(1,'transparent');
   ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*0.25,0,Math.PI*2);ctx.fill();
@@ -393,7 +592,6 @@ function _drawMobius(ctx,r,t,col,glow){
 
 function _drawKlein(ctx,r,t,col,glow){
   ctx.shadowColor=glow;ctx.shadowBlur=25;
-  // Two Möbius strips intersecting in torus field
   for(let strip=0;strip<2;strip++){
     const offset=strip*Math.PI;
     const steps=100;
@@ -406,7 +604,6 @@ function _drawKlein(ctx,r,t,col,glow){
     }
     ctx.strokeStyle=strip===0?col:glow;ctx.lineWidth=2.5;ctx.globalAlpha=0.75;ctx.stroke();
   }
-  // Torus outline
   ctx.beginPath();ctx.ellipse(0,0,r*0.9,r*0.48,t*0.008,0,Math.PI*2);
   ctx.strokeStyle=glow+'44';ctx.lineWidth=1;ctx.globalAlpha=0.4;ctx.stroke();
   ctx.globalAlpha=1;
@@ -417,8 +614,6 @@ function _drawKlein(ctx,r,t,col,glow){
 
 function _drawUniverse(ctx,r,t,col,glow){
   ctx.shadowColor=glow;ctx.shadowBlur=30;
-  // The Klein bottle / universe — two Möbius in torus, ship inside
-  // Outer torus field
   for(let ring=0;ring<3;ring++){
     const rr=r*(0.5+ring*0.18),spin=t*0.006*(ring%2?1:-1);
     ctx.save();ctx.rotate(spin);
@@ -426,10 +621,8 @@ function _drawUniverse(ctx,r,t,col,glow){
     ctx.strokeStyle=glow;ctx.lineWidth=1;ctx.globalAlpha=0.2+ring*0.08;ctx.stroke();
     ctx.restore();
   }
-  // Two Möbius strips
   for(let strip=0;strip<2;strip++){
-    const off=strip*Math.PI*0.5;
-    const steps=140;
+    const off=strip*Math.PI*0.5,steps=140;
     ctx.beginPath();
     for(let i=0;i<=steps;i++){
       const u=(i/steps)*Math.PI*2+t*0.01*(strip===0?1:-1.2)+off;
@@ -440,17 +633,14 @@ function _drawUniverse(ctx,r,t,col,glow){
     ctx.strokeStyle=strip===0?'#ff88cc':'#88ccff';ctx.lineWidth=2;ctx.globalAlpha=0.7;ctx.stroke();
   }
   ctx.globalAlpha=1;
-  // "Ship inside" — small geometric form at center
   ctx.save();ctx.rotate(t*0.03);
   ctx.beginPath();
   for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;i===0?ctx.moveTo(Math.cos(a)*r*0.18,Math.sin(a)*r*0.18):ctx.lineTo(Math.cos(a)*r*0.18,Math.sin(a)*r*0.18);}
   ctx.closePath();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.globalAlpha=0.9;ctx.stroke();
   ctx.restore();
-  // Core
   const g=ctx.createRadialGradient(0,0,0,0,0,r*0.15);
   g.addColorStop(0,'#fff');g.addColorStop(0.5,glow);g.addColorStop(1,'transparent');
   ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*0.15,0,Math.PI*2);ctx.fill();
-  // Cosmic web threads
   for(let i=0;i<12;i++){
     const a=(i/12)*Math.PI*2+t*0.005;
     ctx.beginPath();ctx.moveTo(Math.cos(a)*r*0.18,Math.sin(a)*r*0.18);
@@ -461,7 +651,7 @@ function _drawUniverse(ctx,r,t,col,glow){
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// COSMIC BACKGROUND
+// COSMIC BACKGROUND (stars)
 // ═══════════════════════════════════════════════════════════════════════════
 function initCosmos(){
   const canvas=document.getElementById('cosmos');
@@ -473,13 +663,11 @@ function initCosmos(){
   function draw(){
     canvas.width=window.innerWidth;canvas.height=window.innerHeight;
     ctx.fillStyle='#000008';ctx.fillRect(0,0,canvas.width,canvas.height);
-    // Nebula gradient based on game phase
     const phaseColors={1:'#0a0020',2:'#100030',3:'#080028',4:'#180018',5:'#200010'};
     const nebCol=phaseColors[gamePhase]||'#0a0020';
     const ng=ctx.createRadialGradient(canvas.width*0.5,canvas.height*0.4,0,canvas.width*0.5,canvas.height*0.4,canvas.width*0.6);
     ng.addColorStop(0,nebCol);ng.addColorStop(1,'transparent');
     ctx.fillStyle=ng;ctx.fillRect(0,0,canvas.width,canvas.height);
-    // Stars
     stars.forEach(s=>{
       const alpha=0.3+Math.sin(tick*0.02+s.phase)*0.4;
       ctx.beginPath();ctx.arc(s.x*canvas.width,s.y*canvas.height,s.r,0,Math.PI*2);
@@ -488,6 +676,28 @@ function initCosmos(){
   }
   window.addEventListener('resize',draw);
   return draw;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PARTICLES
+// ═══════════════════════════════════════════════════════════════════════════
+function spawnParticles(x, y, color, count=10){
+  for(let i=0;i<count;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const angle = (i/count)*Math.PI*2 + Math.random()*0.5;
+    const dist = 30 + Math.random()*50;
+    const size = 3+Math.random()*5;
+    p.style.cssText = `
+      width:${size}px;height:${size}px;
+      background:${color};
+      left:${x-size/2}px;top:${y-size/2}px;
+      --tx:translate(${Math.cos(angle)*dist}px,${Math.sin(angle)*dist}px);
+      animation-duration:${0.5+Math.random()*0.4}s;
+    `;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(), 900);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -502,16 +712,12 @@ function initGrid(){
   gridEl.style.gridTemplateColumns=`repeat(${GRID},${cellPx}px)`;
   gridEl.innerHTML='<canvas id="web-canvas"></canvas>';
   board=Array(GRID*GRID).fill(null);
-  // Spawn 2 starting shapes
   spawnRandom();spawnRandom();
   renderAll();
 }
 
-function cellEl(i){return document.getElementById('grid').querySelectorAll('.cell')[i];}
-
 function renderAll(){
   const gridEl=document.getElementById('grid');
-  // Remove old cells, keep web canvas
   const webCnv=document.getElementById('web-canvas');
   gridEl.innerHTML='';gridEl.appendChild(webCnv);
   board.forEach((shape,i)=>{
@@ -528,7 +734,6 @@ function renderAll(){
     }
     gridEl.appendChild(cell);
   });
-  // Size web canvas
   const gridRect=gridEl.getBoundingClientRect();
   webCnv.width=gridRect.width||cellPx*GRID+12;
   webCnv.height=gridRect.height||cellPx*GRID+12;
@@ -549,58 +754,83 @@ function spawnRandom(){
 function updateStats(){
   highestId=board.reduce((m,v)=>v!==null?Math.max(m,v):m,0);
   const s=SHAPES[highestId];
-  gamePhase=s?s.phase:1;
-  document.getElementById('score').textContent=score.toLocaleString();
+  const newPhase=s?s.phase:1;
+
+  // Phase change detection — trigger audio + visual event
+  if(newPhase!==gamePhase){
+    gamePhase=newPhase;
+    playPhaseUp(newPhase);
+    triggerPhaseUpVisual(newPhase);
+  }
+
+  const el=document.getElementById('score');
+  el.textContent=score.toLocaleString();
+  el.classList.remove('bump');
+  void el.offsetWidth;
+  el.classList.add('bump');
+  setTimeout(()=>el.classList.remove('bump'),200);
+
   document.getElementById('phase-txt').textContent=
     ['','PHASE I — THE KNOWN','PHASE II — BEYOND','PHASE III — THE WEB','PHASE IV — MÖBIUS & KLEIN','PHASE V — ∞'][gamePhase]||'';
   document.getElementById('shape-name').textContent=s?s.name:'—';
   document.getElementById('shape-name').style.color=s?s.color:'#c8b8ff';
-  // Update next
   drawShape(document.getElementById('next-canvas').getContext('2d'),nextShape,44,tick);
 }
 
+function triggerPhaseUpVisual(phase){
+  // Shift background hue by phase
+  phiHue = [0,260,200,120,320,60][phase]||260;
+  phiPhaseShift += 45;
+  phiBrightness = 1.0;
+
+  // Grid glow burst
+  const gridEl = document.getElementById('grid');
+  const phaseColors={1:'rgba(123,111,255,0.15)',2:'rgba(200,0,255,0.2)',3:'rgba(255,255,255,0.15)',4:'rgba(255,0,180,0.2)',5:'rgba(255,255,255,0.3)'};
+  gridEl.style.boxShadow = `0 0 80px ${phaseColors[phase]||'rgba(123,111,255,0.15)'}`;
+  setTimeout(()=>gridEl.style.boxShadow='0 0 60px rgba(123,111,255,0.08)', 1200);
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
-// MOVE & MERGE (2048-style)
+// MOVE & MERGE
 // ═══════════════════════════════════════════════════════════════════════════
 function move(dir){
-  // dir: 0=up,1=right,2=down,3=left
   let moved=false;
   const get=(r,c)=>board[r*GRID+c];
   const set=(r,c,v)=>{board[r*GRID+c]=v;};
+  let mergeEvents=[];
 
-  const processLine=(line)=>{
-    // Remove nulls
-    let arr=line.filter(v=>v!==null);
-    // Merge adjacent equal
+  const processLine=(line,startIdx,isRow,dir)=>{
+    let arr=line.map((v,i)=>({v,origIdx:i})).filter(x=>x.v!==null);
     for(let i=0;i<arr.length-1;i++){
-      if(arr[i]===arr[i+1]){
-        const merged=Math.min(arr[i]+1,SHAPES.length-1);
-        arr[i]=merged;arr.splice(i+1,1);
+      if(arr[i].v===arr[i+1].v){
+        const merged=Math.min(arr[i].v+1,SHAPES.length-1);
+        mergeEvents.push({shapeId:merged,origA:arr[i].origIdx,origB:arr[i+1].origIdx,isRow,dir});
+        arr[i].v=merged;
+        arr.splice(i+1,1);
         score+=Math.pow(2,merged+1);
-        triggerMerge(merged);
       }
     }
-    // Pad with nulls
-    while(arr.length<GRID)arr.push(null);
-    return arr;
+    const vals=arr.map(x=>x.v);
+    while(vals.length<GRID)vals.push(null);
+    return vals;
   };
 
-  if(dir===3||dir===1){// left or right — process rows
+  if(dir===3||dir===1){
     for(let r=0;r<GRID;r++){
       let row=Array(GRID).fill(0).map((_,c)=>get(r,c));
       if(dir===1)row.reverse();
       const orig=[...row];
-      row=processLine(row);
+      row=processLine(row,r,true,dir);
       if(dir===1)row.reverse();
       if(row.some((v,i)=>v!==orig[i]))moved=true;
       row.forEach((v,c)=>set(r,c,v));
     }
-  }else{// up or down — process cols
+  }else{
     for(let c=0;c<GRID;c++){
       let col=Array(GRID).fill(0).map((_,r)=>get(r,c));
       if(dir===2)col.reverse();
       const orig=[...col];
-      col=processLine(col);
+      col=processLine(col,c,false,dir);
       if(dir===2)col.reverse();
       if(col.some((v,i)=>v!==orig[i]))moved=true;
       col.forEach((v,r)=>set(r,c,v));
@@ -608,26 +838,52 @@ function move(dir){
   }
 
   if(moved){
+    playMove();
     spawnRandom();
     renderAll();
+    // Process merge events after render
+    mergeEvents.forEach(ev=>triggerMerge(ev.shapeId));
+    // Pop animation on cells that changed
+    popCells();
     checkUniverse();
   }
 }
 
+function popCells(){
+  const cells=document.getElementById('grid').querySelectorAll('.cell');
+  cells.forEach((cell,i)=>{
+    if(board[i]!==null){
+      cell.classList.remove('pop');
+      void cell.offsetWidth;
+      cell.classList.add('pop');
+    }
+  });
+}
+
 function triggerMerge(shapeId){
   const s=SHAPES[shapeId];
+  // Flash
   const flash=document.getElementById('mflash');
   flash.style.background=s.glow+'22';
   flash.style.opacity='1';
   setTimeout(()=>flash.style.opacity='0',300);
-  // Show merge notification
+
+  // Sound
+  playMerge(shapeId);
+
+  // Phi bg pulse
+  phiBrightness = Math.min(1, phiBrightness + 0.3 + shapeId*0.015);
+
+  // Particles at center of screen
+  spawnParticles(window.innerWidth/2, window.innerHeight/2, s.glow, 8+shapeId);
+
+  // Discovery popup for special shapes
   if(s.impossible||s.isWeb||s.isMobius||s.isKlein||s.isUniverse){
     showDiscovery(s);
   }
 }
 
 function showDiscovery(s){
-  // Brief overlay flash with shape name and description
   const el=document.createElement('div');
   el.style.cssText=`position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:300;
     text-align:center;pointer-events:none;animation:fadeInOut 2.5s forwards`;
@@ -656,7 +912,6 @@ function triggerUniverseEnd(){
     <em style="color:rgba(200,180,255,0.5)">Möbius Signal Conservation Principle<br>Klein Bottle Universe Framework<br>Presignal Research Initiative</em>`;
   document.getElementById('ov-btn').textContent='BIRTH ANOTHER';
   ov.classList.add('show');
-  // Animate universe in overlay canvas
   let t2=0;
   const animUniverse=()=>{
     drawShape(canvas.getContext('2d'),23,160,t2);
@@ -667,7 +922,7 @@ function triggerUniverseEnd(){
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// WEB CANVAS — draw connections between web-phase shapes
+// WEB CONNECTIONS
 // ═══════════════════════════════════════════════════════════════════════════
 function drawWeb(){
   const webCnv=document.getElementById('web-canvas');
@@ -708,7 +963,6 @@ const cosmosDraw=initCosmos();
 function loop(){
   tick++;
   cosmosDraw();
-  // Draw all shape canvases
   document.querySelectorAll('.cell').forEach((cell,i)=>{
     const v=board[i];
     if(v===null)return;
@@ -716,16 +970,13 @@ function loop(){
     if(!canvas)return;
     drawShape(canvas.getContext('2d'),v,cellPx,tick);
   });
-  // Draw next shape
   const nc=document.getElementById('next-canvas');
   if(nc)drawShape(nc.getContext('2d'),nextShape,44,tick);
-  // Draw overlay canvas if visible
   const ov=document.getElementById('overlay');
   if(ov.classList.contains('show')&&!universeBuilt){
     const oc=document.getElementById('ov-canvas');
-    if(oc)drawShape(oc.getContext('2d'),11,160,tick);// icosahedron in start screen
+    if(oc)drawShape(oc.getContext('2d'),11,160,tick);
   }
-  // Web connections
   if(tick%3===0)drawWeb();
   requestAnimationFrame(loop);
 }
@@ -745,8 +996,6 @@ document.addEventListener('keydown',e=>{
   const map={ArrowUp:0,ArrowRight:1,ArrowDown:2,ArrowLeft:3,w:0,d:1,s:2,a:3};
   if(map[e.key]!==undefined){e.preventDefault();move(map[e.key]);}
 });
-
-// Mouse drag
 let mx=0,my=0,mdown=false;
 document.addEventListener('mousedown',e=>{mx=e.clientX;my=e.clientY;mdown=true;});
 document.addEventListener('mouseup',e=>{
@@ -762,11 +1011,11 @@ document.addEventListener('mouseup',e=>{
 // ═══════════════════════════════════════════════════════════════════════════
 document.getElementById('ov-btn').addEventListener('click',()=>{
   document.getElementById('overlay').classList.remove('show');
-  nextShape=0;score=0;universeBuilt=false;
+  nextShape=0;score=0;universeBuilt=false;phiBrightness=0.6;
   initGrid();
 });
 document.getElementById('btn-new').addEventListener('click',()=>{
-  if(confirm('Start a new universe?')){score=0;universeBuilt=false;nextShape=0;initGrid();}
+  if(confirm('Start a new universe?')){score=0;universeBuilt=false;nextShape=0;phiBrightness=0.6;initGrid();}
 });
 document.getElementById('btn-info').addEventListener('click',()=>{
   const s=SHAPES[highestId];
@@ -774,16 +1023,13 @@ document.getElementById('btn-info').addEventListener('click',()=>{
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CSS ANIMATION for discovery popup
+// CSS
 // ═══════════════════════════════════════════════════════════════════════════
 const style=document.createElement('style');
 style.textContent=`@keyframes fadeInOut{0%{opacity:0;transform:translate(-50%,-60%)}15%{opacity:1;transform:translate(-50%,-50%)}80%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,-40%)}}`;
 document.head.appendChild(style);
 
-// ═══════════════════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════════════════
-window.addEventListener('resize',()=>{initGrid();});
+window.addEventListener('resize',()=>initGrid());
 initGrid();
 loop();
 </script>
