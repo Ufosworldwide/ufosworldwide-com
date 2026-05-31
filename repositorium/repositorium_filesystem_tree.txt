@@ -1,0 +1,169 @@
+
+REPOSITORIUM/
+│
+├── 📁 00_SOURCE_NODE/
+│   ├── manifest.json                    # Root identity, genesis timestamp, curator identity
+│   ├── golden_spiral.map              # Polar coordinates for all silo placements
+│   ├── fibonacci_index.json           # Level assignments: 1,1,2,3,5,8,13...
+│   └── 📁 00A_IDENTITY/
+│       ├── curator_profile.json       # John Carter — Ontario UAP Researcher
+│       ├── research_philosophy.md     # Why the tree, why Fibonacci, why geometry
+│       └── master_hypothesis.md       # The Earth Lights unifying theory
+│
+├── 📁 01_SILO_ELP_EARTH_LIGHTS/       [Fibonacci Level 5 — 8 sub-nodes max]
+│   ├── silo_manifest.json             # Schema-compliant container definition
+│   ├── 📁 01A_ONTOLOGY/
+│   │   ├── what_it_is.md              # Domain definition & scope boundaries
+│   │   ├── disciplinary_parents.json  # Atmospheric Physics, Geophysics, Plasma
+│   │   └── keywords.taxonomy          # Controlled vocabulary
+│   │
+│   ├── 📁 01B_CORPUS/
+│   │   ├── what_weve_learned.md       # Consolidated knowledge
+│   │   ├── core_theories/
+│   │   │   ├── T-001_piezoelectric_charge.md
+│   │   │   └── T-002_phole_pathway_diversity.md
+│   │   ├── verified_findings/
+│   │   │   └── F-001_hessdalen_quartz_correlation.md
+│   │   └── bibliography.bib           # Zotero-compatible reference library
+│   │
+│   ├── 📁 01C_INVENTORY/
+│   │   ├── what_weve_researched.md    # Completed studies registry
+│   │   ├── studies_catalog.json
+│   │   ├── datasets_catalog.json
+│   │   ├── instruments.json           # Spectrometer, Magnetometer, Seismic Array
+│   │   └── methodologies.md
+│   │
+│   ├── 📁 01D_GAP_ANALYSIS/
+│   │   ├── research_gaps/
+│   │   │   ├── G-R-001_colombia_phole_mapping.md
+│   │   │   └── G-R-002_spectral_database.md
+│   │   ├── rd_gaps/
+│   │   │   └── G-D-001_portable_phole_detector.md
+│   │   └── closure_pathways/
+│   │       └── P-001_colombian_field_deployment.md
+│   │
+│   ├── 📁 01E_HUMAN_CAPITAL/
+│   │   ├── profound_thinkers.json     # Teodorani, Strand, etc.
+│   │   ├── groundwork_operatives.json
+│   │   └── needed_expertise.md        # Open recruitment vectors
+│   │
+│   ├── 📁 01F_LINE_ITEMS/
+│   │   ├── LI-ELP-001_quartz_vein_mapping.md
+│   │   ├── LI-ELP-002_symbolic_correlation.md
+│   │   └── LI-ELP-003_phole_conductivity_baseline.md
+│   │
+│   ├── 📁 01G_SUBMISSIONS/
+│   │   ├── inbox/                     # Unprocessed contributor data
+│   │   ├── validated/                 # Peer-reviewed or replicated
+│   │   └── lineage/                   # Provenance chains for every dataset
+│   │
+│   └── 📁 01H_GEOMETRY/
+│       ├── spiral_position.json       # r=5.0, theta=2.356, phi=1.618
+│       ├── sub_node_coordinates.json  # Golden angle 137.5° distribution
+│       └── depth_map.json             # Max depth 3, branching factor follows Fib
+│
+├── 📁 02_SILO_TEL_TELLURIC_CURRENTS/  [Fibonacci Level 3]
+│   ├── silo_manifest.json
+│   ├── 📁 02A_ONTOLOGY/
+│   ├── 📁 02B_CORPUS/
+│   ├── 📁 02C_INVENTORY/
+│   ├── 📁 02D_GAP_ANALYSIS/
+│   ├── 📁 02E_HUMAN_CAPITAL/
+│   ├── 📁 02F_LINE_ITEMS/
+│   ├── 📁 02G_SUBMISSIONS/
+│   └── 📁 02H_GEOMETRY/
+│
+├── 📁 03_SILO_PIE_PIEZOELECTRIC_GEOMETRY/ [Fibonacci Level 2]
+│   ├── silo_manifest.json
+│   ├── 📁 03A_ONTOLOGY/
+│   ├── 📁 03B_CORPUS/
+│   ├── 📁 03C_INVENTORY/
+│   ├── 📁 03D_GAP_ANALYSIS/
+│   ├── 📁 03E_HUMAN_CAPITAL/
+│   ├── 📁 03F_LINE_ITEMS/
+│   ├── 📁 03G_SUBMISSIONS/
+│   └── 📁 03H_GEOMETRY/
+│
+├── 📁 04_SILO_PLP_PLASMA_PHYSICS/     [Fibonacci Level 3]
+│   ├── silo_manifest.json
+│   ├── 📁 04A_ONTOLOGY/
+│   ├── 📁 04B_CORPUS/
+│   ├── 📁 04C_INVENTORY/
+│   ├── 📁 04D_GAP_ANALYSIS/
+│   ├── 📁 04E_HUMAN_CAPITAL/
+│   ├── 📁 04F_LINE_ITEMS/
+│   ├── 📁 04G_SUBMISSIONS/
+│   └── 📁 04H_GEOMETRY/
+│
+├── 📁 05_SILO_UAP_UAP_ANALYSIS/       [Fibonacci Level 5]
+│   ├── silo_manifest.json
+│   ├── 📁 05A_ONTOLOGY/
+│   ├── 📁 05B_CORPUS/
+│   ├── 📁 05C_INVENTORY/
+│   ├── 📁 05D_GAP_ANALYSIS/
+│   ├── 📁 05E_HUMAN_CAPITAL/
+│   ├── 📁 05F_LINE_ITEMS/
+│   ├── 📁 05G_SUBMISSIONS/
+│   └── 📁 05H_GEOMETRY/
+│
+├── 📁 06_SILO_GEN_GENEALOGICAL_SCIENCE/ [Fibonacci Level 2]
+│   ├── silo_manifest.json
+│   ├── 📁 06A_ONTOLOGY/
+│   ├── 📁 06B_CORPUS/
+│   │   ├── what_weve_learned.md
+│   │   ├── core_theories/
+│   │   │   └── T-001_jackson_clute_lineage.md
+│   │   └── verified_findings/
+│   │       └── F-001_knoet_clute_identity.md
+│   ├── 📁 06C_INVENTORY/
+│   ├── 📁 06D_GAP_ANALYSIS/
+│   ├── 📁 06E_HUMAN_CAPITAL/
+│   ├── 📁 06F_LINE_ITEMS/
+│   ├── 📁 06G_SUBMISSIONS/
+│   └── 📁 06H_GEOMETRY/
+│
+├── 📁 07_SILO_SYM_SYMBOLIC_CORRELATION/ [Fibonacci Level 8]
+│   ├── silo_manifest.json
+│   ├── 📁 07A_ONTOLOGY/
+│   ├── 📁 07B_CORPUS/
+│   │   ├── what_weve_learned.md
+│   │   ├── core_theories/
+│   │   │   └── T-001_presignal_archetype_pattern.md
+│   │   └── verified_findings/
+│   │       └── F-001_wolf_horse_bear_triad.md
+│   ├── 📁 07C_INVENTORY/
+│   ├── 📁 07D_GAP_ANALYSIS/
+│   ├── 📁 07E_HUMAN_CAPITAL/
+│   ├── 📁 07F_LINE_ITEMS/
+│   │   └── LI-SYM-001_cross_culture_presignal_study.md
+│   ├── 📁 07G_SUBMISSIONS/
+│   └── 📁 07H_GEOMETRY/
+│
+├── 📁 08_SILO_RDG_RD_GAPS_MASTER/     [Fibonacci Level 13 — Meta-silo]
+│   ├── silo_manifest.json
+│   ├── 📁 08A_ONTOLOGY/
+│   ├── 📁 08B_CORPUS/
+│   ├── 📁 08C_INVENTORY/
+│   ├── 📁 08D_GAP_ANALYSIS/
+│   │   └── master_gap_registry.json   # Aggregates ALL gaps from all silos
+│   ├── 📁 08E_HUMAN_CAPITAL/
+│   ├── 📁 08F_LINE_ITEMS/
+│   ├── 📁 08G_SUBMISSIONS/
+│   └── 📁 08H_GEOMETRY/
+│
+├── 📁 99_INFRASTRUCTURE/
+│   ├── 📁 99A_GEOMETRY_ENGINE/
+│   │   ├── fibonacci_calculator.py    # Auto-assigns levels, angles, radii
+│   │   ├── spiral_renderer.js         # Visual map generator
+│   │   └── containment_validator.py   # Enforces max nodes per level
+│   ├── 📁 99B_SUBMISSION_PORTAL/
+│   │   ├── contributor_schema.json    # Who can submit, what format
+│   │   ├── validation_pipeline.md     # How data gets verified
+│   │   └── lineage_tracker.py         # Provenance chain builder
+│   ├── 📁 99C_CROSS_SILO_LINKS/
+│   │   ├── dependency_graph.json      # Which silos feed which
+│   │   └── citation_matrix.md         # Cross-references
+│   └── 📁 99D_BACKUPS/
+│       └── snapshot_manifest.json
+│
+└── README.md                          # Genesis document — how to navigate the tree
