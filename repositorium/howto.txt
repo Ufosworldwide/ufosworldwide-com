@@ -1,0 +1,9 @@
+How to Use This
+
+    Create the root directory REPOSITORIUM/ on your local machine or NAS
+    Copy the filesystem tree — each pillar (01_ETHOS/, 02_MYTHOS/, 03_PHYSICAL/, 04_METAPHYSICAL/) gets identical eight-cabinet anatomy (A through H) plus a I_PAPERS/ drawer for your published works
+    Populate 00_SOURCE_NODE/ with your identity, the Presignal doctrine, and your master hypothesis linking Brown Mountain, La Peña de Juaica, and Hessdalen
+    File your papers in each pillar's 0I_PAPERS/ directory using the ID system (P-001 through P-032)
+    Document mana flows in 99A_MANA_FLOWS/mana_registry.json whenever you discover a new cross-domain connection
+    Feed the gaps — ensure every pillar's D_GAP_ANALYSIS/ has at least one open research gap. An empty gap cabinet is a dead branch.
+    Open the submission portal — when collaborators submit data, it enters 0G_SUBMISSIONS/inbox/, validates against the pillar's ontology, and flows upward into Corpus or Inventory if accepted
