@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schumann Winding · Infinite</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; overflow:hidden; background:#000; }
+  canvas { display:block; position:fixed; inset:0; }
+  body { cursor:none; }
+
+  #ui {
+    position:fixed; bottom:32px; left:50%; transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:9px;
+    pointer-events:none; z-index:20;
+  }
+  #status {
+    font-family:'Georgia',serif;
+    font-size:12px; letter-spacing:7px; text-transform:uppercase;
+    color:rgba(255,255,255,0.3); text-align:center;
+    transition: color 2s;
+  }
+  #hint {
+    font-family:'Courier New',monospace;
+    font-size:9px; letter-spacing:3px;
+    color:rgba(255,255,255,0.1); text-align:center;
+  }
+  #depth-bar {
+    width:120px; height:1px;
+    background:rgba(255,255,255,0.08);
+    position:relative; overflow:visible;
+  }
+  #depth-pip {
+    position:absolute; top:-2px;
+    width:5px; height:5px; border-radius:50%;
+    background:rgba(255,255,255,0.3);
+    transform:translateX(-50%);
+    transition:left 0.5s;
+  }
+
+  #cursor {
+    position:fixed; width:14px; height:14px; border-radius:50%;
+    border:1px solid rgba(255,255,255,0.35);
+    pointer-events:none; z-index:30;
+    transform:translate(-50%,-50%);
+    transition:border-color 0.2s, transform 0.1s;
+  }
+
+  #hand-wrap {
+    position:fixed; top:50%; left:50%;
+    width:0; height:0;
+    pointer-events:none; z-index:15;
+  }
+  #clock-hand {
+    position:absolute; bottom:0; left:-1px;
+    width:2px; height:80px;
+    background:linear-gradient(to top,rgba(255,255,255,0.35),transparent);
+    transform-origin:bottom center;
+    border-radius:2px;
+  }
+  #clock-ring {
+    position:fixed; top:50%; left:50%;
+    width:180px; height:180px;
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    pointer-events:none; z-index:14;
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="clock-ring"></div>
+<div id="hand-wrap"><div id="clock-hand"></div></div>
+<div id="cursor"></div>
+<div id="ui">
+  <div id="status">The White Dot</div>
+  <div id="depth-bar"><div id="depth-pip"></div></div>
+  <div id="hint">drag clockwise · wind time forward · forever</div>
+</div>
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  SCHUMANN WINDING — INFINITE UNIVERSE
+//  t = 0: white dot singularity
+//  t = 1: first local galaxy fills screen
+//  t → ∞: logarithmic zoom-out, infinite procedural structure
+// ═══════════════════════════════════════════════════════════════════════════
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const statusEl = document.getElementById('status');
+const depthPip = document.getElementById('depth-pip');
+const cursorEl = document.getElementById('cursor');
+const handEl = document.getElementById('clock-hand');
+
+let W, H, CX, CY;
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  CX = W/2; CY = H/2;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ── Time state ──────────────────────────────────────────────────────────────
+let t = 0;          // actual time (0 = singularity, unbounded above)
+let tTarget = 0;    // drag target
+let handDeg = 0;
+
+// ── Drag ─────────────────────────────────────────────────────────────────────
+let dragging = false, lastAngle = null;
+function evAngle(e) {
+  const x = (e.touches?.[0]?.clientX ?? e.clientX) - CX;
+  const y = (e.touches?.[0]?.clientY ?? e.clientY) - CY;
+  return Math.atan2(y, x) * 180 / Math.PI;
+}
+function onDown(e) {
+  dragging = true;
+  lastAngle = evAngle(e);
+  cursorEl.style.transform = 'translate(-50%,-50%) scale(0.7)';
+}
+function onMove(e) {
+  const ex = e.touches?.[0]?.clientX ?? e.clientX;
+  const ey = e.touches?.[0]?.clientY ?? e.clientY;
+  cursorEl.style.left = ex+'px';
+  cursorEl.style.top  = ey+'px';
+  if (!dragging) return;
+  const ang = evAngle(e);
+  let d = ang - lastAngle;
+  if (d >  180) d -= 360;
+  if (d < -180) d += 360;
+  // one full rotation = 0.18 time units — so to reach t=10 takes ~56 full circles
+  const rate = 0.18 / 360;
+  tTarget = Math.max(0, tTarget + d * rate);
+  handDeg += d;
+  handEl.style.transform = `rotate(${handDeg}deg)`;
+  lastAngle = ang;
+}
+function onUp() {
+  dragging = false;
+  cursorEl.style.transform = 'translate(-50%,-50%) scale(1)';
+}
+window.addEventListener('mousedown', onDown);
+window.addEventListener('mousemove', onMove);
+window.addEventListener('mouseup', onUp);
+window.addEventListener('touchstart', onDown, {passive:true});
+window.addEventListener('touchmove', onMove, {passive:true});
+window.addEventListener('touchend', onUp);
+
+// ── Schumann ─────────────────────────────────────────────────────────────────
+let schumannPhase = 0;
+
+// ── Seeded PRNG (mulberry32) ──────────────────────────────────────────────────
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let z = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    z = z + Math.imul(z ^ z >>> 7, 61 | z) ^ z;
+    return ((z ^ z >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// ── Infinite structure generation ─────────────────────────────────────────────
+// We slice "universe space" into shells by scale level.
+// At zoom level L (integer), we generate a ring of structures whose
+// natural world-space radius is ~screenRadius * goldenRatio^L
+// Each shell is seeded deterministically so structures are stable.
+// As t increases, zoom grows, older shells shrink to dust, new shells appear.
+
+const PHI = 1.6180339887;
+const SYMS = ['π','∞','φ','ψ','7.83','Ω','∇','∮','⊗','△','◯','⊕','ℏ','λ','∑','∂'];
+
+// Generate objects for a given shell index (deterministic by seed)
+function generateShell(shellIdx) {
+  const rng = mulberry32(shellIdx * 1000003 + 7);
+  const objects = [];
+  const count = 6 + Math.floor(rng() * 10); // 6-15 objects per shell
+  for (let i = 0; i < count; i++) {
+    const angle = rng() * Math.PI * 2;
+    const spread = 0.3 + rng() * 0.7;
+    objects.push({
+      angle,
+      spread,
+      type: Math.floor(rng() * 4), // 0=galaxy, 1=cluster, 2=supercluster, 3=filament
+      hue: Math.floor(rng() * 360),
+      size: 0.5 + rng() * 1.5,
+      arms: 2 + Math.floor(rng() * 4),
+      rot: rng() * Math.PI * 2,
+      rotSpeed: (rng() - 0.5) * 0.0006,
+      symIdx: Math.floor(rng() * SYMS.length),
+      starCount: Math.floor(20 + rng() * 60),
+      stars: Array.from({length: 40}, () => ({
+        a: rng()*Math.PI*2,
+        r: rng(),
+        b: 0.3+rng()*0.7,
+        tw: rng()*Math.PI*2
+      }))
+    });
+  }
+  return objects;
+}
+
+// Cache shells
+const shellCache = {};
+function getShell(idx) {
+  if (!shellCache[idx]) shellCache[idx] = generateShell(idx);
+  return shellCache[idx];
+}
+
+// ── Background stars (deep field) ─────────────────────────────────────────────
+const BG_STARS = [];
+for (let i = 0; i < 1200; i++) {
+  const a = Math.random()*Math.PI*2;
+  const r = 30 + Math.random() * Math.max(3000, 3000);
+  BG_STARS.push({
+    x: Math.cos(a)*r, y: Math.sin(a)*r,
+    sz: 0.3 + Math.random()*1.2,
+    b: 0.15 + Math.random()*0.85,
+    tw: Math.random()*Math.PI*2,
+    tws: 0.0008 + Math.random()*0.003
+  });
+}
+
+// ── Inner galaxy (the original one that fills the screen at t=1) ───────────
+const INNER_GALAXY = (() => {
+  const rng = mulberry32(42);
+  const stars = Array.from({length:120}, () => ({
+    a: rng()*Math.PI*2, r: rng(), b:0.4+rng()*0.6, tw:rng()*Math.PI*2
+  }));
+  return { arms:3, hue:220, stars, rot:0 };
+})();
+
+// ── Fibonacci spiral helper ───────────────────────────────────────────────────
+function drawFib(x, y, maxR, alpha, hue, phase) {
+  if (alpha < 0.005) return;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(phase);
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = `hsl(${hue},55%,70%)`;
+  ctx.lineWidth = 0.7;
+  ctx.beginPath();
+  let first = true;
+  for (let i = 0; i < 600; i++) {
+    const r = 0.5 * Math.pow(PHI, i * 0.035);
+    if (r > maxR) break;
+    const theta = i * 0.035 * Math.PI * 2 / PHI;
+    const px = Math.cos(theta)*r, py = Math.sin(theta)*r;
+    if (first) { ctx.moveTo(px, py); first=false; }
+    else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+// ── Hex helper ────────────────────────────────────────────────────────────────
+function drawHex(x, y, r, alpha, hue, now) {
+  if (alpha < 0.005) return;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = `hsl(${hue},55%,65%)`;
+  ctx.lineWidth = 0.8;
+  const pulse = Math.sin(now*0.001 + x*0.01) * 0.2 + 0.8;
+  for (let ring = 0; ring <= 2; ring++) {
+    const rCount = ring === 0 ? 1 : ring * 6;
+    for (let i = 0; i < rCount; i++) {
+      const baseA = ring===0 ? 0 : (Math.PI*2/rCount)*i;
+      const hx = Math.cos(baseA)*ring*r*1.8;
+      const hy = Math.sin(baseA)*ring*r*1.1;
+      ctx.beginPath();
+      for (let k=0;k<6;k++) {
+        const a=(Math.PI/3)*k;
+        const px=hx+Math.cos(a)*r*pulse, py=hy+Math.sin(a)*r*pulse;
+        k===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    }
+  }
+  ctx.globalAlpha=1;
+  ctx.restore();
+}
+
+// ── Draw a galaxy object ──────────────────────────────────────────────────────
+function drawGalaxy(x, y, screenR, hue, arms, rot, stars, alpha, now) {
+  if (alpha < 0.005 || screenR < 1) return;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  // glow
+  const g = ctx.createRadialGradient(0,0,0,0,0,screenR*2.5);
+  g.addColorStop(0, `hsla(${hue},70%,65%,${alpha*0.35})`);
+  g.addColorStop(0.5,`hsla(${hue},55%,45%,${alpha*0.12})`);
+  g.addColorStop(1,'transparent');
+  ctx.fillStyle=g;
+  ctx.beginPath();ctx.arc(0,0,screenR*2.5,0,Math.PI*2);ctx.fill();
+  // arms
+  ctx.strokeStyle=`hsla(${hue},60%,75%,${alpha*0.55})`;
+  ctx.lineWidth=Math.max(0.3, screenR*0.015);
+  for (let arm=0;arm<arms;arm++) {
+    ctx.beginPath();
+    const off=(Math.PI*2/arms)*arm;
+    for (let s=0;s<=screenR;s+=1.5) {
+      const th=off+s*0.2;
+      const px=Math.cos(th)*s, py=Math.sin(th)*s;
+      s===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+  }
+  // stars
+  stars.forEach(s => {
+    const sx=Math.cos(s.a)*s.r*screenR;
+    const sy=Math.sin(s.a)*s.r*screenR;
+    const tw=Math.sin(now*0.0015+s.tw)*0.4+0.6;
+    ctx.fillStyle=`rgba(255,255,255,${s.b*tw*alpha*0.85})`;
+    ctx.beginPath();ctx.arc(sx,sy,Math.max(0.4,screenR*0.012),0,Math.PI*2);ctx.fill();
+  });
+  ctx.restore();
+}
+
+// ── Draw a supercluster / filament ────────────────────────────────────────────
+function drawCluster(x, y, screenR, hue, nodeCount, alpha, now) {
+  if (alpha < 0.005) return;
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.globalAlpha = alpha;
+  const g = ctx.createRadialGradient(0,0,0,0,0,screenR*2);
+  g.addColorStop(0,`hsla(${hue},65%,70%,0.4)`);
+  g.addColorStop(1,'transparent');
+  ctx.fillStyle=g;
+  ctx.beginPath();ctx.arc(0,0,screenR*2,0,Math.PI*2);ctx.fill();
+  // nodes
+  for (let i=0;i<nodeCount;i++) {
+    const a=(Math.PI*2/nodeCount)*i+now*0.00003;
+    const d=screenR*(0.6+Math.sin(now*0.0002+i)*0.2);
+    const nx=Math.cos(a)*d, ny=Math.sin(a)*d;
+    ctx.fillStyle=`hsl(${hue+i*15},70%,75%)`;
+    ctx.beginPath();ctx.arc(nx,ny,Math.max(0.8,screenR*0.08),0,Math.PI*2);ctx.fill();
+    if (i>0) {
+      const pa=(Math.PI*2/nodeCount)*(i-1)+now*0.00003;
+      const pd=screenR*(0.6+Math.sin(now*0.0002+(i-1))*0.2);
+      ctx.strokeStyle=`hsla(${hue},50%,60%,0.2)`;
+      ctx.lineWidth=0.5;
+      ctx.beginPath();ctx.moveTo(Math.cos(pa)*pd,Math.sin(pa)*pd);ctx.lineTo(nx,ny);ctx.stroke();
+    }
+  }
+  ctx.globalAlpha=1;
+  ctx.restore();
+}
+
+// ── Labels ────────────────────────────────────────────────────────────────────
+const LABELS = [
+  [0,    'The White Dot'],
+  [0.05, 'First Light'],
+  [0.15, 'Stellar Nursery'],
+  [0.3,  'A Galaxy Wakes'],
+  [0.55, 'Spiral Arms'],
+  [0.8,  'The Local Group'],
+  [1.1,  'Galactic Supercluster'],
+  [1.6,  'The Observable Horizon'],
+  [2.2,  'Beyond the Veil'],
+  [3.0,  'The Cosmic Web'],
+  [4.2,  'Multiverse Filaments'],
+  [5.8,  'Realm of Realms'],
+  [8.0,  'Infinite Resonance'],
+  [11.0, 'The Dreaming Field'],
+  [16.0, 'No Words Remain'],
+];
+function getLabel(t) {
+  let label = LABELS[0][1];
+  for (let i=0; i<LABELS.length; i++) {
+    if (t >= LABELS[i][0]) label = LABELS[i][1];
+  }
+  return label;
+}
+
+// ── Main loop ─────────────────────────────────────────────────────────────────
+let lastNow = performance.now();
+
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(now - lastNow, 50);
+  lastNow = now;
+
+  // Smooth lerp — very slow
+  t += (tTarget - t) * 0.010;
+  if (t < 0) t = 0;
+
+  schumannPhase += dt * 0.001 * 7.83 * Math.PI * 2 * 0.016;
+
+  // ── ZOOM MATH ──────────────────────────────────────────────────────────────
+  // At t=0: zoom=1 (centered on singularity, tiny)
+  // At t=1: inner galaxy fills ~half screen
+  // t>1: zoom out logarithmically, UNBOUNDED
+  // We use: viewScale = baseScale / exp(k*(t-1)) for t>1
+  // So zooming is always ~the same fractional change per rotation
+  
+  const baseScreenR = Math.min(W,H) * 0.38; // inner galaxy radius at t=1
+
+  // How far we've zoomed out from t=1 baseline
+  // Each unit of t beyond 1 = zoom out by factor e^1.4 ≈ 4
+  // So t=2 → 4x zoom out, t=3 → 16x, t=4 → 64x, etc.
+  const ZOOM_EXP = 1.4;
+  let zoom;
+  if (t <= 1) {
+    zoom = 1;
+  } else {
+    zoom = Math.exp(-ZOOM_EXP * (t - 1));
+  }
+
+  // The "world units per screen pixel" factor — inverse of zoom
+  const worldPerPixel = 1 / zoom;
+  // Screen radius of the innermost galaxy
+  const innerR = baseScreenR * zoom * Math.min(t, 1);
+
+  // ── BACKGROUND ─────────────────────────────────────────────────────────────
+  const tC = Math.min(t, 1);
+  const bg = ctx.createRadialGradient(CX,CY,0,CX,CY,Math.max(W,H)*1.3);
+  bg.addColorStop(0,`hsl(230,50%,${3+tC*7}%)`);
+  bg.addColorStop(0.6,`hsl(260,55%,${2+tC*4}%)`);
+  bg.addColorStop(1,'#000');
+  ctx.fillStyle=bg;
+  ctx.fillRect(0,0,W,H);
+
+  // Monroe wash
+  if (t > 0.2) {
+    const wa = Math.min((t-0.2)*0.08, 0.12);
+    const wh = 280+Math.sin(now*0.00025)*50;
+    const wg = ctx.createRadialGradient(
+      CX+Math.sin(now*0.00018)*150, CY+Math.cos(now*0.00013)*100,
+      0, CX, CY, Math.max(W,H)*0.95);
+    wg.addColorStop(0,`hsla(${wh},60%,50%,${wa})`);
+    wg.addColorStop(0.6,`hsla(${wh+50},45%,40%,${wa*0.3})`);
+    wg.addColorStop(1,'transparent');
+    ctx.fillStyle=wg;
+    ctx.fillRect(0,0,W,H);
+  }
+
+  // ── EVERYTHING IN WORLD SPACE (centered on CX,CY, scaled by zoom) ─────────
+  ctx.save();
+  ctx.translate(CX, CY);
+  ctx.scale(zoom, zoom);
+
+  // Background stars — always in world space, always visible
+  BG_STARS.forEach(s => {
+    const tw = Math.sin(now*s.tws+s.tw)*0.3+0.7;
+    const a = s.b*tw*Math.min(1, tC*3);
+    ctx.fillStyle=`rgba(255,255,255,${a})`;
+    ctx.beginPath();
+    // Scale star size so it looks consistent regardless of zoom
+    ctx.arc(s.x, s.y, s.sz / zoom, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  // Schumann rings (world space)
+  if (t > 0.05) {
+    const sa = Math.min((t-0.05)*0.09, 0.09);
+    ctx.lineWidth = 1.5/zoom;
+    const maxR = Math.max(W,H)*0.7/zoom;
+    for (let r=30/zoom; r<maxR; r+=50/zoom) {
+      const wave = Math.sin(r*zoom*0.06 - now*0.0007)*6/zoom;
+      const sw = Math.sin(schumannPhase + r*zoom*0.02)*3/zoom;
+      ctx.globalAlpha = sa*(1-r*zoom/Math.max(W,H)*0.7);
+      ctx.strokeStyle=`rgba(100,200,255,1)`;
+      ctx.beginPath();
+      ctx.arc(0,0,r+wave+sw,0,Math.PI*2);
+      ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+  }
+
+  // Fibonacci spirals (world space, scale with zoom)
+  if (t > 0.08) {
+    const fa = Math.min((t-0.08)*2, 1)*0.22;
+    drawFib(0,0,320/zoom,fa,200+t*30,now*0.00004);
+    drawFib(0,0,200/zoom,fa*0.6,270+t*20,-now*0.000025);
+  }
+
+  // ── INNER GALAXY ──────────────────────────────────────────────────────────
+  if (t > 0.05) {
+    const life = Math.min((t-0.05)*1.5, 1);
+    INNER_GALAXY.rot += 0.00035;
+    drawGalaxy(0, 0, baseScreenR*life, 220, 3, INNER_GALAXY.rot,
+      INNER_GALAXY.stars, life*0.9, now);
+    // Hex overlay on inner galaxy
+    if (t > 0.25) {
+      const ha = Math.min((t-0.25)*2,1)*0.3;
+      drawHex(0, 0, baseScreenR*0.25*life, ha, 45, now);
+    }
+  }
+
+  // ── INFINITE SHELL SYSTEM ─────────────────────────────────────────────────
+  // Shell index L corresponds to objects at world distance ~ baseScreenR * PHI^L
+  // When zoom*worldDist ≈ screenRadius → object is "at screen edge" → visible
+  // We render shells L where their projected screen distance is < 2*screenSize
+  
+  if (t > 0.5) {
+    const maxScreenDist = Math.max(W,H) * 1.5;
+    // Find which shells are relevant
+    // worldDist_L = baseScreenR * 2^L  (doubling per shell, feels infinite)
+    // screenDist_L = worldDist_L * zoom
+    // visible when screenDist_L < maxScreenDist
+    // → 2^L < maxScreenDist / (baseScreenR * zoom)
+    // → L < log2(maxScreenDist / (baseScreenR * zoom))
+    
+    const maxL = Math.ceil(Math.log2(maxScreenDist / (baseScreenR * Math.max(zoom, 1e-10)))) + 1;
+    const minL = Math.max(1, maxL - 8); // only render ~8 shells deep at a time
+
+    for (let L = minL; L <= maxL; L++) {
+      const worldDist = baseScreenR * Math.pow(2, L);
+      const screenDist = worldDist * zoom;
+      if (screenDist > maxScreenDist * 1.5) continue;
+      if (screenDist < 0.5) continue;
+
+      // Fade: shells appear when they come into view from far, fade when too close
+      const nearFade  = Math.min(1, (screenDist - 0) / (baseScreenR * 0.5));
+      const farFade   = Math.min(1, (maxScreenDist - screenDist) / (maxScreenDist * 0.3));
+      const shellAlpha = Math.max(0, nearFade * farFade);
+      if (shellAlpha < 0.01) continue;
+
+      // This shell's object size in world space
+      const objWorldR = baseScreenR * Math.pow(2, L-1) * 0.18;
+      const objScreenR = objWorldR * zoom;
+
+      const objs = getShell(L);
+      objs.forEach((obj, i) => {
+        const wx = Math.cos(obj.angle) * worldDist * obj.spread;
+        const wy = Math.sin(obj.angle) * worldDist * obj.spread;
+        const sx = wx * zoom; // screen position relative to center
+        const sy = wy * zoom;
+        // Skip if off-screen
+        if (Math.abs(sx) > maxScreenDist || Math.abs(sy) > maxScreenDist) return;
+
+        const alpha = shellAlpha * 0.85;
+
+        if (obj.type === 0 || obj.type === 1) {
+          // Galaxy
+          obj.rot += obj.rotSpeed;
+          drawGalaxy(wx, wy, objScreenR*obj.size/zoom, obj.hue, obj.arms,
+            obj.rot, obj.stars.slice(0,30), alpha, now);
+        } else if (obj.type === 2) {
+          // Supercluster
+          drawCluster(wx, wy, objScreenR*obj.size*1.2/zoom, obj.hue,
+            4+Math.floor(obj.spread*5), alpha*0.7, now);
+        } else {
+          // Filament / symbol
+          ctx.save();
+          ctx.translate(wx, wy);
+          ctx.globalAlpha = alpha * 0.15;
+          ctx.fillStyle = `hsl(${obj.hue},60%,75%)`;
+          ctx.font = `${Math.max(8, objScreenR*0.8)/zoom}px Georgia, serif`;
+          ctx.textAlign='center'; ctx.textBaseline='middle';
+          ctx.fillText(SYMS[obj.symIdx], 0, 0);
+          ctx.globalAlpha=1;
+          ctx.restore();
+          // Also tiny cluster
+          drawCluster(wx, wy, objScreenR*0.5/zoom, obj.hue, 3, alpha*0.4, now);
+        }
+      });
+    }
+  }
+
+  // ── HONEYCOMB overlays scattered in world ─────────────────────────────────
+  if (t > 0.3 && t <= 3) {
+    const seeds = [101, 202, 303, 404, 505, 606];
+    seeds.forEach((seed, i) => {
+      const rng2 = mulberry32(seed);
+      const angle = rng2() * Math.PI * 2;
+      const wdist = baseScreenR * (0.6 + rng2() * 1.2);
+      const wx = Math.cos(angle)*wdist;
+      const wy = Math.sin(angle)*wdist;
+      const screenDist = Math.sqrt(wx*wx+wy*wy)*zoom;
+      if (screenDist > Math.max(W,H)) return;
+      const ha = Math.min((t-0.3)*1.5,1) * Math.max(0, 1-screenDist/Math.max(W,H)) * 
