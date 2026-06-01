@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE SIGNAL — 33 Levels of Perception</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --black:#050508;--deep:#0a0a12;
+  --gold:#c9a84c;--gold-dim:#7a6030;
+  --teal:#2a9d8f;--teal-dim:#1a6d62;
+  --purple:#9b6dbe;--purple-dim:#6a4a88;
+  --white:#e8e0d0;--dim:#7a7060;--red:#c0392b;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:var(--white);font-family:'Crimson Text',serif;}
+
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:20px;gap:18px;}
+.screen.hidden{display:none;}
+
+/* TITLE */
+.eyemark{width:60px;height:30px;border:1px solid var(--gold-dim);border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;}
+.eyemark::before{content:'';width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 14px var(--gold);}
+.title-roman{font-family:'Cinzel',serif;font-size:clamp(0.7rem,2vw,0.9rem);letter-spacing:0.5em;color:var(--dim);}
+.title-main{font-family:'Cinzel',serif;font-size:clamp(2.8rem,9vw,5.5rem);font-weight:900;color:var(--gold);letter-spacing:0.15em;text-shadow:0 0 60px rgba(201,168,76,0.4);animation:glow 4s ease-in-out infinite;}
+@keyframes glow{0%,100%{text-shadow:0 0 40px rgba(201,168,76,0.3);}50%{text-shadow:0 0 90px rgba(201,168,76,0.7),0 0 140px rgba(201,168,76,0.2);}}
+.title-tagline{font-size:clamp(1rem,2.5vw,1.25rem);font-style:italic;color:var(--dim);max-width:440px;text-align:center;line-height:1.7;}
+.divider{width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);}
+.parts-strip{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.part-pill{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.2em;padding:6px 14px;border:1px solid var(--gold-dim);color:var(--gold-dim);}
+.saved-note{font-size:0.8rem;color:var(--dim);letter-spacing:0.1em;}
+
+/* BUTTONS */
+.btn{font-family:'Cinzel',serif;font-size:0.95rem;letter-spacing:0.2em;padding:13px 38px;background:transparent;border:1px solid var(--gold);color:var(--gold);cursor:pointer;text-transform:uppercase;transition:all 0.3s;position:relative;overflow:hidden;}
+.btn::after{content:'';position:absolute;inset:0;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform 0.3s;z-index:-1;}
+.btn:hover::after{transform:scaleX(1);}
+.btn:hover{color:var(--black);}
+.btn-sm{padding:8px 22px;font-size:0.75rem;}
+.btn-teal{border-color:var(--teal);color:var(--teal);}
+.btn-teal::after{background:var(--teal);}
+.btn-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+
+/* LEVEL SELECT */
+.select-header{font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:0.35em;color:var(--dim);}
+.part-section{display:flex;flex-direction:column;gap:8px;align-items:center;}
+.part-title{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.3em;}
+.level-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+.lvl-btn{width:48px;height:48px;border:1px solid;background:transparent;cursor:pointer;font-family:'Cinzel',serif;font-size:0.75rem;font-weight:600;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
+.lvl-btn.p1{border-color:var(--gold-dim);color:var(--gold-dim);}
+.lvl-btn.p2{border-color:var(--teal-dim);color:var(--teal-dim);}
+.lvl-btn.p3{border-color:var(--purple-dim);color:var(--purple-dim);}
+.lvl-btn.done.p1{background:rgba(201,168,76,0.1);border-color:var(--gold);color:var(--gold);}
+.lvl-btn.done.p2{background:rgba(42,157,143,0.1);border-color:var(--teal);color:var(--teal);}
+.lvl-btn.done.p3{background:rgba(155,109,190,0.1);border-color:var(--purple);color:var(--purple);}
+.lvl-btn.active{animation:activePulse 1.5s ease-in-out infinite;}
+@keyframes activePulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0);}50%{box-shadow:0 0 8px 2px rgba(201,168,76,0.25);}}
+.lvl-btn.locked{opacity:0.2;cursor:not-allowed;}
+
+/* INTRO */
+.intro-num{font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:0.3em;color:var(--dim);}
+.intro-part{font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:0.25em;}
+.intro-title{font-family:'Cinzel',serif;font-size:clamp(2rem,7vw,3.8rem);font-weight:900;line-height:1.1;text-align:center;}
+.intro-teaching{font-size:clamp(0.95rem,2.5vw,1.15rem);line-height:1.75;color:var(--dim);font-style:italic;max-width:520px;text-align:center;}
+.quote-block{border-left:2px solid var(--gold-dim);padding-left:18px;max-width:480px;}
+.quote-text{font-size:1.05rem;font-style:italic;line-height:1.6;}
+.quote-src{font-size:0.8rem;color:var(--gold-dim);margin-top:6px;font-family:'Cinzel',serif;letter-spacing:0.1em;}
+
+/* PLAY */
+.play-bar{display:flex;justify-content:space-between;align-items:center;width:min(680px,95vw);}
+.play-title-txt{font-family:'Cinzel',serif;font-size:0.95rem;letter-spacing:0.15em;}
+.play-prog{font-family:'Cinzel',serif;font-size:0.75rem;color:var(--dim);letter-spacing:0.1em;}
+.puzzle-wrap{width:min(680px,95vw);height:min(360px,48vh);border:1px solid rgba(201,168,76,0.15);position:relative;overflow:hidden;background:var(--deep);}
+.puzzle-wrap canvas{position:absolute;inset:0;width:100%;height:100%;}
+.instruction{font-size:0.9rem;color:var(--dim);font-style:italic;text-align:center;max-width:500px;}
+
+/* SORT */
+.sort-zone{position:absolute;border:1px dashed;border-radius:2px;display:flex;flex-direction:column;align-items:center;padding:8px 6px;gap:6px;overflow-y:auto;}
+.zone-label{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.15em;text-align:center;line-height:1.4;}
+.sort-item{position:absolute;padding:6px 12px;font-size:0.8rem;cursor:pointer;border:1px solid rgba(200,200,200,0.15);color:var(--white);background:rgba(10,10,18,0.95);transition:all 0.2s;user-select:none;}
+.sort-item.selected{border-color:var(--gold);color:var(--gold);box-shadow:0 0 10px rgba(201,168,76,0.3);}
+.sort-item.placed{position:relative;left:auto!important;top:auto!important;cursor:default;}
+
+/* TUNE */
+.coherence-track{width:min(680px,95vw);height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;}
+.coherence-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));border-radius:3px;transition:width 0.08s;}
+.sliders-row{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;max-width:680px;}
+.slider-group{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.slider-lbl{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.15em;color:var(--dim);}
+input[type=range]{-webkit-appearance:none;width:100px;height:2px;background:rgba(255,255,255,0.08);outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--gold);cursor:pointer;transition:background 0.2s;}
+
+/* COMPLETE */
+.complete-title{font-family:'Cinzel',serif;font-size:clamp(1.5rem,6vw,2.8rem);font-weight:900;color:var(--gold);text-shadow:0 0 50px rgba(201,168,76,0.5);}
+.revelation{font-size:clamp(1rem,2.5vw,1.2rem);line-height:1.75;color:var(--white);padding:16px 0;border-top:1px solid rgba(201,168,76,0.15);border-bottom:1px solid rgba(201,168,76,0.15);max-width:500px;text-align:center;}
+
+/* GAME COMPLETE */
+.final-title{font-family:'Cinzel',serif;font-size:clamp(2.2rem,8vw,5rem);font-weight:900;color:var(--gold);text-align:center;line-height:1.1;text-shadow:0 0 80px rgba(201,168,76,0.5);}
+.final-text{font-size:clamp(1rem,2.5vw,1.2rem);font-style:italic;color:var(--dim);max-width:500px;text-align:center;line-height:1.75;}
+
+@media(max-width:500px){
+  .lvl-btn{width:40px;height:40px;font-size:0.65rem;}
+  .puzzle-wrap{height:min(300px,40vh);}
+}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+
+<!-- TITLE -->
+<div class="screen" id="titleScreen">
+  <div class="eyemark"></div>
+  <div class="title-roman">A JOURNEY IN 33 LEVELS</div>
+  <div class="title-main">THE SIGNAL</div>
+  <div class="divider"></div>
+  <div class="title-tagline">Strip away what obscures. Find what remains. The signal was always there.</div>
+  <div class="parts-strip">
+    <div class="part-pill">I · THE VEIL</div>
+    <div class="part-pill">II · THE MAP</div>
+    <div class="part-pill">III · THE RECEIVER</div>
+  </div>
+  <button class="btn" onclick="startGame()">Begin</button>
+  <div class="saved-note" id="savedNote"></div>
+</div>
+
+<!-- LEVEL SELECT -->
+<div class="screen hidden" id="levelSelect">
+  <div class="select-header">SELECT LEVEL</div>
+  <div id="levelGrid" style="display:flex;flex-direction:column;gap:14px;align-items:center;"></div>
+  <button class="btn btn-teal btn-sm" onclick="showTitle()">← Back</button>
+</div>
+
+<!-- INTRO -->
+<div class="screen hidden" id="levelIntro">
+  <div class="intro-num" id="iNum"></div>
+  <div class="intro-part" id="iPart"></div>
+  <div class="intro-title" id="iTitle"></div>
+  <div class="divider"></div>
+  <div class="intro-teaching" id="iTeaching"></div>
+  <div class="quote-block hidden" id="iQuoteBlock">
+    <div class="quote-text" id="iQuote"></div>
+    <div class="quote-src" id="iSrc"></div>
+  </div>
+  <button class="btn" onclick="startLevel()">Enter the Level</button>
+</div>
+
+<!-- PLAY -->
+<div class="screen hidden" id="levelPlay">
+  <div class="play-bar">
+    <div class="play-title-txt" id="pTitle"></div>
+    <div class="play-prog" id="pProg"></div>
+  </div>
+  <div id="pMount"></div>
+  <div class="instruction" id="pInstruction"></div>
+  <button class="btn btn-teal btn-sm" onclick="showLevelSelect()">← All Levels</button>
+</div>
+
+<!-- COMPLETE -->
+<div class="screen hidden" id="levelComplete">
+  <div class="complete-title">Signal Received</div>
+  <div class="divider"></div>
+  <div class="revelation" id="cRevelation"></div>
+  <div class="quote-block hidden" id="cQuoteBlock" style="text-align:left;">
+    <div class="quote-text" id="cQuote"></div>
+    <div class="quote-src" id="cSrc"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-teal btn-sm" onclick="showLevelSelect()">All Levels</button>
+    <button class="btn" id="nextBtn" onclick="nextLevel()">Next →</button>
+  </div>
+</div>
+
+<!-- GAME COMPLETE -->
+<div class="screen hidden" id="gameComplete">
+  <div class="eyemark" style="width:80px;height:40px;"></div>
+  <div class="title-roman">ALL 33 LEVELS COMPLETE</div>
+  <div class="final-title">THE SIGNAL<br>IS CLEAR</div>
+  <div class="divider"></div>
+  <div class="final-text">You have moved through every veil. The noise does not disappear — you have learned to subtract it. The receiver was always intact. Only the channel needed clearing.</div>
+  <div class="btn-row">
+    <button class="btn btn-teal btn-sm" onclick="showLevelSelect()">Review Levels</button>
+    <button class="btn" onclick="resetGame()">Begin Again</button>
+  </div>
+</div>
+
+<script>
+// ─── STARS ───────────────────────────────────────────────────
+(function(){
+  const c=document.getElementById('stars'),ctx=c.getContext('2d');
+  let stars=[];
+  function resize(){
+    c.width=innerWidth;c.height=innerHeight;
+    stars=Array.from({length:180},()=>({
+      x:Math.random()*c.width,y:Math.random()*c.height,
+      r:Math.random()*1.1+0.2,o:Math.random()*0.5+0.1,
+      s:Math.random()*0.002+0.0005
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    const t=Date.now();
+    stars.forEach(s=>{
+      const o=s.o+Math.sin(t*s.s)*0.2;
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(232,224,208,${Math.max(0.05,Math.min(0.65,o))})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',resize);resize();draw();
+})();
+
+// ─── LEVEL DATA ───────────────────────────────────────────────
+const L=[
+  // PART I — THE VEIL (1–11)
+  {id:1,p:1,title:"The Veil",pName:"Part I · The Veil",pColor:"var(--gold)",type:"reveal",word:"SIGNAL",
+   teaching:"Every surface conceals a layer beneath. The first skill is not addition — it is removal. Subtract the noise and what remains was always there.",
+   revelation:"The signal was always present. Only the veil obscured it.",quote:null},
+
+  {id:2,p:1,title:"Two Readings",pName:"Part I · The Veil",pColor:"var(--gold)",type:"reveal",word:"WITHIN",
+   teaching:"The same information yields different meaning depending on depth of reading. Surface reading is a first layer. There is always another beneath it.",
+   revelation:"The kingdom is not outside. It was never outside.",
+   quote:{t:"The kingdom of God is within you.",s:"Luke 17:21"}},
+
+  {id:3,p:1,title:"The Pattern",pName:"Part I · The Veil",pColor:"var(--gold)",type:"reveal",word:"ORDER",
+   teaching:"Chaos is not the absence of pattern. It is pattern at a scale your current perception cannot yet resolve. Structure is always present.",
+   revelation:"What appeared random had geometry. The eye learns to find it.",quote:null},
+
+  {id:4,p:1,title:"The Eye",pName:"Part I · The Veil",pColor:"var(--gold)",type:"reveal",word:"CLEAR",
+   teaching:"Perception is not the passive reception of what exists. It is an active tuning operation. A cloudy instrument produces a cloudy reading regardless of the signal's strength.",
+   revelation:"Clear the instrument. The signal does not change — only your reception of it.",
+   quote:{t:"If your eye is clear, your whole body will be full of light.",s:"Matthew 6:22"}},
+
+  {id:5,p:1,title:"The Default Loop",pName:"Part I · The Veil",pColor:"var(--gold)",type:"reveal",word:"AWAKE",
+   teaching:"The brain's default state is a self-referential loop — past memory, future projection, repetitive narrative. This is the resting program running, not awakened consciousness. Disrupting it opens the channel.",
+   revelation:"The loop is not you. It is the program running beneath you.",quote:null},
+
+  {id:6,p:1,title:"Beneath the Form",pName:"Part I · The Veil",pColor:"var(--gold)",type:"reveal",word:"HIDDEN",
+   teaching:"Renaissance masters encoded secondary content beneath surface imagery using deliberate geometric construction. Frank Meshberger's 1990 JAMA paper identified the shape surrounding God in the Sistine Chapel as an anatomically precise human brain cross-section. The encoding was intentional.",
+   revelation:"The prepared eye sees what the unprepared cannot. Both are looking at the same thing.",quote:null},
+
+  {id:7,p:1,title:"Subtraction",pName:"Part I · The Veil",pColor:"var(--gold)",type:"reveal",word:"REMOVE",
+   teaching:"The core methodology: cast wide, subtract noise iteratively, map the gap precisely, never overclaim what remains. This is not the addition of theory. It is the removal of what is not the signal.",
+   revelation:"What you are looking for is what remains when everything false has been removed.",quote:null},
+
+  {id:8,p:1,title:"The Three Layers",pName:"Part I · The Veil",pColor:"var(--gold)",type:"reveal",word:"LAYERS",
+   teaching:"The brain operates in three functional layers: the survival system managing body and habit; the emotional memory system holding charge from past experience; and the prefrontal observer capable of watching the other two. Each responds to different operations.",
+   revelation:"You are the observer. Not the survival program. Not the emotional charge. The one watching both.",quote:null},
+
+  {id:9,p:1,title:"Before Insight",pName:"Part I · The Veil",pColor:"var(--gold)",type:"reveal",word:"STILL",
+   teaching:"Mark Jung-Beeman's fMRI research found that in the 1.5 seconds before genuine insight, the visual cortex dims — the brain reduces external input to increase internal integration. The eye closes to see more. The receiver opens not by grasping but by releasing.",
+   revelation:"In the moment before knowing, the brain goes quiet. This is not absence. This is preparation.",quote:null},
+
+  {id:10,p:1,title:"The Receiver Opens",pName:"Part I · The Veil",pColor:"var(--gold)",type:"reveal",word:"OPEN",
+   teaching:"Pim van Lommel's 2001 Lancet study documented consistent, coherent perception in cardiac arrest patients during confirmed flat EEG — periods of measurably absent neural activity. Whatever consciousness is, it does not simply stop when the instrument is offline.",
+   revelation:"The signal continued when the instrument was down. This is the most interesting data point.",quote:null},
+
+  {id:11,p:1,title:"Signal Found",pName:"Part I · The Veil",pColor:"var(--gold)",type:"reveal",word:"FOUND",
+   teaching:"Part One is complete. You have practiced the primary operation: subtraction. Everything that follows uses this same movement at greater depth. The signal was always there. So were you. The veil was never permanent.",
+   revelation:"Part One complete. The veil has been named. Now learn the territory it was covering.",quote:null},
+
+  // PART II — THE MAP (12–22)
+  {id:12,p:2,title:"The Boxes",pName:"Part II · The Map",pColor:"var(--teal)",type:"sort",
+   cats:[
+    {label:"HIGH COHERENCE",color:"var(--teal)",items:["Gratitude","Creative flow","Clarity","Forgiveness","Stillness","Honest action"]},
+    {label:"LOW COHERENCE",color:"var(--red)",items:["Rumination","Scarcity","Resentment","Reactive anger","Chronic deception"]}
+   ],
+   teaching:"Consciousness does not operate on a single global dial. It operates in parallel situational fields — boxes running simultaneously and independently. Each has its own frequency state. Each attracts accordingly. You are not globally high or low.",
+   revelation:"You are a map of simultaneous states. Locate the specific box.",quote:null},
+
+  {id:13,p:2,title:"The Feedback Loop",pName:"Part II · The Map",pColor:"var(--teal)",type:"sort",
+   cats:[
+    {label:"AMPLIFIES THE LOOP",color:"var(--red)",items:["Rumination","Blame","Replaying","Isolation","Victimhood"]},
+    {label:"INTERRUPTS THE LOOP",color:"var(--teal)",items:["Clear attention","Honest action","Observation","Physical movement","Named and released"]}
+   ],
+   teaching:"The low-frequency loop is self-sealing. The conditions it produces reinforce the conditions that maintain it. Interruption requires an operation that does not match the loop's frequency.",
+   revelation:"The loop can only be interrupted from outside its own frequency.",quote:null},
+
+  {id:14,p:2,title:"The Attractor",pName:"Part II · The Map",pColor:"var(--teal)",type:"sort",
+   cats:[
+    {label:"STABLE COHERENCE",color:"var(--teal)",items:["Consistent integrity","Honest speech","Clear boundaries","Steady practice","Deep attention"]},
+    {label:"DRAIN ATTRACTOR",color:"var(--red)",items:["Shifting narrative","Hidden agenda","Scattered focus","Reactive patterns","Inconsistent values"]}
+   ],
+   teaching:"In chaos dynamics, an attractor is a state a system gravitates toward. Every situational field has attractors — stable states it wants to settle into. Coherent attractors require maintenance but sustain themselves. Drain attractors require no effort and pull steadily downward.",
+   revelation:"Every field has gravity. Coherence requires choice. Drain requires nothing.",quote:null},
+
+  {id:15,p:2,title:"Inner and Outer",pName:"Part II · The Map",pColor:"var(--teal)",type:"sort",
+   cats:[
+    {label:"INNER FIELD",color:"var(--gold)",items:["Self-talk patterns","Belief structures","Contemplative state","Dream content","Creative access"]},
+    {label:"OUTER FIELD",color:"var(--teal)",items:["Relationship dynamics","Work patterns","Financial behavior","Social environment","Environmental choice"]}
+   ],
+   teaching:"Your situational fields span inner and outer domains simultaneously. An interference pattern in one domain does not require global collapse — it requires locating the specific jurisdiction and addressing it there without contaminating adjacent fields.",
+   revelation:"Find the box. The problem is never everywhere. It is somewhere specific.",quote:null},
+
+  {id:16,p:2,title:"The Entanglement",pName:"Part II · The Map",pColor:"var(--teal)",type:"sort",
+   cats:[
+    {label:"ACTUAL CAUSAL LINK",color:"var(--teal)",items:["Pattern repetition","Real consequence","Verified connection","Cause and effect","Genuine relationship"]},
+    {label:"NARRATIVE ENTANGLEMENT",color:"var(--dim)",items:["Story about story","Assumed meaning","Projected intent","Historical charge","Loop thinking"]}
+   ],
+   teaching:"Two boxes can become entangled not through actual connection but through narrative — the story you carry about one situation bleeding its frequency into another. Separating real causal links from narrative entanglement is a primary mapping operation.",
+   revelation:"Some of what feels connected is only connected in the story. The story is not the territory.",quote:null},
+
+  {id:17,p:2,title:"The Moral Code",pName:"Part II · The Map",pColor:"var(--teal)",type:"sort",
+   cats:[
+    {label:"COHERENCE PROTOCOL",color:"var(--teal)",items:["Honest speech","Give freely","Honor the other","Forgive debts","Clear boundaries"]},
+    {label:"DRAIN BEHAVIOR",color:"var(--red)",items:["Hidden agenda","Chronic deception","Persistent resentment","Taking without return","Treating others as less"]}
+   ],
+   teaching:"Moral codes across traditions are not arbitrary social rules. They are operational protocols encoding the understanding that specific behaviors reliably produce specific frequency states. The instruction and the mechanism are inseparable.",
+   revelation:"Moral practice is frequency maintenance technology. It was always this.",
+   quote:{t:"Do unto others as you would have them do unto you.",s:"Luke 6:31 — equivalent form present in 21 of the world's major traditions"}},
+
+  {id:18,p:2,title:"The Harvest",pName:"Part II · The Map",pColor:"var(--teal)",type:"sort",
+   cats:[
+    {label:"SELF-SUSTAINING FIELD",color:"var(--gold)",items:["Coherent action","Honest exchange","Clear boundary","Genuine giving","Stable attention"]},
+    {label:"FEED FIELD",color:"var(--red)",items:["Chronic guilt","Persistent fear","Unresolved anger","Manufactured conflict","Addictive loop"]}
+   ],
+   teaching:"Across Gnostic, indigenous, and contemplative traditions — a consistent structural description: states that perpetuate the conditions generating them. Whether the mechanism is internal psychological or involves external operators, the operational map is the same. Name it. Reduce it. Withdraw the feed.",
+   revelation:"Name what sustains the low-frequency loop. Naming reduces its operational efficiency.",quote:null},
+
+  {id:19,p:2,title:"Resist Not Evil",pName:"Part II · The Map",pColor:"var(--teal)",type:"sort",
+   cats:[
+    {label:"ENGAGES — ENTANGLES",color:"var(--red)",items:["Direct combat","Absorbed resentment","Constant argument","Matching frequency","Feeding the loop"]},
+    {label:"RELEASES — PASSES",color:"var(--teal)",items:["Allow to exist","Named and released","Observe without attach","Frequency mismatch","Attention withdrawn"]}
+   ],
+   teaching:"Resistance creates connection. What you push against, you remain entangled with. The instruction is precise: you do not match the frequency of the interference. You allow it to exist, observe it without attachment, and withdraw the attention that sustains it.",
+   revelation:"The interference cannot sustain without your attention. Withdraw the feed.",
+   quote:{t:"Resist not evil.",s:"Matthew 5:39"}},
+
+  {id:20,p:2,title:"The Convergence",pName:"Part II · The Map",pColor:"var(--teal)",type:"sort",
+   cats:[
+    {label:"WESTERN TRANSMISSION",color:"var(--gold)",items:["Kingdom within","Blessed are the pure","Love thy neighbor","Forgive debts","The eye as lamp"]},
+    {label:"EASTERN TRANSMISSION",color:"var(--teal)",items:["Buddha nature within","Right action","Ahimsa","Karma as return","The witness consciousness"]}
+   ],
+   teaching:"Aldous Huxley's Perennial Philosophy (1945) and Huston Smith's comparative religion scholarship identify a consistent core across traditions: inner transformation, coherence as operating condition for contact with the divine, direct experience over inherited belief. Different language. Same signal.",
+   revelation:"All traditions are expressions of the same root. The branches look different. The signal is one.",quote:null},
+
+  {id:21,p:2,title:"Forgiveness as Technology",pName:"Part II · The Map",pColor:"var(--teal)",type:"sort",
+   cats:[
+    {label:"WHAT FORGIVENESS IS",color:"var(--teal)",items:["Disconnecting the feed line","Releasing your own charge","Ending the loop","Frequency liberation","Completing the lesson"]},
+    {label:"WHAT IT IS NOT",color:"var(--dim)",items:["Approving the harm","Forgetting","Weakness","Required reconciliation","Done for the other person"]}
+   ],
+   teaching:"Forgiveness is not absolution granted to another. It is the operational act of disconnecting the energetic feed line your maintained resentment sustains between you and the event. You are not freeing them. You are freeing yourself from the loop your narrative has been maintaining.",
+   revelation:"You hold the resentment. The resentment holds you. Release is for you.",quote:null},
+
+  {id:22,p:2,title:"The Map Complete",pName:"Part II · The Map",pColor:"var(--teal)",type:"sort",
+   cats:[
+    {label:"MAPS THE TERRITORY",color:"var(--teal)",items:["Situational field awareness","Box identification","Pattern recognition","Causal honesty","Frequency diagnosis"]},
+    {label:"MISTAKES THE MAP",color:"var(--red)",items:["Global self-judgment","One-dial thinking","Others as sole cause","Fixed identity","Narrative as fact"]}
+   ],
+   teaching:"The map is not the territory. But a good map is essential before traversing the territory. Multiple simultaneous situational fields, each with its own frequency state, each with its own attractors, each capable of independent tuning. The territory is your actual lived experience.",
+   revelation:"Part Two complete. You have the map. Now learn to tune the instrument.",quote:null},
+
+  // PART III — THE RECEIVER (23–33)
+  {id:23,p:3,title:"The Antenna",pName:"Part III · The Receiver",pColor:"var(--purple)",type:"tune",target:0.84,
+   sliders:[{lbl:"STILLNESS",v:20},{lbl:"ATTENTION",v:25}],
+   teaching:"Henri Bergson proposed and Kelly et al. formalized in Irreducible Mind (2007) the filter theory of consciousness: the brain reduces a larger field rather than generating consciousness from matter. Under this model, clarity of reception depends on the quality of the instrument, not the strength of the signal.",
+   revelation:"The signal has not weakened. The instrument needs clearing.",quote:null},
+
+  {id:24,p:3,title:"The Interference",pName:"Part III · The Receiver",pColor:"var(--purple)",type:"tune",target:0.82,
+   sliders:[{lbl:"CLARITY",v:15},{lbl:"COHERENCE",v:20},{lbl:"RELEASE",v:15}],
+   teaching:"Neuroinflammation measurably reduces prefrontal function and increases amygdala reactivity — chemically reinforcing lower brain operation. Chronic stress, unresolved emotional charge, and environmental factors all reduce electrical clarity. The biological and the subtle are not separate problems.",
+   revelation:"What creates interference at one level creates it at others. Address both.",quote:null},
+
+  {id:25,p:3,title:"The Clearing",pName:"Part III · The Receiver",pColor:"var(--purple)",type:"tune",target:0.87,
+   sliders:[{lbl:"BODY",v:20},{lbl:"MIND",v:20},{lbl:"FIELD",v:15}],
+   teaching:"Contemplative traditions encode systematic channel-clearing protocols — not arbitrary disciplines but operational sequences refined across millennia of empirical observation. Breath regulation, postural alignment, dietary attention, ethical integrity, meditative attention: each addresses a specific layer of interference.",
+   revelation:"The 5,000 year old technology exists because people mapped this problem and developed protocols that demonstrably work.",quote:null},
+
+  {id:26,p:3,title:"Heart Coherence",pName:"Part III · The Receiver",pColor:"var(--purple)",type:"tune",target:0.89,
+   sliders:[{lbl:"GRATITUDE",v:25},{lbl:"PRESENCE",v:20}],
+   teaching:"HeartMath Institute research documents that specific emotional states — particularly gratitude, genuine care, and calm clarity — produce measurably coherent heart rate variability patterns extending as an electromagnetic field several feet from the body. Incoherent states produce measurably disrupted fields. This is measured, not metaphorical.",
+   revelation:"Coherence is measurable. The heart is a transmitter as well as a receiver.",quote:null},
+
+  {id:27,p:3,title:"The Schumann Bridge",pName:"Part III · The Receiver",pColor:"var(--purple)",type:"tune",target:0.86,
+   sliders:[{lbl:"RESONANCE",v:15},{lbl:"COUPLING",v:20},{lbl:"STILLNESS",v:15}],
+   teaching:"The Earth-ionosphere cavity resonates at approximately 7.83 Hz — the Schumann resonance. Human alpha brainwave states sit in this band. The electromagnetic coupling between individual biofields and this global cavity is documented. What individual coherent states contribute to and receive from this system is an active research question.",
+   revelation:"You are not separate from the field. You are a node within it.",quote:null},
+
+  {id:28,p:3,title:"The Whisper",pName:"Part III · The Receiver",pColor:"var(--purple)",type:"tune",target:0.91,
+   sliders:[{lbl:"SILENCE",v:10},{lbl:"TRUST",v:10},{lbl:"ATTENTION",v:15},{lbl:"RELEASE",v:10}],
+   teaching:"Tesla described his inventions as received. Ramanujan credited his mathematics to dreams and produced theorems that took a century to verify. Kekulé discovered the benzene ring through a vision of a snake eating its tail. The receiver model of creative and scientific insight is historically well documented and almost entirely theorized away.",
+   revelation:"It does not always feel like inspiration. Sometimes it feels like your own thought — until you notice it already knew.",quote:null},
+
+  {id:29,p:3,title:"Direct Knowing",pName:"Part III · The Receiver",pColor:"var(--purple)",type:"tune",target:0.90,
+   sliders:[{lbl:"HONESTY",v:20},{lbl:"OPENNESS",v:20},{lbl:"SURRENDER",v:10}],
+   teaching:"Gnosis — from the Greek for direct knowing — describes what the receiver model produces when fully operational. Not belief about truth. Not faith that something is true. Direct experiential contact with what is. The Nag Hammadi Gnostic texts, studied by Princeton scholar Elaine Pagels among others, describe this as the primary human capacity the Archon system works to prevent.",
+   revelation:"Belief is a placeholder for the experience. The experience makes the placeholder unnecessary.",quote:null},
+
+  {id:30,p:3,title:"The Teaching Preserved",pName:"Part III · The Receiver",pColor:"var(--purple)",type:"tune",target:0.88,
+   sliders:[{lbl:"DISCERNMENT",v:15},{lbl:"SUBTRACTION",v:20},{lbl:"RECOGNITION",v:15}],
+   teaching:"Strip away 2,000 years of institutional religion, political manipulation, and doctrinal calcification. What remains is a precise transmission: the receiver is internal. Clarity of the instrument determines reception quality. Moral practice is frequency regulation. Direct experience supersedes inherited belief. The kingdom is not coming. It is within.",
+   revelation:"The teaching survived its own suppression. This is evidence of its signal strength.",
+   quote:{t:"These things you shall do — and greater.",s:"John 14:12"}},
+
+  {id:31,p:3,title:"Integration",pName:"Part III · The Receiver",pColor:"var(--purple)",type:"tune",target:0.92,
+   sliders:[{lbl:"PERCEPTION",v:20},{lbl:"MAPPING",v:20},{lbl:"CLEARING",v:15},{lbl:"RECEPTION",v:15}],
+   teaching:"The three parts are not sequential stages you complete and leave behind. They are simultaneous operations. Perception continues. Mapping continues. Clearing continues. When these three are operating coherently, reception — the fourth operation — becomes available. This is the integrated instrument.",
+   revelation:"You do not graduate from subtraction. You deepen it.",quote:null},
+
+  {id:32,p:3,title:"The Operator",pName:"Part III · The Receiver",pColor:"var(--purple)",type:"tune",target:0.94,
+   sliders:[{lbl:"INTEGRITY",v:10},{lbl:"CLARITY",v:10},{lbl:"LOVE",v:10},{lbl:"STILLNESS",v:10}],
+   teaching:"Whether described as the divine, the higher self, the Holy Spirit, Buddha nature, or the morphic field — the consistent structural description across traditions is the same: it transmits. It does not impose. It waits for the channel to be clear enough to carry the signal. The receiver does not find the transmitter. The receiver becomes clear enough to receive what was always transmitting.",
+   revelation:"It was always transmitting. You are learning to receive.",quote:null},
+
+  {id:33,p:3,title:"The Signal",pName:"Part III · The Receiver",pColor:"var(--purple)",type:"tune",target:0.96,
+   sliders:[{lbl:"PERCEPTION",v:5},{lbl:"COHERENCE",v:5},{lbl:"RELEASE",v:5},{lbl:"TRUST",v:5},{lbl:"LOVE",v:5}],
+   teaching:"The noise does not disappear. You have learned to subtract it. The receiver was never broken — only obscured. The signal is not something you achieve. It is something you clear the path for. Within, through moral coherence, through direct knowing, through clearing, through love: every direction arrives at the same coordinates.",
+   revelation:"The signal is clear. It always was. So were you.",
+   quote:{t:"Be still and know.",s:"Psalm 46:10"}}
+];
+
+// ─── STATE ────────────────────────────────────────────────────
+let G={done:[],cur:1,active:null};
+
+function load(){
+  try{const s=JSON.parse(localStorage.getItem('sig33')||'{}');G.done=s.done||[];G.cur=s.cur||1;}catch(e){}
+}
+function save(){
+  try{localStorage.setItem('sig33',JSON.stringify({done:G.done,cur:G.cur}));}catch(e){}
+}
+
+// ─── SCREENS ─────────────────────────────────────────────────
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');}
+
+function showTitle(){
+  const n=document.getElementById('savedNote');
+  n.textContent=G.done.length>0?`Progress: ${G.done.length} / 33 levels complete`:'';
+  show('titleScreen');
+}
+function startGame(){showLevelSelect();}
+function showLevelSelect(){buildGrid();show('levelSelect');}
+
+function buildGrid(){
+  const el=document.getElementById('levelGrid');
+  el.innerHTML='';
+  [1,2,3].forEach(part=>{
+    const sec=document.createElement('div');
+    sec.className='part-section';
+    const titles={1:'Part I · The Veil',2:'Part II · The Map',3:'Part III · The Receiver'};
+    const colors={1:'var(--gold)',2:'var(--teal)',3:'var(--purple)'};
+    const t=document.createElement('div');
+    t.className='part-title';t.style.color=colors[part];t.textContent=titles[part];
+    sec.appendChild(t);
+    const row=document.createElement('div');row.className='level-row';
+    L.filter(l=>l.p===part).forEach(lv=>{
+      const b=document.createElement('button');
+      const done=G.done.includes(lv.id);
+      const unlocked=lv.id===1||G.done.includes(lv.id-1)||done;
+      const active=lv.id===G.cur&&!done;
+      b.className=`lvl-btn p${part}${done?' done':''}${active?' active':''}${!unlocked?' locked':''}`;
+      b.textContent=lv.id;b.title=lv.title;
+      if(unlocked)b.onclick=()=>openLevel(lv.id);
+      row.appendChild(b);
+    });
+    sec.appendChild(row);el.appendChild(sec);
+  });
+}
+
+function openLevel(id){
+  const lv=L.find(l=>l.id===id);G.active=lv;
+  document.getElementById('iNum').textContent=`Level ${lv.id} of 33`;
+  document.getElementById('iPart').textContent=lv.pName;
+  document.getElementById('iPart').style.color=lv.pColor;
+  document.getElementById('iTitle').textContent=lv.title;
+  document.getElementById('iTitle').style.color=lv.pColor;
+  document.getElementById('iTeaching').textContent=lv.teaching;
+  const qb=document.getElementById('iQuoteBlock');
+  if(lv.quote){
+    document.getElementById('iQuote').textContent=`"${lv.quote.t}"`;
+    document.getElementById('iSrc').textContent=`— ${lv.quote.s}`;
+    qb.classList.remove('hidden');
+  }else{qb.classList.add('hidden');}
+  show('levelIntro');
+}
+
+function startLevel(){
+  const lv=G.active;
+  document.getElementById('pTitle').textContent=lv.title;
+  document.getElementById('pTitle').style.color=lv.pColor;
+  document.getElementById('pProg').textContent=`${lv.id} / 33`;
+  document.getElementById('pInstruction').textContent=lv.type==='reveal'?'Move your cursor (or drag on touch) across the darkness to clear the veil':lv.type==='sort'?'Click an item to select it, then click a zone to place it':'Adjust the sliders to bring the waves into coherence';
+  const mt=document.getElementById('pMount');mt.innerHTML='';
+  if(lv.type==='reveal')buildReveal(mt,lv);
+  else if(lv.type==='sort')buildSort(mt,lv);
+  else buildTune(mt,lv);
+  show('levelPlay');
+}
+
+// ─── REVEAL PUZZLE ───────────────────────────────────────────
+function buildReveal(mount,lv){
+  const wrap=document.createElement('div');wrap.className='puzzle-wrap';mount.appendChild(wrap);
+  const cv=document.createElement('canvas');wrap.appendChild(cv);
+  const R=14;
+  let W,H,particles=[],cleared=0,total=0,done=false;
+
+  function setup(){
+    W=wrap.offsetWidth;H=wrap.offsetHeight;
+    cv.width=W;cv.height=H;
+    particles=[];cleared=0;
+    const cols=Math.ceil(W/(R*1.8)),rows=Math.ceil(H/(R*1.8));
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+      particles.push({
+        x:c*R*1.8+R*0.9+(Math.random()-0.5)*6,
+        y:r*R*1.8+R*0.9+(Math.random()-0.5)*6,
+        r:R*(0.65+Math.random()*0.45),alive:true,
+        g:Math.random()>0.85
+      });
+    }
+    total=particles.length;
+  }
+
+  const ctx=cv.getContext('2d');
+  function render(){
+    ctx.fillStyle='#0a0a12';ctx.fillRect(0,0,W,H);
+    // concentric rings
+    ctx.strokeStyle='rgba(201,168,76,0.04)';ctx.lineWidth=1;
+    for(let i=1;i<9;i++){ctx.beginPath();ctx.arc(W/2,H/2,i*25,0,Math.PI*2);ctx.stroke();}
+    // word
+    const fs=Math.min(W/lv.word.length*1.05,96);
+    ctx.font=`900 ${fs}px 'Cinzel',serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(201,168,76,0.08)';ctx.fillText(lv.word,W/2+3,H/2+3);
+    ctx.fillStyle='rgba(201,168,76,0.9)';ctx.fillText(lv.word,W/2,H/2);
+    // particles
+    particles.forEach(p=>{
+      if(!p.alive)return;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.g?'rgba(42,157,143,0.75)':'rgba(8,8,16,0.88)';
+      ctx.fill();
+    });
+    // progress bar
+    const pct=cleared/total;
+    ctx.fillStyle='rgba(42,157,143,0.25)';ctx.fillRect(10,H-12,W-20,4);
+    ctx.fillStyle='rgba(42,157,143,0.8)';ctx.fillRect(10,H-12,(W-20)*pct,4);
+    if(!done&&pct>0.87){done=true;setTimeout(completeLevel,600);}
+    if(!done)requestAnimationFrame(render);
+  }
+
+  function clear(x,y){
+    particles.forEach(p=>{if(!p.alive)return;const dx=p.x-x,dy=p.y-y;if(dx*dx+dy*dy<(R*2.8)*(R*2.8)){p.alive=false;cleared++;}});
+  }
+
+  cv.addEventListener('mousemove',e=>{const rc=cv.getBoundingClientRect();clear((e.clientX-rc.left)*(W/rc.width),(e.clientY-rc.top)*(H/rc.height));});
+  cv.addEventListener('touchmove',e=>{e.preventDefault();const rc=cv.getBoundingClientRect(),t=e.touches[0];clear((t.clientX-rc.left)*(W/rc.width),(t.clientY-rc.top)*(H/rc.height));},{passive:false});
+
+  setup();render();
+}
+
+// ─── SORT PUZZLE ─────────────────────────────────────────────
+function buildSort(mount,lv){
+  const wrap=document.createElement('div');wrap.className='puzzle-wrap';
+  wrap.style.height='min(400px,52vh)';mount.appendChild(wrap);
+
+  const W=wrap.offsetWidth||680,H=wrap.offsetHeight||400;
+  const cats=lv.cats;
+  let selected=null,placed=0,total=0,done=false;
+
+  // Items list
+  let allItems=[];
+  cats.forEach((cat,ci)=>{cat.items.forEach(txt=>{allItems.push({txt,ci,el:null,placed:false});total++;});});
+  allItems.sort(()=>Math.random()-0.5);
+
+  // Draw zones
+  const zoneW=Math.floor((W-30)/cats.length)-10;
+  const zoneTop=Math.floor(H*0.42);
+  const zoneH=H-zoneTop-10;
+  const zoneEls=cats.map((cat,i)=>{
+    const z=document.createElement('div');z.className='sort-zone';
+    z.style.cssText=`left:${10+i*(zoneW+10)}px;top:${zoneTop}px;width:${zoneW}px;height:${zoneH}px;border-color:${cat.color};`;
+    const lbl=document.createElement('div');lbl.className='zone-label';lbl.style.color=cat.color;lbl.textContent=cat.label;
+    z.appendChild(lbl);wrap.appendChild(z);
+    z.addEventListener('click',()=>{if(selected)placeItem(selected,i,cat.color,z);});
+    return z;
+  });
+
+  // Spread items across top area
+  const cols=Math.min(5,Math.ceil(allItems.length/2));
+  allItems.forEach((item,i)=>{
+    const el=document.createElement('div');el.className='sort-item';el.textContent=item.txt;
+    const col=i%cols,row=Math.floor(i/cols);
+    el.style.left=`${8+col*((W-16)/cols)}px`;
+    el.style.top=`${8+row*42}px`;
+    el.style.maxWidth=`${(W-16)/cols-8}px`;
+    item.el=el;wrap.appendChild(el);
+    el.addEventListener('click',()=>{
+      if(item.placed)return;
+      if(selected===item){selected=null;el.classList.remove('selected');}
+      else{if(selected){selected.el.classList.remove('selected');}selected=item;el.classList.add('selected');}
+    });
+  });
+
+  function placeItem(item,catI,color,zoneEl){
+    item.placed=true;item.el.classList.remove('selected');item.el.classList.add('placed');
+    item.el.style.borderColor=color;item.el.style.color=color;
+    item.el.style.position='relative';item.el.style.left='auto';item.el.style.top='auto';
+    item.el.style.margin='2px';item.el.style.fontSize='0.75rem';
+    zoneEl.appendChild(item.el);
+    selected=null;placed++;
+    if(placed>=total&&!done){done=true;setTimeout(completeLevel,700);}
+  }
+
+  // Progress note
+  const note=document.createElement('div');
+  note.style.cssText='position:absolute;bottom:8px;right:10px;font-size:0.7rem;color:var(--dim);font-style:italic;';
+  note.textContent='Select an item, then click a zone';
+  wrap.appendChild(note);
+  function updateNote(){note.textContent=`${placed} / ${total} placed`;if(!done)requestAnimationFrame(updateNote);}
+  updateNote();
+}
+
+// ─── TUNE PUZZLE ─────────────────────────────────────────────
+function buildTune(mount,lv){
+  // Coherence bar first
+  const track=document.createElement('div');track.className='coherence-track';
+  const fill=document.createElement('div');fill.className='coherence-fill';fill.style.width='0%';
+  track.appendChild(fill);mount.appendChild(track);
+
+  const wrap=document.createElement('div');wrap.className='puzzle-wrap';mount.appendChild(wrap);
+  const cv=document.createElement('canvas');wrap.appendChild(cv);
+  cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;';
+  const W=wrap.offsetWidth||680,H=wrap.offsetHeight||360;
+  cv.width=W;cv.height=H;
+  const ctx=cv.getContext('2d');
+
+  // Sliders
+  const srow=document.createElement('div');srow.className='sliders-row';mount.appendChild(srow);
+  const vals={};
+  // Random sweet spots per level play
+  const sweet={};
+  lv.sliders.forEach(s=>{
+    sweet[s.lbl]=50+Math.random()*40;vals[s.lbl]=s.v;
+    const g=document.createElement('div');g.className='slider-group';
+    const l=document.createElement('div');l.className='slider-lbl';l.textContent=s.lbl;
+    const inp=document.createElement('input');inp.type='range';inp.min=0;inp.max=100;inp.value=s.v;
+    inp.addEventListener('input',()=>vals[s.lbl]=+inp.value);
+    g.appendChild(l);g.appendChild(inp);srow.appendChild(g);
+  });
+
+  function coherence(){
+    let err=0;const n=lv.sliders.length;
+    lv.sliders.forEach(s=>{err+=Math.abs(vals[s.lbl]-sweet[s.lbl])/100;});
+    return Math.max(0,1-err/n);
+  }
+
+  let t=0,done=false;
+  function draw(){
+    const coh=coherence();t+=0.018;
+    ctx.fillStyle='#0a0a12';ctx.fillRect(0,0,W,H);
+    const cy=H/2,amp=55;
+    // Target wave
+    ctx.beginPath();ctx.strokeStyle='rgba(42,157,143,0.35)';ctx.lineWidth=1.5;
+    for(let x=0;x<W;x++){const y=cy+Math.sin(x*0.022+t)*amp*Math.sin(x*0.008+0.5);x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.stroke();
+    // Interference
+    const iAmp=(1-coh)*45;
+    ctx.beginPath();ctx.strokeStyle=`rgba(192,57,43,${0.25+(1-coh)*0.5})`;ctx.lineWidth=1.2;
+    for(let x=0;x<W;x++){const y=cy+Math.sin(x*0.031+t*1.4+2)*( amp+iAmp)*Math.sin(x*0.013+1)+(Math.random()-0.5)*iAmp*0.2;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.stroke();
+    // Result
+    ctx.beginPath();ctx.strokeStyle=`rgba(201,168,76,${0.45+coh*0.55})`;ctx.lineWidth=coh>0.75?2.5:1.8;
+    for(let x=0;x<W;x++){
+      const sig=Math.sin(x*0.022+t)*amp*Math.sin(x*0.008+0.5);
+      const noise=(1-coh)*25*Math.sin(x*0.04+t*1.3);
+      const y=cy+sig*coh+noise;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // Glow at high coherence
+    if(coh>0.75){ctx.fillStyle=`rgba(201,168,76,${(coh-0.75)*0.1})`;ctx.fillRect(0,0,W,H);}
+    // Labels
+    ctx.font="10px 'Cinzel',serif";
+    ctx.fillStyle='rgba(42,157,143,0.5)';ctx.textAlign='left';ctx.fillText('TARGET',10,18);
+    ctx.fillStyle=`rgba(201,168,76,${0.4+coh*0.6})`;ctx.textAlign='right';
+    ctx.fillText(`COHERENCE ${Math.round(coh*100)}%`,W-10,18);ctx.textAlign='left';
+    fill.style.width=(coh*100)+'%';
+    if(!done&&coh>=lv.target){done=true;setTimeout(completeLevel,900);}
+    if(!done)requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ─── COMPLETE ─────────────────────────────────────────────────
+function completeLevel(){
+  const lv=G.active;
+  if(!G.done.includes(lv.id))G.done.push(lv.id);
+  G.cur=Math.min(33,lv.id+1);save();
+  if(G.done.length>=33){show('gameComplete');return;}
+  document.getElementById('cRevelation').textContent=lv.revelation;
+  const qb=document.getElementById('cQuoteBlock');
+  if(lv.quote){
+    document.getElementById('cQuote').textContent=`"${lv.quote.t}"`;
+    document.getElementById('cSrc').textContent=`— ${lv.quote.s}`;
+    qb.classList.remove('hidden');
+  }else{qb.classList.add('hidden');}
+  document.getElementById('nextBtn').style.display=lv.id<33?'inline-block':'none';
+  show('levelComplete');
+}
+
+function nextLevel(){const n=G.active.id+1;if(n<=33)openLevel(n);else show('gameComplete');}
+function resetGame(){G={done:[],cur:1,active:null};save();showTitle();}
+
+// ─── INIT ─────────────────────────────────────────────────────
+load();showTitle();
+</script>
+</body>
+</html>
