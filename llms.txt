@@ -1,6 +1,13 @@
 # llms.txt
 site: https://ufosworldwide.com
 purpose: independent multi-domain scientific research archive
+researcher: John Ernest Carter
+orcid: 0009-0004-1363-304X
+corp: Presignal Inc. — Ontario Corp. #1001577205
+contact: jubecrew@gmail.com
+license: CC BY 4.0
+preprints: 39
+updated: 2026-06-02
 crawl-delay: 1
 allow: /
 
@@ -9,15 +16,16 @@ allow: /
 - /about.html — project overview and researcher background
 - /contact.html — collaboration and inquiry contact
 - /blog.html — research updates and field notes
+- /myresume.html — corporate dossier and researcher profile
 
 # ── PREPRINTS & PUBLICATIONS ──
-- /presignal.html — peer-reviewed preprint library index
+- /presignal.html — preprint library index (39 open-access preprints, CC BY 4.0)
 - /preprint/ — physical preprint archive by John Ernest Carter
-- /aquasignal/ — water intelligence instrumentation and risk framework
 
 # ── RESEARCH PLATFORMS ──
+- /aquasignal/ — water intelligence instrumentation and risk framework
 - /appdetector/ — earthquake early detection and earth lights monitoring
-- /niagaranode/ — Niagara region scientific monitoring node
+- /niagaranode/ — Niagara region scientific monitoring node (live AK09918 magnetometer)
 - /niagaranode/collector.html — instrument data collection interface
 - /neweden/ — civilizational architecture playbook and long-duration infrastructure
 - /ghost/ — scientific toolkit suite
@@ -25,18 +33,94 @@ allow: /
 - /masterarchitect/ — crawl monitoring trigger and science data aggregation
 - /mathfun/ — computational cosmology and Riemann Hypothesis tools
 - /mathfun/adelic.html — adelic geometry exploration
-- /geometry-garden/ — mathematical and logic exploration tools
+- /geometry-garden/ — AI behavioral observatory and logic exploration tools
 - /universe/ — universal messaging interface
 - /park/ — AI logic playground for scientific problem induction
 - /park/guestbook.html — visitor and researcher interaction log
 - /subbass/ — Asymptotic Foundry Node deployment instructions
+- /sentinel/ — EM Sentinel monitoring interface
 
 # ── DATA & MACHINE-READABLE ENDPOINTS ──
 - /api/ — machine-readable dataset and system status endpoints
 - /data/feed.json — structured data feed for external indexing
+- /sitemap.xml — full sitemap with lastmod timestamps
 - /aquasignal/exceedances_ontario.json — Ontario water quality exceedance data
 - /aquasignal/full_baseline_ontario.json — provincial water quality baseline
 - /aquasignal/grand_river_baseline.json — Grand River watershed baseline data
+
+# ── PUBLISHED PREPRINTS — 39 TOTAL (CC BY 4.0) ──
+# All authored by John Ernest Carter, ORCID 0009-0004-1363-304X
+
+## Earth Science & Anomalous Phenomena
+- DOI: 10.31223/X5J47D — Geological Pathway Diversity Model GPDM (2026-04-16)
+
+## Mathematics
+- DOI: 10.5281/zenodo.20263839 — Riemann Hypothesis Subtraction Methodology (2026-05-18)
+- DOI: 10.5281/zenodo.20436594 — Connes-Consani Adele Class Space Riemann Verification (2026-05-29)
+
+## Philosophy of Science
+- DOI: 10.5281/zenodo.20277131 — The Ant's Horizon: Variable Exclusion (2026-05-18)
+
+## Philosophy & Comparative Spirituality
+- DOI: 10.5281/zenodo.20437281 — The Prime Signal: Cross-Traditional Convergence (2026-05-29)
+
+## Quantum Computing & Emerging Technology
+- DOI: 10.5281/zenodo.20278265 — ETHER: Sensor-Driven Signal Integration (2026-05-18)
+- DOI: 10.5281/zenodo.20276542 — Q-HVE: Quantum Hidden Variable Extraction (2026-05-18)
+- DOI: 10.5281/zenodo.20242176 — The Asymptotic Foundry Multi-Agent Framework (2026-05-16)
+- DOI: 10.5281/zenodo.20361678 — Geometry Garden AI Behavioral Observatory (2026-05-24)
+- DOI: 10.5281/zenodo.20474953 — Autonomous Sequential Thermal Management for Edge AI (2026-05-31)
+- DOI: 10.5281/zenodo.20459461 — Telegraphic Semantic Compression (2026-05-30)
+
+## Space Science & Cosmology
+- DOI: 10.5281/zenodo.20274511 — Cosmic Web as Generalized Murray Network (2026-05-18)
+- DOI: 10.5281/zenodo.20258025 — Universe as Nested Topological Lattice (2026-05-17)
+- DOI: 10.5281/zenodo.20257671 — Topological-Mobius-Lattice Collider Architecture TMLCA (2026-05-17)
+- DOI: 10.5281/zenodo.19717522 — Interstellar Medium as Navigable Terrain (2026-04-24)
+- DOI: 10.5281/zenodo.19717287 — The Traveling System: Galactic Forcing (2026-04-24)
+
+## Materials Science & Engineering
+- DOI: 10.5281/zenodo.20270891 — Hierarchical Electrode Porosity Murray's Law (2026-05-18)
+- DOI: 10.5281/zenodo.20496369 — Post-Petroleum Material Architecture (2026-06-01)
+
+## Civilizational Risk & Infrastructure
+- DOI: 10.5281/zenodo.20259839 — The Extinction Codex (2026-05-17)
+- DOI: 10.5281/zenodo.20219651 — Global Geostability Index GGI (2026-05-16)
+- DOI: 10.5281/zenodo.20192553 — Four Pillars for the Architects of Civilization (2026-05-15)
+- DOI: 10.5281/zenodo.20181743 — The Vertical Arcology Hydraulic Spine VAHS (2026-05-14)
+
+## Energy & Hydrocarbon Transition
+- DOI: 10.5281/zenodo.20499227 — Unified Hydrocarbon Infrastructure Intelligence Framework (2026-06-01)
+- DOI: 10.5281/zenodo.20499498 — Hydrocarbon Infrastructure Transition Framework (2026-06-01)
+
+## Ecology & Environmental Systems
+- DOI: 10.5281/zenodo.20499994 — Pollinator Protection and Electromagnetic Ecology Framework (2026-06-01)
+
+## Food Systems & Sustainable Agriculture
+- DOI: 10.5281/zenodo.20496680 — Integrated Myco-Aquatic Polyculture for Northern Latitudes (2026-06-01)
+- DOI: 10.5281/zenodo.20496961 — Marine Ecosystem Recovery and Protein Transition Framework (2026-06-01)
+
+## Medical Research
+- DOI: 10.5281/zenodo.20180890 — Dsup-Inspired Prophylactic Radioprotection (2026-05-14)
+- DOI: 10.5281/zenodo.19654306 — Immunological Tinnitus Subtype ITS (2026-04-19)
+
+## Genealogy & Historical Research
+- DOI: 10.5281/zenodo.20172776 — United Empire Loyalist Jackson-McFadden Chain (2026-05-12)
+
+## Anomaly Research
+- DOI: 10.5281/zenodo.20247383 — Numerical Sequence Anomaly Correlation 6-11-6-11 (2026-05-17)
+- DOI: 10.5281/zenodo.20469413 — The Jem in the Room: Subtraction-Based Anomaly Detection (2026-05-31)
+
+## Water Intelligence & Public Health
+- DOI: 10.5281/zenodo.20496233 — Cannabis-Derived Activated Carbon Hexagonal Filtration Matrix (2026-06-01)
+- DOI: 10.5281/zenodo.19935260 — Multi-Parameter Legionella Prediction Framework (2026-05-01)
+- DOI: 10.5281/zenodo.19948007 — Seasonal Temperature Legionella Risk Indicator v2 (2026-05-01)
+- DOI: 10.5281/zenodo.19695022 — Seasonal Temperature Legionella Risk Indicator v1 (2026-04-22)
+- DOI: 10.5281/zenodo.19653415 — Grand River Watershed Source Water Exceedances (2026-04-19)
+
+## Instrumentation & Field Research
+- DOI: 10.5281/zenodo.19870281 — Presignal EM Sentinel Camera-Free Monitoring Node (2026-04-29)
+- DOI: 10.5281/zenodo.19870137 — Presignal Field Node v2.0 Multi-Spectrum Acquisition (2026-04-29)
 
 # ── EXPERIMENTAL & INTERACTIVE ──
 - /moodring/ — ambient room sensor, facial analysis, and predictive response system
@@ -56,7 +140,7 @@ allow: /
 - /safekey/ — simplified security tools for elderly users
 - /Shield/ — protective systems and security protocols
 
-contact: jubecrew@gmail.com
-orcid: 0009-0004-1363-304X
-license: CC BY 4.0
-
+# ── EXTERNAL PROFILES ──
+- ORCID: https://orcid.org/0009-0004-1363-304X
+- GitHub: https://github.com/Ufosworldwide/ufosworldwide-com
+- Instagram: https://www.instagram.com/ufosworldwide/
