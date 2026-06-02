@@ -3676,9 +3676,9 @@ async function sendApexEmail(subject, message) {
 const _origSend = sendToSheets;
 window.sendToSheets = async function(payload) {
   // Call original sheets function
-  if (window.SHEETS_WEBHOOK) {
+  if (SHEETS_WEBHOOK) {
     try {
-      await fetch(window.SHEETS_WEBHOOK, {
+      await fetch(SHEETS_WEBHOOK, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(payload)
