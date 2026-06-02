@@ -2,1434 +2,293 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Julie's Cattery & Clinic</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kitty Kingdoms 🐱</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#9B59B6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kitty Kingdoms">
+<script>
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
+  // Show install prompt when browser fires it
+  let _installPrompt=null;
+  window.addEventListener('beforeinstallprompt',(e)=>{
+    e.preventDefault();_installPrompt=e;
+    const btn=document.getElementById('install-btn');
+    if(btn)btn.style.display='flex';
+  });
+  window.addEventListener('appinstalled',()=>{
+    const btn=document.getElementById('install-btn');
+    if(btn)btn.style.display='none';
+  });
+  function installApp(){
+    if(_installPrompt){_installPrompt.prompt();_installPrompt.userChoice.then(()=>{_installPrompt=null;});}
+  }
+</script>
 <style>
-/* ============================================
-   JULIE'S CATTERY & CLINIC
-   A cozy cat breeding farm sim.
-   Stardew heart + Neko Atsume vibes + 
-   DragonVale genetics obsession.
-   One file. Zero dependencies. Infinite cats.
-   ============================================ */
-
 :root {
-  --bg: #f7f3e8;
-  --panel: #fffdf7;
-  --accent: #ff8c94;
-  --accent2: #88d8b0;
-  --accent3: #a8e6cf;
-  --text: #4a4a4a;
-  --textLight: #777;
-  --border: #e0d5c5;
-  --shadow: rgba(0,0,0,0.08);
-  --catOrange: #ffa052;
-  --catGray: #9fa8b8;
-  --catBlack: #3a3a3a;
-  --catWhite: #fdfdfd;
-  --catBrown: #8d6e63;
-  --catCream: #ffe0b2;
-  --catBlue: #7986cb;
-  --catPink: #f8bbd0;
+  --cream:#FFF8F0;--pink:#FF6B9D;--pink-light:#FFB3D0;
+  --purple:#9B59B6;--purple-dark:#6C3483;
+  --gold:#F4D03F;--gold-dark:#D4AC0D;
+  --brown:#8B5A2B;--dark:#2C1810;
+  --green:#27AE60;--blue:#3498DB;--orange:#E67E22;
+  --red:#E74C3C;--teal:#1ABC9C;--gray:#95A5A6;
+  --common-color:#7FB069;--special-color:#4A90D9;
+  --rare-color:#9B59B6;--ultra-color:#F39C12;
 }
-
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); }
-
-/* ===== LAYOUT ===== */
-#game { width: 100%; height: 100%; display: flex; flex-direction: column; max-width: 900px; margin: 0 auto; position: relative; }
-header { background: linear-gradient(135deg, var(--accent), #ff6f7a); color: white; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px var(--shadow); z-index: 100; }
-header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.5px; }
-header .stats { display: flex; gap: 12px; font-size: 0.85rem; }
-header .stat { background: rgba(255,255,255,0.25); padding: 4px 10px; border-radius: 12px; font-weight: 600; }
-
-#screen-container { flex: 1; overflow-y: auto; position: relative; background: var(--bg); }
-.screen { display: none; width: 100%; min-height: 100%; padding: 16px; animation: fadeIn 0.3s ease; }
-.screen.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ===== NAVIGATION ===== */
-nav { background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 6px 0; z-index: 100; }
-nav button { background: none; border: none; font-size: 0.75rem; color: var(--textLight); display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; padding: 4px 8px; border-radius: 12px; transition: all 0.2s; }
-nav button .icon { font-size: 1.4rem; }
-nav button.active { color: var(--accent); background: rgba(255,140,148,0.1); }
-nav button:hover { color: var(--accent); }
-
-/* ===== CARDS & PANELS ===== */
-.card { background: var(--panel); border-radius: 16px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 6px var(--shadow); border: 1px solid var(--border); }
-.card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; color: var(--text); display: flex; align-items: center; gap: 6px; }
-.btn { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: transform 0.1s, box-shadow 0.2s; display: inline-flex; align-items: center; gap: 4px; }
-.btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,140,148,0.3); }
-.btn:active { transform: scale(0.97); }
-.btn.secondary { background: var(--accent2); }
-.btn.small { padding: 5px 10px; font-size: 0.75rem; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-/* ===== CAT SPRITE SYSTEM ===== */
-.cat-sprite { position: relative; width: 90px; height: 110px; display: inline-block; flex-shrink: 0; cursor: pointer; transition: transform 0.2s; }
-.cat-sprite:hover { transform: scale(1.08); }
-.cat-sprite .cs-body { position: absolute; width: 64px; height: 52px; background: var(--fur); border-radius: 50% 50% 45% 45%; top: 48px; left: 13px; transition: all 0.3s; z-index: 2; }
-.cat-sprite .cs-head { position: absolute; width: 52px; height: 46px; background: var(--fur); border-radius: 50% 50% 42% 42%; top: 14px; left: 19px; z-index: 3; }
-.cat-sprite .cs-ear { position: absolute; width: 16px; height: 20px; background: var(--fur); top: 6px; z-index: 1; }
-.cat-sprite .cs-ear.left { left: 18px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); transform: rotate(-12deg); }
-.cat-sprite .cs-ear.right { right: 18px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); transform: rotate(12deg); }
-.cat-sprite .cs-ear.rounded { clip-path: ellipse(50% 45% at 50% 50%); height: 14px; top: 10px; }
-.cat-sprite .cs-ear.folded { clip-path: polygon(20% 50%, 0% 100%, 100% 100%); transform: rotate(-35deg); height: 14px; top: 14px; }
-.cat-sprite .cs-ear.curled { clip-path: ellipse(45% 40% at 50% 80%); width: 14px; transform: rotate(-20deg); }
-.cat-sprite .cs-eye { position: absolute; width: 9px; height: 9px; background: white; border-radius: 50%; top: 28px; z-index: 4; overflow: hidden; }
-.cat-sprite .cs-eye.left { left: 26px; }
-.cat-sprite .cs-eye.right { right: 26px; }
-.cat-sprite .cs-eye::after { content: ''; position: absolute; width: 5px; height: 7px; background: var(--eye); border-radius: 50%; top: 1px; left: 2px; }
-.cat-sprite .cs-eye.blink { height: 1px; top: 32px; }
-.cat-sprite .cs-nose { position: absolute; width: 7px; height: 5px; background: var(--nose); border-radius: 40% 40% 50% 50%; top: 38px; left: 41px; z-index: 4; }
-.cat-sprite .cs-mouth { position: absolute; width: 12px; height: 6px; border-bottom: 2px solid var(--nose); border-radius: 0 0 50% 50%; top: 40px; left: 38px; z-index: 4; opacity: 0.6; }
-.cat-sprite .cs-tail { position: absolute; width: 36px; height: 9px; background: var(--fur); border-radius: 4px; top: 68px; right: -2px; transform-origin: left center; animation: tailWag 3.5s ease-in-out infinite; z-index: 1; }
-.cat-sprite .cs-paw { position: absolute; width: 10px; height: 8px; background: var(--fur); border-radius: 50%; bottom: 2px; z-index: 2; }
-.cat-sprite .cs-paw.left { left: 22px; }
-.cat-sprite .cs-paw.right { right: 22px; }
-
-/* Patterns */
-.cat-sprite.pattern-tabby .cs-body::before, 
-.cat-sprite.pattern-tabby .cs-head::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent, transparent 7px, var(--fur-dark) 7px, var(--fur-dark) 11px); opacity: 0.35; border-radius: inherit; pointer-events: none; }
-.cat-sprite.pattern-tabby .cs-tail { background: repeating-linear-gradient(90deg, var(--fur), var(--fur) 4px, var(--fur-dark) 4px, var(--fur-dark) 7px); }
-
-.cat-sprite.pattern-bicolor .cs-body::after { content: ''; position: absolute; bottom: 0; left: 8%; width: 84%; height: 45%; background: white; border-radius: 50% 50% 40% 40%; opacity: 0.92; pointer-events: none; }
-.cat-sprite.pattern-bicolor .cs-head::after { content: ''; position: absolute; bottom: 0; right: 0; width: 55%; height: 50%; background: white; border-radius: 0 0 50% 40%; opacity: 0.92; pointer-events: none; }
-
-.cat-sprite.pattern-colorpoint .cs-head { background: linear-gradient(to bottom, var(--fur-dark) 25%, var(--fur) 75%); }
-.cat-sprite.pattern-colorpoint .cs-ear { background: var(--fur-dark); }
-.cat-sprite.pattern-colorpoint .cs-tail { background: var(--fur-dark); }
-.cat-sprite.pattern-colorpoint .cs-paw { background: var(--fur-dark); }
-
-.cat-sprite.pattern-calico .cs-body { background: linear-gradient(135deg, var(--fur) 40%, var(--fur2) 40%, var(--fur2) 70%, white 70%); }
-.cat-sprite.pattern-calico .cs-head { background: linear-gradient(90deg, var(--fur) 50%, white 50%); }
-
-.cat-sprite.pattern-tortie .cs-body { background: linear-gradient(45deg, var(--fur) 30%, var(--fur2) 30%, var(--fur2) 60%, var(--fur) 60%, var(--fur) 80%, var(--fur2) 80%); }
-
-/* Fluff / Long Hair */
-.cat-sprite.fluffy .cs-body { box-shadow: 0 0 10px 5px var(--fur); }
-.cat-sprite.fluffy .cs-tail { height: 13px; box-shadow: 0 0 8px 3px var(--fur); animation-duration: 5s; }
-.cat-sprite.fluffy .cs-head { box-shadow: 0 0 6px 3px var(--fur); }
-
-/* Slim / Svelte */
-.cat-sprite.slim .cs-body { width: 54px; height: 58px; left: 18px; border-radius: 45% 45% 50% 50%; }
-
-/* Cobby / Chunky */
-.cat-sprite.cobby .cs-body { width: 72px; height: 48px; left: 9px; border-radius: 55% 55% 40% 40%; }
-.cat-sprite.cobby .cs-head { width: 56px; height: 48px; left: 17px; }
-
-/* Flat face (Persian) */
-.cat-sprite.flatface .cs-head { border-radius: 45% 45% 40% 40%; height: 44px; }
-.cat-sprite.flatface .cs-nose { top: 36px; width: 8px; height: 6px; }
-
-/* Wedge face (Siamese/Oriental) */
-.cat-sprite.wedgeface .cs-head { clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); border-radius: 0; height: 50px; }
-
-/* Accessories */
-.cat-sprite .acc-hat { position: absolute; z-index: 5; pointer-events: none; }
-.cat-sprite .acc-hat.bow { top: 2px; left: 32px; width: 18px; height: 10px; background: #ff69b4; border-radius: 50%; box-shadow: 0 0 0 2px white; }
-.cat-sprite .acc-hat.flower { top: 0px; left: 30px; width: 20px; height: 20px; background: #ffd700; border-radius: 50%; box-shadow: 6px 0 0 -4px #ff8c00, -6px 0 0 -4px #ff8c00, 0 6px 0 -4px #ff8c00, 0 -6px 0 -4px #ff8c00; }
-.cat-sprite .acc-hat.cowboy { top: -2px; left: 24px; width: 30px; height: 14px; background: #8d6e63; border-radius: 4px 4px 0 0; }
-.cat-sprite .acc-hat.cowboy::after { content: ''; position: absolute; top: 10px; left: -4px; width: 38px; height: 4px; background: #6d4c41; border-radius: 2px; }
-.cat-sprite .acc-hat.wizard { top: -4px; left: 28px; width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-bottom: 24px solid #673ab7; }
-.cat-sprite .acc-hat.wizard::after { content: ''; position: absolute; top: 20px; left: -4px; width: 8px; height: 8px; background: #ffd700; border-radius: 50%; }
-.cat-sprite .acc-collar { position: absolute; top: 54px; left: 28px; width: 34px; height: 5px; background: var(--collar); border-radius: 3px; z-index: 3; }
-.cat-sprite .acc-collar::after { content: ''; position: absolute; top: 2px; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; background: gold; border-radius: 50%; }
-.cat-sprite .acc-glasses { position: absolute; top: 26px; left: 24px; width: 42px; height: 14px; z-index: 5; pointer-events: none; }
-.cat-sprite .acc-glasses::before, .cat-sprite .acc-glasses::after { content: ''; position: absolute; width: 16px; height: 12px; border: 2px solid #333; border-radius: 4px; background: rgba(255,255,255,0.2); top: 0; }
-.cat-sprite .acc-glasses::before { left: 0; }
-.cat-sprite .acc-glasses::after { right: 0; }
-
-/* Animations */
-@keyframes tailWag { 0%, 100% { transform: rotate(-15deg); } 50% { transform: rotate(30deg); } }
-@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
-@keyframes sleep { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
-.cat-sprite.sleeping { animation: sleep 3s ease-in-out infinite; opacity: 0.8; }
-.cat-sprite.sleeping .cs-eye { height: 2px; top: 31px; }
-.cat-sprite.playing { animation: bounce 0.6s ease-in-out infinite; }
-
-/* ===== FARM VIEW ===== */
-#farm-yard { position: relative; width: 100%; height: 380px; background: linear-gradient(to bottom, #c8e6c9 0%, #a5d6a7 60%, #81c784 100%); border-radius: 20px; overflow: hidden; border: 2px solid var(--border); margin-bottom: 12px; }
-#farm-yard .yard-sky { position: absolute; top: 10px; right: 20px; font-size: 2.5rem; opacity: 0.8; }
-#farm-yard .yard-cloud { position: absolute; background: white; border-radius: 20px; opacity: 0.7; animation: floatCloud 20s linear infinite; }
-@keyframes floatCloud { from { transform: translateX(-100px); } to { transform: translateX(calc(100vw + 100px)); } }
-#farm-yard .building { position: absolute; cursor: pointer; transition: transform 0.2s; text-align: center; }
-#farm-yard .building:hover { transform: scale(1.05); }
-#farm-yard .building .b-icon { font-size: 2.8rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
-#farm-yard .building .b-label { font-size: 0.7rem; font-weight: 700; background: rgba(255,255,255,0.85); padding: 2px 6px; border-radius: 8px; margin-top: -4px; display: inline-block; }
-#farm-yard .roaming-cat { position: absolute; transition: all 2.5s ease-in-out; cursor: pointer; z-index: 10; }
-#farm-yard .roaming-cat:hover { z-index: 20; }
-#farm-yard .cat-bubble { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: white; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; white-space: nowrap; box-shadow: 0 2px 4px var(--shadow); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-#farm-yard .roaming-cat:hover .cat-bubble { opacity: 1; }
-
-.yard-grass { position: absolute; bottom: 0; width: 100%; height: 30px; background: repeating-linear-gradient(90deg, #66bb6a, #66bb6a 2px, #81c784 2px, #81c784 8px); opacity: 0.5; }
-
-/* ===== CATTERY GRID ===== */
-.cattery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
-.cat-card { background: white; border-radius: 14px; padding: 8px; text-align: center; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; position: relative; }
-.cat-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 12px var(--shadow); }
-.cat-card.selected { border-color: var(--accent); background: rgba(255,140,148,0.08); }
-.cat-card .cc-sprite { margin: 0 auto 6px; transform: scale(0.85); }
-.cat-card .cc-name { font-size: 0.8rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cat-card .cc-breed { font-size: 0.65rem; color: var(--textLight); margin-top: 2px; }
-.cat-card .cc-tags { display: flex; gap: 3px; justify-content: center; margin-top: 4px; flex-wrap: wrap; }
-.cat-card .tag { font-size: 0.6rem; padding: 1px 5px; border-radius: 6px; background: var(--bg); color: var(--textLight); }
-.cat-card .tag.kitten { background: var(--accent3); color: #2e7d5a; }
-.cat-card .tag.adult { background: #bbdefb; color: #1565c0; }
-.cat-card .tag.senior { background: #ffe0b2; color: #e65100; }
-.cat-card .tag.sick { background: #ffcdd2; color: #c62828; }
-
-/* ===== CLINIC ===== */
-.clinic-waiting { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; }
-.clinic-patient { background: white; border-radius: 16px; padding: 12px; min-width: 140px; text-align: center; border: 2px solid var(--border); cursor: pointer; transition: all 0.2s; }
-.clinic-patient:hover { border-color: var(--accent2); }
-.clinic-patient .symptom { font-size: 1.8rem; margin: 6px 0; }
-.clinic-patient .symptom-name { font-size: 0.8rem; font-weight: 600; color: var(--text); }
-.clinic-exam { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-.treatment-btn { background: white; border: 2px solid var(--border); border-radius: 12px; padding: 12px; cursor: pointer; text-align: center; transition: all 0.2s; }
-.treatment-btn:hover { border-color: var(--accent2); background: rgba(136,216,176,0.1); }
-.treatment-btn .tx-icon { font-size: 1.6rem; display: block; margin-bottom: 4px; }
-.treatment-btn .tx-name { font-size: 0.8rem; font-weight: 600; }
-
-/* ===== CAT DETAIL ===== */
-#cat-detail-view { display: flex; flex-direction: column; align-items: center; padding: 20px; }
-#cat-detail-view .big-cat { transform: scale(1.6); margin: 20px 0; }
-#cat-detail-view .detail-name { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; text-align: center; }
-#cat-detail-view .detail-breed { font-size: 0.85rem; color: var(--textLight); margin-bottom: 16px; text-align: center; }
-#cat-detail-view .detail-stats { width: 100%; max-width: 320px; margin-bottom: 16px; }
-.stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem; }
-.stat-bar { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; margin: 0 10px; overflow: hidden; }
-.stat-bar .fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
-.stat-bar .fill.health { background: #ef5350; }
-.stat-bar .fill.hunger { background: #ffa726; }
-.stat-bar .fill.happy { background: #66bb6a; }
-.stat-bar .fill.energy { background: #42a5f5; }
-
-.dna-helix { display: flex; flex-direction: column; gap: 4px; width: 100%; max-width: 320px; margin: 12px 0; }
-.dna-row { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
-.dna-row .dna-label { width: 80px; text-align: right; color: var(--textLight); }
-.dna-row .dna-bar { flex: 1; height: 18px; background: var(--bg); border-radius: 9px; overflow: hidden; display: flex; }
-.dna-row .dna-seg { height: 100%; transition: width 0.5s; }
-.dna-row .dna-seg.dom { opacity: 1; }
-.dna-row .dna-seg.rec { opacity: 0.5; }
-
-.accessory-row { display: flex; gap: 8px; overflow-x: auto; padding: 8px 0; }
-.acc-option { min-width: 60px; height: 60px; background: white; border: 2px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; cursor: pointer; transition: all 0.2s; }
-.acc-option:hover { border-color: var(--accent); }
-.acc-option.equipped { border-color: var(--accent); background: rgba(255,140,148,0.1); }
-
-/* ===== LAB / BREEDING ===== */
-.breed-pair { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 16px 0; }
-.breed-pair .plus { font-size: 1.5rem; color: var(--textLight); }
-.breed-slot { width: 100px; height: 120px; background: white; border: 2px dashed var(--border); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
-.breed-slot:hover { border-color: var(--accent); }
-.breed-slot.filled { border-style: solid; border-color: var(--accent); }
-.breed-slot .slot-label { font-size: 0.75rem; color: var(--textLight); margin-top: 4px; }
-
-.offspring-preview { background: white; border-radius: 16px; padding: 16px; text-align: center; margin-top: 12px; }
-.offspring-preview .preview-cat { transform: scale(1.2); margin: 10px auto; }
-
-/* ===== MODALS & TOASTS ===== */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-.modal-overlay.active { display: flex; }
-.modal-box { background: var(--panel); border-radius: 20px; padding: 24px; max-width: 400px; width: 100%; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: popIn 0.3s; }
-@keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; }
-.toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px); background: #333; color: white; padding: 10px 20px; border-radius: 20px; font-size: 0.85rem; opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 2000; }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-/* ===== UTILITIES ===== */
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.gap-2 { gap: 8px; }
-.gap-4 { gap: 16px; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.text-center { text-align: center; }
-.mt-2 { margin-top: 8px; }
-.mt-4 { margin-top: 16px; }
-.mb-2 { margin-bottom: 8px; }
-.w-full { width: 100%; }
-.scroll-x { overflow-x: auto; }
-.hide-scrollbar::-webkit-scrollbar { display: none; }
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 480px) {
-  header h1 { font-size: 0.95rem; }
-  .cat-sprite { transform: scale(0.9); }
-  #farm-yard { height: 300px; }
-  .cattery-grid { grid-template-columns: repeat(3, 1fr); }
-}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Georgia',serif;background:var(--cream);min-height:100vh;overflow:hidden;user-select:none;}
+#loading-screen{position:fixed;inset:0;background:linear-gradient(135deg,#FFB3D0 0%,#9B59B6 50%,#2C1810 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.5s;}
+#loading-screen h1{font-size:3.5rem;color:white;text-shadow:0 4px 20px rgba(0,0,0,0.3);animation:pawBounce 0.8s infinite alternate;}
+#loading-screen p{color:#FFE0ED;font-size:1.2rem;margin-top:10px;}
+#loading-bar-outer{width:300px;height:20px;background:rgba(255,255,255,0.2);border-radius:10px;margin-top:30px;overflow:hidden;}
+#loading-bar{height:100%;width:0%;background:var(--gold);border-radius:10px;transition:width 0.1s;}
+@keyframes pawBounce{from{transform:translateY(0)}to{transform:translateY(-10px)}}
+#game-container{width:100vw;height:100vh;display:flex;flex-direction:column;}
+#hud{background:linear-gradient(135deg,var(--dark) 0%,var(--purple-dark) 100%);color:white;padding:8px 16px;display:flex;align-items:center;gap:12px;border-bottom:3px solid var(--gold);flex-shrink:0;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.3);}
+#hud .game-title{font-size:1.3rem;font-weight:bold;background:linear-gradient(to right,var(--gold),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;flex-shrink:0;}
+.hud-stat{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.1);border-radius:20px;padding:3px 10px;font-size:0.85rem;}
+.hud-stat .val{font-weight:bold;color:var(--gold);}
+#hud-day{margin-left:auto;font-size:0.8rem;color:var(--pink-light);}
+#nav-tabs{background:var(--dark);display:flex;gap:0;flex-shrink:0;border-bottom:3px solid var(--gold);overflow-x:auto;}
+.nav-tab{padding:9px 15px;color:#ccc;cursor:pointer;font-size:0.85rem;white-space:nowrap;border-right:1px solid rgba(255,255,255,0.1);transition:all 0.2s;flex-shrink:0;}
+.nav-tab:hover{background:rgba(255,255,255,0.1);color:white;}
+.nav-tab.active{background:var(--gold);color:var(--dark);font-weight:bold;}
+#main-content{flex:1;overflow:hidden;position:relative;}
+.panel{position:absolute;inset:0;display:none;overflow:hidden;}
+.panel.active{display:flex;}
+#panel-world{flex-direction:column;}
+#world-header{background:linear-gradient(135deg,var(--purple-dark),var(--dark));color:white;padding:8px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-bottom:2px solid var(--gold);flex-wrap:wrap;}
+#world-selector{display:flex;gap:5px;flex-wrap:wrap;}
+.world-btn{padding:4px 10px;border-radius:20px;border:2px solid transparent;cursor:pointer;font-size:0.75rem;font-weight:bold;transition:all 0.2s;}
+.world-btn.active,.world-btn:hover{border-color:var(--gold);}
+#world-canvas-wrapper{flex:1;position:relative;overflow:hidden;}
+#world-canvas{width:100%;height:100%;display:block;}
+#panel-cattery{flex-direction:column;background:linear-gradient(135deg,#FFF5F8,#F3E5F5);}
+#cattery-top{padding:10px 14px;background:linear-gradient(135deg,var(--pink),var(--purple));color:white;flex-shrink:0;}
+#cattery-top h2{font-size:1.2rem;}
+#cattery-filters{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap;}
+.filter-btn{padding:4px 11px;border-radius:20px;border:2px solid rgba(255,255,255,0.5);color:white;cursor:pointer;font-size:0.75rem;transition:all 0.2s;background:transparent;}
+.filter-btn.active{background:white;color:var(--purple);border-color:white;}
+#cat-grid{flex:1;overflow-y:auto;padding:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;align-content:start;}
+.cat-card{background:white;border-radius:14px;padding:10px 7px;text-align:center;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.1);border:3px solid transparent;position:relative;}
+.cat-card:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,0.15);}
+.cat-card canvas{display:block;margin:0 auto 6px;}
+.cat-name{font-size:0.72rem;font-weight:bold;color:var(--dark);}
+.cat-breed-name{font-size:0.62rem;color:var(--gray);margin-top:2px;}
+.cat-rarity-badge{position:absolute;top:5px;right:5px;font-size:0.58rem;font-weight:bold;border-radius:8px;padding:2px 5px;color:white;}
+.rarity-common .cat-rarity-badge{background:var(--common-color);}
+.rarity-special .cat-rarity-badge{background:var(--special-color);}
+.rarity-rare .cat-rarity-badge{background:var(--rare-color);}
+.rarity-ultra .cat-rarity-badge{background:linear-gradient(135deg,#F39C12,#E74C3C);}
+#panel-breeding{flex-direction:column;background:linear-gradient(135deg,#FFF8E7,#FFF3F8);}
+#breeding-top{padding:10px 14px;background:linear-gradient(135deg,var(--orange),var(--pink));color:white;flex-shrink:0;}
+#breeding-arena{display:flex;align-items:center;justify-content:center;gap:16px;padding:14px;flex-shrink:0;}
+.breed-slot{width:150px;height:185px;background:white;border-radius:18px;border:3px dashed #ccc;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 10px rgba(0,0,0,0.08);}
+.breed-slot:hover{border-color:var(--pink);}
+.breed-slot.filled{border-style:solid;border-color:var(--purple);}
+.breed-slot p{font-size:0.7rem;color:var(--gray);margin-top:7px;text-align:center;padding:0 6px;}
+.breed-heart{font-size:2rem;animation:heartbeat 1s infinite;}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+#breed-btn{padding:10px 24px;background:linear-gradient(135deg,var(--pink),var(--purple));color:white;border:none;border-radius:22px;font-size:0.95rem;font-weight:bold;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(155,89,182,0.4);}
+#breed-btn:hover{transform:scale(1.05);}
+#breed-btn:disabled{background:var(--gray);cursor:not-allowed;transform:none;}
+#breeding-result{text-align:center;padding:0 14px;flex-shrink:0;}
+#breeding-cats-list{flex:1;overflow-y:auto;padding:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:7px;}
+.breed-select-card{background:white;border-radius:10px;padding:7px 5px;text-align:center;cursor:pointer;transition:all 0.2s;border:2px solid transparent;box-shadow:0 2px 6px rgba(0,0,0,0.08);}
+.breed-select-card:hover{border-color:var(--pink);}
+.breed-select-card.selected{border-color:var(--purple);background:#F3E5F5;}
+.breed-select-card canvas{margin:0 auto 3px;display:block;}
+.breed-select-card p{font-size:0.62rem;color:var(--dark);}
+#panel-customize{flex-direction:row;overflow:hidden;background:#FFF5F8;}
+#customize-preview{width:260px;flex-shrink:0;background:linear-gradient(135deg,var(--purple-dark),var(--dark));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px;}
+#customize-preview canvas{border-radius:18px;}
+#customize-preview h3{color:white;font-size:1rem;}
+#customize-options{flex:1;overflow-y:auto;padding:14px;}
+.customize-section{margin-bottom:18px;}
+.customize-section h4{font-size:0.85rem;font-weight:bold;color:var(--purple-dark);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--pink-light);}
+.color-grid{display:flex;flex-wrap:wrap;gap:7px;}
+.color-swatch{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.2s;flex-shrink:0;}
+.color-swatch.selected{border-color:var(--dark);transform:scale(1.2);}
+.options-grid{display:flex;flex-wrap:wrap;gap:7px;}
+.option-btn{padding:5px 12px;border-radius:18px;border:2px solid #ddd;cursor:pointer;font-size:0.75rem;transition:all 0.2s;background:white;color:var(--dark);}
+.option-btn.selected{background:var(--purple);color:white;border-color:var(--purple);}
+.outfit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(75px,1fr));gap:7px;}
+.outfit-item{background:white;border-radius:10px;border:2px solid #eee;padding:7px 3px;text-align:center;cursor:pointer;transition:all 0.2s;font-size:0.65rem;}
+.outfit-item:hover{border-color:var(--pink);}
+.outfit-item.selected{border-color:var(--purple);background:#F3E5F5;}
+.outfit-item .outfit-icon{font-size:1.4rem;display:block;margin-bottom:3px;}
+#save-customize-btn{width:100%;padding:10px;background:linear-gradient(135deg,var(--pink),var(--purple));color:white;border:none;border-radius:13px;font-size:0.95rem;font-weight:bold;cursor:pointer;margin-top:10px;transition:all 0.2s;}
+#save-customize-btn:hover{opacity:0.9;transform:scale(1.02);}
+#panel-shop{flex-direction:column;background:linear-gradient(135deg,#FFF8E7,#FFF);}
+#shop-top{padding:10px 14px;background:linear-gradient(135deg,var(--gold-dark),var(--orange));color:white;flex-shrink:0;}
+#shop-grid{flex:1;overflow-y:auto;padding:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;align-content:start;}
+.shop-item{background:white;border-radius:14px;padding:14px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.08);border:2px solid #eee;}
+.shop-item-icon{font-size:2.2rem;}
+.shop-item h4{font-size:0.8rem;color:var(--dark);margin:7px 0 3px;}
+.shop-item p{font-size:0.68rem;color:var(--gray);margin-bottom:7px;}
+.shop-buy-btn{padding:5px 14px;border-radius:18px;border:none;background:var(--gold);color:var(--dark);cursor:pointer;font-weight:bold;font-size:0.75rem;transition:all 0.2s;}
+.shop-buy-btn:hover{background:var(--gold-dark);transform:scale(1.05);}
+#panel-vet{flex-direction:column;background:#F0FFF4;}
+#vet-top{padding:10px 14px;background:linear-gradient(135deg,var(--green),var(--teal));color:white;flex-shrink:0;}
+#vet-content{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.vet-case{background:white;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.08);border-left:5px solid var(--green);display:flex;align-items:center;gap:10px;}
+.vet-case.urgent{border-left-color:var(--red);}
+.vet-case canvas{flex-shrink:0;}
+.vet-case-info{flex:1;}
+.vet-case-info h4{font-size:0.85rem;color:var(--dark);}
+.vet-case-info p{font-size:0.72rem;color:var(--gray);margin-top:3px;}
+.health-bar{height:8px;background:#eee;border-radius:4px;margin-top:5px;overflow:hidden;}
+.health-fill{height:100%;border-radius:4px;transition:width 0.3s;}
+.treat-btn{padding:7px 14px;border-radius:18px;border:none;background:var(--green);color:white;cursor:pointer;font-size:0.75rem;font-weight:bold;white-space:nowrap;transition:all 0.2s;}
+.treat-btn:hover{background:var(--teal);}
+.treat-btn:disabled{background:var(--gray);cursor:not-allowed;}
+#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:1000;padding:14px;}
+#modal-overlay.open{display:flex;}
+#modal-box{background:white;border-radius:22px;max-width:440px;width:100%;max-height:80vh;overflow-y:auto;padding:20px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modalPop 0.3s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes modalPop{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+#modal-close{position:absolute;top:10px;right:14px;font-size:1.4rem;cursor:pointer;color:var(--gray);background:none;border:none;line-height:1;}
+#modal-close:hover{color:var(--dark);}
+#modal-title{font-size:1.3rem;color:var(--purple-dark);margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.modal-cat-display{text-align:center;margin-bottom:14px;}
+.modal-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.modal-stat{background:#f8f8f8;border-radius:10px;padding:8px;font-size:0.75rem;}
+.modal-stat label{color:var(--gray);display:block;margin-bottom:3px;}
+.stat-bar{height:9px;background:#eee;border-radius:4px;overflow:hidden;margin-top:3px;}
+.stat-fill{height:100%;border-radius:4px;}
+.modal-actions{display:flex;flex-direction:column;gap:7px;}
+.modal-btn{padding:10px;border-radius:13px;border:none;cursor:pointer;font-size:0.85rem;font-weight:bold;transition:all 0.2s;}
+.modal-btn:hover{opacity:0.9;transform:scale(1.02);}
+.btn-feed{background:linear-gradient(135deg,#FF9800,#F57C00);color:white;}
+.btn-play{background:linear-gradient(135deg,var(--blue),#1565C0);color:white;}
+.btn-groom{background:linear-gradient(135deg,var(--pink),var(--purple));color:white;}
+.btn-adopt{background:linear-gradient(135deg,var(--green),var(--teal));color:white;}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--dark);color:white;padding:10px 22px;border-radius:28px;font-size:0.85rem;z-index:2000;transition:transform 0.3s;white-space:nowrap;box-shadow:0 8px 25px rgba(0,0,0,0.3);}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#breed-result-card{display:none;text-align:center;padding:14px;background:linear-gradient(135deg,#FFF8E7,#F3E5F5);border-radius:18px;border:2px solid var(--gold);margin:0 14px;flex-shrink:0;}
+#breed-result-card h3{color:var(--purple-dark);margin-bottom:7px;}
+#breed-result-card canvas{margin:0 auto;display:block;}
+#breed-result-card p{color:var(--gray);font-size:0.75rem;margin-top:5px;}
+#add-offspring-btn{margin-top:8px;padding:7px 18px;background:linear-gradient(135deg,var(--green),var(--teal));color:white;border:none;border-radius:18px;cursor:pointer;font-weight:bold;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:#f1f1f1;border-radius:3px;}
+::-webkit-scrollbar-thumb{background:var(--pink-light);border-radius:3px;}
 </style>
 </head>
 <body>
-<div id="game">
-  <header>
-    <h1>🐱 Julie's Cattery</h1>
-    <div class="stats">
-      <div class="stat" id="stat-money">💰 $<span>500</span></div>
-      <div class="stat" id="stat-rep">⭐ <span>0</span></div>
-      <div class="stat" id="stat-day">📅 Day <span>1</span></div>
-    </div>
-  </header>
-
-  <div id="screen-container">
-    <!-- ===== FARM SCREEN ===== -->
-    <div id="screen-farm" class="screen active">
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <div class="card-title">🏡 <span id="farm-name-display">Julie's Farm</span></div>
-          <button class="btn small" onclick="editFarmName()">✏️ Rename</button>
-        </div>
-        <div id="farm-yard">
-          <div class="yard-sky">☀️</div>
-          <div class="yard-cloud" style="width:60px; height:30px; top:20px; animation-duration:25s;"></div>
-          <div class="yard-cloud" style="width:40px; height:20px; top:50px; animation-duration:35s; animation-delay:-10s;"></div>
-          <div class="building" style="bottom:40px; left:10%;" onclick="UIManager.showScreen('cattery')">
-            <div class="b-icon">🏠</div>
-            <div class="b-label">Cattery</div>
-          </div>
-          <div class="building" style="bottom:40px; right:10%;" onclick="UIManager.showScreen('clinic')">
-            <div class="b-icon">🏥</div>
-            <div class="b-label">Clinic</div>
-          </div>
-          <div class="building" style="bottom:120px; left:35%;" onclick="UIManager.showScreen('lab')">
-            <div class="b-icon">🔬</div>
-            <div class="b-label">Lab</div>
-          </div>
-          <div class="yard-grass"></div>
-          <div id="roaming-cats"></div>
-        </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn" onclick="Game.nextDay()">🌙 End Day</button>
-          <button class="btn secondary" onclick="Game.buyRandomCat()">🐈 Adopt Cat ($150)</button>
-          <button class="btn secondary" onclick="UIManager.showScreen('cattery')">🧬 Breed Cats</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">📋 Farm Log</div>
-        <div id="farm-log" style="font-size:0.85rem; color:var(--textLight); max-height:120px; overflow-y:auto;">
-          <div>Welcome to your new cattery, Julie! 🐾</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== CATTERY SCREEN ===== -->
-    <div id="screen-cattery" class="screen">
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <div class="card-title">🏠 The Cattery (<span id="cat-count">0</span>/<span id="cat-max">10</span>)</div>
-          <div style="display:flex; gap:6px;">
-            <button class="btn small" onclick="CatteryManager.feedAll()">🍖 Feed All</button>
-            <button class="btn small secondary" onclick="CatteryManager.clearSelection()">Clear</button>
-          </div>
-        </div>
-        <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
-          <button class="btn small" onclick="CatteryManager.filter='all'; CatteryManager.render()">All</button>
-          <button class="btn small" onclick="CatteryManager.filter='kitten'; CatteryManager.render()">Kittens</button>
-          <button class="btn small" onclick="CatteryManager.filter='adult'; CatteryManager.render()">Adults</button>
-          <button class="btn small" onclick="CatteryManager.filter='senior'; CatteryManager.render()">Seniors</button>
-          <button class="btn small" onclick="CatteryManager.filter='purebred'; CatteryManager.render()">Purebred</button>
-          <button class="btn small" onclick="CatteryManager.filter='crossbreed'; CatteryManager.render()">Crossbreed</button>
-          <button class="btn small" onclick="CatteryManager.filter='sick'; CatteryManager.render()">Sick</button>
-        </div>
-        <div class="cattery-grid" id="cattery-grid"></div>
-      </div>
-      <div class="card" id="breeding-panel" style="display:none;">
-        <div class="card-title">🧬 Breeding Station</div>
-        <div class="breed-pair">
-          <div class="breed-slot" id="breed-mom" onclick="CatteryManager.selectBreedParent('mom')"></div>
-          <div class="plus">+</div>
-          <div class="breed-slot" id="breed-dad" onclick="CatteryManager.selectBreedParent('dad')"></div>
-        </div>
-        <div class="text-center">
-          <button class="btn" id="breed-btn" onclick="CatteryManager.breed()" disabled>💕 Breed ($50)</button>
-        </div>
-        <div id="offspring-preview" style="display:none;"></div>
-      </div>
-    </div>
-
-    <!-- ===== CLINIC SCREEN ===== -->
-    <div id="screen-clinic" class="screen">
-      <div class="card">
-        <div class="card-title">🏥 Veterinary Clinic</div>
-        <p style="font-size:0.85rem; color:var(--textLight); margin-bottom:12px;">Treat sick cats to earn money and reputation. Correct diagnoses level up your vet skills!</p>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <div style="font-size:0.85rem; font-weight:600;">Waiting Room</div>
-          <button class="btn small" onclick="ClinicManager.newPatient()">📋 New Patient</button>
-        </div>
-        <div class="clinic-waiting hide-scrollbar" id="clinic-waiting"></div>
-      </div>
-      <div class="card" id="exam-panel" style="display:none;">
-        <div class="card-title">🔍 Examination</div>
-        <div id="exam-cat" class="text-center"></div>
-        <div id="exam-symptoms" style="margin:12px 0; font-size:0.9rem; text-align:center;"></div>
-        <div style="font-size:0.8rem; font-weight:600; margin-bottom:8px;">Choose Treatment:</div>
-        <div class="clinic-exam" id="treatment-options"></div>
-      </div>
-    </div>
-
-    <!-- ===== CAT DETAIL SCREEN ===== -->
-    <div id="screen-catdetail" class="screen">
-      <div id="cat-detail-view">
-        <button class="btn small" style="position:absolute; top:10px; left:10px;" onclick="UIManager.back()">← Back</button>
-        <div class="big-cat" id="detail-cat-sprite"></div>
-        <div class="detail-name" id="detail-name"></div>
-        <div class="detail-breed" id="detail-breed"></div>
-
-        <div class="detail-stats">
-          <div class="stat-row"><span>❤️ Health</span><div class="stat-bar"><div class="fill health" id="bar-health"></div></div><span id="val-health"></span></div>
-          <div class="stat-row"><span>🍗 Hunger</span><div class="stat-bar"><div class="fill hunger" id="bar-hunger"></div></div><span id="val-hunger"></span></div>
-          <div class="stat-row"><span>😊 Happy</span><div class="stat-bar"><div class="fill happy" id="bar-happy"></div></div><span id="val-happy"></span></div>
-          <div class="stat-row"><span>⚡ Energy</span><div class="stat-bar"><div class="fill energy" id="bar-energy"></div></div><span id="val-energy"></span></div>
-        </div>
-
-        <div class="card w-full">
-          <div class="card-title">🧬 DNA Profile</div>
-          <div class="dna-helix" id="detail-dna"></div>
-        </div>
-
-        <div class="card w-full">
-          <div class="card-title">🎩 Accessories</div>
-          <div style="font-size:0.8rem; color:var(--textLight); margin-bottom:6px;">Hats</div>
-          <div class="accessory-row hide-scrollbar" id="acc-hats"></div>
-          <div style="font-size:0.8rem; color:var(--textLight); margin:8px 0 6px;">Collars</div>
-          <div class="accessory-row hide-scrollbar" id="acc-collars"></div>
-        </div>
-
-        <div class="card w-full">
-          <div class="card-title">⚙️ Actions</div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn" onclick="CatDetailManager.pet()">🤍 Pet</button>
-            <button class="btn" onclick="CatDetailManager.feed()">🍖 Feed</button>
-            <button class="btn" onclick="CatDetailManager.treat()">💊 Treat</button>
-            <button class="btn secondary" onclick="CatDetailManager.rename()">✏️ Rename</button>
-            <button class="btn secondary" onclick="CatDetailManager.adoptOut()">🏠 Adopt Out ($<span id="adopt-price">100</span>)</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== LAB SCREEN ===== -->
-    <div id="screen-lab" class="screen">
-      <div class="card">
-        <div class="card-title">🔬 Genetics Lab</div>
-        <p style="font-size:0.85rem; color:var(--textLight); margin-bottom:12px;">Study breed genetics and track your crossbreeding discoveries.</p>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <div style="font-size:0.9rem; font-weight:700;">📚 Breed Encyclopedia</div>
-          <div style="font-size:0.8rem; color:var(--textLight);"><span id="unlocked-count">0</span>/<span id="total-breeds">0</span> Unlocked</div>
-        </div>
-        <div id="breed-encyclopedia" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:10px;"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">🏆 Reputation</div>
-        <div style="display:flex; gap:16px; margin-top:8px;">
-          <div style="flex:1; text-align:center;">
-            <div style="font-size:1.5rem;">🧬</div>
-            <div style="font-size:0.8rem; font-weight:600;">Breeder</div>
-            <div style="font-size:1.1rem; font-weight:700; color:var(--accent);" id="rep-breeder">0</div>
-          </div>
-          <div style="flex:1; text-align:center;">
-            <div style="font-size:1.5rem;">🏥</div>
-            <div style="font-size:0.8rem; font-weight:600;">Veterinarian</div>
-            <div style="font-size:1.1rem; font-weight:700; color:var(--accent2);" id="rep-vet">0</div>
-          </div>
-        </div>
-      </div>
-    </div>
+<div id="loading-screen">
+  <h1>🐱 Kitty Kingdoms</h1>
+  <p>Loading your purrfect world...</p>
+  <div id="loading-bar-outer"><div id="loading-bar"></div></div>
+</div>
+<div id="game-container" style="display:none;">
+  <div id="hud">
+    <div class="game-title">🐱 Kitty Kingdoms</div>
+    <div class="hud-stat"><span>🪙</span><span class="val" id="hud-coins">500</span></div>
+    <div class="hud-stat"><span>🐾</span><span class="val" id="hud-cats">0</span></div>
+    <div class="hud-stat"><span>🍣</span><span class="val" id="hud-food">20</span></div>
+    <div class="hud-stat"><span>💊</span><span class="val" id="hud-meds">5</span></div>
+    <div id="hud-day">Day <span id="day-count">1</span></div>
+    <button id="install-btn" onclick="installApp()" style="display:none;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;border:2px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer;font-size:0.75rem;font-weight:bold;flex-shrink:0;">📲 Install</button>
   </div>
-
-  <nav>
-    <button class="active" onclick="UIManager.showScreen('farm')">
-      <span class="icon">🏡</span>
-      <span>Farm</span>
-    </button>
-    <button onclick="UIManager.showScreen('cattery')">
-      <span class="icon">🏠</span>
-      <span>Cattery</span>
-    </button>
-    <button onclick="UIManager.showScreen('clinic')">
-      <span class="icon">🏥</span>
-      <span>Clinic</span>
-    </button>
-    <button onclick="UIManager.showScreen('lab')">
-      <span class="icon">🔬</span>
-      <span>Lab</span>
-    </button>
-  </nav>
-
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
-
-  <!-- Modal -->
-  <div class="modal-overlay" id="modal" onclick="if(event.target===this)UIManager.closeModal()">
-    <div class="modal-box" id="modal-content"></div>
+  <div id="nav-tabs">
+    <div class="nav-tab active" data-panel="world">🏠 Cat Cafe</div>
+    <div class="nav-tab" data-panel="cattery">🐱 My Cats</div>
+    <div class="nav-tab" data-panel="breeding">💕 Breed</div>
+    <div class="nav-tab" data-panel="customize">👗 Dress Up</div>
+    <div class="nav-tab" data-panel="vet">🏥 Vet</div>
+    <div class="nav-tab" data-panel="shop">🛒 Shop</div>
+  </div>
+  <div id="main-content">
+    <div class="panel active" id="panel-world">
+      <div id="world-header">
+        <span style="font-size:1rem;font-weight:bold;">🌍</span>
+        <div id="world-selector">
+          <button class="world-btn active" data-world="cafe" style="background:#8B5A2B;color:white;">☕ Cafe</button>
+          <button class="world-btn" data-world="garden" style="background:#2E7D32;color:white;">🌸 Garden</button>
+          <button class="world-btn" data-world="space" style="background:#1A237E;color:white;">🚀 Space</button>
+          <button class="world-btn" data-world="winter" style="background:#1565C0;color:white;">❄️ Winter</button>
+          <button class="world-btn" data-world="halloween" style="background:#6A1B9A;color:white;">🎃 Halloween</button>
+          <button class="world-btn" data-world="palace" style="background:#F57F17;color:white;">👑 Palace</button>
+        </div>
+      </div>
+      <div id="world-canvas-wrapper"><canvas id="world-canvas"></canvas></div>
+    </div>
+    <div class="panel" id="panel-cattery">
+      <div id="cattery-top">
+        <h2>🐱 My Cattery</h2>
+        <div id="cattery-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="common">Common</button>
+          <button class="filter-btn" data-filter="special">✨ Special</button>
+          <button class="filter-btn" data-filter="rare">💜 Rare</button>
+          <button class="filter-btn" data-filter="ultra">🌟 Ultra</button>
+        </div>
+      </div>
+      <div id="cat-grid"></div>
+    </div>
+    <div class="panel" id="panel-breeding">
+      <div id="breeding-top"><h2>💕 Breeding Den</h2><p style="font-size:0.8rem;opacity:0.9">Select two cats to breed!</p></div>
+      <div id="breeding-arena">
+        <div class="breed-slot" id="breed-slot-a" onclick="openBreedSelect('a')">
+          <span style="font-size:1.8rem">🐱</span><p>Tap to select<br>Parent A</p>
+        </div>
+        <div style="text-align:center">
+          <div class="breed-heart">💕</div>
+          <button id="breed-btn" onclick="doBreed()" disabled>Breed!</button>
+        </div>
+        <div class="breed-slot" id="breed-slot-b" onclick="openBreedSelect('b')">
+          <span style="font-size:1.8rem">🐱</span><p>Tap to select<br>Parent B</p>
+        </div>
+      </div>
+      <div id="breed-result-card">
+        <h3>🎉 New Kitten!</h3>
+        <canvas id="result-canvas" width="85" height="95"></canvas>
+        <p id="result-name"></p>
+        <p id="result-rarity" style="font-weight:bold;margin-top:3px;"></p>
+        <button id="add-offspring-btn" onclick="addOffspring()">Add to Cattery 🐱</button>
+      </div>
+      <div style="padding:7px 14px;font-weight:bold;color:var(--dark);font-size:0.85rem;">Select parent:</div>
+      <div id="breeding-cats-list"></div>
+    </div>
+    <div class="panel" id="panel-customize">
+      <div id="customize-preview">
+        <h3>🎨 Dress Up</h3>
+        <canvas id="customize-canvas" width="170" height="170" style="background:rgba(255,255,255,0.1);border-radius:18px;"></canvas>
+        <p style="color:#ccc;font-size:0.75rem;text-align:center;" id="customize-cat-name">Select a cat below</p>
+        <button id="save-customize-btn" onclick="saveCustomize()">💾 Save Look</button>
+      </div>
+      <div id="customize-options">
+        <div class="customize-section"><h4>🐱 Choose Cat</h4><div id="customize-cat-select" class="options-grid"></div></div>
+        <div class="customize-section"><h4>🎨 Body Color</h4><div class="color-grid" id="body-color-grid"></div></div>
+        <div class="customize-section"><h4>👁️ Eye Color</h4><div class="color-grid" id="eye-color-grid"></div></div>
+        <div class="customize-section"><h4>🦓 Stripe Pattern</h4><div class="options-grid" id="stripe-grid"></div></div>
+        <div class="customize-section"><h4>👒 Hats</h4><div class="outfit-grid" id="hat-grid"></div></div>
+        <div class="customize-section"><h4>👕 Outfits</h4><div class="outfit-grid" id="outfit-grid-items"></div></div>
+        <div class="customize-section"><h4>✨ Accessories</h4><div class="outfit-grid" id="accessory-grid"></div></div>
+      </div>
+    </div>
+    <div class="panel" id="panel-vet">
+      <div id="vet-top"><h2>🏥 Vet Clinic</h2><p style="font-size:0.8rem;opacity:0.9">Treat sick cats to earn coins!</p></div>
+      <div id="vet-content"></div>
+    </div>
+    <div class="panel" id="panel-shop">
+      <div id="shop-top"><h2>🛒 Cat Shop</h2><p style="font-size:0.8rem;opacity:0.9">Food, medicine & more!</p></div>
+      <div id="shop-grid"></div>
+    </div>
   </div>
 </div>
-
-<script>
-/* ============================================
-   JULIE'S CATTERY & CLINIC — GAME ENGINE
-   ============================================ */
-
-// ===== DATA =====
-const BREEDS = {
-  domestic: { name: "Domestic Shorthair", color: "#9fa8b8", pattern: "tabby", ear: "normal", face: "normal", body: "normal", fur: "short", eye: "#66bb6a", desc: "The classic house cat. Hardy, friendly, and full of surprises." },
-  siamese: { name: "Siamese", color: "#e0e0e0", pattern: "colorpoint", ear: "large", face: "wedge", body: "slim", fur: "short", eye: "#42a5f5", desc: "Vocal, intelligent, and strikingly beautiful with blue eyes." },
-  mainecoon: { name: "Maine Coon", color: "#8d6e63", pattern: "tabby", ear: "tufted", face: "normal", body: "cobby", fur: "long", eye: "#66bb6a", desc: "Gentle giants with luxurious coats and tufted ears." },
-  persian: { name: "Persian", color: "#fdfdfd", pattern: "solid", ear: "small", face: "flat", body: "cobby", fur: "long", eye: "#ffa726", desc: "Regal fluffballs with sweet personalities and flat faces." },
-  bengal: { name: "Bengal", color: "#d4a017", pattern: "tabby", ear: "normal", face: "normal", body: "slim", fur: "short", eye: "#66bb6a", desc: "Wild-looking spots and endless energy. Mini leopards!" },
-  scottishfold: { name: "Scottish Fold", color: "#c8bfb0", pattern: "solid", ear: "folded", face: "round", body: "cobby", fur: "short", eye: "#ffa726", desc: "Adorable folded ears and owl-like expressions." },
-  ragdoll: { name: "Ragdoll", color: "#e8d5c4", pattern: "colorpoint", ear: "normal", face: "round", body: "cobby", fur: "long", eye: "#42a5f5", desc: "Floppy, affectionate clouds with sapphire eyes." },
-  sphynx: { name: "Sphynx", color: "#ffe0b2", pattern: "solid", ear: "large", face: "normal", body: "slim", fur: "none", eye: "#ffa726", desc: "Hairless wonders. Warm, wrinkly, and full of love." },
-  abyssinian: { name: "Abyssinian", color: "#d4a017", pattern: "ticked", ear: "large", face: "normal", body: "slim", fur: "short", eye: "#66bb6a", desc: "Ancient breed with ticked coats and curious souls." },
-  russianblue: { name: "Russian Blue", color: "#7986cb", pattern: "solid", ear: "normal", face: "normal", body: "slim", fur: "short", eye: "#42a5f5", desc: "Silvery-blue coats and emerald eyes. Shy but loyal." },
-  norwegian: { name: "Norwegian Forest", color: "#fdfdfd", pattern: "tabby", ear: "tufted", face: "normal", body: "cobby", fur: "long", eye: "#66bb6a", desc: "Viking cats built for snow. Majestic climbers." },
-  bsh: { name: "British Shorthair", color: "#9fa8b8", pattern: "solid", ear: "rounded", face: "round", body: "cobby", fur: "short", eye: "#ffa726", desc: "Teddy bear cats with copper eyes and easygoing nature." },
-  oriental: { name: "Oriental", color: "#3a3a3a", pattern: "solid", ear: "large", face: "wedge", body: "slim", fur: "short", eye: "#42a5f5", desc: "Siamese cousins in every color. Chatty and athletic." },
-  birman: { name: "Birman", color: "#e8d5c4", pattern: "colorpoint", ear: "normal", face: "round", body: "normal", fur: "long", eye: "#42a5f5", desc: "Sacred cats with white gloves and gentle hearts." },
-  turkishvan: { name: "Turkish Van", color: "#fdfdfd", pattern: "bicolor", ear: "normal", face: "normal", body: "normal", fur: "semi", eye: "#42a5f5", desc: "The swimming cat! Loves water and has van markings." },
-  manx: { name: "Manx", color: "#9fa8b8", pattern: "tabby", ear: "normal", face: "round", body: "cobby", fur: "short", eye: "#66bb6a", desc: "Tailless charmers from the Isle of Man." },
-  savannah: { name: "Savannah", color: "#d4a017", pattern: "tabby", ear: "large", face: "normal", body: "slim", fur: "short", eye: "#66bb6a", desc: "Serval hybrids. Tall, spotted, and dog-like." },
-  munchkin: { name: "Munchkin", color: "#fdfdfd", pattern: "bicolor", ear: "normal", face: "round", body: "cobby", fur: "short", eye: "#ffa726", desc: "Short legs, big hearts. The dachshunds of cats." }
-};
-
-const COLORS = {
-  black: "#3a3a3a", white: "#fdfdfd", orange: "#ffa052", cream: "#ffe0b2",
-  blue: "#7986cb", gray: "#9fa8b8", brown: "#8d6e63", chocolate: "#5d4037",
-  lilac: "#b39ddb", red: "#e57373", silver: "#cfd8dc", golden: "#d4a017"
-};
-
-const PATTERNS = ["solid", "tabby", "bicolor", "colorpoint", "calico", "tortie"];
-const PERSONALITIES = ["Lap Cat", "Hunter", "Zoomer", "Talker", "Shy", "Clown", "Boss", "Gentle"];
-const ACCESSORIES = {
-  hats: [
-    { id: "none", name: "None", icon: "❌" },
-    { id: "bow", name: "Pink Bow", icon: "🎀" },
-    { id: "flower", name: "Sunflower", icon: "🌻" },
-    { id: "cowboy", name: "Cowboy Hat", icon: "🤠" },
-    { id: "wizard", name: "Wizard Hat", icon: "🧙" },
-    { id: "crown", name: "Tiny Crown", icon: "👑" },
-    { id: "beret", name: "Beret", icon: "🎨" },
-    { id: "beanie", name: "Beanie", icon: "🧢" }
-  ],
-  collars: [
-    { id: "none", name: "None", color: "transparent" },
-    { id: "red", name: "Red", color: "#ef5350" },
-    { id: "blue", name: "Blue", color: "#42a5f5" },
-    { id: "pink", name: "Pink", color: "#f8bbd0" },
-    { id: "green", name: "Green", color: "#66bb6a" },
-    { id: "purple", name: "Purple", color: "#ab47bc" },
-    { id: "gold", name: "Gold", color: "#ffd700" },
-    { id: "black", name: "Black", color: "#333" }
-  ]
-};
-
-const SYMPTOMS = [
-  { name: "Limping", icon: "🦵", treatment: "rest", desc: "The cat is favoring one leg. Needs rest." },
-  { name: "Itching", icon: "🤒", treatment: "groom", desc: "Constant scratching. Needs grooming and skin care." },
-  { name: "Fever", icon: "🌡️", treatment: "medicine", desc: "Warm nose and lethargy. Needs fever reducer." },
-  { name: "Overweight", icon: "🍔", treatment: "diet", desc: "A bit too chunky. Needs a diet plan." },
-  { name: "Sadness", icon: "😿", treatment: "pet", desc: "Low mood. Needs extra love and playtime." },
-  { name: "Hairball", icon: "🧶", treatment: "groom", desc: "Hacking sounds. Needs brushing and laxative." },
-  { name: "Dehydration", icon: "💧", treatment: "medicine", desc: "Dry gums. Needs fluids and electrolytes." },
-  { name: "Sprain", icon: "🩹", treatment: "rest", desc: "Tender paw. Needs wrapping and rest." }
-];
-
-const TREATMENTS = {
-  rest: { name: "Rest & Wrap", icon: "🛌", cost: 0 },
-  groom: { name: "Grooming", icon: "✂️", cost: 5 },
-  medicine: { name: "Medicine", icon: "💊", cost: 10 },
-  diet: { name: "Diet Plan", icon: "🥗", cost: 5 },
-  pet: { name: "Therapy", icon: "🤗", cost: 0 },
-  surgery: { name: "Surgery", icon: "🔪", cost: 50 }
-};
-
-// ===== UTILITIES =====
-const $ = id => document.getElementById(id);
-const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-const randItem = arr => arr[rand(0, arr.length - 1)];
-const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
-const uid = () => 'cat_' + Date.now() + '_' + rand(1000, 9999);
-const toast = msg => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); };
-
-function formatBreedName(breedKey) {
-  const b = BREEDS[breedKey];
-  return b ? b.name : breedKey;
-}
-
-function mixColors(c1, c2) {
-  // Simple hex mix
-  const hex = x => parseInt(x.slice(1), 16);
-  const r1 = (hex(c1) >> 16) & 255, g1 = (hex(c1) >> 8) & 255, b1 = hex(c1) & 255;
-  const r2 = (hex(c2) >> 16) & 255, g2 = (hex(c2) >> 8) & 255, b2 = hex(c2) & 255;
-  const r = Math.round((r1 + r2) / 2), g = Math.round((g1 + g2) / 2), b = Math.round((b1 + b2) / 2);
-  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
-}
-
-// ===== GENETICS ENGINE =====
-class Genetics {
-  static createFromBreed(breedKey) {
-    const b = BREEDS[breedKey];
-    return {
-      breedMix: { [breedKey]: 1.0 },
-      color: b.color,
-      color2: b.color,
-      pattern: b.pattern,
-      eyeColor: b.eye,
-      earType: b.ear,
-      faceType: b.face,
-      bodyType: b.body,
-      furLength: b.fur,
-      personality: randItem(PERSONALITIES),
-      gender: Math.random() < 0.5 ? 'F' : 'M'
-    };
-  }
-
-  static breed(mom, dad) {
-    const g = {
-      breedMix: Genetics.mixBreeds(mom.genes.breedMix, dad.genes.breedMix),
-      color: Math.random() < 0.5 ? mom.genes.color : dad.genes.color,
-      color2: Math.random() < 0.5 ? mom.genes.color2 : dad.genes.color2,
-      pattern: Math.random() < 0.7 ? (Math.random() < 0.5 ? mom.genes.pattern : dad.genes.pattern) : randItem(PATTERNS),
-      eyeColor: Math.random() < 0.5 ? mom.genes.eyeColor : dad.genes.eyeColor,
-      earType: Math.random() < 0.5 ? mom.genes.earType : dad.genes.earType,
-      faceType: Math.random() < 0.5 ? mom.genes.faceType : dad.genes.faceType,
-      bodyType: Math.random() < 0.5 ? mom.genes.bodyType : dad.genes.bodyType,
-      furLength: Math.random() < 0.5 ? mom.genes.furLength : dad.genes.furLength,
-      personality: randItem(PERSONALITIES),
-      gender: Math.random() < 0.5 ? 'F' : 'M'
-    };
-    // Mutation chance for rare traits
-    if (Math.random() < 0.05) g.eyeColor = randItem(Object.values(COLORS));
-    if (Math.random() < 0.03) g.pattern = randItem(PATTERNS);
-    return g;
-  }
-
-  static mixBreeds(mix1, mix2) {
-    const result = {};
-    const all = new Set([...Object.keys(mix1), ...Object.keys(mix2)]);
-    all.forEach(k => {
-      const v1 = mix1[k] || 0;
-      const v2 = mix2[k] || 0;
-      result[k] = (v1 + v2) / 2;
-    });
-    // Normalize
-    const sum = Object.values(result).reduce((a, b) => a + b, 0);
-    Object.keys(result).forEach(k => result[k] /= sum);
-    return result;
-  }
-
-  static getPrimaryBreed(genes) {
-    const entries = Object.entries(genes.breedMix).sort((a, b) => b[1] - a[1]);
-    return entries[0];
-  }
-
-  static getBreedLabel(genes) {
-    const entries = Object.entries(genes.breedMix).sort((a, b) => b[1] - a[1]);
-    const top = entries[0];
-    if (top[1] >= 0.85) return BREEDS[top[0]].name;
-    if (entries.length === 2 && entries[1][1] > 0.25) {
-      return BREEDS[top[0]].name + " × " + BREEDS[entries[1][0]].name + " Mix";
-    }
-    if (entries.length > 2) {
-      return "Multi-Gen Hybrid (" + entries.slice(0, 2).map(e => BREEDS[e[0]].name.split(' ')[0]).join('/') + ")";
-    }
-    return BREEDS[top[0]].name + " Mix";
-  }
-
-  static getPhenotype(genes) {
-    const pb = Genetics.getPrimaryBreed(genes);
-    const breedData = BREEDS[pb[0]] || BREEDS.domestic;
-    return {
-      color: genes.color,
-      color2: genes.color2,
-      pattern: genes.pattern,
-      eyeColor: genes.eyeColor,
-      earType: genes.earType,
-      faceType: genes.faceType,
-      bodyType: genes.bodyType,
-      furLength: genes.furLength,
-      breedPercent: pb[1]
-    };
-  }
-}
-
-// ===== CAT CLASS =====
-class Cat {
-  constructor(genes, name, ageDays = 0) {
-    this.id = uid();
-    this.genes = genes;
-    this.name = name;
-    this.ageDays = ageDays;
-    this.health = 100;
-    this.hunger = 50;
-    this.happiness = 70;
-    this.energy = 80;
-    this.sick = false;
-    this.symptom = null;
-    this.hat = "none";
-    this.collar = "none";
-    this.x = rand(10, 80);
-    this.y = rand(20, 70);
-    this.state = "idle"; // idle, walking, sleeping, playing
-    this.pregnant = false;
-    this.pregnantDays = 0;
-  }
-
-  get stage() {
-    if (this.ageDays < 14) return "kitten";
-    if (this.ageDays < 60) return "adult";
-    return "senior";
-  }
-
-  get isAdult() { return this.stage === "adult" || this.stage === "senior"; }
-  get canBreed() { return this.isAdult && !this.pregnant && this.health > 60 && this.energy > 40; }
-
-  age(days = 1) {
-    this.ageDays += days;
-    this.hunger = clamp(this.hunger - rand(5, 15), 0, 100);
-    this.energy = clamp(this.energy - rand(2, 8), 0, 100);
-    if (this.hunger < 20 || this.energy < 20) this.health = clamp(this.health - rand(5, 10), 0, 100);
-    if (this.happiness < 30) this.health = clamp(this.health - 3, 0, 100);
-
-    // Random sickness
-    if (!this.sick && this.health < 70 && Math.random() < 0.15) {
-      this.sick = true;
-      this.symptom = randItem(SYMPTOMS);
-      this.happiness = clamp(this.happiness - 20, 0, 100);
-    }
-
-    // Pregnancy
-    if (this.pregnant) {
-      this.pregnantDays++;
-      if (this.pregnantDays >= 3) {
-        this.pregnant = false;
-        this.pregnantDays = 0;
-        return true; // gave birth
-      }
-    }
-    return false;
-  }
-
-  feed(quality = 1) {
-    this.hunger = clamp(this.hunger + 30 * quality, 0, 100);
-    this.health = clamp(this.health + 5, 0, 100);
-    this.happiness = clamp(this.happiness + 5, 0, 100);
-  }
-
-  pet() {
-    this.happiness = clamp(this.happiness + 15, 0, 100);
-    this.energy = clamp(this.energy - 5, 0, 100);
-  }
-
-  treat() {
-    if (this.sick) {
-      this.sick = false;
-      this.symptom = null;
-      this.health = clamp(this.health + 20, 0, 100);
-      this.happiness = clamp(this.happiness + 10, 0, 100);
-      return true;
-    }
-    this.health = clamp(this.health + 10, 0, 100);
-    return false;
-  }
-
-  getAdoptValue() {
-    let val = 50;
-    if (this.stage === "kitten") val += 100;
-    const pb = Genetics.getPrimaryBreed(this.genes);
-    if (pb[1] < 0.8) val += 80; // mixed breeds are trendy
-    if (this.genes.pattern === "calico" || this.genes.pattern === "colorpoint") val += 40;
-    if (this.hat !== "none" || this.collar !== "none") val += 20;
-    return val;
-  }
-}
-
-// ===== RENDERER =====
-const Renderer = {
-  catSprite(cat, size = "normal") {
-    const ph = Genetics.getPhenotype(cat.genes);
-    const scale = size === "mini" ? 0.6 : size === "big" ? 1.6 : 1;
-    const classes = [`cat-sprite`, `pattern-${ph.pattern}`, `ear-${ph.earType}`, `face-${ph.faceType}`, `body-${ph.bodyType}`, `fur-${ph.furLength}`];
-    if (ph.furLength === "long" || ph.furLength === "semi") classes.push("fluffy");
-    if (ph.bodyType === "slim") classes.push("slim");
-    if (ph.bodyType === "cobby") classes.push("cobby");
-    if (ph.faceType === "flat") classes.push("flatface");
-    if (ph.faceType === "wedge") classes.push("wedgeface");
-    if (cat.state === "sleeping") classes.push("sleeping");
-    if (cat.state === "playing") classes.push("playing");
-
-    const furDark = ph.color === "#fdfdfd" ? "#e0e0e0" : ph.color === "#3a3a3a" ? "#222" : mixColors(ph.color, "#333333");
-    const collarData = ACCESSORIES.collars.find(c => c.id === cat.collar);
-    const collarColor = collarData ? collarData.color : "transparent";
-
-    let accHTML = '';
-    if (cat.hat !== "none") accHTML += `<div class="acc-hat ${cat.hat}"></div>`;
-    if (cat.collar !== "none") accHTML += `<div class="acc-collar" style="--collar:${collarColor}"></div>`;
-    if (cat.hat === "glasses") accHTML += `<div class="acc-glasses"></div>`;
-
-    const style = `transform:scale(${scale}); --fur:${ph.color}; --fur-dark:${furDark}; --fur2:${ph.color2}; --eye:${ph.eyeColor}; --nose:${ph.pattern === "colorpoint" ? '#b39ddb' : '#ff9999'}; --collar:${collarColor};`;
-
-    return `<div class="${classes.join(' ')}" style="${style}" data-id="${cat.id}">
-      <div class="cs-tail"></div>
-      <div class="cs-body"></div>
-      <div class="cs-paw left"></div>
-      <div class="cs-paw right"></div>
-      <div class="cs-head">
-        <div class="cs-ear left ${ph.earType}"></div>
-        <div class="cs-ear right ${ph.earType}"></div>
-        <div class="cs-eye left"></div>
-        <div class="cs-eye right"></div>
-        <div class="cs-nose"></div>
-        <div class="cs-mouth"></div>
-      </div>
-      ${accHTML}
-    </div>`;
-  },
-
-  miniBreedSprite(breedKey) {
-    const b = BREEDS[breedKey];
-    if (!b) return '';
-    const cat = new Cat(Genetics.createFromBreed(breedKey), b.name);
-    return this.catSprite(cat, "mini");
-  }
-};
-
-// ===== GAME STATE =====
-const Game = {
-  money: 500,
-  reputation: { breeder: 0, vet: 0 },
-  day: 1,
-  farmName: "Julie's Farm",
-  cats: [],
-  maxCats: 10,
-  unlockedBreeds: ["domestic", "siamese", "mainecoon", "persian", "bengal"],
-  clinicPatients: [],
-  log: [],
-  selectedCat: null,
-
-  init() {
-    const saved = localStorage.getItem('julieCatterySave');
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        this.load(data);
-        toast("Welcome back, Julie! 🐾");
-      } catch(e) {
-        this.newGame();
-      }
-    } else {
-      this.newGame();
-    }
-    this.startLoop();
-  },
-
-  newGame() {
-    this.money = 500;
-    this.reputation = { breeder: 0, vet: 0 };
-    this.day = 1;
-    this.farmName = "Julie's Farm";
-    this.cats = [];
-    this.maxCats = 10;
-    this.unlockedBreeds = ["domestic", "siamese", "mainecoon", "persian", "bengal"];
-    this.clinicPatients = [];
-    this.log = ["Welcome to your new cattery, Julie! 🐾"];
-
-    // Starter cats
-    const starters = ["domestic", "siamese", "mainecoon"];
-    starters.forEach((b, i) => {
-      const cat = new Cat(Genetics.createFromBreed(b), ["Whiskers", "Luna", "Mochi"][i], rand(20, 40));
-      cat.hunger = rand(40, 80);
-      this.cats.push(cat);
-    });
-
-    this.save();
-    this.renderAll();
-  },
-
-  save() {
-    const data = {
-      money: this.money,
-      reputation: this.reputation,
-      day: this.day,
-      farmName: this.farmName,
-      cats: this.cats.map(c => ({
-        id: c.id, genes: c.genes, name: c.name, ageDays: c.ageDays,
-        health: c.health, hunger: c.hunger, happiness: c.happiness, energy: c.energy,
-        sick: c.sick, symptom: c.symptom, hat: c.hat, collar: c.collar, pregnant: c.pregnant
-      })),
-      maxCats: this.maxCats,
-      unlockedBreeds: this.unlockedBreeds,
-      log: this.log
-    };
-    localStorage.setItem('julieCatterySave', JSON.stringify(data));
-  },
-
-  load(data) {
-    this.money = data.money;
-    this.reputation = data.reputation;
-    this.day = data.day;
-    this.farmName = data.farmName || "Julie's Farm";
-    this.maxCats = data.maxCats || 10;
-    this.unlockedBreeds = data.unlockedBreeds || ["domestic", "siamese", "mainecoon", "persian", "bengal"];
-    this.log = data.log || [];
-    this.cats = (data.cats || []).map(c => {
-      const cat = new Cat(c.genes, c.name, c.ageDays);
-      Object.assign(cat, c);
-      return cat;
-    });
-  },
-
-  nextDay() {
-    this.day++;
-    const newKittens = [];
-    this.cats.forEach(cat => {
-      const gaveBirth = cat.age();
-      if (gaveBirth) {
-        // Find dad (last bred with - simplified)
-        const dad = this.cats.find(c => c.gender === 'M' && c.id !== cat.id) || this.cats[0];
-        const kittenGenes = Genetics.breed(cat, dad || cat);
-        const kitten = new Cat(kittenGenes, "Kitten", 0);
-        kitten.name = this.generateKittenName(kitten);
-        newKittens.push(kitten);
-        this.log.unshift(`🎉 ${cat.name} gave birth to ${kitten.name}!`);
-        this.reputation.breeder += 15;
-      }
-    });
-
-    // Add new kittens
-    newKittens.forEach(k => {
-      if (this.cats.length < this.maxCats) this.cats.push(k);
-    });
-
-    // Random clinic patients
-    if (this.clinicPatients.length < 3 && Math.random() < 0.6) {
-      ClinicManager.newPatient();
-    }
-
-    // Unlock breeds
-    this.checkUnlocks();
-
-    this.log.unshift(`☀️ Day ${this.day} begins!`);
-    if (this.log.length > 20) this.log.pop();
-
-    this.save();
-    this.renderAll();
-    toast(`Day ${this.day} started!`);
-  },
-
-  buyRandomCat() {
-    if (this.cats.length >= this.maxCats) { toast("Cattery is full! Expand first."); return; }
-    if (this.money < 150) { toast("Not enough money! 💸"); return; }
-
-    const breed = randItem(this.unlockedBreeds);
-    const cat = new Cat(Genetics.createFromBreed(breed), this.generateName(), rand(10, 50));
-    cat.hunger = rand(30, 70);
-    this.money -= 150;
-    this.cats.push(cat);
-    this.log.unshift(`🐈 Adopted ${cat.name} (${BREEDS[breed].name})!`);
-    this.save();
-    this.renderAll();
-    toast(`Welcome home, ${cat.name}!`);
-  },
-
-  generateName() {
-    const names = ["Milo", "Bella", "Leo", "Lily", "Oliver", "Lucy", "Simba", "Chloe", "Jack", "Nala",
-      "Charlie", "Sophie", "Tiger", "Luna", "Smokey", "Coco", "Felix", "Molly", "Oscar", "Daisy"];
-    return randItem(names);
-  },
-
-  generateKittenName(kitten) {
-    const names = ["Tiny", "Pip", "Bean", "Sprout", "Nugget", "Muffin", "Pebble", "Bit", "Dot", "Puff",
-      "Mochi", "Tofu", "Peanut", "Cookie", "Biscuit", "Wisp", "Fawn", "Cub", "Kit", "Pip"];
-    return randItem(names);
-  },
-
-  checkUnlocks() {
-    const all = Object.keys(BREEDS);
-    const remaining = all.filter(b => !this.unlockedBreeds.includes(b));
-    if (remaining.length === 0) return;
-
-    const threshold = this.reputation.breeder + this.reputation.vet;
-    if (threshold > this.unlockedBreeds.length * 80) {
-      const newBreed = randItem(remaining);
-      this.unlockedBreeds.push(newBreed);
-      this.log.unshift(`🔓 New breed unlocked: ${BREEDS[newBreed].name}!`);
-      toast(`Unlocked: ${BREEDS[newBreed].name}!`);
-    }
-  },
-
-  renderAll() {
-    $("stat-money").querySelector("span").textContent = this.money;
-    $("stat-rep").querySelector("span").textContent = this.reputation.breeder + this.reputation.vet;
-    $("stat-day").querySelector("span").textContent = this.day;
-    $("farm-name-display").textContent = this.farmName;
-    $("cat-count").textContent = this.cats.length;
-    $("cat-max").textContent = this.maxCats;
-    $("rep-breeder").textContent = this.reputation.breeder;
-    $("rep-vet").textContent = this.reputation.vet;
-    $("unlocked-count").textContent = this.unlockedBreeds.length;
-    $("total-breeds").textContent = Object.keys(BREEDS).length;
-
-    // Farm log
-    $("farm-log").innerHTML = this.log.slice(0, 8).map(l => `<div style="margin-bottom:4px; border-bottom:1px solid #eee; padding-bottom:4px;">${l}</div>`).join('');
-
-    FarmManager.render();
-    CatteryManager.render();
-    ClinicManager.render();
-    LabManager.render();
-  },
-
-  startLoop() {
-    setInterval(() => {
-      // Random cat animations
-      this.cats.forEach(cat => {
-        if (Math.random() < 0.1) {
-          const states = ["idle", "idle", "idle", "sleeping", "playing"];
-          cat.state = randItem(states);
-          if (cat.state === "sleeping") {
-            cat.energy = clamp(cat.energy + 5, 0, 100);
-          }
-        }
-      });
-      FarmManager.render();
-    }, 3000);
-
-    // Blink animation
-    setInterval(() => {
-      document.querySelectorAll('.cs-eye').forEach(eye => {
-        eye.classList.add('blink');
-        setTimeout(() => eye.classList.remove('blink'), 200);
-      });
-    }, 4000);
-  }
-};
-
-// ===== UI MANAGER =====
-const UIManager = {
-  currentScreen: 'farm',
-  history: [],
-
-  showScreen(id) {
-    this.history.push(this.currentScreen);
-    this.currentScreen = id;
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    $(`screen-${id}`).classList.add('active');
-    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-    const navBtn = Array.from(document.querySelectorAll('nav button')).find(b => b.onclick && b.onclick.toString().includes(id));
-    if (navBtn) navBtn.classList.add('active');
-
-    if (id === 'cattery') CatteryManager.render();
-    if (id === 'clinic') ClinicManager.render();
-    if (id === 'lab') LabManager.render();
-    if (id === 'catdetail' && Game.selectedCat) CatDetailManager.render(Game.selectedCat);
-  },
-
-  back() {
-    const prev = this.history.pop() || 'farm';
-    this.showScreen(prev);
-  },
-
-  showModal(html) {
-    $("modal-content").innerHTML = html;
-    $("modal").classList.add('active');
-  },
-
-  closeModal() {
-    $("modal").classList.remove('active');
-  }
-};
-
-// ===== FARM MANAGER =====
-const FarmManager = {
-  render() {
-    const container = $("roaming-cats");
-    container.innerHTML = Game.cats.map(cat => {
-      const bubble = cat.sick ? '😿' : cat.hunger < 30 ? '🍗' : cat.happiness > 80 ? '❤️' : '';
-      return `<div class="roaming-cat" style="left:${cat.x}%; top:${cat.y}%;" onclick="CatDetailManager.open('${cat.id}')">
-        <div class="cat-bubble">${bubble} ${cat.name}</div>
-        ${Renderer.catSprite(cat, "mini")}
-      </div>`;
-    }).join('');
-  }
-};
-
-// ===== CATTERY MANAGER =====
-const CatteryManager = {
-  filter: 'all',
-  breedParents: { mom: null, dad: null },
-
-  render() {
-    const grid = $("cattery-grid");
-    let cats = Game.cats;
-    if (this.filter === 'kitten') cats = cats.filter(c => c.stage === 'kitten');
-    if (this.filter === 'adult') cats = cats.filter(c => c.stage === 'adult');
-    if (this.filter === 'senior') cats = cats.filter(c => c.stage === 'senior');
-    if (this.filter === 'purebred') cats = cats.filter(c => Genetics.getPrimaryBreed(c.genes)[1] >= 0.85);
-    if (this.filter === 'crossbreed') cats = cats.filter(c => Genetics.getPrimaryBreed(c.genes)[1] < 0.85);
-    if (this.filter === 'sick') cats = cats.filter(c => c.sick);
-
-    grid.innerHTML = cats.map(cat => {
-      const tags = [`<span class="tag ${cat.stage}">${cat.stage}</span>`];
-      if (cat.sick) tags.push('<span class="tag sick">sick</span>');
-      if (cat.pregnant) tags.push('<span class="tag">🤰</span>');
-
-      return `<div class="cat-card ${this.breedParents.mom === cat.id || this.breedParents.dad === cat.id ? 'selected' : ''}" 
-        onclick="CatteryManager.clickCat('${cat.id}')">
-        <div class="cc-sprite">${Renderer.catSprite(cat, "mini")}</div>
-        <div class="cc-name">${cat.name}</div>
-        <div class="cc-breed">${Genetics.getBreedLabel(cat.genes)}</div>
-        <div class="cc-tags">${tags.join('')}</div>
-      </div>`;
-    }).join('');
-
-    // Update breeding panel
-    $("breeding-panel").style.display = this.breedParents.mom || this.breedParents.dad ? 'block' : 'none';
-    this.updateBreedSlot('mom');
-    this.updateBreedSlot('dad');
-
-    const canBreed = this.breedParents.mom && this.breedParents.dad && Game.money >= 50;
-    $("breed-btn").disabled = !canBreed;
-  },
-
-  clickCat(id) {
-    const cat = Game.cats.find(c => c.id === id);
-    if (!cat) return;
-
-    // If breeding panel is open, select for breeding
-    if ($("breeding-panel").style.display !== 'none') {
-      if (cat.gender === 'F' && !this.breedParents.mom) {
-        this.breedParents.mom = id;
-      } else if (cat.gender === 'M' && !this.breedParents.dad) {
-        this.breedParents.dad = id;
-      } else if (cat.gender === 'F' && this.breedParents.mom === id) {
-        this.breedParents.mom = null;
-      } else if (cat.gender === 'M' && this.breedParents.dad === id) {
-        this.breedParents.dad = null;
-      } else {
-        // Swap or clear
-        if (cat.gender === 'F') this.breedParents.mom = id;
-        else this.breedParents.dad = id;
-      }
-      this.render();
-      return;
-    }
-
-    CatDetailManager.open(id);
-  },
-
-  selectBreedParent(role) {
-    if (this.breedParents[role]) {
-      this.breedParents[role] = null;
-      this.render();
-    }
-  },
-
-  updateBreedSlot(role) {
-    const slot = $(`breed-${role}`);
-    const id = this.breedParents[role];
-    if (!id) {
-      slot.classList.remove('filled');
-      slot.innerHTML = `<div style="font-size:1.5rem;">🐱</div><div class="slot-label">${role === 'mom' ? 'Queen' : 'Stud'}</div>`;
-      return;
-    }
-    const cat = Game.cats.find(c => c.id === id);
-    if (!cat) return;
-    slot.classList.add('filled');
-    slot.innerHTML = `<div style="transform:scale(0.7);">${Renderer.catSprite(cat, "normal")}</div><div class="slot-label">${cat.name}</div>`;
-  },
-
-  breed() {
-    const mom = Game.cats.find(c => c.id === this.breedParents.mom);
-    const dad = Game.cats.find(c => c.id === this.breedParents.dad);
-    if (!mom || !dad || Game.money < 50) return;
-    if (!mom.canBreed || !dad.canBreed) { toast("One of the cats can't breed right now."); return; }
-    if (Game.cats.length >= Game.maxCats) { toast("Cattery full!"); return; }
-
-    Game.money -= 50;
-    mom.energy -= 30;
-    dad.energy -= 20;
-    mom.happiness += 10;
-
-    const kittenGenes = Genetics.breed(mom, dad);
-    const kitten = new Cat(kittenGenes, Game.generateKittenName(), 0);
-    kitten.name = prompt("Name the kitten:", kitten.name) || kitten.name;
-    Game.cats.push(kitten);
-
-    Game.reputation.breeder += 10;
-    Game.log.unshift(`🧬 ${mom.name} and ${dad.name} bred ${kitten.name}!`);
-
-    this.breedParents = { mom: null, dad: null };
-    Game.save();
-    Game.renderAll();
-    toast(`Welcome, ${kitten.name}! 🎉`);
-  },
-
-  clearSelection() {
-    this.breedParents = { mom: null, dad: null };
-    this.render();
-  },
-
-  feedAll() {
-    let cost = 0;
-    Game.cats.forEach(cat => {
-      if (cat.hunger < 80) {
-        cat.feed();
-        cost += 5;
-      }
-    });
-    if (cost > 0) {
-      Game.money = Math.max(0, Game.money - cost);
-      Game.save();
-      Game.renderAll();
-      toast(`Fed all cats! (-$${cost})`);
-    } else {
-      toast("All cats are full!");
-    }
-  }
-};
-
-// ===== CAT DETAIL MANAGER =====
-const CatDetailManager = {
-  currentCat: null,
-
-  open(id) {
-    const cat = Game.cats.find(c => c.id === id);
-    if (!cat) return;
-    Game.selectedCat = cat;
-    this.currentCat = cat;
-    UIManager.showScreen('catdetail');
-    this.render(cat);
-  },
-
-  render(cat) {
-    $("detail-cat-sprite").innerHTML = Renderer.catSprite(cat, "big");
-    $("detail-name").textContent = cat.name;
-    $("detail-breed").textContent = Genetics.getBreedLabel(cat.genes) + " • " + (cat.gender === 'F' ? '♀️ Female' : '♂️ Male') + " • Day " + cat.ageDays;
-
-    $("bar-health").style.width = cat.health + "%";
-    $("val-health").textContent = cat.health + "%";
-    $("bar-hunger").style.width = cat.hunger + "%";
-    $("val-hunger").textContent = cat.hunger + "%";
-    $("bar-happy").style.width = cat.happiness + "%";
-    $("val-happy").textContent = cat.happiness + "%";
-    $("bar-energy").style.width = cat.energy + "%";
-    $("val-energy").textContent = cat.energy + "%";
-
-    $("adopt-price").textContent = cat.getAdoptValue();
-
-    // DNA
-    const entries = Object.entries(cat.genes.breedMix).sort((a, b) => b[1] - a[1]);
-    $("detail-dna").innerHTML = entries.map(([k, v]) => {
-      const color = BREEDS[k]?.color || '#999';
-      return `<div class="dna-row">
-        <div class="dna-label">${BREEDS[k]?.name?.split(' ')[0] || k}</div>
-        <div class="dna-bar"><div class="dna-seg dom" style="width:${Math.round(v*100)}%; background:${color};"></div></div>
-        <div style="width:40px; text-align:right; font-size:0.75rem;">${Math.round(v*100)}%</div>
-      </div>`;
-    }).join('') + `
-      <div class="dna-row"><div class="dna-label">Pattern</div><div style="flex:1; font-size:0.8rem; text-transform:capitalize;">${cat.genes.pattern}</div></div>
-      <div class="dna-row"><div class="dna-label">Personality</div><div style="flex:1; font-size:0.8rem;">${cat.genes.personality}</div></div>
-    `;
-
-    // Accessories
-    $("acc-hats").innerHTML = ACCESSORIES.hats.map(h => `
-      <div class="acc-option ${cat.hat === h.id ? 'equipped' : ''}" onclick="CatDetailManager.equipHat('${h.id}')">
-        ${h.icon}
-      </div>
-    `).join('');
-
-    $("acc-collars").innerHTML = ACCESSORIES.collars.map(c => `
-      <div class="acc-option ${cat.collar === c.id ? 'equipped' : ''}" onclick="CatDetailManager.equipCollar('${c.id}')" style="background:${c.color === 'transparent' ? '#f5f5f5' : c.color};">
-        ${c.id === 'none' ? '❌' : '🔘'}
-      </div>
-    `).join('');
-  },
-
-  pet() {
-    if (!this.currentCat) return;
-    this.currentCat.pet();
-    Game.save();
-    this.render(this.currentCat);
-    toast(`You petted ${this.currentCat.name}! ❤️`);
-  },
-
-  feed() {
-    if (!this.currentCat) return;
-    if (Game.money < 5) { toast("Not enough money!"); return; }
-    this.currentCat.feed();
-    Game.money -= 5;
-    Game.save();
-    this.render(this.currentCat);
-    toast(`Fed ${this.currentCat.name}! 🍖`);
-  },
-
-  treat() {
-    if (!this.currentCat) return;
-    if (Game.money < 10) { toast("Not enough money for medicine!"); return; }
-    const wasSick = this.currentCat.sick;
-    this.currentCat.treat();
-    if (wasSick) Game.money -= 10;
-    Game.save();
-    this.render(this.currentCat);
-    toast(`${this.currentCat.name} feels better! 💊`);
-  },
-
-  rename() {
-    if (!this.currentCat) return;
-    const name = prompt("New name:", this.currentCat.name);
-    if (name) {
-      this.currentCat.name = name;
-      Game.save();
-      this.render(this.currentCat);
-      toast(`Renamed to ${name}!`);
-    }
-  },
-
-  adoptOut() {
-    if (!this.currentCat) return;
-    const val = this.currentCat.getAdoptValue();
-    if (confirm(`Adopt out ${this.currentCat.name} for $${val}?`)) {
-      Game.money += val;
-      Game.cats = Game.cats.filter(c => c.id !== this.currentCat.id);
-      Game.log.unshift(`🏠 ${this.currentCat.name} was adopted for $${val}.`);
-      Game.save();
-      UIManager.back();
-      Game.renderAll();
-      toast(`Adopted out for $${val}!`);
-    }
-  },
-
-  equipHat(id) {
-    if (!this.currentCat) return;
-    this.currentCat.hat = id;
-    Game.save();
-    this.render(this.currentCat);
-    Game.renderAll();
-  },
-
-  equipCollar(id) {
-    if (!this.currentCat) return;
-    this.currentCat.collar = id;
-    Game.save();
-    this.render(this.currentCat);
-    Game.renderAll();
-  }
-};
-
-// ===== CLINIC MANAGER =====
-const ClinicManager = {
-  currentPatient: null,
-
-  render() {
-    const waiting = $("clinic-waiting");
-    waiting.innerHTML = Game.clinicPatients.map((p, i) => `
-      <div class="clinic-patient" onclick="ClinicManager.examine(${i})">
-        <div style="transform:scale(0.7);">${Renderer.catSprite(p.cat, "normal")}</div>
-        <div style="font-weight:700; font-size:0.8rem;">${p.cat.name}</div>
-        <div class="symptom">${p.symptom.icon}</div>
-        <div class="symptom-name">${p.symptom.name}</div>
-      </div>
-    `).join('');
-    if (Game.clinicPatients.length === 0) {
-      waiting.innerHTML = `<div style="color:var(--textLight); font-size:0.85rem; padding:20px;">No patients waiting. Click "New Patient" or advance days.</div>`;
-    }
-  },
-
-  newPatient() {
-    if (Game.clinicPatients.length >= 4) { toast("Clinic is full!"); return; }
-    const breed = randItem(Game.unlockedBreeds);
-    const cat = new Cat(Genetics.createFromBreed(breed), Game.generateName(), rand(10, 50));
-    cat.sick = true;
-    cat.symptom = randItem(SYMPTOMS);
-    Game.clinicPatients.push({ cat, symptom: cat.symptom, treated: false });
-    this.render();
-    toast("New patient arrived! 🏥");
-  },
-
-  examine(index) {
-    const patient = Game.clinicPatients[index];
-    if (!patient || patient.treated) return;
-    this.currentPatient = { ...patient, index };
-
-    $("exam-panel").style.display = 'block';
-    $("exam-cat").innerHTML = Renderer.catSprite(patient.cat, "big");
-    $("exam-symptoms").innerHTML = `
-      <div style="font-size:1.2rem; margin-bottom:8px;">${patient.symptom.icon} ${patient.symptom.name}</div>
-      <div style="color:var(--textLight);">${patient.symptom.desc}</div>
-    `;
-
-    $("treatment-options").innerHTML = Object.entries(TREATMENTS).map(([key, tx]) => `
-      <div class="treatment-btn" onclick="ClinicManager.treat('${key}')">
-        <span class="tx-icon">${tx.icon}</span>
-        <span class="tx-name">${tx.name}</span>
-        <div style="font-size:0.7rem; color:var(--textLight); margin-top:2px;">$${tx.cost}</div>
-      </div>
-    `).join('');
-  },
-
-  treat(treatmentKey) {
-    if (!this.currentPatient) return;
-    const patient = Game.clinicPatients[this.currentPatient.index];
-    const tx = TREATMENTS[treatmentKey];
-
-    if (Game.money < tx.cost) { toast("Not enough money!"); return; }
-
-    const correct = patient.symptom.treatment === treatmentKey;
-    Game.money -= tx.cost;
-
-    if (correct) {
-      const reward = 30 + rand(10, 30);
-      Game.money += reward;
-      Game.reputation.vet += 10;
-      patient.treated = true;
-      Game.clinicPatients.splice(this.currentPatient.index, 1);
-      $("exam-panel").style.display = 'none';
-      Game.log.unshift(`🏥 Cured ${patient.cat.name}! +$${reward} +Rep`);
-      toast(`Excellent! Cured ${patient.cat.name}! +$${reward}`);
-    } else {
-      Game.reputation.vet = Math.max(0, Game.reputation.vet - 2);
-      toast(`Oops, wrong treatment. Try again!`);
-      return; // Don't close panel
-    }
-
-    Game.save();
-    Game.renderAll();
-  }
-};
-
-// ===== LAB MANAGER =====
-const LabManager = {
-  render() {
-    const enc = $("breed-encyclopedia");
-    enc.innerHTML = Object.entries(BREEDS).map(([key, b]) => {
-      const unlocked = Game.unlockedBreeds.includes(key);
-      return `<div class="card" style="opacity:${unlocked ? 1 : 0.5}; text-align:center; padding:12px;">
-        <div style="transform:scale(0.8); margin-bottom:4px;">${Renderer.miniBreedSprite(key)}</div>
-        <div style="font-weight:700; font-size:0.85rem;">${b.name}</div>
-        <div style="font-size:0.7rem; color:var(--textLight); margin-top:4px;">${unlocked ? b.desc : '??? (Unlock by gaining reputation)'}</div>
-        ${unlocked ? `<div style="font-size:0.65rem; margin-top:4px; color:var(--accent);">✓ Unlocked</div>` : `<div style="font-size:0.65rem; margin-top:4px;">🔒 Locked</div>`}
-      </div>`;
-    }).join('');
-  }
-};
-
-// ===== GLOBAL FUNCTIONS =====
-function editFarmName() {
-  const name = prompt("Farm name:", Game.farmName);
-  if (name) {
-    Game.farmName = name;
-    Game.save();
-    Game.renderAll();
-    toast(`Farm renamed to ${name}!`);
-  }
-}
-
-// ===== INIT =====
-window.onload = () => {
-  Game.init();
-};
-</script>
+<div id="modal-overlay" onclick="closeModalOverlay(event)">
+  <div id="modal-box">
+    <button id="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+<div id="toast"></div>
+<script src="game.js"></script>
 </body>
 </html>

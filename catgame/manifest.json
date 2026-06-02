@@ -1,0 +1,24 @@
+{
+  "name": "Kitty Kingdoms",
+  "short_name": "Kitty Kingdoms",
+  "description": "A cat breeding and cafe simulation game",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#2C1810",
+  "theme_color": "#9B59B6",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%239B59B6'/><text y='140' font-size='130' text-anchor='middle' x='96'>🐱</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%239B59B6'/><text y='380' font-size='340' text-anchor='middle' x='256'>🐱</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
