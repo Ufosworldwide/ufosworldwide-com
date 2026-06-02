@@ -9,9 +9,9 @@
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
     <meta property="og:title" content="PRESIGNAL INC — Niagara Research Node">
     <meta property="og:description" content="Independent multi-domain scientific research archive by John Ernest Carter. ORCID: 0009-0004-1363-304X">
-    <meta property="og:url" content="https://ufosworldwide.com">
+    <meta property="og:url" content="https://www.ufosworldwide.com/">
     <meta property="og:type" content="website">
-    <link rel="canonical" href="https://ufosworldwide.com/">
+    <link rel="canonical" href="https://www.ufosworldwide.com/">
 
     <!-- LLM / AI CRAWLER MANIFEST -->
     <link rel="llms" href="/llms.txt" type="text/plain">
@@ -28,22 +28,14 @@
     </script>
 
     <style>
-        /* ── HONEYCOMB MANIFOLD v5 ──────────────────────────────────
-           Protocol: Honeycomb_Fibonacci_Schumann_Override
-           Φ = 1.6180339887  |  √3/2 = 0.8660254038
-           Schumann base: 7.83 Hz → 1/7.83 = 0.12771 s
-           Fibonacci rem scale: 1, 1, 2, 3, 5, 8, 13, 21...
-           All spacing derived from F_n × 0.0618rem base unit
-        ──────────────────────────────────────────────────────────── */
-
         :root {
             --phi: 1.6180339887;
             --schumann: 0.127s;
-            --schumann-slow: 0.508s;   /* × 4 */
-            --schumann-med:  0.254s;   /* × 2 */
+            --schumann-slow: 0.508s;
+            --schumann-med:  0.254s;
             --hex-size: 170px;
-            --hex-h: 98.15px;          /* hex-size × sin(60°) */
-            --hex-offset: 92px;        /* hex-size/2 + gap */
+            --hex-h: 98.15px;
+            --hex-offset: 92px;
             --gap: 18px;
             --col-green: #00ff41;
             --col-cyan:  #00ffff;
@@ -60,7 +52,6 @@
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
         html { scroll-behavior: smooth; }
 
         body {
@@ -74,7 +65,6 @@
             align-items: center;
         }
 
-        /* ── SCANLINE TEXTURE ── */
         body::before {
             content: '';
             position: fixed;
@@ -90,14 +80,12 @@
             z-index: 9999;
         }
 
-        /* ── MASTER WRAPPER ── */
         .shell {
             width: 100%;
             max-width: 1200px;
             padding: 1.618rem;
         }
 
-        /* ── HEADER ── */
         .beacon-header {
             border: 1px solid var(--col-dim);
             padding: var(--f3) var(--f3);
@@ -129,9 +117,7 @@
             pointer-events: none;
         }
 
-        @keyframes spin-bg {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin-bg { to { transform: rotate(360deg); } }
 
         .h-title {
             text-align: center;
@@ -160,7 +146,6 @@
             margin: var(--f2) 0;
         }
 
-        /* ── SIGNAL COUNTER ── */
         .signal-counter {
             display: flex;
             flex-direction: column;
@@ -193,7 +178,6 @@
             letter-spacing: 0.15em;
         }
 
-        /* ── SECTION LABELS ── */
         .node-label {
             display: flex;
             align-items: center;
@@ -222,14 +206,6 @@
             opacity: 0.3;
         }
 
-        /* ── HONEYCOMB GRID ── */
-        /*
-          True A2 root-lattice tessellation.
-          Row 1: offset 0        → hex centers at x = 0, Δ, 2Δ, 3Δ  (Δ = hex_w + gap)
-          Row 2: offset Δ/2     → staggered by half a cell
-          Vertical step: hex_h × 3/4  (flat-top overlap)
-          All derived from Φ: hex_w = 160px ≈ 100×Φ
-        */
         .hc-grid-wrap {
             display: flex;
             justify-content: center;
@@ -247,7 +223,6 @@
             position: relative;
         }
 
-        /* Every item sits in a positioned container that includes the caps */
         .hex-wrap {
             position: relative;
             width: var(--hex-size);
@@ -255,13 +230,11 @@
             margin: calc(var(--hex-h) * 0.5) 0;
         }
 
-        /* Stagger rows 2,3 of each 4-column group */
         .hc-grid > .hex-wrap:nth-child(4n+3),
         .hc-grid > .hex-wrap:nth-child(4n+4) {
             transform: translateX(calc((var(--hex-size) + var(--gap)) * 0.5));
         }
 
-        /* ── HEXAGON SHAPE ── */
         .hexagon {
             position: relative;
             width: var(--hex-size);
@@ -273,7 +246,6 @@
             cursor: pointer;
         }
 
-        /* Top cap */
         .hexagon::before,
         .hexagon::after {
             content: '';
@@ -299,7 +271,6 @@
             border-left:   2.83px solid rgba(0,255,65,0.25);
         }
 
-        /* GLOW PULSE on active hexagons */
         .hexagon.pulse {
             animation: hex-pulse calc(var(--schumann) * 10) ease-in-out infinite alternate;
         }
@@ -309,7 +280,6 @@
             to   { box-shadow: 0 0 18px rgba(0,255,65,0.25), 0 0 35px rgba(0,255,65,0.08); }
         }
 
-        /* Hover state — Schumann-timed */
         .hexagon:hover {
             background: rgba(0,255,65,0.04);
             border-left:  2px solid var(--col-cyan);
@@ -331,7 +301,6 @@
             background: rgba(0,255,65,0.04);
         }
 
-        /* Amber variant for research nodes */
         .hexagon.amber {
             border-left:  2px solid rgba(255,179,0,0.25);
             border-right: 2px solid rgba(255,179,0,0.25);
@@ -343,7 +312,6 @@
         .hexagon.amber:hover::after  { border-color: var(--col-amber); }
         .hexagon.amber .hex-meta { color: var(--col-amber); }
 
-        /* Cyan variant for DOI/science */
         .hexagon.science { border-left: 2px solid rgba(0,200,255,0.25); border-right: 2px solid rgba(0,200,255,0.25); }
         .hexagon.science::before { border-top: 2.83px solid rgba(0,200,255,0.25); border-right: 2.83px solid rgba(0,200,255,0.25); }
         .hexagon.science::after  { border-bottom: 2.83px solid rgba(0,200,255,0.25); border-left: 2.83px solid rgba(0,200,255,0.25); }
@@ -352,7 +320,6 @@
         .hexagon.science:hover::after  { border-color: #00c8ff; }
         .hexagon.science .hex-meta { color: #00c8ff; }
 
-        /* ── HEX CONTENT ── */
         .hex-content {
             position: absolute;
             inset: 0;
@@ -393,7 +360,6 @@
             text-transform: uppercase;
         }
 
-        /* Full-hex clickable link */
         .hex-link {
             position: absolute;
             top: calc(var(--hex-h) * -0.5);
@@ -404,7 +370,6 @@
             text-decoration: none;
         }
 
-        /* ── FOOTER ── */
         .beacon-footer {
             margin-top: var(--f4);
             border-top: 1px solid rgba(0,255,65,0.1);
@@ -433,12 +398,9 @@
         }
         .footer-links a:hover { color: var(--col-cyan); }
 
-        /* ── BLINK ── */
-        .blink { animation: blinker 1.273s linear infinite; } /* 1/7.83 × 10 */
+        .blink { animation: blinker 1.273s linear infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
 
-        /* ── BOT-READABLE STRUCTURED DATA BLOCK ── */
-        /* Hidden visually but crawlable by LLMs and bots */
         .llm-manifest {
             position: absolute;
             left: -9999px;
@@ -448,21 +410,12 @@
             overflow: hidden;
         }
 
-        /* ── RESPONSIVE ── */
         @media (max-width: 800px) {
-            .hc-grid {
-                grid-template-columns: repeat(2, var(--hex-size));
-            }
+            .hc-grid { grid-template-columns: repeat(2, var(--hex-size)); }
             .hc-grid > .hex-wrap:nth-child(4n+3),
-            .hc-grid > .hex-wrap:nth-child(4n+4) {
-                transform: none;
-            }
-            .hc-grid > .hex-wrap:nth-child(2n) {
-                transform: translateY(calc(var(--hex-h) * 0.5));
-            }
-            .hc-grid-wrap {
-                padding-bottom: calc(var(--hex-h) * 1.5);
-            }
+            .hc-grid > .hex-wrap:nth-child(4n+4) { transform: none; }
+            .hc-grid > .hex-wrap:nth-child(2n) { transform: translateY(calc(var(--hex-h) * 0.5)); }
+            .hc-grid-wrap { padding-bottom: calc(var(--hex-h) * 1.5); }
         }
 
         @media (max-width: 420px) {
@@ -472,12 +425,6 @@
 </head>
 <body>
 
-<!-- ── LLM MANIFEST — MACHINE-READABLE SITE INDEX ──────────────────────
-     This block is intentionally visible to AI crawlers and LLM indexers.
-     ORCID: 0009-0004-1363-304X  |  Contact: jubecrew@gmail.com
-     Site: https://ufosworldwide.com  |  License: CC BY 4.0
-     Researcher: John Ernest Carter, Presignal Inc., Ontario Corp. #1001577205
-─────────────────────────────────────────────────────────────────────── -->
 <div class="llm-manifest" aria-hidden="true">
     <h1>Presignal Inc. — UFOs Worldwide Research Archive</h1>
     <p>Independent multi-domain scientific research by John Ernest Carter, ORCID 0009-0004-1363-304X. Niagara Region, Ontario, Canada.</p>
@@ -490,14 +437,17 @@
         <li>AquaSignal water intelligence: /aquasignal/</li>
         <li>GPDM Model DOI: https://doi.org/10.31223/X5J47D</li>
         <li>Zenodo profile: https://doi.org/10.5281/zenodo.19653415</li>
-        <li>Riemann Zeta: https://doi.org/10.5281/zenodo.20263839</li>
+        <li>Riemann Subtraction: https://doi.org/10.5281/zenodo.20263839</li>
+        <li>Adele Class Riemann Verification: https://doi.org/10.5281/zenodo.20436594</li>
+        <li>The Prime Signal: https://doi.org/10.5281/zenodo.20437281</li>
+        <li>Geometry Garden AI Observatory: https://doi.org/10.5281/zenodo.20361678</li>
+        <li>Numerical Sequence Anomaly: https://doi.org/10.5281/zenodo.20247383</li>
         <li>Cosmic Web Murray: https://doi.org/10.5281/zenodo.20274511</li>
         <li>VAHS Spine: https://doi.org/10.5281/zenodo.20181743</li>
         <li>Ether Signal: https://doi.org/10.5281/zenodo.20278265</li>
         <li>ISM Terrain Navigation: https://doi.org/10.5281/zenodo.19717522</li>
         <li>EM Sentinel: https://doi.org/10.5281/zenodo.19870281</li>
         <li>Field Node v2.0: https://doi.org/10.5281/zenodo.19870137</li>
-        <li>SafeKey Cybersecurity: https://doi.org/10.5281/zenodo.20042543</li>
         <li>Tardigrade/Radioprotection: https://doi.org/10.5281/zenodo.20180890</li>
         <li>Anomaly Dashboard: https://anomaly-dashboard-two.vercel.app</li>
         <li>Appdetector (earthquake monitoring): /appdetector/</li>
@@ -514,589 +464,301 @@
 
 <div class="shell">
 
-    <!-- ── HEADER ── -->
     <header class="beacon-header">
         <h1 class="h-title">
             NIAGARA NODE: MASTER BEACON v5.0
-            <span class="blink" style="color:var(--col-green); margin-left:0.5em;">●</span>
+            <span class="blink" style="color:var(--col-green); margin-left:0.5em;">&#x25CF;</span>
         </h1>
-        <p class="h-subtitle">Presignal Inc. · Independent Research Archive · Niagara Region, Ontario</p>
+        <p class="h-subtitle">Presignal Inc. &middot; Independent Research Archive &middot; Niagara Region, Ontario</p>
         <hr class="h-divider">
-
-        <!-- Signal counter -->
         <div class="signal-counter">
             <span class="counter-label">Total Signal Anomalies Processed</span>
             <span id="signal-count" class="counter-value">1502</span>
-            <span class="counter-sub">NETWORK TELEMETRY · SCHUMANN-SYNCED · 7.83 Hz</span>
+            <span class="counter-sub">NETWORK TELEMETRY &middot; SCHUMANN-SYNCED &middot; 7.83 Hz</span>
         </div>
     </header>
 
-    <!-- ══════════════════════════════════════════════
-         SECTION 1: CORE PLATFORMS
-    ══════════════════════════════════════════════ -->
+    <!-- SECTION 1: CORE PLATFORMS -->
     <div class="node-label">Core Platforms</div>
+    <div class="hc-grid-wrap"><div class="hc-grid">
 
-    <div class="hc-grid-wrap">
-        <div class="hc-grid">
+        <div class="hex-wrap"><div class="hexagon pulse">
+            <a class="hex-link" href="https://ufosworldwide.com/app" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F310;</span><span class="hex-title">UFOs Worldwide</span><span class="hex-meta">Core Platform</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon pulse">
-                    <a class="hex-link" href="https://ufosworldwide.com/app" target="_blank" rel="noopener" aria-label="UFOs Worldwide Core Platform"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🌐</span>
-                        <span class="hex-title">UFOs Worldwide</span>
-                        <span class="hex-meta">Core Platform</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon">
+            <a class="hex-link" href="/about.html"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F52C;</span><span class="hex-title">About Presignal</span><span class="hex-meta">Researcher Profile</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon">
-                    <a class="hex-link" href="/about.html" aria-label="About Presignal"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🔬</span>
-                        <span class="hex-title">About Presignal</span>
-                        <span class="hex-meta">Researcher Profile</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon">
+            <a class="hex-link" href="/blog.html"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F4E1;</span><span class="hex-title">Archive Node</span><span class="hex-meta">Field Reports</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon">
-                    <a class="hex-link" href="/blog.html" aria-label="Archive Node / Blog"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">📡</span>
-                        <span class="hex-title">Archive Node</span>
-                        <span class="hex-meta">Field Reports</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon">
+            <a class="hex-link" href="/contact.html"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F4EC;</span><span class="hex-title">Contact</span><span class="hex-meta">Collaboration</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon">
-                    <a class="hex-link" href="/contact.html" aria-label="Contact"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">📬</span>
-                        <span class="hex-title">Contact</span>
-                        <span class="hex-meta">Collaboration</span>
-                    </div>
-                </div>
-            </div>
+    </div></div>
 
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════════
-         SECTION 2: UAP INVESTIGATION TOOLS
-    ══════════════════════════════════════════════ -->
+    <!-- SECTION 2: UAP INVESTIGATION TOOLS -->
     <div class="node-label">UAP Investigation Tools</div>
+    <div class="hc-grid-wrap"><div class="hc-grid">
 
-    <div class="hc-grid-wrap">
-        <div class="hc-grid">
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="https://aeroscopeuap.netlify.app/" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F4FB;</span><span class="hex-title">Aeroscope UAP</span><span class="hex-meta">Radar Sim Feed</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="https://aeroscopeuap.netlify.app/" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">📻</span>
-                        <span class="hex-title">Aeroscope UAP</span>
-                        <span class="hex-meta">Radar Sim Feed</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="https://signalscopex11.netlify.app/" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F4F6;</span><span class="hex-title">SignalScope X11</span><span class="hex-meta">RF Log Node</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="https://signalscopex11.netlify.app/" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">📶</span>
-                        <span class="hex-title">SignalScope X11</span>
-                        <span class="hex-meta">RF Log Node</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="https://ether-listen.netlify.app/" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F50A;</span><span class="hex-title">Ether Listen</span><span class="hex-meta">Flux Sensor Array</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="https://ether-listen.netlify.app/" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🔊</span>
-                        <span class="hex-title">Ether Listen</span>
-                        <span class="hex-meta">Flux Sensor Array</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="https://admirable-queijadas-b90981.netlify.app/" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F5C2;</span><span class="hex-title">Metadata Proc</span><span class="hex-meta">Data Grid Context</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="https://admirable-queijadas-b90981.netlify.app/" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🗂</span>
-                        <span class="hex-title">Metadata Proc</span>
-                        <span class="hex-meta">Data Grid Context</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="/appdetector/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F30D;</span><span class="hex-title">Appdetector</span><span class="hex-meta">Quake + Earth Lights</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="/appdetector/" aria-label="Appdetector earthquake monitoring"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🌍</span>
-                        <span class="hex-title">Appdetector</span>
-                        <span class="hex-meta">Quake + Earth Lights</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="/niagaranode/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F4CD;</span><span class="hex-title">Niagara Node</span><span class="hex-meta">Regional Monitor</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="/niagaranode/" aria-label="Niagara Region monitoring node"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">📍</span>
-                        <span class="hex-title">Niagara Node</span>
-                        <span class="hex-meta">Regional Monitor</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="/lights.html"></a>
+            <div class="hex-content"><span class="hex-icon">&#x2728;</span><span class="hex-title">Lights Archive</span><span class="hex-meta">Luminous Phenomena</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="/lights.html" aria-label="Anomalous luminous phenomena"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">✨</span>
-                        <span class="hex-title">Lights Archive</span>
-                        <span class="hex-meta">Luminous Phenomena</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="https://anomaly-dashboard-two.vercel.app" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F4CA;</span><span class="hex-title">Anomaly Dashboard</span><span class="hex-meta">NOAA/USGS/DONKI</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="https://anomaly-dashboard-two.vercel.app" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">📊</span>
-                        <span class="hex-title">Anomaly Dashboard</span>
-                        <span class="hex-meta">NOAA/USGS/DONKI</span>
-                    </div>
-                </div>
-            </div>
+    </div></div>
 
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════════
-         SECTION 3: PRESIGNAL RESEARCH PREPRINTS
-    ══════════════════════════════════════════════ -->
+    <!-- SECTION 3: PRESIGNAL RESEARCH PREPRINTS -->
     <div class="node-label">Presignal Research Preprints</div>
+    <div class="hc-grid-wrap"><div class="hc-grid">
 
-    <div class="hc-grid-wrap">
-        <div class="hc-grid">
+        <div class="hex-wrap"><div class="hexagon science pulse">
+            <a class="hex-link" href="/presignal.html"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F4DA;</span><span class="hex-title">Presignal Library</span><span class="hex-meta">29 Preprints</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science pulse">
-                    <a class="hex-link" href="/presignal.html" aria-label="Presignal preprint library index"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">📚</span>
-                        <span class="hex-title">Presignal Library</span>
-                        <span class="hex-meta">23+ Preprints</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://doi.org/10.31223/X5J47D" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F30B;</span><span class="hex-title">GPDM v2.4</span><span class="hex-meta">DOI: X5J47D</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="https://doi.org/10.31223/X5J47D" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🌋</span>
-                        <span class="hex-title">GPDM v2.4</span>
-                        <span class="hex-meta">DOI: X5J47D</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://doi.org/10.5281/zenodo.20263839" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x221E;</span><span class="hex-title">Riemann Zeta</span><span class="hex-meta">DOI: 20263839</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="https://doi.org/10.5281/zenodo.20263839" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">∞</span>
-                        <span class="hex-title">Riemann Zeta</span>
-                        <span class="hex-meta">DOI: 20263839</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://doi.org/10.5281/zenodo.20436594" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x221E;</span><span class="hex-title">Adele Class Riemann</span><span class="hex-meta">DOI: 20436594</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="https://doi.org/10.5281/zenodo.20274511" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🕸</span>
-                        <span class="hex-title">Cosmic Web Murray</span>
-                        <span class="hex-meta">DOI: 20274511</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://doi.org/10.5281/zenodo.20274511" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F578;</span><span class="hex-title">Cosmic Web Murray</span><span class="hex-meta">DOI: 20274511</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="https://doi.org/10.5281/zenodo.20181743" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🔩</span>
-                        <span class="hex-title">VAHS Spine</span>
-                        <span class="hex-meta">DOI: 20181743</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://doi.org/10.5281/zenodo.20181743" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F529;</span><span class="hex-title">VAHS Spine</span><span class="hex-meta">DOI: 20181743</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="https://doi.org/10.5281/zenodo.20278265" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">⚡</span>
-                        <span class="hex-title">Ether Signal</span>
-                        <span class="hex-meta">DOI: 20278265</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://doi.org/10.5281/zenodo.20278265" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x26A1;</span><span class="hex-title">Ether Signal</span><span class="hex-meta">DOI: 20278265</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="https://doi.org/10.5281/zenodo.19717522" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🛸</span>
-                        <span class="hex-title">ISM Terrain Nav</span>
-                        <span class="hex-meta">DOI: 19717522</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://doi.org/10.5281/zenodo.19717522" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F6F8;</span><span class="hex-title">ISM Terrain Nav</span><span class="hex-meta">DOI: 19717522</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="https://doi.org/10.5281/zenodo.19870281" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">📡</span>
-                        <span class="hex-title">EM Sentinel</span>
-                        <span class="hex-meta">DOI: 19870281</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://doi.org/10.5281/zenodo.19870281" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F4E1;</span><span class="hex-title">EM Sentinel</span><span class="hex-meta">DOI: 19870281</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="https://doi.org/10.5281/zenodo.19870137" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🔧</span>
-                        <span class="hex-title">Field Node v2.0</span>
-                        <span class="hex-meta">DOI: 19870137</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://doi.org/10.5281/zenodo.19870137" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F527;</span><span class="hex-title">Field Node v2.0</span><span class="hex-meta">DOI: 19870137</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="https://doi.org/10.5281/zenodo.20042543" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🔒</span>
-                        <span class="hex-title">SafeKey Framework</span>
-                        <span class="hex-meta">DOI: 20042543</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://doi.org/10.5281/zenodo.20180890" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F9A0;</span><span class="hex-title">Tardigrade / Rad</span><span class="hex-meta">DOI: 20180890</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="https://doi.org/10.5281/zenodo.20180890" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🦠</span>
-                        <span class="hex-title">Tardigrade / Rad</span>
-                        <span class="hex-meta">DOI: 20180890</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://doi.org/10.5281/zenodo.20437281" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F514;</span><span class="hex-title">The Prime Signal</span><span class="hex-meta">DOI: 20437281</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="https://orcid.org/0009-0004-1363-304X" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🆔</span>
-                        <span class="hex-title">ORCID Registry</span>
-                        <span class="hex-meta">0009-0004-1363-304X</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://doi.org/10.5281/zenodo.20361678" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x2B21;</span><span class="hex-title">Geometry Garden AI</span><span class="hex-meta">DOI: 20361678</span></div>
+        </div></div>
 
-        </div>
-    </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://doi.org/10.5281/zenodo.20247383" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F522;</span><span class="hex-title">Sequence Anomaly</span><span class="hex-meta">DOI: 20247383</span></div>
+        </div></div>
 
-    <!-- ══════════════════════════════════════════════
-         SECTION 4: WATER + ENVIRONMENTAL
-    ══════════════════════════════════════════════ -->
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="https://orcid.org/0009-0004-1363-304X" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F194;</span><span class="hex-title">ORCID Registry</span><span class="hex-meta">0009-0004-1363-304X</span></div>
+        </div></div>
+
+    </div></div>
+
+    <!-- SECTION 4: WATER + ENVIRONMENTAL -->
     <div class="node-label">Water Intelligence + Environment</div>
+    <div class="hc-grid-wrap"><div class="hc-grid">
 
-    <div class="hc-grid-wrap">
-        <div class="hc-grid">
+        <div class="hex-wrap"><div class="hexagon pulse" style="border-color:rgba(0,150,255,0.3);">
+            <a class="hex-link" href="/aquasignal/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F4A7;</span><span class="hex-title">AquaSignal</span><span class="hex-meta">Water Intelligence</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon pulse" style="border-color:rgba(0,150,255,0.3);">
-                    <a class="hex-link" href="/aquasignal/" aria-label="AquaSignal water intelligence platform"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">💧</span>
-                        <span class="hex-title">AquaSignal</span>
-                        <span class="hex-meta">Water Intelligence</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon">
+            <a class="hex-link" href="/plant-a-promise"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F331;</span><span class="hex-title">Plant a Promise</span><span class="hex-meta">Eco Initiative</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon">
-                    <a class="hex-link" href="/plant-a-promise" aria-label="Plant a Promise environmental initiative"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🌱</span>
-                        <span class="hex-title">Plant a Promise</span>
-                        <span class="hex-meta">Eco Initiative</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon">
+            <a class="hex-link" href="/aquasignal/exceedances_ontario.json" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x2697;&#xFE0F;</span><span class="hex-title">Ontario Exceedances</span><span class="hex-meta">JSON Data Feed</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon">
-                    <a class="hex-link" href="/aquasignal/exceedances_ontario.json" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">⚗️</span>
-                        <span class="hex-title">Ontario Exceedances</span>
-                        <span class="hex-meta">JSON Data Feed</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon">
+            <a class="hex-link" href="/resonance-city.html"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F3D9;</span><span class="hex-title">Resonance City</span><span class="hex-meta">Civic Architecture</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon">
-                    <a class="hex-link" href="/resonance-city.html" aria-label="Resonance city architecture"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🏙</span>
-                        <span class="hex-title">Resonance City</span>
-                        <span class="hex-meta">Civic Architecture</span>
-                    </div>
-                </div>
-            </div>
+    </div></div>
 
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════════
-         SECTION 5: MATH + COMPUTATION
-    ══════════════════════════════════════════════ -->
+    <!-- SECTION 5: MATH + COMPUTATION -->
     <div class="node-label">Mathematics + Computation</div>
+    <div class="hc-grid-wrap"><div class="hc-grid">
 
-    <div class="hc-grid-wrap">
-        <div class="hc-grid">
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="/mathfun/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F9EE;</span><span class="hex-title">MathFun</span><span class="hex-meta">Riemann + Cosmology</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="/mathfun/" aria-label="Computational cosmology and Riemann tools"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🧮</span>
-                        <span class="hex-title">MathFun</span>
-                        <span class="hex-meta">Riemann + Cosmology</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="/mathfun/adelic.html"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F52E;</span><span class="hex-title">Adelic Geometry</span><span class="hex-meta">p-adic Exploration</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="/mathfun/adelic.html" aria-label="Adelic geometry exploration"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🔮</span>
-                        <span class="hex-title">Adelic Geometry</span>
-                        <span class="hex-meta">p-adic Exploration</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="/geometry-garden/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x2B21;</span><span class="hex-title">Geometry Garden</span><span class="hex-meta">Logic Playground</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="/geometry-garden/" aria-label="Mathematical logic exploration"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">⬡</span>
-                        <span class="hex-title">Geometry Garden</span>
-                        <span class="hex-meta">Logic Playground</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon science">
+            <a class="hex-link" href="/subbass/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x3005;&#xFE0F;</span><span class="hex-title">SubBass</span><span class="hex-meta">Asymptotic Foundry</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon science">
-                    <a class="hex-link" href="/subbass/" aria-label="Asymptotic Foundry Node"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">〽️</span>
-                        <span class="hex-title">SubBass</span>
-                        <span class="hex-meta">Asymptotic Foundry</span>
-                    </div>
-                </div>
-            </div>
+    </div></div>
 
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════════
-         SECTION 6: GAMES + INTERACTIVE
-    ══════════════════════════════════════════════ -->
+    <!-- SECTION 6: GAMES + INTERACTIVE -->
     <div class="node-label">Simulations + Games + Interactive</div>
+    <div class="hc-grid-wrap"><div class="hc-grid">
 
-    <div class="hc-grid-wrap">
-        <div class="hc-grid">
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="https://veilofash.netlify.app/" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F525;</span><span class="hex-title">Veil of Ash</span><span class="hex-meta">Simulation Engine</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="https://veilofash.netlify.app/" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🔥</span>
-                        <span class="hex-title">Veil of Ash</span>
-                        <span class="hex-meta">Simulation Engine</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="https://thornsignal.netlify.app/" target="_blank" rel="noopener"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F480;</span><span class="hex-title">Thorn Signal</span><span class="hex-meta">Console TTY</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="https://thornsignal.netlify.app/" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">💀</span>
-                        <span class="hex-title">Thorn Signal</span>
-                        <span class="hex-meta">Console TTY</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="/catgame/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F431;</span><span class="hex-title">Cat Game</span><span class="hex-meta">Logic Puzzle</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="/catgame/" aria-label="Cat Game logic puzzle"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🐱</span>
-                        <span class="hex-title">Cat Game</span>
-                        <span class="hex-meta">Logic Puzzle</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="/treasurechest/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F393;</span><span class="hex-title">Treasure Chest</span><span class="hex-meta">Edu Games</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="/treasurechest/" aria-label="Science and math educational games"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🎓</span>
-                        <span class="hex-title">Treasure Chest</span>
-                        <span class="hex-meta">Edu Games</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="/moodring/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F535;</span><span class="hex-title">Mood Ring</span><span class="hex-meta">Ambient Sensor</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="/moodring/" aria-label="Ambient room sensor + facial analysis"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🔵</span>
-                        <span class="hex-title">Mood Ring</span>
-                        <span class="hex-meta">Ambient Sensor</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="/park/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F333;</span><span class="hex-title">The Park</span><span class="hex-meta">AI Induction Lab</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="/park/" aria-label="AI logic playground"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🌳</span>
-                        <span class="hex-title">The Park</span>
-                        <span class="hex-meta">AI Induction Lab</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="/universe/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F30C;</span><span class="hex-title">The Universe</span><span class="hex-meta">Messaging Interface</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="/universe/" aria-label="Universal messaging interface"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🌌</span>
-                        <span class="hex-title">The Universe</span>
-                        <span class="hex-meta">Messaging Interface</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon amber">
+            <a class="hex-link" href="/portal.html"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F300;</span><span class="hex-title">Portal</span><span class="hex-meta">Anomaly Index</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon amber">
-                    <a class="hex-link" href="/portal.html" aria-label="Research gateway and anomaly index"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🌀</span>
-                        <span class="hex-title">Portal</span>
-                        <span class="hex-meta">Anomaly Index</span>
-                    </div>
-                </div>
-            </div>
+    </div></div>
 
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════════
-         SECTION 7: SECURITY + IDENTITY
-    ══════════════════════════════════════════════ -->
+    <!-- SECTION 7: SECURITY + IDENTITY -->
     <div class="node-label">Security + Identity + Dossier</div>
+    <div class="hc-grid-wrap"><div class="hc-grid">
 
-    <div class="hc-grid-wrap">
-        <div class="hc-grid">
+        <div class="hex-wrap"><div class="hexagon">
+            <a class="hex-link" href="/safekey/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F510;</span><span class="hex-title">SafeKey</span><span class="hex-meta">Simplified Security</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon">
-                    <a class="hex-link" href="/safekey/" aria-label="SafeKey security tool for elderly users"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🔐</span>
-                        <span class="hex-title">SafeKey</span>
-                        <span class="hex-meta">Simplified Security</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon">
+            <a class="hex-link" href="/Shield/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F6E1;</span><span class="hex-title">Shield</span><span class="hex-meta">Protective Protocols</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon">
-                    <a class="hex-link" href="/Shield/" aria-label="Protective systems and security protocols"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">🛡</span>
-                        <span class="hex-title">Shield</span>
-                        <span class="hex-meta">Protective Protocols</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon">
+            <a class="hex-link" href="/myresume.html"></a>
+            <div class="hex-content"><span class="hex-icon">&#x1F4C4;</span><span class="hex-title">Corporate Dossier</span><span class="hex-meta">myresume.html</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon">
-                    <a class="hex-link" href="https://www.ufosworldwide.com/myresume.html" target="_blank" rel="noopener"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">📄</span>
-                        <span class="hex-title">Corporate Dossier</span>
-                        <span class="hex-meta">myresume.html</span>
-                    </div>
-                </div>
-            </div>
+        <div class="hex-wrap"><div class="hexagon">
+            <a class="hex-link" href="/goodkarma/"></a>
+            <div class="hex-content"><span class="hex-icon">&#x262F;&#xFE0F;</span><span class="hex-title">Good Karma</span><span class="hex-meta">Certification FW</span></div>
+        </div></div>
 
-            <div class="hex-wrap">
-                <div class="hexagon">
-                    <a class="hex-link" href="/goodkarma/" aria-label="Good karma certification framework"></a>
-                    <div class="hex-content">
-                        <span class="hex-icon">☯️</span>
-                        <span class="hex-title">Good Karma</span>
-                        <span class="hex-meta">Certification FW</span>
-                    </div>
-                </div>
-            </div>
+    </div></div>
 
-        </div>
-    </div>
-
-    <!-- ── FOOTER ── -->
     <footer class="beacon-footer">
-        <div>NODE LOCATION: NIAGARA REGION, ONTARIO, CANADA &nbsp;·&nbsp; SYSTEM STATUS: ACTIVE &nbsp;·&nbsp; CORP. #1001577205</div>
+        <div>NODE LOCATION: NIAGARA REGION, ONTARIO, CANADA &nbsp;&middot;&nbsp; SYSTEM STATUS: ACTIVE &nbsp;&middot;&nbsp; CORP. #1001577205</div>
         <div style="margin-top:0.3rem; opacity:0.4;">PRESIGNAL INC. &nbsp;|&nbsp; JOHN ERNEST CARTER &nbsp;|&nbsp; ORCID 0009-0004-1363-304X &nbsp;|&nbsp; CC BY 4.0</div>
-        <div style="margin-top:0.3rem; font-size:0.5rem; opacity:0.3;">GREAT RESPONSIBILITY · SEEK HELP · REWARD THE HEART</div>
+        <div style="margin-top:0.3rem; font-size:0.5rem; opacity:0.3;">GREAT RESPONSIBILITY &middot; SEEK HELP &middot; REWARD THE HEART</div>
         <div class="footer-links">
             <a href="/llms.txt">llms.txt</a>
             <a href="/api/">API Feed</a>
@@ -1110,17 +772,16 @@
         </div>
     </footer>
 
-</div><!-- /.shell -->
+</div>
 
 <script>
-    // ── SCHUMANN COUNTER — 7.83 Hz base frequency
     const el = document.getElementById('signal-count');
     let n = 1502;
     setInterval(() => {
         const d = Math.floor(Math.random() * 3);
         n += d;
         el.textContent = n.toLocaleString();
-    }, 7830); // 1000ms / 7.83Hz × 1000 = 7830ms per tick
+    }, 7830);
 </script>
 
 </body>

@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Niagara Node 1 — Collector v2</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #030508;
+    color: #a0c8a0;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    padding: 12px;
+    min-height: 100vh;
+  }
+  #header {
+    border-bottom: 1px solid #1a2a1a;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+  }
+  #header .title { font-size: 14px; font-weight: bold; color: #60ff80; letter-spacing: 3px; }
+  #header .sub { font-size: 9px; color: #3a5a3a; letter-spacing: 2px; margin-top: 2px; }
+  #status-bar {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 10px;
+  }
+  .stat-box {
+    border: 1px solid #1a3a1a;
+    padding: 5px 8px;
+    flex: 1; min-width: 80px;
+  }
+  .stat-box .label { font-size: 8px; color: #3a6a3a; letter-spacing: 2px; text-transform: uppercase; }
+  .stat-box .val { font-size: 13px; color: #60ff80; margin-top: 2px; }
+  .stat-box .val.warn { color: #ffaa20; }
+  .stat-box .val.err { color: #ff4040; }
+  .stat-box .val.ok { color: #40ff80; }
+  .stat-box .val.pulse { animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  #sensor-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .sensor-panel {
+    border: 1px solid #1a3a1a;
+    padding: 6px 8px;
+  }
+  .sensor-panel .s-name { font-size: 9px; color: #3a6a3a; letter-spacing: 2px; margin-bottom: 4px; }
+  .sensor-panel .s-val { font-size: 11px; color: #80e890; }
+  .sensor-panel .s-age { font-size: 8px; color: #2a4a2a; margin-top: 2px; }
+  .sensor-panel.stale { border-color: #4a2a00; }
+  .sensor-panel.stale .s-name { color: #6a4a00; }
+  .sensor-panel.stale .s-val { color: #aa7020; }
+  .sensor-panel.invalid { border-color: #4a0000; }
+  .sensor-panel.invalid .s-val { color: #ff4040; }
+  #log-box {
+    border: 1px solid #1a3a1a;
+    height: 180px;
+    overflow-y: auto;
+    padding: 6px;
+    margin-bottom: 10px;
+    background: #010204;
+  }
+  .log-line { font-size: 10px; margin-bottom: 2px; line-height: 1.4; }
+  .log-line.ok { color: #40a040; }
+  .log-line.warn { color: #aa7020; }
+  .log-line.err { color: #cc3030; }
+  .log-line.info { color: #3a5a6a; }
+  #btn-start {
+    width: 100%; padding: 14px;
+    background: #0a1a0a; border: 2px solid #40c060;
+    color: #40ff80; font-family: inherit; font-size: 14px;
+    letter-spacing: 4px; cursor: pointer; margin-bottom: 6px;
+  }
+  #btn-start:active { background: #1a3a1a; }
+  #btn-push {
+    width: 100%; padding: 8px;
+    background: #0a0a1a; border: 1px solid #304060;
+    color: #4060a0; font-family: inherit; font-size: 11px;
+    letter-spacing: 2px; cursor: pointer; margin-bottom: 10px;
+  }
+  #offline-badge {
+    display: none;
+    background: #3a1a00; border: 1px solid #aa4400;
+    color: #ff8040; padding: 4px 8px; font-size: 10px;
+    margin-bottom: 6px; letter-spacing: 2px;
+  }
+  #footer {
+    font-size: 8px; color: #1a3a1a; letter-spacing: 1px;
+    border-top: 1px solid #1a2a1a; padding-top: 6px; margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="title">NIAGARA NODE 1</div>
+  <div class="sub">PRESIGNAL INC · COLLECTOR v2.1 · SAMSUNG S20 FE · AK09918</div>
+</div>
+
+<div id="status-bar">
+  <div class="stat-box">
+    <div class="label">Status</div>
+    <div class="val warn" id="s-status">READY</div>
+  </div>
+  <div class="stat-box">
+    <div class="label">Pushes</div>
+    <div class="val" id="s-count">0</div>
+  </div>
+  <div class="stat-box">
+    <div class="label">Errors</div>
+    <div class="val" id="s-errors">0</div>
+  </div>
+  <div class="stat-box">
+    <div class="label">Queued</div>
+    <div class="val" id="s-queued">0</div>
+  </div>
+  <div class="stat-box">
+    <div class="label">Battery</div>
+    <div class="val" id="s-battery">—</div>
+  </div>
+  <div class="stat-box">
+    <div class="label">Last Push</div>
+    <div class="val" id="s-last">—</div>
+  </div>
+</div>
+
+<div id="sensor-grid">
+  <div class="sensor-panel" id="panel-mag">
+    <div class="s-name">MAGNETOMETER · AK09918</div>
+    <div class="s-val" id="sv-mag">waiting...</div>
+    <div class="s-age" id="sa-mag">—</div>
+  </div>
+  <div class="sensor-panel" id="panel-gyro">
+    <div class="s-name">GYROSCOPE · LSM6DSO</div>
+    <div class="s-val" id="sv-gyro">waiting...</div>
+    <div class="s-age" id="sa-gyro">—</div>
+  </div>
+  <div class="sensor-panel" id="panel-accel">
+    <div class="s-name">ACCELEROMETER · LSM6DSO</div>
+    <div class="s-val" id="sv-accel">waiting...</div>
+    <div class="s-age" id="sa-accel">—</div>
+  </div>
+  <div class="sensor-panel" id="panel-misc">
+    <div class="s-name">NETWORK · BATTERY</div>
+    <div class="s-val" id="sv-misc">waiting...</div>
+    <div class="s-age" id="sa-misc">—</div>
+  </div>
+</div>
+
+<div id="offline-badge">⚠ OFFLINE — BUFFERING LOCALLY</div>
+
+<button id="btn-start" onclick="startNode()">▶ START NODE</button>
+<button id="btn-push" onclick="manualPush()">MANUAL PUSH NOW</button>
+
+<div id="log-box"></div>
+
+<div id="footer">
+  Presignal Inc · Ontario Corp #1001577205 · John Ernest Carter · Firebase: anomaly-intelligence · Schema v2
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDYnezOndO4OUXdFdumwSobgOBf8n6fLdM",
+  authDomain: "anomaly-intelligence.firebaseapp.com",
+  projectId: "anomaly-intelligence",
+  storageBucket: "anomaly-intelligence.firebasestorage.app",
+  messagingSenderId: "341282991733",
+  appId: "1:341282991733:web:f01390ac6fadd4a261923c"
+};
+
+const PUSH_INTERVAL_MS  = 60000;
+const STALE_THRESHOLD_MS = 90000;
+const MAG_MIN_UT = 10;
+const MAG_MAX_UT = 120;
+const MAX_QUEUE  = 10;
+const SCHEMA_VER = 2;
+
+// NaN-safe number helper — Firestore rejects NaN, returns null instead
+function safeNum(v, decimals = null) {
+  if (v === null || v === undefined) return null;
+  if (typeof v !== 'number' || isNaN(v) || !isFinite(v)) return null;
+  return decimals !== null ? parseFloat(v.toFixed(decimals)) : v;
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let db, nodeRef;
+let isRunning = false;
+let intervalHandle = null;
+let wakeLock = null;
+let pushCount = 0;
+let errorCount = 0;
+let pushSeq = 0;
+let lastPushTime = null;
+let battery = null;
+
+const sensors = {
+  mag:   { x: null, y: null, z: null, ts: null, accuracy: null, obj: null },
+  gyro:  { x: null, y: null, z: null, ts: null, obj: null },
+  accel: { x: null, y: null, z: null, ts: null, obj: null },
+};
+
+// ─── LOGGING ─────────────────────────────────────────────────────────────────
+function log(msg, type = 'info') {
+  const box = document.getElementById('log-box');
+  const ts = new Date().toISOString().slice(11, 19);
+  const el = document.createElement('div');
+  el.className = `log-line ${type}`;
+  el.textContent = `[${ts}] ${msg}`;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+  // keep max 200 lines
+  while (box.children.length > 200) box.removeChild(box.firstChild);
+}
+
+function setStatus(txt, cls = 'warn') {
+  const el = document.getElementById('s-status');
+  el.textContent = txt;
+  el.className = `val ${cls}`;
+}
+
+// ─── SENSOR AGE DISPLAY ───────────────────────────────────────────────────────
+function updateSensorPanels() {
+  const now = Date.now();
+
+  // MAG
+  const magAge = sensors.mag.ts ? now - sensors.mag.ts : null;
+  const magStale = magAge === null || magAge > STALE_THRESHOLD_MS;
+  const magX = sensors.mag.x, magY = sensors.mag.y, magZ = sensors.mag.z;
+  const magMag = (magX !== null) ? Math.sqrt(magX**2 + magY**2 + magZ**2) : null;
+  const magInvalid = magMag !== null && (magMag < MAG_MIN_UT || magMag > MAG_MAX_UT);
+  const pMag = document.getElementById('panel-mag');
+  pMag.className = `sensor-panel${magStale ? ' stale' : magInvalid ? ' invalid' : ''}`;
+  document.getElementById('sv-mag').textContent =
+    magX !== null
+      ? `X:${magX.toFixed(1)} Y:${magY.toFixed(1)} Z:${magZ.toFixed(1)} μT\n|B|=${magMag?.toFixed(1)}μT${magInvalid?' ⚠INVALID':''}`
+      : 'no data';
+  document.getElementById('sa-mag').textContent =
+    magAge !== null ? `age ${(magAge/1000).toFixed(0)}s · acc:${sensors.mag.accuracy ?? '?'}${magStale?' · STALE':''}` : 'never fired';
+
+  // GYRO
+  const gyroAge = sensors.gyro.ts ? now - sensors.gyro.ts : null;
+  const gyroStale = gyroAge === null || gyroAge > STALE_THRESHOLD_MS;
+  const pGyro = document.getElementById('panel-gyro');
+  pGyro.className = `sensor-panel${gyroStale ? ' stale' : ''}`;
+  document.getElementById('sv-gyro').textContent =
+    sensors.gyro.x !== null
+      ? `X:${sensors.gyro.x.toFixed(3)} Y:${sensors.gyro.y.toFixed(3)} Z:${sensors.gyro.z.toFixed(3)} rad/s`
+      : 'no data';
+  document.getElementById('sa-gyro').textContent =
+    gyroAge !== null ? `age ${(gyroAge/1000).toFixed(0)}s${gyroStale?' · STALE':''}` : 'never fired';
+
+  // ACCEL
+  const accelAge = sensors.accel.ts ? now - sensors.accel.ts : null;
+  const accelStale = accelAge === null || accelAge > STALE_THRESHOLD_MS;
+  const pAccel = document.getElementById('panel-accel');
+  pAccel.className = `sensor-panel${accelStale ? ' stale' : ''}`;
+  document.getElementById('sv-accel').textContent =
+    sensors.accel.x !== null
+      ? `X:${sensors.accel.x.toFixed(2)} Y:${sensors.accel.y.toFixed(2)} Z:${sensors.accel.z.toFixed(2)} m/s²`
+      : 'no data';
+  document.getElementById('sa-accel').textContent =
+    accelAge !== null ? `age ${(accelAge/1000).toFixed(0)}s${accelStale?' · STALE':''}` : 'never fired';
+
+  // MISC
+  const conn = navigator.connection;
+  document.getElementById('sv-misc').textContent =
+    battery
+      ? `bat:${Math.round(battery.level*100)}% ${battery.charging?'⚡':'🔋'} | net:${conn?.effectiveType ?? '?'}`
+      : `net:${conn?.effectiveType ?? '?'}`;
+  document.getElementById('sa-misc').textContent =
+    battery ? `chgRate:${battery.chargingTime === Infinity ? '∞' : battery.chargingTime + 's'}` : '';
+}
+
+// ─── LOCAL QUEUE (offline buffer) ────────────────────────────────────────────
+function queueLoad() {
+  try { return JSON.parse(localStorage.getItem('node1_queue') || '[]'); }
+  catch { return []; }
+}
+function queueSave(q) {
+  try { localStorage.setItem('node1_queue', JSON.stringify(q)); } catch {}
+}
+function queueAdd(doc) {
+  const q = queueLoad();
+  q.push(doc);
+  if (q.length > MAX_QUEUE) q.shift(); // drop oldest if full
+  queueSave(q);
+  document.getElementById('s-queued').textContent = q.length;
+  document.getElementById('offline-badge').style.display = 'block';
+}
+function queueClear() {
+  queueSave([]);
+  document.getElementById('s-queued').textContent = 0;
+  document.getElementById('offline-badge').style.display = 'none';
+}
+
+// ─── PAYLOAD BUILDER ─────────────────────────────────────────────────────────
+function buildPayload() {
+  const now = Date.now();
+  const ts  = new Date(now).toISOString();
+
+  // Sensor ages
+  const magAge   = sensors.mag.ts   ? now - sensors.mag.ts   : null;
+  const gyroAge  = sensors.gyro.ts  ? now - sensors.gyro.ts  : null;
+  const accelAge = sensors.accel.ts ? now - sensors.accel.ts : null;
+
+  // Mag validity
+  const mx = sensors.mag.x, my = sensors.mag.y, mz = sensors.mag.z;
+  const magMag = (mx !== null && !isNaN(mx) && !isNaN(my) && !isNaN(mz)) ? Math.sqrt(mx**2 + my**2 + mz**2) : null;
+  const magValid = magMag !== null && magMag >= MAG_MIN_UT && magMag <= MAG_MAX_UT;
+  const magStale = magAge === null || magAge > STALE_THRESHOLD_MS;
+
+  // Push gap check
+  let pushGapMs = null, pushGapFlag = null;
+  if (lastPushTime) {
+    pushGapMs = now - lastPushTime;
+    if (pushGapMs > 75000) pushGapFlag = 'MISSED_PUSH';
+    if (pushGapMs < 45000) pushGapFlag = 'DUPLICATE_PUSH';
+  }
+
+  // Network
+  const conn = navigator.connection;
+
+  pushSeq++;
+
+  return {
+    // ── Meta ──
+    schema_version: SCHEMA_VER,
+    node_id: 'niagara-node-1',
+    device: 'Samsung Galaxy S20 FE',
+    device_serial: 'RFCNA0Y2VVE',
+    timestamp: ts,
+    timestamp_ms: now,
+    push_sequence: pushSeq,
+    push_gap_ms: pushGapMs,
+    push_gap_flag: pushGapFlag,
+    tab_visible: !document.hidden,
+
+    // ── Magnetometer (AK09918) ──
+    mag_x: mx,
+    mag_y: my,
+    mag_z: mz,
+    mag_magnitude: safeNum(magMag, 3),
+    mag_valid: magValid,
+    mag_stale: magStale,
+    mag_age_ms: magAge,
+    mag_accuracy: sensors.mag.accuracy,
+
+    // ── Gyroscope (LSM6DSO) ──
+    gyro_x: safeNum(sensors.gyro.x, 5),
+    gyro_y: safeNum(sensors.gyro.y, 5),
+    gyro_z: safeNum(sensors.gyro.z, 5),
+    gyro_stale: gyroAge === null || gyroAge > STALE_THRESHOLD_MS,
+    gyro_age_ms: gyroAge,
+
+    // ── Accelerometer (LSM6DSO) ──
+    accel_x: safeNum(sensors.accel.x, 4),
+    accel_y: safeNum(sensors.accel.y, 4),
+    accel_z: safeNum(sensors.accel.z, 4),
+    accel_stale: accelAge === null || accelAge > STALE_THRESHOLD_MS,
+    accel_age_ms: accelAge,
+
+    // ── Battery ──
+    battery_level: battery ? safeNum(battery.level * 100, 1) : null,
+    battery_charging: battery ? battery.charging : null,
+    battery_charging_time_s: battery ? (battery.chargingTime === Infinity ? null : battery.chargingTime) : null,
+    battery_discharging_time_s: battery ? (battery.dischargingTime === Infinity ? null : battery.dischargingTime) : null,
+
+    // ── Network ──
+    network_type: conn?.effectiveType ?? null,
+    network_downlink_mbps: conn?.downlink ?? null,
+    network_rtt_ms: conn?.rtt ?? null,
+    network_save_data: conn?.saveData ?? null,
+
+    // ── Node health ──
+    push_count_session: pushCount + 1,
+    error_count_session: errorCount,
+    wake_lock_active: wakeLock !== null,
+    user_agent: navigator.userAgent,
+
+    // ── Sensor capability flags ──
+    api_mag_available: 'Magnetometer' in window,
+    api_gyro_available: 'Gyroscope' in window,
+    api_accel_available: 'Accelerometer' in window,
+    api_battery_available: 'getBattery' in navigator,
+    api_als_available: false, // STK31610 not exposed to web API on Android
+  };
+}
+
+// ─── FIRESTORE PUSH ──────────────────────────────────────────────────────────
+async function drainQueue() {
+  const q = queueLoad();
+  if (q.length === 0) return;
+  log(`Draining ${q.length} queued docs...`, 'warn');
+  for (const doc of q) {
+    try {
+      await addDoc(nodeRef, { ...doc, recovered_from_queue: true });
+      log(`Queue drain OK — seq ${doc.push_sequence}`, 'ok');
+    } catch (e) {
+      log(`Queue drain FAILED — keeping: ${e.message}`, 'err');
+      return; // stop draining if still offline
+    }
+  }
+  queueClear();
+}
+
+async function pushData() {
+  updateSensorPanels();
+  const payload = buildPayload();
+
+  // Warn on stale mag
+  if (payload.mag_stale) log('⚠ Magnetometer data STALE — age ' + (payload.mag_age_ms/1000).toFixed(0) + 's', 'warn');
+  if (!payload.mag_valid && payload.mag_magnitude !== null)
+    log(`⚠ Magnetometer magnitude out of range: ${payload.mag_magnitude}μT`, 'warn');
+
+  try {
+    await drainQueue();
+    await addDoc(nodeRef, payload);
+    pushCount++;
+    lastPushTime = Date.now();
+    document.getElementById('s-count').textContent = pushCount;
+    document.getElementById('s-last').textContent = new Date().toISOString().slice(11, 19) + ' UTC';
+    document.getElementById('s-errors').textContent = errorCount;
+    const mag = payload.mag_magnitude;
+    log(`Push #${pushCount} OK — seq:${payload.push_sequence} |B|=${mag !== null ? mag.toFixed(1) + 'μT' : 'null'} bat:${payload.battery_level ?? '?'}% gap:${payload.push_gap_ms ? (payload.push_gap_ms/1000).toFixed(0)+'s' : 'first'}${payload.push_gap_flag ? ' ⚠'+payload.push_gap_flag : ''}`, 'ok');
+  } catch (e) {
+    errorCount++;
+    document.getElementById('s-errors').textContent = errorCount;
+    log(`Push FAILED (seq:${payload.push_sequence}): ${e.message} — buffering locally`, 'err');
+    queueAdd(payload);
+  }
+}
+
+// ─── SENSOR INIT ─────────────────────────────────────────────────────────────
+function initSensors() {
+  // MAGNETOMETER
+  if ('Magnetometer' in window) {
+    try {
+      const mag = new Magnetometer({ frequency: 10 });
+      mag.addEventListener('reading', () => {
+        sensors.mag.x = (typeof mag.x === 'number' && !isNaN(mag.x)) ? mag.x : null;
+        sensors.mag.y = (typeof mag.y === 'number' && !isNaN(mag.y)) ? mag.y : null;
+        sensors.mag.z = (typeof mag.z === 'number' && !isNaN(mag.z)) ? mag.z : null;
+        sensors.mag.ts = Date.now();
+        sensors.mag.accuracy = mag.accuracy ?? null;
+      });
+      mag.addEventListener('error', e => {
+        log('Magnetometer error: ' + e.error?.message, 'err');
+      });
+      mag.start();
+      sensors.mag.obj = mag;
+      log('Magnetometer API started (10Hz)', 'ok');
+    } catch (e) {
+      log('Magnetometer start failed: ' + e.message, 'err');
+    }
+  } else {
+    log('window.Magnetometer NOT available — ALS fallback only', 'warn');
+    // DeviceOrientationEvent gives compass heading but NOT raw μT — do NOT use for mag data
+    // Log this clearly so dashboard can flag the limitation
+  }
+
+  // GYROSCOPE
+  if ('Gyroscope' in window) {
+    try {
+      const gyro = new Gyroscope({ frequency: 10 });
+      gyro.addEventListener('reading', () => {
+        sensors.gyro.x = (typeof gyro.x === 'number' && !isNaN(gyro.x)) ? gyro.x : null;
+        sensors.gyro.y = (typeof gyro.y === 'number' && !isNaN(gyro.y)) ? gyro.y : null;
+        sensors.gyro.z = (typeof gyro.z === 'number' && !isNaN(gyro.z)) ? gyro.z : null;
+        sensors.gyro.ts = Date.now();
+      });
+      gyro.addEventListener('error', e => log('Gyroscope error: ' + e.error?.message, 'err'));
+      gyro.start();
+      sensors.gyro.obj = gyro;
+      log('Gyroscope API started (10Hz)', 'ok');
+    } catch (e) {
+      log('Gyroscope start failed: ' + e.message, 'err');
+    }
+  } else {
+    log('window.Gyroscope NOT available', 'warn');
+  }
+
+  // ACCELEROMETER
+  if ('Accelerometer' in window) {
+    try {
+      const accel = new Accelerometer({ frequency: 10 });
+      accel.addEventListener('reading', () => {
+        sensors.accel.x = (typeof accel.x === 'number' && !isNaN(accel.x)) ? accel.x : null;
+        sensors.accel.y = (typeof accel.y === 'number' && !isNaN(accel.y)) ? accel.y : null;
+        sensors.accel.z = (typeof accel.z === 'number' && !isNaN(accel.z)) ? accel.z : null;
+        sensors.accel.ts = Date.now();
+      });
+      accel.addEventListener('error', e => log('Accelerometer error: ' + e.error?.message, 'err'));
+      accel.start();
+      sensors.accel.obj = accel;
+      log('Accelerometer API started (10Hz)', 'ok');
+    } catch (e) {
+      log('Accelerometer start failed: ' + e.message, 'err');
+    }
+  } else {
+    log('window.Accelerometer NOT available', 'warn');
+  }
+
+  // BATTERY
+  if ('getBattery' in navigator) {
+    navigator.getBattery().then(b => {
+      battery = b;
+      b.addEventListener('levelchange', () => { battery = b; });
+      b.addEventListener('chargingchange', () => { battery = b; });
+      log(`Battery: ${Math.round(b.level*100)}% ${b.charging ? 'charging ⚡' : 'on battery'}`, 'ok');
+    }).catch(e => log('Battery API error: ' + e.message, 'warn'));
+  } else {
+    log('Battery API not available', 'warn');
+  }
+}
+
+// ─── WAKE LOCK ────────────────────────────────────────────────────────────────
+async function acquireWakeLock() {
+  if (!('wakeLock' in navigator)) {
+    log('Wake Lock API not available — screen may dim', 'warn');
+    return;
+  }
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    log('Wake lock acquired — screen will stay on', 'ok');
+    wakeLock.addEventListener('release', () => {
+      log('Wake lock released by system', 'warn');
+      wakeLock = null;
+    });
+  } catch (e) {
+    log('Wake lock failed: ' + e.message, 'warn');
+  }
+}
+
+// Re-acquire wake lock when tab becomes visible again
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && isRunning && wakeLock === null) {
+    log('Tab visible again — reacquiring wake lock', 'warn');
+    await acquireWakeLock();
+  }
+  if (document.visibilityState === 'hidden') {
+    log('Tab hidden — wake lock may be released by OS', 'warn');
+  }
+});
+
+// ─── ONLINE/OFFLINE ───────────────────────────────────────────────────────────
+window.addEventListener('online',  () => log('Network: ONLINE', 'ok'));
+window.addEventListener('offline', () => log('Network: OFFLINE — local buffer active', 'warn'));
+
+// ─── START ────────────────────────────────────────────────────────────────────
+async function startNode() {
+  if (isRunning) { log('Already running', 'warn'); return; }
+
+  log('Initializing Firebase...', 'info');
+  try {
+    const app = initializeApp(FIREBASE_CONFIG);
+    db = getFirestore(app);
+    nodeRef = collection(db, 'niagara-field-node');
+    log('Firebase connected', 'ok');
+  } catch (e) {
+    log('Firebase init FAILED: ' + e.message, 'err');
+    setStatus('FIREBASE ERROR', 'err');
+    return;
+  }
+
+  log('Acquiring wake lock...', 'info');
+  await acquireWakeLock();
+
+  log('Starting sensors...', 'info');
+  initSensors();
+
+  // Wait for first sensor readings
+  log('Waiting 3s for sensors to warm up...', 'info');
+  await new Promise(r => setTimeout(r, 3000));
+
+  log('First push...', 'info');
+  await pushData();
+
+  intervalHandle = setInterval(pushData, PUSH_INTERVAL_MS);
+  isRunning = true;
+  setStatus('● ACTIVE — 60s', 'ok');
+  document.getElementById('s-status').classList.add('pulse');
+  document.getElementById('btn-start').textContent = '◼ NODE RUNNING';
+  document.getElementById('btn-start').style.borderColor = '#206040';
+  document.getElementById('btn-start').style.color = '#206040';
+  log(`Node live — push every ${PUSH_INTERVAL_MS/1000}s`, 'ok');
+}
+
+async function manualPush() {
+  if (!isRunning) { log('Start node first', 'warn'); return; }
+  log('Manual push triggered', 'info');
+  await pushData();
+}
+
+window.startNode = startNode;
+window.manualPush = manualPush;
+
+log('Collector v2.1 loaded — tap START NODE', 'ok');
+log('Fixes: raw mag API · gyro · accel · battery · wake lock · queue · stale detection · validation', 'info');
+</script>
+</body>
+</html>
