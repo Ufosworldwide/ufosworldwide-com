@@ -229,14 +229,6 @@ All pages live at **ufosworldwide.com/[path]** unless otherwise noted.
 | Lights | [ufosworldwide.com/lights.html](https://www.ufosworldwide.com/lights.html) | Anomalous lights reference |
 | Safekit | [ufosworldwide.com/safekit.html](https://www.ufosworldwide.com/safekit.html) | Safety kit interface |
 
-### APEX Operations Suite
-
-| Page | URL | Description |
-|------|-----|-------------|
-| APEX Main | [apex-eight-umber.vercel.app](https://apex-eight-umber.vercel.app) | Parts intelligence platform hub |
-| APEX Dispatch | [ufosworldwide.com/apex-dispatch](https://www.ufosworldwide.com/apex-dispatch) | Live dispatch dashboard & map |
-| API Proxy | [ufosworldwide.com/api](https://www.ufosworldwide.com/api) | APEX Vercel proxy webhook |
-
 ### Games & Interactive Experiences
 
 | Page | URL | Description |
