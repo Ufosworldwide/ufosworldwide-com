@@ -166,7 +166,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);height:100vh
 </div>
 <script>
 let drivers={},events=[],activeHub='all',selectedDriver=null;
-let webhookUrl=localStorage.getItem('apex_webhook')||'';
+let webhookUrl='/api/apex';
 let pollInterval=null;
 if(webhookUrl){document.getElementById('webhook-input').value=webhookUrl;setStatus(true);startPoll();}
 function saveWebhook(){webhookUrl=document.getElementById('webhook-input').value.trim();localStorage.setItem('apex_webhook',webhookUrl);setStatus(true);startPoll();}
