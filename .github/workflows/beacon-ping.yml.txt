@@ -1,0 +1,35 @@
+name: Beacon Ping — Sitemap Indexer Notification
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ping-indexers:
+    runs-on: ubuntu-latest
+    name: Ping search engines and crawlers
+    steps:
+      - name: Ping Google
+        run: curl -s "https://www.google.com/ping?sitemap=https://www.ufosworldwide.com/sitemap.xml" -o /dev/null -w "Google: %{http_code}\n"
+
+      - name: Ping Bing
+        run: curl -s "https://www.bing.com/ping?sitemap=https://www.ufosworldwide.com/sitemap.xml" -o /dev/null -w "Bing: %{http_code}\n"
+
+      - name: Ping IndexNow
+        run: |
+          curl -s -X POST "https://api.indexnow.org/indexnow" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "host": "www.ufosworldwide.com",
+              "key": "presignal-indexnow-key",
+              "keyLocation": "https://www.ufosworldwide.com/presignal-indexnow-key.txt",
+              "urlList": [
+                "https://www.ufosworldwide.com/",
+                "https://www.ufosworldwide.com/presignal.html",
+                "https://www.ufosworldwide.com/sitemap.xml"
+              ]
+            }' -o /dev/null -w "IndexNow: %{http_code}\n"
+
+      - name: Log pulse time
+        run: echo "Beacon pulse sent at $(date -u)"
