@@ -3699,7 +3699,7 @@ async function sendApexEmail(subject, message, toEmail) {
       subject: subject,
       message: message,
       to_email: toEmail || NOTIFY_EMAIL
-    });
+    }, {publicKey: '6dgwBRJOa8AY5dsOh', privateKey: '1GVZrlL035d3lbB5DRv-K'});
     console.log('Email sent to:', toEmail || NOTIFY_EMAIL);
   } catch(e) {
     console.warn('EmailJS failed:', e);
