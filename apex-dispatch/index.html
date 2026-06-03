@@ -3693,14 +3693,14 @@ const NOTIFY_EMAIL = 'john.carter@performance.ca';
 
 emailjs.init(EMAILJS_KEY);
 
-async function sendApexEmail(subject, message) {
+async function sendApexEmail(subject, message, toEmail) {
   try {
     await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
       subject: subject,
       message: message,
-      to_email: NOTIFY_EMAIL
+      to_email: toEmail || NOTIFY_EMAIL
     });
-    console.log('Email sent:', subject);
+    console.log('Email sent to:', toEmail || NOTIFY_EMAIL);
   } catch(e) {
     console.warn('EmailJS failed:', e);
   }
@@ -3771,7 +3771,7 @@ Photo Taken: ${payload.hasPhoto ? 'YES' : 'NO'}
 
 Parts:
 ${parts}`;
-    sendApexEmail(`✓ DELIVERY CONFIRMED — ${payload.customer?.name}`, msg);
+    sendApexEmail(`✓ DELIVERY CONFIRMED — ${payload.customer?.name}`, msg, payload.recipientEmail || NOTIFY_EMAIL);
   }
 
   if (payload.type === 'ORDER_CREATED') {
