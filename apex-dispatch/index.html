@@ -192,9 +192,9 @@ input[type="file"]{display:none}
   <div class="login-logo">APEX</div>
   <div class="login-tagline">Performance Dispatch System</div>
   <div class="login-card">
-    <div class="login-card-title">APEX Driver Sign In</div>
+    <div class="login-card-title">Driver Sign In</div>
     <div class="field"><label>Full Name</label><input type="text" id="login-name" placeholder="Your full name" autocomplete="name"></div>
-    <div class="field"><label>Work Email</label><input type="email" id="login-email" placeholder="john.carter@performance.ca" autocomplete="email"></div>
+    <div class="field"><label>Work Email</label><input type="email" id="login-email" placeholder="firstname.lastname@performance.ca" autocomplete="email"></div>
     <div class="field"><label>Hub</label>
       <select id="login-hub">
         <option value="">Select your hub...</option>
@@ -240,16 +240,32 @@ input[type="file"]{display:none}
   <!-- NEW ORDER TAB -->
   <div class="screen-inner" id="screen-new-order">
 
-    
+    <!-- MIXBOX -->
+    <div class="card" style="border:1.5px solid var(--blue);">
+      <div class="card-header" style="background:var(--blue-light);">
+        <div class="card-title" style="color:var(--blue);">📦 Scan MixBox Label</div>
+        <span style="font-size:10px;font-weight:700;color:var(--blue);background:var(--blue);color:#fff;padding:2px 8px;border-radius:4px;">FASTEST</span>
+      </div>
+      <div class="card-body">
+        <div class="scan-box" onclick="triggerMixboxScan()">
+          <div class="icon">🔲</div>
+          <div class="label">Scan Box QR Code</div>
+          <div class="sublabel">One scan — all parts load instantly</div>
+        </div>
+        <input type="file" id="mixbox-file-input" accept="image/*" capture="environment" onchange="processMixboxQR(event)">
+      </div>
+    </div>
+
+    <div style="font-size:11px;font-weight:600;color:var(--text-dim);text-align:center;letter-spacing:2px;text-transform:uppercase;margin:4px 0 12px;">— or scan invoice —</div>
 
     <!-- INVOICE SCAN -->
     <div class="card">
-      <div class="card-header"><div class="card-title">📷 Photo — Invoice &amp; Parts</div></div>
+      <div class="card-header"><div class="card-title">📄 Invoice Scan</div></div>
       <div class="card-body">
         <div class="scan-box" onclick="triggerInvoiceScan()">
           <div class="icon">📷</div>
-          <div class="label">Photo of Invoice &amp; Parts</div>
-          <div class="sublabel">Take a clear photo of the invoice and all parts</div>
+          <div class="label">Scan Invoice</div>
+          <div class="sublabel">Camera reads part numbers · shipped vs backordered</div>
         </div>
         <img id="ocr-preview" alt="Invoice">
         <div class="progress-wrap" id="ocr-progress-wrap"><div class="progress-bar" id="ocr-progress-bar"></div></div>
@@ -286,7 +302,7 @@ input[type="file"]{display:none}
     <div class="card">
       <div class="card-header">
         <div class="card-title">🔢 Part Numbers</div>
-        
+        <button class="btn btn-outline btn-sm" onclick="triggerPartScan()">📷 Scan Part</button>
       </div>
       <div class="card-body">
         <div class="field">
@@ -296,7 +312,7 @@ input[type="file"]{display:none}
             <button class="btn btn-blue btn-sm" onclick="addManualPart()">Add</button>
           </div>
         </div>
-        
+        <input type="file" id="part-file-input" accept="image/*" capture="environment" onchange="processPartImage(event)">
         <div class="parts-list" id="parts-list"></div>
       </div>
     </div>
@@ -520,7 +536,7 @@ const CUSTOMERS = [
   {id:'C0110',name:'CUSTOM AUTOBODY REPAIR - 9035',address:'28 RUTHERFORD RD S, BRAMPTON, ON'},
   {id:'C0111',name:'EUROMOTIVE AUTO SERVICE - 253',address:'18-360 YORK RD, NIAGARA ON THE LAKE, ON'},
   {id:'C0112',name:'CSN HACKETT\'S BELLEVILLE - 11581',address:'#32 COUNTY ROAD 3 R R #7, BELLEVILLE, ON'},
-  {id:'C0113',name:'CK COLLISION CENTRES SCAR - 854',address:'514 CENTENNIAL RD. N, , ON'},
+  {id:'C0113',name:'CK COLLISION CENTRES SCAR - 854',address:'514 CENTENNIAL RD. N, ON'},
   {id:'C0114',name:'Sun Collision - 15560',address:'186 MERRITT ST, ST.CATHARINES, ON'},
   {id:'C0115',name:'Humber 27 Tire & Auto Service Centre Ltd - 22968',address:'106 Regina Rd, Unit 7, Woodbridge, ON'},
   {id:'C0116',name:'ADESA AUCTIONS CANADA CORP - 472',address:'55 AUCTION LANE, BRAMPTON, ON'},
@@ -604,7 +620,7 @@ const CUSTOMERS = [
   {id:'C0194',name:'THE LAB GROUP INC - 11844',address:'333 WYECROFT RD, OAKVILLE, ON'},
   {id:'C0195',name:'RUTHERFORD TRANSMISSION - 204',address:'2070 STEELES AVE E UNIT#6, BRAMPTON, ON'},
   {id:'C0196',name:'PROCOLOR COLLISION THORNHILL - 9453',address:'7-71 GLEN CAMERON RD, THORNHILL, ON'},
-  {id:'C0197',name:'CSN HAMILTON - 7575',address:'194 JOHN ST SOUTH, , ON'},
+  {id:'C0197',name:'CSN HAMILTON - 7575',address:'194 JOHN ST SOUTH, ON'},
   {id:'C0198',name:'ZELLENS AUTO MALL - 829',address:'274 CATHARINE ST N, HAMILTON, ON'},
   {id:'C0199',name:'BOSCH CAR SERVICE - 4422',address:'49 SOUTHWORTH ST, WELLAND, ON'},
   {id:'C0200',name:'OPEN LANE - 13363',address:'55 AUCTION LANE, BRAMPTON, ON'},
@@ -734,7 +750,7 @@ const CUSTOMERS = [
   {id:'C0324',name:'RITEWAY AUTOBODY - 6822',address:'311 ARMSTRONG AVE, GEORGETOWN, ON'},
   {id:'C0325',name:'CSN Stratford - 23375',address:'695 Wright Blvd, Stratford, ON'},
   {id:'C0326',name:'GLIDDEN AUTOBODY&COLLISION CENTRE - 2386',address:'255 RUTHERFORF RD UNIT#7, BRAMPTON, ON'},
-  {id:'C0327',name:'CARSTAR MAINWAY (ARO) - 7618',address:'3388 MAINWAY, , ON'},
+  {id:'C0327',name:'CARSTAR MAINWAY (ARO) - 7618',address:'3388 MAINWAY, ON'},
   {id:'C0328',name:'COLLISION 77 - 6746',address:'27 FISHERMAN DR #10, BRAMPTON, ON'},
   {id:'C0329',name:'UNITED AUTO CENTRE - 11202',address:'539 SPEERS RD, OAKVILLE, ON'},
   {id:'C0330',name:'Canadian Tire (Lincoln Mall) - 4105',address:'459 Welland Ave, ST.CATHARINES, ON'},
@@ -1739,7 +1755,7 @@ const CUSTOMERS = [
   {id:'C1329',name:'Kaloti Auto Service Inc - 23282',address:'28 Melanie Dr, Brampton, ON'},
   {id:'C1330',name:'Cars4Everyone - 18220',address:'69 Eastern Ave Suite 212, Brampton, ON'},
   {id:'C1331',name:'AVP MOTORS - 24986',address:'106 REGINA RD UNIT 2, WOODBRIDGE, ON'},
-  {id:'C1332',name:'SHARPS AUTO CENTER - 7190',address:'7 PETRIE STREET, , ON'},
+  {id:'C1332',name:'SHARPS AUTO CENTER - 7190',address:'7 PETRIE STREET, ON'},
   {id:'C1333',name:'MACLEOD AUTOMOTIVE - 7395',address:'301A AQUEDUCT ST, WELLAND, ON'},
   {id:'C1334',name:'TORONTO CAR SALES - 17721',address:'300 QUEEN ST E, BRAMPTON, ON'},
   {id:'C1335',name:'JMP AUTO CENTRE - 27722',address:'4-1222 FEWSTER DR, MISSISSAUGA, ON'},
@@ -3315,7 +3331,7 @@ const CUSTOMERS = [
   {id:'C2905',name:'SIMPLICITY CAR CARE - 102',address:'113 CUSHMAN RD, ST. CATHARINES, ON'},
   {id:'C2906',name:'SAVOIE MOTOR SALES - 497',address:'4400 LYONS CREEK RD, NIAGARA FALLS, ON'},
   {id:'C2907',name:'NIAGARA AUTO WRECKERS - 734',address:'1440 BARRON RD, ALLANBURG, ON'},
-  {id:'C2908',name:'CARSTAR CALEDONIA - 1245',address:'15 GREENS RD, , ON'},
+  {id:'C2908',name:'CARSTAR CALEDONIA - 1245',address:'15 GREENS RD, ON'},
   {id:'C2909',name:'MERCEDES-BENZ BURLINGTON - 1611',address:'441 NORTH SERVICE RD, BURLINGTON, ON'},
   {id:'C2910',name:'GNV AUTO SALES INC - 2118',address:'1064 HIGHWAY 8 UNIT 1, STONEY CREEK, ON'},
   {id:'C2911',name:'AUTO VALUE HYUNDAI - 2882',address:'4060 MONTROSE RD, NIAGARA FALLS, ON'},
@@ -3479,7 +3495,7 @@ const CUSTOMERS = [
   {id:'C3069',name:'Brampton Chrysler - 11997',address:'190 Canam Crescent, Brampton, ON'},
   {id:'C3070',name:'Kia of Brampton - 10',address:'85 Canam Crescent, Brampton, ON'},
   {id:'C3071',name:'Classic Honda - 8',address:'30 Van Kirk Drive, Brampton, ON'},
-  {id:'C3072',name:'Planet Ford - 21',address:'111 Canam Cres., Brampton, ON'}
+  {id:'C3072',name:'Planet Ford - 21',address:'111 Canam Cres., Brampton, ON'},
 ];
 
 let driver=null,manifest=[],currentParts=[],returnParts=[],selectedCustomer=null,returnSelectedCustomer=null,activeDeliveryId=null,deliveryPhotoBase64=null,lastLocation=null,shiftStart=null,gpsInterval=null;
@@ -3526,59 +3542,9 @@ function triggerMixboxScan(){document.getElementById('mixbox-file-input').click(
 async function processMixboxQR(e){const file=e.target.files[0];if(!file)return;showToast('Reading MixBox label...','');try{const r=await Tesseract.recognize(file,'eng');const m=r.data.text.match(/\{[\s\S]*\}/);if(m){const d=JSON.parse(m[0]);if(d.boxId&&d.parts){d.parts.forEach(p=>addPart(p));showToast(`📦 ${d.parts.length} parts loaded from ${d.boxId}`,'success');document.getElementById('ocr-status').textContent=`MixBox ${d.boxId} · ${d.parts.length} parts`;return;}}showToast('QR not readable — scan invoice instead','error');}catch(err){showToast('Could not read MixBox','error');}e.target.value='';}
 
 function triggerInvoiceScan(){document.getElementById('invoice-file-input').click();}
-async function processInvoiceImage(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const preview = document.getElementById('ocr-preview');
-  preview.src = URL.createObjectURL(file);
-  preview.style.display = 'block';
-  document.getElementById('ocr-progress-wrap').style.display = 'none';
-  document.getElementById('ocr-status').textContent = '✓ Photo captured — fill in the details below';
-  showToast('Photo saved', 'success');
-  e.target.value = '';
-}
+async function processInvoiceImage(e){const file=e.target.files[0];if(!file)return;const preview=document.getElementById('ocr-preview');preview.src=URL.createObjectURL(file);preview.style.display='block';document.getElementById('ocr-progress-wrap').style.display='block';document.getElementById('ocr-status').textContent='Reading invoice...';try{const r=await Tesseract.recognize(file,'eng',{logger:m=>{if(m.status==='recognizing text')document.getElementById('ocr-progress-bar').style.width=(m.progress*100)+'%';}});const parts=extractPartNumbers(r.data.text);document.getElementById('ocr-status').textContent=`Found ${parts.length} part number(s)`;document.getElementById('ocr-progress-wrap').style.display='none';parts.forEach(p=>addPart(p));showToast(parts.length>0?`${parts.length} parts extracted`:'No parts found — add manually',parts.length>0?'success':'error');}catch(err){document.getElementById('ocr-status').textContent='Scan failed — enter manually';showToast('OCR failed','error');}e.target.value='';}
 
-function extractPartNumbers(text) {
-  const found = new Set();
-
-  // Mercedes: 000-490-51-00 style (groups of digits/letters separated by dashes)
-  const mercedes = text.matchAll(/\b\d{3}-\d{3}-\d{2}-\d{2}\b/g);
-  for (const m of mercedes) found.add(m[0]);
-
-  // Toyota: 47201-52600 style (5 digits dash 5 digits)
-  const toyota = text.matchAll(/\b\d{5}-\d{5}\b/g);
-  for (const m of toyota) found.add(m[0]);
-
-  // Toyota variant: 04152-52600, 90919-02240 etc
-  const toyotaV = text.matchAll(/\b\d{5}-\d{5}\b/g);
-  for (const m of toyotaV) found.add(m[0]);
-
-  // Chrysler: 68661147AB style (6-10 digits followed by 1-2 letters)
-  const chrysler = text.matchAll(/\b\d{6,10}[A-Z]{1,2}\b/g);
-  for (const m of chrysler) found.add(m[0]);
-
-  // Ford: M1PZ*15A246*AB style (alphanumeric with asterisks)
-  const ford = text.matchAll(/\b[A-Z0-9]+\*[A-Z0-9]+(?:\*[A-Z0-9]+)?\b/g);
-  for (const m of ford) found.add(m[0]);
-
-  // Generic CDK: look for PART NUMBER or PART NO column values
-  // Find text after column headers
-  const partColMatch = text.match(/PART(?:\s+N(?:O|UMBER)?)[\s\S]{0,50}?([A-Z0-9][A-Z0-9\-\*]{4,20})/i);
-  if (partColMatch) found.add(partColMatch[1].trim());
-
-  // Fallback: alphanumeric 6-15 chars with at least one letter and one number
-  // Only if nothing found yet
-  if (found.size === 0) {
-    const lines = text.split('\n');
-    for (const line of lines) {
-      const generic = line.matchAll(/\b([A-Z0-9]{2,}[-*][A-Z0-9]{2,}(?:[-*][A-Z0-9]+)*)\b/g);
-      for (const m of generic) {
-        if (m[0].length >= 5 && m[0].length <= 25) found.add(m[0]);
-      }
-    }
-  }
-
-  return [...found];
-}
+function extractPartNumbers(text){const c=text.replace(/[-\s*#|]/g,' ');return[...new Set([...c.matchAll(/\b[A-Z0-9]{4,20}\b/g)].map(m=>m[0]).filter(p=>/[0-9]/.test(p)&&/[A-Z]/.test(p)))];}
 function triggerPartScan(){document.getElementById('part-file-input').click();}
 async function processPartImage(e){const file=e.target.files[0];if(!file)return;try{const r=await Tesseract.recognize(file,'eng');extractPartNumbers(r.data.text).forEach(p=>addPart(p));showToast('Part scanned','success');}catch(err){showToast('Scan failed','error');}e.target.value='';}
 function addManualPart(){const i=document.getElementById('manual-part-input');const v=i.value.trim().replace(/[\s\-*#]/g,'').toUpperCase();if(!v)return;addPart(v);i.value='';}
@@ -3689,18 +3655,18 @@ document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click
 const EMAILJS_SERVICE = 'service_53tsuzt';
 const EMAILJS_TEMPLATE = 'template_yce0vqq';
 const EMAILJS_KEY = '6dgwBRJOa8AY5dsOh';
-const NOTIFY_EMAIL = 'john.carter@performance.ca';
+const NOTIFY_EMAIL = 'jubecrew@gmail.com';
 
 emailjs.init(EMAILJS_KEY);
 
-async function sendApexEmail(subject, message, toEmail) {
+async function sendApexEmail(subject, message) {
   try {
     await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
       subject: subject,
       message: message,
-      to_email: toEmail || NOTIFY_EMAIL
-    }, {publicKey: '6dgwBRJOa8AY5dsOh', privateKey: '1GVZrlL035d3lbB5DRv-K'});
-    console.log('Email sent to:', toEmail || NOTIFY_EMAIL);
+      to_email: NOTIFY_EMAIL
+    }, {publicKey: \'6dgwBRJOa8AY5dsOh\', privateKey: \'1GVZrlL035d3lbB5DRv-K\'});
+    console.log('Email sent:', subject);
   } catch(e) {
     console.warn('EmailJS failed:', e);
   }
@@ -3771,7 +3737,7 @@ Photo Taken: ${payload.hasPhoto ? 'YES' : 'NO'}
 
 Parts:
 ${parts}`;
-    sendApexEmail(`✓ DELIVERY CONFIRMED — ${payload.customer?.name}`, msg, payload.recipientEmail || NOTIFY_EMAIL);
+    sendApexEmail(`✓ DELIVERY CONFIRMED — ${payload.customer?.name}`, msg);
   }
 
   if (payload.type === 'ORDER_CREATED') {
