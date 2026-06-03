@@ -3531,46 +3531,9 @@ async function processInvoiceImage(e) {
   const preview = document.getElementById('ocr-preview');
   preview.src = URL.createObjectURL(file);
   preview.style.display = 'block';
-  document.getElementById('ocr-progress-wrap').style.display = 'block';
-  document.getElementById('ocr-status').textContent = 'Reading invoice...';
-  try {
-    const r = await Tesseract.recognize(file, 'eng', {
-      logger: m => { if (m.status === 'recognizing text') document.getElementById('ocr-progress-bar').style.width = (m.progress * 100) + '%'; }
-    });
-    const text = r.data.text;
-
-    // Extract invoice number
-    const invMatch = text.match(/INVOICE\s*(?:NUMBER|NO\.?)?\s*[:\s]*(\d{4,8})/i) ||
-                     text.match(/INV(?:OICE)?[\s#:]*([0-9]{4,8})/i);
-    if (invMatch && !document.getElementById('invoice-number').value) {
-      document.getElementById('invoice-number').value = invMatch[1];
-      showToast('Invoice ' + invMatch[1] + ' captured', 'success');
-    }
-
-    // Extract customer name - look for SOLD TO area
-    const soldMatch = text.match(/(?:SOLD\s+TO|S\s+O\s+L\s+D)[\s\S]{0,20}\n([A-Z][A-Z\s]+(?:AUTO|BODY|COLLISION|CHRYSLER|SERVICE|REPAIR|MOTORS|INC|LTD|FORD|CHEV)[A-Z\s]*)/i);
-    if (soldMatch) {
-      const custName = soldMatch[1].trim();
-      const searchEl = document.getElementById('customer-search');
-      if (!searchEl.value) {
-        searchEl.value = custName.split('\n')[0].trim();
-        searchCustomers(searchEl.value);
-      }
-    }
-
-    // Extract part numbers
-    const parts = extractPartNumbers(text);
-    document.getElementById('ocr-status').textContent = `Found ${parts.length} part number(s)` + (invMatch ? ` · Invoice ${invMatch[1]}` : '');
-    document.getElementById('ocr-progress-wrap').style.display = 'none';
-    parts.forEach(p => addPart(p));
-
-    if (parts.length > 0) showToast(`${parts.length} part(s) extracted`, 'success');
-    else showToast('No parts detected — add manually', 'error');
-
-  } catch(err) {
-    document.getElementById('ocr-status').textContent = 'Scan failed — enter manually';
-    showToast('OCR failed', 'error');
-  }
+  document.getElementById('ocr-progress-wrap').style.display = 'none';
+  document.getElementById('ocr-status').textContent = '✓ Photo captured — fill in the details below';
+  showToast('Photo saved', 'success');
   e.target.value = '';
 }
 
