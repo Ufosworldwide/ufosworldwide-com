@@ -20,6 +20,9 @@
 <button id="askBtn">Hold to Ask Ether</button>
 
 <script>
+  if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+  }
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
 let W, H;
