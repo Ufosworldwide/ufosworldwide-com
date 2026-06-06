@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0a">
+<title>Ether Board</title>
+<style>
+  body { margin:0; background:#050505; color:#ccc; overflow:hidden; font-family: serif; }
+  canvas { display:block; width:100vw; height:100vh; }
+  #askBtn { position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
+            padding:15px 40px; background:#1a1a1a; border:1px solid #444;
+            color:#fff; font-size:18px; border-radius:30px; }
+</style>
+</head>
+<body>
+<<canvas id="board"></canvas>
+<button id="askBtn">Hold to Ask Ether</button>
+
+<script>
+const canvas = document.getElementById('board');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; }
+window.addEventListener('resize', resize);
+resize();
+
+// --- Board Definition ---
+const BOARD = [
+  {c:'A',x:0.2,y:0.25},{c:'B',x:0.3,y:0.2},{c:'C',x:0.4,y:0.18},
+  {c:'D',x:0.5,y:0.18},{c:'E',x:0.6,y:0.2},{c:'F',x:0.7,y:0.25},
+  {c:'G',x:0.25,y:0.4},{c:'H',x:0.35,y:0.38},{c:'I',x:0.45,y:0.37},
+  {c:'J',x:0.55,y:0.37},{c:'K',x:0.65,y:0.38},{c:'L',x:0.75,y:0.4},
+  {c:'YES',x:0.2,y:0.6},{c:'NO',x:0.8,y:0.6},{c:'GOODBYE',x:0.5,y:0.85}
+];
+BOARD.forEach(l=>{ l.x*=W; l.y*=H; });
+
+// --- State ---
+const planchette = { x:W/2, y:H/2, vx:0, vy:0 };
+let drift = {x:0,y:0};
+let targetQueue = [];
+let currentTarget = null;
+
+// --- Sensors ---
+if('Accelerometer' in window){
+  const acc=new Accelerometer({frequency:30});
+  acc.addEventListener('reading',()=>{
+    drift.x += acc.x*0.08; drift.y += acc.y*0.08;
+  });
+  acc.start();
+}
+
+// --- Physics ---
+function update(){
+  if(currentTarget){
+    const dx = currentTarget.x - planchette.x;
+    const dy = currentTarget.y - planchette.y;
+    planchette.vx += dx*0.003 + drift.x*0.15;
+    planchette.vy += dy*0.003 + drift.y*0.15;
+    pl.vx *= 0.90; pl.vy *= 0.90;
+    planchette.x += planchette.vx;
+    planchette.y += planchette.vy;
+    
+    const dist = Math.hypot(dx,dy);
+    if(dist<<20){
+      navigator.vibrate?.(30);
+      currentTarget = targetQueue.shift() || null;
+      // If queue empty, return to center or GOODBYE
+      if(!currentTarget) currentTarget = {x:W/2,y:H/2};
+    }
+  }
+  // Decay drift so it doesn't run away
+  drift.x *= 0.95; drift.y *= 0.95;
+}
+
+// --- Render ---
+function draw(){
+  ctx.fillStyle='#050505'; ctx.fillRect(0,0,W,H);
+  // Draw letters
+  ctx.fillStyle='#8a8a8a'; ctx.font='24px serif'; ctx.textAlign='center';
+  BOARD.forEach(l=>ctx.fillText(l.c,l.x,l.y));
+  // Draw planchette
+  ctx.beginPath();
+  ctx.arc(planchette.x, planchette.y, 25, 0, Math.PI*2);
+  ctx.fillStyle='rgba(200,200,220,0.15)';
+  ctx.strokeStyle='#aaa'; ctx.lineWidth=2;
+  ctx.fill(); ctx.stroke();
+  // Draw "eye" in center
+  ctx.beginPath();
+  ctx.arc(planchette.x, planchette.y, 6, 0, Math.PI*2);
+  ctx.fillStyle='#fff'; ctx.fill();
+}
+
+function loop(){ update(); draw(); requestAnimationFrame(loop); }
+loop();
+
+// --- Speech ---
+const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+rec.lang='en-US';
+rec.onresult = e => {
+  const q = e.results[0][0].transcript.toUpperCase();
+  // Fake response generation based on question length + drift
+  const words = ['SPIRIT','WATCH','STONE','BELOW','ETHER','LIGHT'];
+  const pick = words[(q.length + Math.abs(drift.x*100)|0) % words.length];
+  targetQueue = pick.split('').map(ch => BOARD.find(b=>b.c===ch) || {x:W/2,y:H/2});
+  targetQueue.push(BOARD.find(b=>b.c==='GOODBYE'));
+  currentTarget = targetQueue.shift();
+};
+
+const btn = document.getElementById('askBtn');
+btn.addEventListener('mousedown',()=>rec.start());
+btn.addEventListener('mouseup',()=>rec.stop());
+btn.addEventListener('touchstart',(e)=>{e.preventDefault();rec.start();});
+btn.addEventListener('touchend',(e)=>{e.preventDefault();rec.stop();});
+</script>
+</body>
+</html>
