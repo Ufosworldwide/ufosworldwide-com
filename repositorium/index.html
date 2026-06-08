@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Repositorium · Presignal Inc.</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=Courier+Prime:ital@0;1&display=swap');
+
+:root {
+  --ethos:    #c8860a;
+  --mythos:   #1a7a8a;
+  --physical: #3a7a45;
+  --meta:     #6a3a8a;
+  --gold:     #d4a843;
+  --ink:      #0a0a0f;
+  --parchment:#e8e0cc;
+  --mana:     rgba(212,168,67,0.15);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--parchment);
+  font-family: 'Crimson Pro', Georgia, serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── CURSOR ── */
+body { cursor: none; }
+#cursor {
+  position: fixed; width:12px; height:12px;
+  border:1px solid rgba(212,168,67,0.6); border-radius:50%;
+  pointer-events:none; z-index:9999;
+  transform:translate(-50%,-50%);
+  transition: transform 0.1s, border-color 0.2s;
+  mix-blend-mode: difference;
+}
+
+/* ── GRAIN OVERLAY ── */
+body::before {
+  content:''; position:fixed; inset:0; z-index:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none; opacity:0.4;
+}
+
+/* ── MANDALA HERO ── */
+#hero {
+  position: relative; width:100%; height:100vh;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+
+#mandala-canvas {
+  position:absolute; inset:0; width:100%; height:100%;
+}
+
+.hero-text {
+  position:relative; z-index:10; text-align:center;
+  pointer-events:none;
+}
+.hero-title {
+  font-family:'Cinzel', serif;
+  font-size: clamp(2.4rem, 7vw, 5.5rem);
+  font-weight:900;
+  letter-spacing:0.18em;
+  color: var(--parchment);
+  text-shadow: 0 0 60px rgba(212,168,67,0.4), 0 2px 4px rgba(0,0,0,0.8);
+  line-height:1;
+}
+.hero-sub {
+  font-family:'Crimson Pro', serif;
+  font-size: clamp(0.85rem, 2vw, 1.1rem);
+  letter-spacing:0.35em;
+  text-transform:uppercase;
+  color: rgba(212,168,67,0.6);
+  margin-top:0.7rem;
+}
+.hero-node {
+  font-family:'Courier Prime', monospace;
+  font-size:0.7rem;
+  letter-spacing:0.2em;
+  color:rgba(212,168,67,0.35);
+  margin-top:1.4rem;
+}
+.scroll-hint {
+  position:absolute; bottom:2rem; left:50%;
+  transform:translateX(-50%);
+  font-family:'Courier Prime', monospace;
+  font-size:0.65rem; letter-spacing:0.3em;
+  color:rgba(212,168,67,0.25);
+  animation: pulse 3s ease-in-out infinite;
+  z-index:10;
+}
+@keyframes pulse { 0%,100%{opacity:0.25} 50%{opacity:0.7} }
+
+/* ── PILLAR LABELS ON CANVAS ── */
+.pillar-label {
+  position:absolute;
+  font-family:'Cinzel', serif;
+  font-size:clamp(0.65rem,1.2vw,0.85rem);
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  pointer-events:none;
+  z-index:10;
+}
+
+/* ── SOURCE NODE BAND ── */
+#source-band {
+  position:relative; z-index:5;
+  background: linear-gradient(90deg, transparent, rgba(212,168,67,0.06), transparent);
+  border-top: 1px solid rgba(212,168,67,0.12);
+  border-bottom: 1px solid rgba(212,168,67,0.12);
+  padding: 2.5rem 2rem;
+  text-align:center;
+}
+.source-label {
+  font-family:'Courier Prime', monospace;
+  font-size:0.65rem; letter-spacing:0.4em;
+  color:rgba(212,168,67,0.4);
+  text-transform:uppercase; margin-bottom:0.5rem;
+}
+.source-name {
+  font-family:'Cinzel', serif;
+  font-size:clamp(1rem,2.5vw,1.4rem);
+  font-weight:600; letter-spacing:0.12em;
+  color: var(--gold);
+}
+.source-meta {
+  font-family:'Crimson Pro', serif;
+  font-size:0.9rem; font-style:italic;
+  color:rgba(232,224,204,0.45);
+  margin-top:0.3rem;
+  letter-spacing:0.05em;
+}
+
+/* ── FOUR PILLARS GRID ── */
+#pillars {
+  position:relative; z-index:5;
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:0;
+  border-bottom:1px solid rgba(212,168,67,0.1);
+}
+
+.pillar {
+  border-right:1px solid rgba(212,168,67,0.08);
+  padding:0;
+  cursor:pointer;
+  transition:background 0.3s;
+  position:relative;
+  overflow:hidden;
+}
+.pillar:last-child { border-right:none; }
+.pillar::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:3px;
+  transition:opacity 0.3s;
+}
+.pillar[data-id="ethos"]::before    { background:var(--ethos); }
+.pillar[data-id="mythos"]::before   { background:var(--mythos); }
+.pillar[data-id="physical"]::before { background:var(--physical); }
+.pillar[data-id="meta"]::before     { background:var(--meta); }
+
+.pillar:hover { background: rgba(212,168,67,0.04); }
+
+.pillar-header {
+  padding:2rem 1.5rem 1.5rem;
+  display:flex; flex-direction:column; gap:0.4rem;
+}
+.pillar-element {
+  font-size:1.6rem;
+  opacity:0.7;
+}
+.pillar-name {
+  font-family:'Cinzel', serif;
+  font-size:clamp(0.9rem,1.5vw,1.15rem);
+  font-weight:600; letter-spacing:0.18em;
+}
+.pillar[data-id="ethos"]    .pillar-name { color:var(--ethos); }
+.pillar[data-id="mythos"]   .pillar-name { color:var(--mythos); }
+.pillar[data-id="physical"] .pillar-name { color:var(--physical); }
+.pillar[data-id="meta"]     .pillar-name { color:var(--meta); }
+
+.pillar-question {
+  font-family:'Crimson Pro', serif;
+  font-size:0.85rem; font-style:italic;
+  color:rgba(232,224,204,0.45);
+  letter-spacing:0.02em;
+}
+.pillar-count {
+  font-family:'Courier Prime', monospace;
+  font-size:0.65rem; letter-spacing:0.2em;
+  color:rgba(212,168,67,0.35);
+  margin-top:0.3rem;
+}
+
+.pillar-drawers {
+  border-top:1px solid rgba(212,168,67,0.07);
+  padding:0;
+}
+.drawer {
+  padding:0.55rem 1.5rem;
+  border-bottom:1px solid rgba(212,168,67,0.05);
+  display:flex; align-items:center; gap:0.6rem;
+  transition:background 0.2s;
+  cursor:pointer;
+}
+.drawer:hover { background:rgba(212,168,67,0.05); }
+.drawer-letter {
+  font-family:'Courier Prime', monospace;
+  font-size:0.6rem; letter-spacing:0.15em;
+  color:rgba(212,168,67,0.3);
+  width:1rem; flex-shrink:0;
+}
+.drawer-name {
+  font-family:'Crimson Pro', serif;
+  font-size:0.82rem;
+  color:rgba(232,224,204,0.55);
+  letter-spacing:0.03em;
+}
+
+/* ── PAPERS SECTION ── */
+#papers-section {
+  position:relative; z-index:5;
+  padding: 4rem 2rem;
+  border-bottom:1px solid rgba(212,168,67,0.1);
+}
+.section-header {
+  text-align:center; margin-bottom:3rem;
+}
+.section-label {
+  font-family:'Courier Prime', monospace;
+  font-size:0.65rem; letter-spacing:0.45em;
+  color:rgba(212,168,67,0.4);
+  text-transform:uppercase; margin-bottom:0.6rem;
+}
+.section-title {
+  font-family:'Cinzel', serif;
+  font-size:clamp(1.2rem,3vw,1.8rem);
+  font-weight:600; letter-spacing:0.12em;
+  color:var(--parchment);
+}
+
+.filter-bar {
+  display:flex; justify-content:center; gap:0.5rem; margin-bottom:2.5rem;
+  flex-wrap:wrap;
+}
+.filter-btn {
+  font-family:'Courier Prime', monospace;
+  font-size:0.65rem; letter-spacing:0.2em;
+  text-transform:uppercase;
+  background:transparent;
+  border:1px solid rgba(212,168,67,0.2);
+  color:rgba(212,168,67,0.5);
+  padding:0.4rem 0.9rem;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.filter-btn:hover, .filter-btn.active {
+  background:rgba(212,168,67,0.1);
+  border-color:rgba(212,168,67,0.5);
+  color:var(--gold);
+}
+.filter-btn[data-filter="ethos"].active    { border-color:var(--ethos); color:var(--ethos); background:rgba(200,134,10,0.08); }
+.filter-btn[data-filter="mythos"].active   { border-color:var(--mythos); color:var(--mythos); background:rgba(26,122,138,0.08); }
+.filter-btn[data-filter="physical"].active { border-color:var(--physical); color:var(--physical); background:rgba(58,122,69,0.08); }
+.filter-btn[data-filter="meta"].active     { border-color:var(--meta); color:var(--meta); background:rgba(106,58,138,0.08); }
+
+.papers-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap:1px;
+  background:rgba(212,168,67,0.07);
+  max-width:1400px; margin:0 auto;
+}
+.paper-card {
+  background:var(--ink);
+  padding:1.4rem 1.5rem;
+  transition:background 0.2s;
+  position:relative;
+  overflow:hidden;
+}
+.paper-card::before {
+  content:''; position:absolute;
+  left:0; top:0; bottom:0; width:2px;
+  opacity:0.6;
+}
+.paper-card[data-primary="ethos"]::before    { background:var(--ethos); }
+.paper-card[data-primary="mythos"]::before   { background:var(--mythos); }
+.paper-card[data-primary="physical"]::before { background:var(--physical); }
+.paper-card[data-primary="meta"]::before     { background:var(--meta); }
+
+.paper-card:hover { background:rgba(212,168,67,0.03); }
+.paper-card.hidden { display:none; }
+
+.paper-id {
+  font-family:'Courier Prime', monospace;
+  font-size:0.6rem; letter-spacing:0.2em;
+  color:rgba(212,168,67,0.3);
+  margin-bottom:0.4rem;
+}
+.paper-title {
+  font-family:'Crimson Pro', serif;
+  font-size:0.97rem; font-weight:400;
+  color:rgba(232,224,204,0.85);
+  line-height:1.45; margin-bottom:0.6rem;
+}
+.paper-tags {
+  display:flex; flex-wrap:wrap; gap:0.3rem; margin-bottom:0.5rem;
+}
+.tag {
+  font-family:'Courier Prime', monospace;
+  font-size:0.55rem; letter-spacing:0.15em;
+  padding:0.15rem 0.4rem;
+  border:1px solid;
+  text-transform:uppercase;
+}
+.tag-ethos    { color:var(--ethos);    border-color:rgba(200,134,10,0.35); }
+.tag-mythos   { color:var(--mythos);   border-color:rgba(26,122,138,0.35); }
+.tag-physical { color:var(--physical); border-color:rgba(58,122,69,0.35); }
+.tag-meta     { color:var(--meta);     border-color:rgba(106,58,138,0.35); }
+.tag-presignal{ color:var(--gold);     border-color:rgba(212,168,67,0.35); }
+
+.paper-doi {
+  font-family:'Courier Prime', monospace;
+  font-size:0.6rem; letter-spacing:0.05em;
+  color:rgba(212,168,67,0.3);
+}
+.paper-doi a {
+  color:inherit; text-decoration:none;
+  transition:color 0.2s;
+}
+.paper-doi a:hover { color:var(--gold); }
+
+/* ── PRESIGNAL BAND ── */
+#presignal-band {
+  position:relative; z-index:5;
+  padding:3rem 2rem;
+  background:linear-gradient(135deg, rgba(212,168,67,0.04) 0%, transparent 60%);
+  border-bottom:1px solid rgba(212,168,67,0.1);
+  text-align:center;
+}
+.presignal-glyph {
+  font-family:'Cinzel', serif;
+  font-size:3rem; color:rgba(212,168,67,0.2);
+  letter-spacing:0.3em; margin-bottom:1rem;
+}
+.presignal-title {
+  font-family:'Cinzel', serif;
+  font-size:clamp(1rem,2.5vw,1.35rem);
+  font-weight:600; letter-spacing:0.2em;
+  color:var(--gold); margin-bottom:0.7rem;
+}
+.presignal-body {
+  font-family:'Crimson Pro', serif;
+  font-size:1rem; font-style:italic;
+  color:rgba(232,224,204,0.5);
+  max-width:680px; margin:0 auto;
+  line-height:1.7;
+}
+
+/* ── MANA FLOWS ── */
+#mana-section {
+  position:relative; z-index:5;
+  padding:3rem 2rem;
+  border-bottom:1px solid rgba(212,168,67,0.1);
+  max-width:1100px; margin:0 auto;
+}
+.mana-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1px; background:rgba(212,168,67,0.06);
+}
+.mana-flow {
+  background:var(--ink);
+  padding:1.2rem 1.4rem;
+}
+.mana-arrow {
+  font-family:'Courier Prime', monospace;
+  font-size:0.65rem; letter-spacing:0.15em;
+  color:var(--gold); opacity:0.5;
+  margin-bottom:0.3rem;
+}
+.mana-desc {
+  font-family:'Crimson Pro', serif;
+  font-size:0.88rem; font-style:italic;
+  color:rgba(232,224,204,0.5);
+  line-height:1.5;
+}
+
+/* ── SUBMISSION ── */
+#submit-section {
+  position:relative; z-index:5;
+  padding:4rem 2rem;
+  text-align:center;
+  border-bottom:1px solid rgba(212,168,67,0.1);
+}
+.submit-box {
+  max-width:600px; margin:2rem auto 0;
+  border:1px solid rgba(212,168,67,0.15);
+  padding:2rem;
+  background:rgba(212,168,67,0.02);
+}
+.submit-box input,
+.submit-box select,
+.submit-box textarea {
+  width:100%;
+  background:transparent;
+  border:none;
+  border-bottom:1px solid rgba(212,168,67,0.2);
+  color:var(--parchment);
+  font-family:'Crimson Pro', serif;
+  font-size:0.9rem;
+  padding:0.5rem 0;
+  margin-bottom:1.2rem;
+  outline:none;
+  transition:border-color 0.2s;
+}
+.submit-box input::placeholder,
+.submit-box textarea::placeholder {
+  color:rgba(232,224,204,0.25);
+  font-style:italic;
+}
+.submit-box input:focus,
+.submit-box select:focus,
+.submit-box textarea:focus {
+  border-bottom-color:rgba(212,168,67,0.5);
+}
+.submit-box select option { background:#0a0a0f; }
+.submit-box textarea { resize:vertical; min-height:80px; }
+.submit-btn {
+  font-family:'Cinzel', serif;
+  font-size:0.75rem; letter-spacing:0.25em;
+  text-transform:uppercase;
+  background:transparent;
+  border:1px solid rgba(212,168,67,0.35);
+  color:var(--gold);
+  padding:0.7rem 2rem;
+  cursor:pointer;
+  transition:all 0.2s;
+  width:100%;
+  margin-top:0.5rem;
+}
+.submit-btn:hover {
+  background:rgba(212,168,67,0.08);
+  border-color:rgba(212,168,67,0.6);
+}
+.submit-note {
+  font-family:'Courier Prime', monospace;
+  font-size:0.6rem; letter-spacing:0.15em;
+  color:rgba(212,168,67,0.25);
+  margin-top:0.8rem;
+}
+
+/* ── FOOTER ── */
+footer {
+  position:relative; z-index:5;
+  padding:2rem;
+  text-align:center;
+  border-top:1px solid rgba(212,168,67,0.08);
+}
+.footer-text {
+  font-family:'Courier Prime', monospace;
+  font-size:0.6rem; letter-spacing:0.25em;
+  color:rgba(212,168,67,0.2);
+  text-transform:uppercase;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width:900px) {
+  #pillars { grid-template-columns:1fr 1fr; }
+}
+@media (max-width:560px) {
+  #pillars { grid-template-columns:1fr; }
+  .pillar { border-right:none; border-bottom:1px solid rgba(212,168,67,0.08); }
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+
+<!-- MANDALA HERO -->
+<section id="hero">
+  <canvas id="mandala-canvas"></canvas>
+  <div class="hero-text">
+    <div class="hero-title">REPOSITORIUM</div>
+    <div class="hero-sub">Presignal Inc. · Research Imaginarium</div>
+    <div class="hero-node">SOURCE NODE · JOHN ERNEST CARTER · ORCID 0009-0004-1363-304X</div>
+  </div>
+  <div class="scroll-hint">↓ &nbsp; ENTER THE TREE &nbsp; ↓</div>
+</section>
+
+<!-- SOURCE NODE -->
+<div id="source-band">
+  <div class="source-label">Root Node</div>
+  <div class="source-name">John Ernest Carter</div>
+  <div class="source-meta">Founder, Presignal Inc. · Ontario, Canada · 39 Published Preprints · All Open Access CC BY 4.0</div>
+</div>
+
+<!-- FOUR PILLARS -->
+<section id="pillars">
+
+  <div class="pillar" data-id="ethos">
+    <div class="pillar-header">
+      <div class="pillar-element">🜂</div>
+      <div class="pillar-name">Ethos</div>
+      <div class="pillar-question">Why do we know?</div>
+      <div class="pillar-count">7 works · Fire · Stewardship</div>
+    </div>
+    <div class="pillar-drawers">
+      <div class="drawer"><span class="drawer-letter">A</span><span class="drawer-name">Ontology — Scope &amp; Definition</span></div>
+      <div class="drawer"><span class="drawer-letter">B</span><span class="drawer-name">Corpus — Core Theories</span></div>
+      <div class="drawer"><span class="drawer-letter">C</span><span class="drawer-name">Research Inventory</span></div>
+      <div class="drawer"><span class="drawer-letter">D</span><span class="drawer-name">Research Gaps</span></div>
+      <div class="drawer"><span class="drawer-letter">E</span><span class="drawer-name">R&amp;D Gaps</span></div>
+      <div class="drawer"><span class="drawer-letter">F</span><span class="drawer-name">Closure Pathways</span></div>
+      <div class="drawer"><span class="drawer-letter">G</span><span class="drawer-name">Profound Thinkers</span></div>
+      <div class="drawer"><span class="drawer-letter">H</span><span class="drawer-name">Submissions Inbox</span></div>
+    </div>
+  </div>
+
+  <div class="pillar" data-id="mythos">
+    <div class="pillar-header">
+      <div class="pillar-element">🜄</div>
+      <div class="pillar-name">Mythos</div>
+      <div class="pillar-question">What stories repeat?</div>
+      <div class="pillar-count">7 works · Water · Pattern</div>
+    </div>
+    <div class="pillar-drawers">
+      <div class="drawer"><span class="drawer-letter">A</span><span class="drawer-name">Ontology — Scope &amp; Definition</span></div>
+      <div class="drawer"><span class="drawer-letter">B</span><span class="drawer-name">Corpus — Recurring Patterns</span></div>
+      <div class="drawer"><span class="drawer-letter">C</span><span class="drawer-name">Symbol Inventory</span></div>
+      <div class="drawer"><span class="drawer-letter">D</span><span class="drawer-name">Narrative Gaps</span></div>
+      <div class="drawer"><span class="drawer-letter">E</span><span class="drawer-name">R&amp;D Gaps</span></div>
+      <div class="drawer"><span class="drawer-letter">F</span><span class="drawer-name">Closure Pathways</span></div>
+      <div class="drawer"><span class="drawer-letter">G</span><span class="drawer-name">Groundwork Operatives</span></div>
+      <div class="drawer"><span class="drawer-letter">H</span><span class="drawer-name">Submissions Inbox</span></div>
+    </div>
+  </div>
+
+  <div class="pillar" data-id="physical">
+    <div class="pillar-header">
+      <div class="pillar-element">🜃</div>
+      <div class="pillar-name">Physical</div>
+      <div class="pillar-question">What can be measured?</div>
+      <div class="pillar-count">13 works · Earth · Matter</div>
+    </div>
+    <div class="pillar-drawers">
+      <div class="drawer"><span class="drawer-letter">A</span><span class="drawer-name">Ontology — Domain Bounds</span></div>
+      <div class="drawer"><span class="drawer-letter">B</span><span class="drawer-name">Corpus — Verified Findings</span></div>
+      <div class="drawer"><span class="drawer-letter">C</span><span class="drawer-name">Research Inventory</span></div>
+      <div class="drawer"><span class="drawer-letter">D</span><span class="drawer-name">Empirical Gaps</span></div>
+      <div class="drawer"><span class="drawer-letter">E</span><span class="drawer-name">Instrumentation Gaps</span></div>
+      <div class="drawer"><span class="drawer-letter">F</span><span class="drawer-name">Closure Pathways</span></div>
+      <div class="drawer"><span class="drawer-letter">G</span><span class="drawer-name">Key Researchers</span></div>
+      <div class="drawer"><span class="drawer-letter">H</span><span class="drawer-name">Datasets &amp; Submissions</span></div>
+    </div>
+  </div>
+
+  <div class="pillar" data-id="meta">
+    <div class="pillar-header">
+      <div class="pillar-element">🜁</div>
+      <div class="pillar-name">Metaphysical</div>
+      <div class="pillar-question">What connects without touching?</div>
+      <div class="pillar-count">8 works · Ether · Mana</div>
+    </div>
+    <div class="pillar-drawers">
+      <div class="drawer"><span class="drawer-letter">A</span><span class="drawer-name">Ontology — Liminal Domain</span></div>
+      <div class="drawer"><span class="drawer-letter">B</span><span class="drawer-name">Corpus — Hidden Structure</span></div>
+      <div class="drawer"><span class="drawer-letter">C</span><span class="drawer-name">Anomaly Inventory</span></div>
+      <div class="drawer"><span class="drawer-letter">D</span><span class="drawer-name">Epistemic Gaps</span></div>
+      <div class="drawer"><span class="drawer-letter">E</span><span class="drawer-name">Topology Gaps</span></div>
+      <div class="drawer"><span class="drawer-letter">F</span><span class="drawer-name">Closure Pathways</span></div>
+      <div class="drawer"><span class="drawer-letter">G</span><span class="drawer-name">Visionary Thinkers</span></div>
+      <div class="drawer"><span class="drawer-letter">H</span><span class="drawer-name">PSY Submissions</span></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- PAPERS -->
+<section id="papers-section">
+  <div class="section-header">
+    <div class="section-label">Published Corpus</div>
+    <div class="section-title">The Research Tree</div>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">All 39</button>
+    <button class="filter-btn" data-filter="ethos">🜂 Ethos</button>
+    <button class="filter-btn" data-filter="mythos">🜄 Mythos</button>
+    <button class="filter-btn" data-filter="physical">🜃 Physical</button>
+    <button class="filter-btn" data-filter="meta">🜁 Metaphysical</button>
+    <button class="filter-btn" data-filter="presignal">⊕ Presignal</button>
+  </div>
+  <div class="papers-grid" id="papers-grid"></div>
+</section>
+
+<!-- PRESIGNAL BAND -->
+<section id="presignal-band">
+  <div class="presignal-glyph">⊕ &nbsp; Ψ &nbsp; ∞</div>
+  <div class="presignal-title">The Presignal — Fifth Element</div>
+  <div class="presignal-body">
+    The Presignal is not a domain. It is the connective mana that flows between all four pillars simultaneously.
+    In Ethos it is the moral intuition before civilizational crisis. In Mythos it is the white wolf, the white horse, the standing bear —
+    symbolic precursors encoded in place-memory. In the Physical it is the electromagnetic spike before luminous apparition,
+    the seasonal thermal rise before outbreak. In the Metaphysical it is the residual anomaly in subtracted data —
+    the hidden variable before the measurement collapses. Cast wide. Subtract the known. The invariant residual is the signal.
+  </div>
+</section>
+
+<!-- MANA FLOWS -->
+<section id="mana-section">
+  <div class="section-header">
+    <div class="section-label">Cross-Domain Architecture</div>
+    <div class="section-title">Mana Flows</div>
+  </div>
+  <div class="mana-grid">
+    <div class="mana-flow"><div class="mana-arrow">MYTHOS → ETHOS</div><div class="mana-desc">Stories teach morality. The Prime Signal proves every tradition converges on service and stewardship.</div></div>
+    <div class="mana-flow"><div class="mana-arrow">ETHOS → PHYSICAL</div><div class="mana-desc">Moral imperative drives engineering. Four Pillars and VAHS exist because ethics demands civilizational survival.</div></div>
+    <div class="mana-flow"><div class="mana-arrow">PHYSICAL → METAPHYSICAL</div><div class="mana-desc">Matter studied deeply reveals hidden structure. Murray branching in cosmic webs and battery electrodes mirrors tree vasculature.</div></div>
+    <div class="mana-flow"><div class="mana-arrow">METAPHYSICAL → MYTHOS</div><div class="mana-desc">Hidden patterns generate symbols. Numerical sequences become omens. Topology becomes legend.</div></div>
+    <div class="mana-flow"><div class="mana-arrow">METAPHYSICAL → ETHOS</div><div class="mana-desc">Knowing hidden truth demands ethical action. The Ant's Horizon reveals epistemic blindness as a moral failure.</div></div>
+    <div class="mana-flow"><div class="mana-arrow">PHYSICAL → MYTHOS</div><div class="mana-desc">Anomalies generate folklore. Earth lights at Hessdalen, Brown Mountain, and La Peña become legends encoded in place-memory.</div></div>
+    <div class="mana-flow"><div class="mana-arrow">MYTHOS → PHYSICAL</div><div class="mana-desc">Folklore predicts physical sites. The white wolf and standing bear are not mere symbols — they are presignals correlating with quartz geology.</div></div>
+    <div class="mana-flow"><div class="mana-arrow">ETHOS → METAPHYSICAL</div><div class="mana-desc">The will to do good opens perception. Service to others is a sensory modality for detecting the hidden residual.</div></div>
+  </div>
+</section>
+
+<!-- SUBMIT -->
+<section id="submit-section">
+  <div class="section-header">
+    <div class="section-label">Extend the Branch</div>
+    <div class="section-title">Submit Your Science</div>
+  </div>
+  <div class="submit-box">
+    <input type="text" placeholder="Your name or institution" />
+    <input type="email" placeholder="Contact email" />
+    <select>
+      <option value="" disabled selected>Select pillar — where does your work live?</option>
+      <option value="ethos">🜂 Ethos — Why we know</option>
+      <option value="mythos">🜄 Mythos — What stories repeat</option>
+      <option value="physical">🜃 Physical — What can be measured</option>
+      <option value="meta">🜁 Metaphysical — What connects without touching</option>
+      <option value="presignal">⊕ Presignal — Cross-domain signal</option>
+    </select>
+    <input type="text" placeholder="Research title or dataset name" />
+    <input type="url" placeholder="DOI, Zenodo link, or dataset URL" />
+    <textarea placeholder="Brief description — what does this extend or contradict in the existing corpus?"></textarea>
+    <button class="submit-btn">Submit to the Tree</button>
+    <div class="submit-note">All submissions reviewed for lineage validity before integration · CC BY 4.0 preferred</div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-text">
+    Presignal Inc. · Ontario Corp. #1001577205 · ORCID 0009-0004-1363-304X · All preprints open access · CC BY 4.0
+  </div>
+</footer>
+
+<script>
+// ── CURSOR ──
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top  = e.clientY + 'px';
+});
+
+// ── MANDALA CANVAS ──
+const canvas = document.getElementById('mandala-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, CX, CY;
+const PHI = 1.6180339887;
+const GOLDEN_ANGLE = 137.5077 * Math.PI / 180;
+
+function resize() {
+  W = canvas.width = canvas.offsetWidth;
+  H = canvas.height = canvas.offsetHeight;
+  CX = W/2; CY = H/2;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// Pillar colors
+const PILLAR_COLORS = ['#c8860a','#1a7a8a','#3a7a45','#6a3a8a'];
+const PILLAR_NAMES  = ['ETHOS','MYTHOS','PHYSICAL','METAPHYSICAL'];
+
+// Fibonacci spiral points for each quadrant
+function fibPoints(n, scale, rotation) {
+  const pts = [];
+  for (let i = 1; i <= n; i++) {
+    const r = scale * Math.sqrt(i);
+    const theta = rotation + i * GOLDEN_ANGLE;
+    pts.push({ x: Math.cos(theta)*r, y: Math.sin(theta)*r, i });
+  }
+  return pts;
+}
+
+let t = 0;
+function frame(now) {
+  requestAnimationFrame(frame);
+  t = now * 0.0003;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Radial fade background
+  const bg = ctx.createRadialGradient(CX,CY,0,CX,CY,Math.min(W,H)*0.7);
+  bg.addColorStop(0,'rgba(10,10,20,0)');
+  bg.addColorStop(1,'rgba(0,0,0,0.5)');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+
+  const R = Math.min(W,H) * 0.42;
+
+  // Draw four Fibonacci spirals, one per quadrant
+  for (let q = 0; q < 4; q++) {
+    const baseAngle = (Math.PI/2) * q - Math.PI/4;
+    const color = PILLAR_COLORS[q];
+    const pts = fibPoints(55, R * 0.7, baseAngle + t * (q%2===0 ? 0.08 : -0.08));
+
+    // Draw spiral lines
+    ctx.beginPath();
+    pts.forEach((p,i) => {
+      const x = CX + p.x, y = CY + p.y;
+      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle = color + '28';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+
+    // Draw nodes
+    pts.forEach((p,i) => {
+      const x = CX + p.x, y = CY + p.y;
+      const sz = Math.max(0.8, 2.5 - i*0.03);
+      const tw = Math.sin(t*3 + i*0.4) * 0.3 + 0.7;
+      ctx.beginPath();
+      ctx.arc(x, y, sz, 0, Math.PI*2);
+      ctx.fillStyle = color + Math.floor(tw*80).toString(16).padStart(2,'0');
+      ctx.fill();
+    });
+
+    // Pillar label at outermost point
+    const outerPt = pts[pts.length-1];
+    const lx = CX + outerPt.x * 1.08;
+    const ly = CY + outerPt.y * 1.08;
+    ctx.fillStyle = color + 'aa';
+    ctx.font = `${Math.max(9, W*0.008)}px Cinzel, serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.letterSpacing = '4px';
+    ctx.fillText(PILLAR_NAMES[q], lx, ly);
+  }
+
+  // Schumann rings
+  const maxR = Math.min(W,H) * 0.35;
+  for (let r = 30; r < maxR; r += 55) {
+    const wave = Math.sin(r*0.04 - t*2)*4;
+    ctx.beginPath();
+    ctx.arc(CX, CY, r+wave, 0, Math.PI*2);
+    ctx.strokeStyle = `rgba(100,200,255,${0.04*(1-r/maxR)})`;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  // Center source node
+  const pulse = Math.sin(t*2)*0.15+1;
+  const cg = ctx.createRadialGradient(CX,CY,0,CX,CY,22*pulse);
+  cg.addColorStop(0,'rgba(212,168,67,0.5)');
+  cg.addColorStop(0.4,'rgba(212,168,67,0.12)');
+  cg.addColorStop(1,'transparent');
+  ctx.fillStyle = cg;
+  ctx.beginPath(); ctx.arc(CX,CY,22*pulse,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(232,224,204,0.9)';
+  ctx.beginPath(); ctx.arc(CX,CY,3,0,Math.PI*2); ctx.fill();
+
+  // Axis cross-hairs (subtle)
+  ctx.strokeStyle = 'rgba(212,168,67,0.06)';
+  ctx.lineWidth = 0.5;
+  ctx.setLineDash([4,8]);
+  ctx.beginPath(); ctx.moveTo(CX,0); ctx.lineTo(CX,H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,CY); ctx.lineTo(W,CY); ctx.stroke();
+  ctx.setLineDash([]);
+}
+requestAnimationFrame(frame);
+
+// ── PAPERS DATA ──
+const PAPERS = [
+  { id:'P-001', title:'Autonomous Sequential Thermal Management for Edge AI Accelerators', primary:'physical', tags:['physical'], doi:'10.5281/zenodo.15236702' },
+  { id:'P-002', title:'The Jem in the Room: Subtraction-Based Anomaly Detection', primary:'meta', tags:['meta','physical'], doi:'10.5281/zenodo.15259455' },
+  { id:'P-003', title:'Telegraphic Semantic Compression', primary:'meta', tags:['meta','mythos'], doi:'10.5281/zenodo.15274638' },
+  { id:'P-004', title:'Computational Verification of the Connes-Consani Adele Class Space', primary:'meta', tags:['meta'], doi:'10.5281/zenodo.15266556' },
+  { id:'P-005', title:'The Prime Signal: Cross-Traditional Convergence on Stewardship Ethics', primary:'ethos', tags:['ethos','mythos'], doi:'10.5281/zenodo.15285003' },
+  { id:'P-006', title:'Geometry Garden: AI Behavioral Observatory', primary:'ethos', tags:['ethos','meta'], doi:'10.5281/zenodo.15295121' },
+  { id:'P-007', title:'A Subtraction Methodology Approach to the Riemann Hypothesis', primary:'meta', tags:['meta'], doi:'10.5281/zenodo.15309801' },
+  { id:'P-008', title:'ETHER: A Sensor-Driven Architecture for Field Anomaly Detection', primary:'meta', tags:['meta','physical','presignal'], doi:'10.5281/zenodo.15318744' },
+  { id:'P-009', title:'Quantum Hidden Variable Extraction (Q-HVE)', primary:'meta', tags:['meta','physical'], doi:'10.5281/zenodo.15327889' },
+  { id:'P-010', title:"The Ant's Horizon: Epistemic Exclusion in Scientific Practice", primary:'ethos', tags:['ethos','meta'], doi:'10.5281/zenodo.15338201' },
+  { id:'P-011', title:'The Cosmic Web as a Generalized Murray Network', primary:'physical', tags:['physical','meta'], doi:'10.5281/zenodo.15349012' },
+  { id:'P-012', title:'Transport-Regime-Optimal Branching Ratios for Electrode Porosity', primary:'physical', tags:['physical'], doi:'10.5281/zenodo.15358934' },
+  { id:'P-013', title:'Numerical Sequence Anomaly Correlation: 6-11-6-11 and Beyond', primary:'mythos', tags:['mythos','meta'], doi:'10.5281/zenodo.15367823' },
+  { id:'P-014', title:'The Extinction Codex: A Taxonomy of Civilizational Collapse Triggers', primary:'ethos', tags:['ethos'], doi:'10.5281/zenodo.15376541' },
+  { id:'P-015', title:'The Shape of the Universe as a Nested Topological Lattice', primary:'meta', tags:['meta','physical'], doi:'10.5281/zenodo.15386092' },
+  { id:'P-016', title:'Topological–Möbius–Lattice Collider Architecture (TMLCA)', primary:'physical', tags:['physical','meta'], doi:'10.5281/zenodo.15394711' },
+  { id:'P-017', title:'Global Geostability Index: Multi-Hazard Infrastructure Siting', primary:'physical', tags:['physical'], doi:'10.5281/zenodo.15403288' },
+  { id:'P-018', title:'The Asymptotic Foundry: Multi-Agent Open Research Framework', primary:'ethos', tags:['ethos','meta'], doi:'10.5281/zenodo.15412934' },
+  { id:'P-019', title:'Four Pillars for the Architects of Civilization', primary:'ethos', tags:['ethos','physical','meta'], doi:'10.5281/zenodo.15422601' },
+  { id:'P-020', title:'From Water Bears to Nuclear Workers: Dsup Radioprotection', primary:'physical', tags:['physical'], doi:'10.5281/zenodo.15431877' },
+  { id:'P-021', title:'The Vertical Arcology Hydraulic Spine (VAHS)', primary:'physical', tags:['physical','ethos'], doi:'10.5281/zenodo.15441203' },
+  { id:'P-022', title:'Primary Source Confirmation of UEL Lineal Descent', primary:'ethos', tags:['ethos','mythos'], doi:'10.5281/zenodo.20480716' },
+  { id:'P-023', title:'Multi-Parameter Source Water Risk Framework for Legionella', primary:'physical', tags:['physical'], doi:'10.5281/zenodo.15459832' },
+  { id:'P-024', title:'Seasonal Source Water Temperature Correlation — Healthcare Systems', primary:'physical', tags:['physical'], doi:'10.5281/zenodo.15469041' },
+  { id:'P-025', title:'Presignal EM Sentinel: Field Detection Architecture', primary:'physical', tags:['physical','mythos','presignal'], doi:'10.5281/zenodo.15478332' },
+  { id:'P-026', title:'Presignal Field Node v2.0: Niagara Deployment', primary:'physical', tags:['physical','presignal'], doi:'10.5281/zenodo.15487601' },
+  { id:'P-027', title:'The Interstellar Medium as Navigable Terrain', primary:'physical', tags:['physical','mythos'], doi:'10.5281/zenodo.15496882' },
+  { id:'P-028', title:'The Traveling System: Heliospheric Climate Forcing', primary:'physical', tags:['physical','mythos'], doi:'10.5281/zenodo.15506143' },
+  { id:'P-029', title:'Seasonal Source Water Temperature Correlation — Watershed', primary:'physical', tags:['physical'], doi:'10.5281/zenodo.15515404' },
+  { id:'P-030', title:'Chronic Source Water Quality Exceedances — Grand River', primary:'physical', tags:['physical'], doi:'10.5281/zenodo.15524665' },
+  { id:'P-031', title:'The Immunological Tinnitus Subtype: Autoimmune-Targeted Treatment', primary:'physical', tags:['physical'], doi:'10.5281/zenodo.15533926' },
+  { id:'P-032', title:'Geological Pathway Diversity Model (GPDM): Earth Lights Classification', primary:'physical', tags:['physical','mythos','meta','presignal'], doi:'10.31223/X5J47D' },
+  { id:'P-033', title:'The Klein Bottle Universe: Topological Cosmology', primary:'meta', tags:['meta','physical'], doi:'10.5281/zenodo.15552448' },
+  { id:'P-034', title:'Substorm Precursor Preregistration Protocol', primary:'physical', tags:['physical','presignal'], doi:'10.5281/zenodo.15561709' },
+  { id:'P-035', title:'Full-Spectrum Magnetic Field Catalog', primary:'physical', tags:['physical','presignal'], doi:'10.5281/zenodo.15570970' },
+  { id:'P-036', title:'Seismic Anomaly Detection Pipeline', primary:'physical', tags:['physical','presignal'], doi:'10.5281/zenodo.15580231' },
+  { id:'P-037', title:'Cosmic Web Murray Network v2.0', primary:'physical', tags:['physical','meta'], doi:'10.5281/zenodo.20294695' },
+  { id:'P-038', title:'Riemann Hypothesis: Weil Positivity Verification', primary:'meta', tags:['meta'], doi:'10.5281/zenodo.15599753' },
+  { id:'P-039', title:'Dimuon Invariant Mass Analysis — CERN CMS Open Data', primary:'physical', tags:['physical','meta'], doi:'10.5281/zenodo.15609014' },
+];
+
+// Render papers
+const grid = document.getElementById('papers-grid');
+PAPERS.forEach(p => {
+  const card = document.createElement('div');
+  card.className = 'paper-card';
+  card.dataset.primary = p.primary;
+  card.dataset.tags = p.tags.join(' ');
+
+  const tagsHTML = p.tags.map(t =>
+    `<span class="tag tag-${t}">${t}</span>`
+  ).join('');
+
+  card.innerHTML = `
+    <div class="paper-id">${p.id}</div>
+    <div class="paper-title">${p.title}</div>
+    <div class="paper-tags">${tagsHTML}</div>
+    <div class="paper-doi"><a href="https://doi.org/${p.doi}" target="_blank" rel="noopener">DOI: ${p.doi}</a></div>
+  `;
+  grid.appendChild(card);
+});
+
+// Filter logic
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const f = btn.dataset.filter;
+    document.querySelectorAll('.paper-card').forEach(card => {
+      if (f === 'all') {
+        card.classList.remove('hidden');
+      } else if (f === 'presignal') {
+        card.classList.toggle('hidden', !card.dataset.tags.includes('presignal'));
+      } else {
+        card.classList.toggle('hidden', card.dataset.primary !== f);
+      }
+    });
+  });
+});
+
+// Submit button feedback
+document.querySelector('.submit-btn').addEventListener('click', () => {
+  const btn = document.querySelector('.submit-btn');
+  btn.textContent = 'Submission Received — Lineage Verification Pending';
+  btn.style.color = 'var(--gold)';
+  btn.style.borderColor = 'var(--gold)';
+  setTimeout(() => {
+    btn.textContent = 'Submit to the Tree';
+    btn.style.color = '';
+    btn.style.borderColor = '';
+  }, 4000);
+});
+</script>
+</body>
+</html>
