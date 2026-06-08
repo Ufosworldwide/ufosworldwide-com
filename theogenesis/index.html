@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Theogenesis — Sacred Match</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0608;
+  --panel:#120d0f;
+  --border:#3a2a1a;
+  --gold:#c8a94a;
+  --gold2:#f0d070;
+  --text:#e8d5b0;
+  --muted:#8a7060;
+}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Cinzel',serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  overflow-x:hidden;
+}
+
+/* Starfield bg */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(80,40,10,0.3) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(10,30,60,0.3) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 50%, rgba(40,10,40,0.2) 0%, transparent 70%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── SCREENS ── */
+.screen{position:relative;z-index:1;width:100%;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.screen.hidden{display:none}
+
+/* ── TITLE SCREEN ── */
+#title-screen{gap:0}
+.title-glow{
+  font-family:'Cinzel Decorative',cursive;
+  font-size:clamp(2rem,6vw,4rem);
+  font-weight:700;
+  color:var(--gold2);
+  text-shadow:0 0 30px rgba(200,169,74,0.8), 0 0 60px rgba(200,169,74,0.4);
+  letter-spacing:0.1em;
+  text-align:center;
+  margin-bottom:4px;
+}
+.title-sub{
+  font-family:'IM Fell English SC',serif;
+  font-size:clamp(0.8rem,2vw,1.1rem);
+  color:var(--muted);
+  letter-spacing:0.3em;
+  margin-bottom:50px;
+  text-align:center;
+}
+.level-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:12px;
+  width:100%;
+  max-width:900px;
+  padding:0 10px;
+}
+.level-card{
+  background:linear-gradient(135deg,rgba(30,20,10,0.9),rgba(15,10,5,0.95));
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px 12px;
+  cursor:pointer;
+  transition:all 0.25s;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.level-card::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg,transparent 60%,rgba(200,169,74,0.05));
+  pointer-events:none;
+}
+.level-card:hover{
+  border-color:var(--gold);
+  transform:translateY(-2px);
+  box-shadow:0 6px 24px rgba(200,169,74,0.2);
+}
+.level-card.locked{opacity:0.4;cursor:not-allowed}
+.level-card.locked:hover{transform:none;box-shadow:none;border-color:var(--border)}
+.lc-num{font-size:0.7rem;color:var(--muted);letter-spacing:0.2em;margin-bottom:6px}
+.lc-icon{font-size:2rem;margin-bottom:6px;display:block}
+.lc-name{font-size:0.75rem;color:var(--gold2);letter-spacing:0.05em;line-height:1.3}
+.lc-era{font-size:0.6rem;color:var(--muted);margin-top:4px}
+.lc-stars{font-size:0.8rem;margin-top:4px;color:#c8a94a;letter-spacing:2px}
+.lc-badge{
+  position:absolute;top:6px;right:6px;
+  font-size:0.55rem;background:var(--gold);color:#1a0d00;
+  border-radius:4px;padding:2px 5px;letter-spacing:0.05em;
+  display:none;
+}
+.level-card.completed .lc-badge{display:block}
+
+/* ── GAME SCREEN ── */
+#game-screen{justify-content:flex-start;padding:10px 10px 20px}
+.game-header{
+  width:100%;max-width:520px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0 14px;
+  border-bottom:1px solid rgba(200,169,74,0.2);
+  margin-bottom:14px;
+}
+.gh-left{display:flex;flex-direction:column}
+.gh-title{font-family:'Cinzel Decorative',cursive;font-size:1.1rem;color:var(--gold2)}
+.gh-sub{font-size:0.65rem;color:var(--muted);letter-spacing:0.2em;margin-top:2px}
+.score-box{text-align:right}
+.score-label{font-size:0.6rem;color:var(--muted);letter-spacing:0.2em}
+.score-val{font-size:1.4rem;color:var(--gold2);font-weight:600;line-height:1}
+.btn-back{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.1em;
+  padding:6px 12px;border-radius:6px;cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-back:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Progress bar */
+.progress-wrap{width:100%;max-width:520px;margin-bottom:12px}
+.progress-label{display:flex;justify-content:space-between;font-size:0.6rem;color:var(--muted);letter-spacing:0.15em;margin-bottom:4px}
+.progress-bar{height:4px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;transition:width 0.4s ease}
+
+/* Board */
+.board-wrap{
+  position:relative;
+  background:rgba(10,6,4,0.8);
+  border:1px solid rgba(200,169,74,0.2);
+  border-radius:16px;
+  padding:14px;
+  max-width:520px;
+  width:100%;
+}
+.board{
+  display:grid;
+  gap:6px;
+  width:100%;
+}
+
+/* Tile */
+.tile{
+  aspect-ratio:1;
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  transition:transform 0.15s, filter 0.15s, box-shadow 0.15s;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.tile:hover{transform:scale(1.07);filter:brightness(1.15)}
+.tile.selected{
+  transform:scale(1.1);
+  box-shadow:0 0 0 3px var(--gold2), 0 0 20px rgba(240,208,112,0.5);
+  filter:brightness(1.2);
+  z-index:2;
+}
+.tile.matched{animation:matchPop 0.35s ease forwards}
+.tile.falling{animation:tileFall 0.3s ease forwards}
+.tile.new-tile{animation:tileAppear 0.25s ease forwards}
+.tile.hint{animation:hintPulse 0.6s ease infinite}
+
+@keyframes matchPop{
+  0%{transform:scale(1.1);opacity:1}
+  50%{transform:scale(1.4);opacity:0.7;filter:brightness(2)}
+  100%{transform:scale(0);opacity:0}
+}
+@keyframes tileFall{0%{transform:translateY(-30px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes tileAppear{0%{transform:scale(0.5);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes hintPulse{0%,100%{box-shadow:0 0 0 2px var(--gold),0 0 10px rgba(200,169,74,0.4)}50%{box-shadow:0 0 0 4px var(--gold2),0 0 20px rgba(200,169,74,0.7)}}
+
+/* Symbol on tile */
+.tile-symbol{
+  font-size:clamp(1.2rem,4vw,2rem);
+  line-height:1;
+  text-shadow:0 1px 4px rgba(0,0,0,0.8);
+  position:relative;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* Tile base styles using CSS backgrounds to simulate the textures */
+.tile-stone{
+  background:
+    radial-gradient(ellipse at 35% 30%, #c4a060 0%, #8a6030 40%, #5a3a18 70%, #3a2208 100%);
+  box-shadow:inset 0 2px 4px rgba(255,200,100,0.2), inset 0 -2px 4px rgba(0,0,0,0.5), 0 3px 8px rgba(0,0,0,0.5);
+  border:1px solid #6a4a20;
+}
+.tile-gold{
+  background:
+    radial-gradient(ellipse at 35% 25%, #ffd860 0%, #d4a820 40%, #a07810 65%, #705000 100%);
+  box-shadow:inset 0 2px 6px rgba(255,240,150,0.4), inset 0 -2px 4px rgba(100,60,0,0.5), 0 3px 10px rgba(200,140,0,0.3);
+  border:1px solid #b08828;
+}
+.tile-gold::after{
+  content:'';position:absolute;top:6%;left:15%;width:40%;height:15%;
+  background:rgba(255,248,180,0.35);border-radius:50%;transform:rotate(-20deg);
+  pointer-events:none;
+}
+.tile-jade{
+  background:
+    radial-gradient(ellipse at 40% 30%, #5ad070 0%, #1a8030 40%, #0a5020 70%, #043010 100%);
+  box-shadow:inset 0 2px 5px rgba(100,255,150,0.2), inset 0 -2px 4px rgba(0,0,0,0.6), 0 3px 10px rgba(0,100,40,0.3);
+  border:1px solid #1a6030;
+  border-radius:14px;
+}
+.tile-crystal{
+  background:
+    radial-gradient(ellipse at 40% 30%, #e8d8ff 0%, #b090e0 35%, #8060c0 65%, #503090 100%);
+  box-shadow:inset 0 2px 8px rgba(220,200,255,0.4), inset 0 -2px 4px rgba(40,0,80,0.5), 0 3px 12px rgba(120,80,200,0.3);
+  border:1px solid #7050b0;
+  clip-path:polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  border-radius:0;
+}
+.tile-crystal .tile-symbol{font-size:clamp(0.9rem,2.8vw,1.5rem)}
+.tile-ether{
+  background:
+    radial-gradient(ellipse at 50% 50%, #1a2a4a 0%, #0a1830 50%, #050f20 100%);
+  box-shadow:0 0 10px rgba(0,150,255,0.4), inset 0 0 15px rgba(0,200,255,0.15), 0 3px 10px rgba(0,0,0,0.6);
+  border:2px solid #0090e0;
+  border-radius:50%;
+  outline:1px solid rgba(0,200,255,0.3);
+  outline-offset:2px;
+}
+.tile-ether .tile-symbol{filter:drop-shadow(0 0 4px rgba(0,200,255,0.8))}
+
+/* Legend */
+.tile-legend{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;
+  padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;
+  border:1px solid rgba(200,169,74,0.1);
+  max-width:520px;width:100%;
+}
+.legend-item{
+  display:flex;align-items:center;gap:6px;
+  font-size:0.6rem;color:var(--muted);letter-spacing:0.1em;
+  flex:1;min-width:120px;
+}
+.legend-swatch{
+  width:22px;height:22px;border-radius:4px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:0.8rem;
+}
+
+/* Win/Fail overlay */
+.overlay{
+  position:fixed;inset:0;z-index:100;
+  background:rgba(0,0,0,0.85);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:20px;
+}
+.overlay.hidden{display:none}
+.overlay-box{
+  background:linear-gradient(135deg,rgba(30,18,8,0.98),rgba(15,10,5,0.98));
+  border:1px solid var(--gold);
+  border-radius:20px;
+  padding:40px 50px;
+  text-align:center;
+  max-width:380px;
+  box-shadow:0 0 60px rgba(200,169,74,0.3);
+}
+.overlay-icon{font-size:3rem;margin-bottom:12px}
+.overlay-title{
+  font-family:'Cinzel Decorative',cursive;
+  font-size:1.4rem;color:var(--gold2);
+  margin-bottom:8px;
+}
+.overlay-msg{font-size:0.8rem;color:var(--muted);line-height:1.6;margin-bottom:24px}
+.btn-primary{
+  background:linear-gradient(135deg,#c8a94a,#a07820);
+  border:none;color:#1a0d00;
+  font-family:'Cinzel',serif;font-size:0.8rem;font-weight:600;letter-spacing:0.15em;
+  padding:12px 28px;border-radius:8px;cursor:pointer;
+  transition:all 0.2s;margin:0 6px;
+}
+.btn-primary:hover{filter:brightness(1.2);transform:translateY(-1px)}
+.btn-secondary{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:0.1em;
+  padding:12px 24px;border-radius:8px;cursor:pointer;
+  transition:all 0.2s;margin:0 6px;
+}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Moves / timer HUD */
+.hud-row{
+  display:flex;gap:20px;max-width:520px;width:100%;margin-bottom:8px;
+}
+.hud-box{
+  flex:1;background:rgba(255,255,255,0.03);border:1px solid rgba(200,169,74,0.1);
+  border-radius:8px;padding:8px 12px;text-align:center;
+}
+.hud-label{font-size:0.55rem;color:var(--muted);letter-spacing:0.2em}
+.hud-val{font-size:1.1rem;color:var(--gold2);font-weight:600}
+
+/* Particles */
+.particle{
+  position:fixed;pointer-events:none;z-index:50;
+  font-size:1.2rem;animation:particleFly 0.8s ease-out forwards;
+}
+@keyframes particleFly{
+  0%{transform:translate(-50%,-50%) scale(1);opacity:1}
+  100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(0.3);opacity:0}
+}
+
+/* Scrollable level list */
+.level-scroll{max-height:70vh;overflow-y:auto;width:100%;max-width:900px;padding:4px}
+.level-scroll::-webkit-scrollbar{width:4px}
+.level-scroll::-webkit-scrollbar-track{background:transparent}
+.level-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.era-divider{
+  font-size:0.65rem;color:var(--muted);letter-spacing:0.3em;
+  text-align:center;padding:10px 0 6px;
+  border-top:1px solid rgba(200,169,74,0.1);
+  margin-top:4px;
+  grid-column:1/-1;
+}
+</style>
+</head>
+<body>
+
+<!-- TITLE SCREEN -->
+<div id="title-screen" class="screen">
+  <div class="title-glow">THEOGENESIS</div>
+  <div class="title-sub">Sacred Match · Timeline of Belief</div>
+  <div class="level-scroll">
+    <div class="level-grid" id="level-grid"></div>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen" class="screen hidden">
+  <div class="game-header">
+    <div class="gh-left">
+      <div class="gh-title" id="game-title">—</div>
+      <div class="gh-sub" id="game-era">—</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div class="score-box">
+        <div class="score-label">SCORE</div>
+        <div class="score-val" id="score-display">0</div>
+      </div>
+      <button class="btn-back" onclick="showTitle()">← EXIT</button>
+    </div>
+  </div>
+
+  <div class="hud-row">
+    <div class="hud-box"><div class="hud-label">MOVES</div><div class="hud-val" id="moves-display">30</div></div>
+    <div class="hud-box"><div class="hud-label">TARGET</div><div class="hud-val" id="target-display">1000</div></div>
+    <div class="hud-box"><div class="hud-label">COMBOS</div><div class="hud-val" id="combo-display">0</div></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>PROGRESS TO DIVINE</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="board-wrap">
+    <div class="board" id="board"></div>
+  </div>
+
+  <div class="tile-legend" id="tile-legend"></div>
+</div>
+
+<!-- WIN OVERLAY -->
+<div class="overlay hidden" id="win-overlay">
+  <div class="overlay-box">
+    <div class="overlay-icon">✨</div>
+    <div class="overlay-title" id="win-title">Enlightened</div>
+    <div class="overlay-msg" id="win-msg">You have completed the sacred path.</div>
+    <div>
+      <button class="btn-primary" onclick="nextLevel()">Next Era →</button>
+      <button class="btn-secondary" onclick="replayLevel()">Play Again</button>
+    </div>
+  </div>
+</div>
+
+<!-- FAIL OVERLAY -->
+<div class="overlay hidden" id="fail-overlay">
+  <div class="overlay-box">
+    <div class="overlay-icon">🕯️</div>
+    <div class="overlay-title">The Path Fades</div>
+    <div class="overlay-msg" id="fail-msg">The sacred knowledge slips away. Try again.</div>
+    <div>
+      <button class="btn-primary" onclick="replayLevel()">Try Again</button>
+      <button class="btn-secondary" onclick="showTitle()">Return</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ────────────────────────────────────────────────────────────
+const LEVELS = [
+  {id:0, name:"Paleolithic", era:"~50,000 BCE", continent:"Global", base:"stone", winTile:"The Dreaming",
+   symbols:["🔥","🦴","🌙","🦌","🪨","🌿"], target:800, moves:30,
+   lore:"The first sacred fires lit across the ancient world."},
+  {id:1, name:"Aboriginal Dreaming", era:"~48,000 BCE", continent:"Australia", base:"stone", winTile:"Songlines",
+   symbols:["🌏","🐍","🎨","🌀","🌅","🪃"], target:900, moves:30,
+   lore:"The Rainbow Serpent carved the rivers and named the stars."},
+  {id:2, name:"Ancient Egyptian", era:"~3,000 BCE", continent:"Africa", base:"gold", winTile:"Living Horus",
+   symbols:["👁️","☥","🪲","🪷","🦅","🐈"], target:1000, moves:28,
+   lore:"From the chaos waters of Nun, Atum spoke the world into being."},
+  {id:3, name:"Mesopotamian", era:"~3,000 BCE", continent:"Asia", base:"gold", winTile:"Marduk's Order",
+   symbols:["🏛️","🦁","🌊","🌲","🐂","⭐"], target:1000, moves:28,
+   lore:"Marduk slew Tiamat and from her body shaped the heavens."},
+  {id:4, name:"Hinduism", era:"~1,500 BCE", continent:"Asia", base:"jade", winTile:"Sanatana Dharma",
+   symbols:["🕉️","🔱","🪷","🐚","🌺","☸️"], target:1100, moves:26,
+   lore:"From Brahman, all things emerged and shall return."},
+  {id:5, name:"Zoroastrianism", era:"~1,000 BCE", continent:"Asia", base:"crystal", winTile:"Asha",
+   symbols:["🔥","🦅","⭐","🌞","🐂","⚖️"], target:1100, moves:26,
+   lore:"Between Ahura Mazda and Angra Mainyu, the cosmic battle unfolds."},
+  {id:6, name:"Judaism", era:"~1,000 BCE", continent:"Asia", base:"gold", winTile:"Tikkun Olam",
+   symbols:["✡️","🕎","🍷","🍎","🕯️","📜"], target:1200, moves:26,
+   lore:"From the void, Elohim spoke and light divided the darkness."},
+  {id:7, name:"Greek Hellenism", era:"~800 BCE", continent:"Europe", base:"gold", winTile:"Classical Legacy",
+   symbols:["⚡","🦉","🏺","🫒","🎭","🌊"], target:1200, moves:25,
+   lore:"Chaos begat Gaia, and from Gaia sprang the Titans and Gods."},
+  {id:8, name:"Jainism", era:"~800 BCE", continent:"Asia", base:"jade", winTile:"Kevala Jñāna",
+   symbols:["🪷","🐚","🌙","🙏","🔆","🌀"], target:1100, moves:26,
+   lore:"Through the 24 Tirthankaras, the path to liberation was shown."},
+  {id:9, name:"Buddhism", era:"~500 BCE", continent:"Asia", base:"jade", winTile:"Nirvana",
+   symbols:["☸️","🪷","🧘","🙏","🔔","🌸"], target:1200, moves:25,
+   lore:"Under the Bodhi tree, Siddhartha pierced the veil of suffering."},
+  {id:10, name:"Confucianism", era:"~500 BCE", continent:"Asia", base:"jade", winTile:"Junzi",
+   symbols:["📜","🖌️","🏛️","🎋","⚖️","🐉"], target:1100, moves:26,
+   lore:"Through rites, relationships, and virtue the good society is built."},
+  {id:11, name:"Taoism", era:"~400 BCE", continent:"Asia", base:"jade", winTile:"The Tao",
+   symbols:["☯️","🐉","🎋","🍑","🗻","💨"], target:1100, moves:26,
+   lore:"The Tao that can be named is not the eternal Tao."},
+  {id:12, name:"Shinto", era:"~500 BCE", continent:"Asia", base:"jade", winTile:"Wa (Harmony)",
+   symbols:["⛩️","🌸","🍃","🦊","🌊","🎌"], target:1100, moves:26,
+   lore:"Izanagi and Izanami stirred the primordial sea into the islands."},
+  {id:13, name:"Celtic", era:"~500 BCE", continent:"Europe", base:"stone", winTile:"Otherworld Gateway",
+   symbols:["🍀","🦌","🌙","🪨","🌳","🐍"], target:1200, moves:25,
+   lore:"The druids memorized the cosmos in sacred groves."},
+  {id:14, name:"Norse", era:"~200 BCE", continent:"Europe", base:"stone", winTile:"Yggdrasil",
+   symbols:["ᚠ","ᚢ","ᚦ","ᚨ","ᚱ","ᚲ"], target:1200, moves:25,
+   lore:"From Ymir's body the worlds were carved by Odin, Vili, and Ve."},
+  {id:15, name:"Roman", era:"~500 BCE", continent:"Europe", base:"gold", winTile:"Pax Deorum",
+   symbols:["🦅","🏛️","⚔️","🛡️","🌾","👑"], target:1200, moves:25,
+   lore:"Jupiter and the Capitoline Triad watched over the eternal city."},
+  {id:16, name:"Christianity", era:"~30 CE", continent:"Global", base:"crystal", winTile:"Kingdom of God",
+   symbols:["✝️","🐟","🍞","🕊️","🐑","⭐"], target:1300, moves:24,
+   lore:"From the Garden to the Cross to the Empty Tomb."},
+  {id:17, name:"Gnosticism", era:"~100 CE", continent:"Europe", base:"crystal", winTile:"Gnosis",
+   symbols:["🕯️","🐍","🍎","🌟","📜","🔑"], target:1200, moves:25,
+   lore:"The Demiurge built a prison of matter; the Monad offers escape."},
+  {id:18, name:"Manichaeism", era:"~200 CE", continent:"Asia", base:"crystal", winTile:"Restoration of Light",
+   symbols:["🌓","🌞","🌙","⚖️","🔥","🌊"], target:1200, moves:25,
+   lore:"Light trapped in matter yearns to return to the Father of Greatness."},
+  {id:19, name:"Islam", era:"~610 CE", continent:"Global", base:"crystal", winTile:"Ummah",
+   symbols:["☪️","🕌","📖","🌙","🌹","⭐"], target:1300, moves:24,
+   lore:"The Night of Power revealed the Word that would unite millions."},
+  {id:20, name:"Yoruba / Ifá", era:"~1,000 CE", continent:"Africa", base:"gold", winTile:"Aṣẹ",
+   symbols:["🐚","🎭","🌈","🔥","🌊","🌴"], target:1200, moves:25,
+   lore:"Olodumare sent the Orishas to shape the living world."},
+  {id:21, name:"Sikhism", era:"~1,500 CE", continent:"Asia", base:"crystal", winTile:"Khalsa",
+   symbols:["🪯","⚔️","🦁","🌊","🗡️","⭐"], target:1300, moves:24,
+   lore:"Nanak heard the voice of the One while bathing in the sacred river."},
+  {id:22, name:"Baha'i", era:"~1860s", continent:"Global", base:"ether", winTile:"Unity of Humanity",
+   symbols:["⭐","🕊️","🌐","🌹","⚙️","🌊"], target:1300, moves:24,
+   lore:"Progressive revelation unfolds the nature of the Divine over time."},
+  {id:23, name:"Mormonism", era:"~1830 CE", continent:"Americas", base:"ether", winTile:"Celestial Kingdom",
+   symbols:["⛪","🐝","🌻","📖","⭐","🏔️"], target:1300, moves:24,
+   lore:"An angel revealed golden plates hidden in the American hills."},
+  {id:24, name:"Neopaganism", era:"~1950s", continent:"Global", base:"ether", winTile:"Wheel of the Year",
+   symbols:["🌙","🔥","🌿","🪄","🌸","🗿"], target:1200, moves:25,
+   lore:"The old ways remembered: the cycle of solstice and harvest."},
+  {id:25, name:"New Age / Cosmic", era:"~1970s", continent:"Global", base:"ether", winTile:"Cosmic Consciousness",
+   symbols:["🛸","🔮","🌈","✨","🌀","💫"], target:1300, moves:24,
+   lore:"From channelers to contactees, the cosmos speaks again."},
+  {id:26, name:"Scientific Naturalism", era:"~1850s–present", continent:"Global", base:"ether", winTile:"Cosmic Perspective",
+   symbols:["🔭","⚛️","🧬","🌍","🔬","🚀"], target:1400, moves:22,
+   lore:"The universe 13.8 billion years old, billions of galaxies, one pale blue dot."},
+];
+
+const ERA_GROUPS = [
+  {label:"PREHISTORIC", ids:[0,1]},
+  {label:"ANCIENT CIVILIZATIONS", ids:[2,3,4,5,6,7]},
+  {label:"AXIAL AGE", ids:[8,9,10,11,12,13,14,15]},
+  {label:"CLASSICAL & MEDIEVAL", ids:[16,17,18,19,20]},
+  {label:"MODERN ERA", ids:[21,22,23,24,25,26]},
+];
+
+// ── STATE ────────────────────────────────────────────────────────────
+let state = {
+  currentLevel: 0,
+  score: 0,
+  moves: 30,
+  combos: 0,
+  board: [],
+  cols: 7,
+  rows: 7,
+  selected: null,
+  animating: false,
+  completedLevels: JSON.parse(localStorage.getItem('theogenesis_progress') || '[]'),
+};
+
+function saveProgress(){
+  localStorage.setItem('theogenesis_progress', JSON.stringify(state.completedLevels));
+}
+
+// ── TITLE ────────────────────────────────────────────────────────────
+function buildLevelGrid(){
+  const grid = document.getElementById('level-grid');
+  grid.innerHTML = '';
+
+  ERA_GROUPS.forEach(group => {
+    const div = document.createElement('div');
+    div.className='era-divider';
+    div.textContent=group.label;
+    grid.appendChild(div);
+    group.ids.forEach(id => {
+      const lvl = LEVELS[id];
+      const completed = state.completedLevels.includes(id);
+      const locked = id > 0 && !state.completedLevels.includes(id-1) && id !== 0;
+      const card = document.createElement('div');
+      card.className = 'level-card' + (locked?' locked':'') + (completed?' completed':'');
+      const stars = completed ? '★★★' : '☆☆☆';
+      card.innerHTML = `
+        <div class="lc-badge">DONE</div>
+        <div class="lc-num">LV ${id+1}</div>
+        <div class="lc-icon">${lvl.symbols[0]}</div>
+        <div class="lc-name">${lvl.name}</div>
+        <div class="lc-era">${lvl.era}</div>
+        <div class="lc-stars">${stars}</div>
+      `;
+      if(!locked) card.onclick = () => startLevel(id);
+      grid.appendChild(card);
+    });
+  });
+}
+
+function showTitle(){
+  document.getElementById('title-screen').classList.remove('hidden');
+  document.getElementById('game-screen').classList.add('hidden');
+  hideOverlays();
+  buildLevelGrid();
+}
+
+// ── GAME ─────────────────────────────────────────────────────────────
+function startLevel(id){
+  const lvl = LEVELS[id];
+  state.currentLevel = id;
+  state.score = 0;
+  state.moves = lvl.moves;
+  state.combos = 0;
+  state.selected = null;
+  state.animating = false;
+
+  document.getElementById('title-screen').classList.add('hidden');
+  document.getElementById('game-screen').classList.remove('hidden');
+  hideOverlays();
+
+  document.getElementById('game-title').textContent = lvl.name;
+  document.getElementById('game-era').textContent = lvl.era + ' · ' + lvl.continent;
+  document.getElementById('target-display').textContent = lvl.target;
+
+  // Board size based on level difficulty
+  state.cols = id < 5 ? 6 : (id < 15 ? 7 : 8);
+  state.rows = state.cols;
+
+  document.getElementById('board').style.gridTemplateColumns = `repeat(${state.cols},1fr)`;
+
+  generateBoard();
+  renderBoard();
+  buildLegend();
+  updateHUD();
+}
+
+function generateBoard(){
+  const lvl = LEVELS[state.currentLevel];
+  state.board = [];
+  for(let r=0;r<state.rows;r++){
+    state.board.push([]);
+    for(let c=0;c<state.cols;c++){
+      let sym;
+      do { sym = randomSymbol(); } while(
+        (c>=2 && state.board[r][c-1]===sym && state.board[r][c-2]===sym) ||
+        (r>=2 && state.board[r-1][c]===sym && state.board[r-2][c]===sym)
+      );
+      state.board[r].push(sym);
+    }
+  }
+}
+
+function randomSymbol(){
+  const lvl = LEVELS[state.currentLevel];
+  return lvl.symbols[Math.floor(Math.random()*lvl.symbols.length)];
+}
+
+function renderBoard(){
+  const board = document.getElementById('board');
+  board.innerHTML='';
+  const lvl = LEVELS[state.currentLevel];
+  for(let r=0;r<state.rows;r++){
+    for(let c=0;c<state.cols;c++){
+      const tile = document.createElement('div');
+      tile.className = `tile tile-${lvl.base}`;
+      tile.dataset.r=r; tile.dataset.c=c;
+      tile.innerHTML=`<span class="tile-symbol">${state.board[r][c]}</span>`;
+      tile.onclick = () => handleTileClick(r,c);
+      board.appendChild(tile);
+    }
+  }
+}
+
+function getTileEl(r,c){
+  return document.querySelector(`.tile[data-r="${r}"][data-c="${c}"]`);
+}
+
+function handleTileClick(r,c){
+  if(state.animating) return;
+  if(state.moves<=0) return;
+
+  if(state.selected===null){
+    state.selected={r,c};
+    getTileEl(r,c).classList.add('selected');
+  } else {
+    const {r:r1,c:c1} = state.selected;
+    getTileEl(r1,c1).classList.remove('selected');
+
+    if(r1===r && c1===c){
+      state.selected=null; return;
+    }
+    const adj = (Math.abs(r-r1)===1&&c===c1)||(Math.abs(c-c1)===1&&r===r1);
+    if(adj){
+      swapTiles(r1,c1,r,c);
+    } else {
+      state.selected={r,c};
+      getTileEl(r,c).classList.add('selected');
+    }
+  }
+}
+
+function swapTiles(r1,c1,r2,c2){
+  const tmp = state.board[r1][c1];
+  state.board[r1][c1]=state.board[r2][c2];
+  state.board[r2][c2]=tmp;
+  state.selected=null;
+  state.moves--;
+
+  const matches = findMatches();
+  if(matches.length===0){
+    // swap back
+    const t2=state.board[r1][c1];
+    state.board[r1][c1]=state.board[r2][c2];
+    state.board[r2][c2]=t2;
+    state.moves++;
+    renderBoard();
+    return;
+  }
+  updateHUD();
+  renderBoard();
+  state.animating=true;
+  processMatches(matches);
+}
+
+function findMatches(){
+  const matches=new Set();
+  // horizontal
+  for(let r=0;r<state.rows;r++){
+    for(let c=0;c<state.cols-2;c++){
+      const s=state.board[r][c];
+      if(s && s===state.board[r][c+1] && s===state.board[r][c+2]){
+        let end=c+2;
+        while(end+1<state.cols && state.board[r][end+1]===s) end++;
+        for(let k=c;k<=end;k++) matches.add(`${r},${k}`);
+        c=end;
+      }
+    }
+  }
+  // vertical
+  for(let c=0;c<state.cols;c++){
+    for(let r=0;r<state.rows-2;r++){
+      const s=state.board[r][c];
+      if(s && s===state.board[r+1][c] && s===state.board[r+2][c]){
+        let end=r+2;
+        while(end+1<state.rows && state.board[end+1][c]===s) end++;
+        for(let k=r;k<=end;k++) matches.add(`${k},${c}`);
+        r=end;
+      }
+    }
+  }
+  return [...matches].map(s=>{const[r,c]=s.split(',').map(Number);return{r,c};});
+}
+
+function processMatches(matches){
+  if(matches.length===0){state.animating=false;state.combos=0;checkEndGame();updateHUD();return;}
+
+  const pts = matches.length * 50 * (state.combos+1);
+  state.score+=pts;
+  state.combos++;
+
+  // Animate matched tiles
+  matches.forEach(({r,c})=>{
+    const el=getTileEl(r,c);
+    if(el){el.classList.add('matched');spawnParticles(el,state.board[r][c]);}
+    state.board[r][c]=null;
+  });
+
+  updateHUD();
+
+  setTimeout(()=>{
+    // Drop tiles
+    for(let c=0;c<state.cols;c++){
+      const col=[];
+      for(let r=state.rows-1;r>=0;r--) if(state.board[r][c]!==null) col.push(state.board[r][c]);
+      while(col.length<state.rows) col.push(randomSymbol());
+      for(let r=state.rows-1;r>=0;r--) state.board[r][c]=col[state.rows-1-r];
+    }
+    renderBoard();
+    // Animate falls
+    document.querySelectorAll('.tile').forEach(el=>el.classList.add('falling'));
+    setTimeout(()=>{
+      const newMatches=findMatches();
+      processMatches(newMatches);
+    },320);
+  },380);
+}
+
+function spawnParticles(el,sym){
+  const rect=el.getBoundingClientRect();
+  const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+  for(let i=0;i<4;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.textContent=sym;
+    p.style.left=cx+'px'; p.style.top=cy+'px';
+    const angle=Math.random()*Math.PI*2;
+    const dist=40+Math.random()*40;
+    p.style.setProperty('--dx',Math.cos(angle)*dist+'px');
+    p.style.setProperty('--dy',Math.sin(angle)*dist+'px');
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),820);
+  }
+}
+
+function updateHUD(){
+  const lvl=LEVELS[state.currentLevel];
+  document.getElementById('score-display').textContent=state.score.toLocaleString();
+  document.getElementById('moves-display').textContent=state.moves;
+  document.getElementById('combo-display').textContent=state.combos>0?`×${state.combos}`:'—';
+  const pct=Math.min(100,Math.round(state.score/lvl.target*100));
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-pct').textContent=pct+'%';
+}
+
+function checkEndGame(){
+  const lvl=LEVELS[state.currentLevel];
+  if(state.score>=lvl.target){
+    if(!state.completedLevels.includes(state.currentLevel)){
+      state.completedLevels.push(state.currentLevel);
+      saveProgress();
+    }
+    document.getElementById('win-title').textContent=lvl.winTile;
+    document.getElementById('win-msg').innerHTML=`<em>${lvl.lore}</em><br><br>Score: ${state.score.toLocaleString()} · Moves left: ${state.moves}`;
+    document.getElementById('win-overlay').classList.remove('hidden');
+  } else if(state.moves<=0){
+    document.getElementById('fail-msg').innerHTML=`You reached ${state.score.toLocaleString()} of ${lvl.target} needed.<br>The divine path remains obscured.`;
+    document.getElementById('fail-overlay').classList.remove('hidden');
+  }
+}
+
+function nextLevel(){
+  hideOverlays();
+  const next=state.currentLevel+1;
+  if(next<LEVELS.length) startLevel(next);
+  else showTitle();
+}
+function replayLevel(){hideOverlays();startLevel(state.currentLevel);}
+function hideOverlays(){
+  document.getElementById('win-overlay').classList.add('hidden');
+  document.getElementById('fail-overlay').classList.add('hidden');
+}
+
+function buildLegend(){
+  const lvl=LEVELS[state.currentLevel];
+  const leg=document.getElementById('tile-legend');
+  leg.innerHTML='';
+  lvl.symbols.forEach(sym=>{
+    const item=document.createElement('div');
+    item.className='legend-item';
+    const sw=document.createElement('div');
+    sw.className=`legend-swatch tile-${lvl.base}`;
+    sw.style.cssText='width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:14px;';
+    sw.textContent=sym;
+    item.appendChild(sw);
+    const lbl=document.createElement('span');
+    lbl.textContent=sym;
+    item.appendChild(lbl);
+    leg.appendChild(item);
+  });
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────
+buildLevelGrid();
+</script>
+</body>
+</html>
