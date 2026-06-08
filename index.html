@@ -3,732 +3,341 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UFOs Worldwide — Presignal Field Observatory</title>
-<meta name="description" content="Independent multi-domain research and field investigation. Niagara Region, Ontario. Citizen science, anomaly detection, AI behavioral observatory.">
-<meta name="author" content="John Ernest Carter / Presignal Inc.">
-<meta property="og:title" content="UFOs Worldwide — Presignal Field Observatory">
-<meta property="og:description" content="Cast wide. Subtract all known explanations. Identify the invariant residual.">
-<meta property="og:url" content="https://ufosworldwide.com">
-<link rel="canonical" href="https://ufosworldwide.com">
-
-<!-- Google Analytics GA4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-NXSH8ZZZQ0"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-NXSH8ZZZQ0');
-</script>
-
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
-
+<title>Presignal Inc. -- UFOs Worldwide | Niagara Research Node</title>
 <style>
-:root {
-  --navy: #040811;
-  --deep: #090514;
-  --steel: #1a0f30;
-  --silver: #9c8eb9;
-  --pale: #d3c7ed;
-  --magenta: #ff007f;
-  --cyan: #00ffff;
-  --white: #ffffff;
-  --cream: #f4eeff;
-  --PHI: 1.61803398875;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-html, body {
-  background: var(--navy);
-  color: var(--white);
-  font-family: 'Courier Prime', monospace;
-  overflow-x: hidden;
-  min-height: 100vh;
-}
-
-/* ── INTERFERENCE FIELD ── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 50% 50%, rgba(255,0,127,0.08) 0%, transparent 55%),
-    radial-gradient(circle at 50% 50%, rgba(0,255,255,0.07) 0%, transparent 38%),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: -2;
-}
-
-/* ── SPIRAL CANVAS ── */
-#spiral-canvas {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 160vmax;
-  height: 160vmax;
-  z-index: -1;
-  opacity: 0.28;
-  pointer-events: none;
-}
-
-/* ── LAYOUT ── */
-.container {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 0 40px;
-  position: relative;
-  z-index: 2;
-}
-
-/* ── HEADER ── */
-header {
-  padding: 64px 0 48px;
-  border-bottom: 1px dashed rgba(0,255,255,0.25);
-}
-
-.eyebrow {
-  font-size: 10px;
-  letter-spacing: 6px;
-  color: var(--cyan);
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 20px;
-}
-
-.eyebrow::before {
-  content: '';
-  display: block;
-  width: 36px;
-  height: 1px;
-  background: var(--cyan);
-}
-
-h1 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(52px, 9vw, 96px);
-  letter-spacing: 3px;
-  line-height: 0.88;
-  text-shadow: 0 0 40px rgba(0,255,255,0.2);
-}
-
-h1 em {
-  display: block;
-  font-style: normal;
-  color: var(--magenta);
-  font-size: 0.38em;
-  letter-spacing: 10px;
-  margin-top: 10px;
-}
-
-.tagline {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 18px;
-  font-style: italic;
-  color: var(--pale);
-  line-height: 1.65;
-  max-width: 600px;
-  margin-top: 28px;
-  border-left: 2px solid var(--magenta);
-  padding-left: 18px;
-  opacity: 0.85;
-}
-
-/* ── LIVE SIGNAL STRIP ── */
-.signal-strip {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  padding: 14px 0;
-  border-bottom: 1px dashed rgba(0,255,255,0.15);
-  font-size: 11px;
-  letter-spacing: 2px;
-  color: var(--silver);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.signal-strip::-webkit-scrollbar { display: none; }
-
-.signal-dot {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-}
-
-.pulse {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #00ff66;
-  box-shadow: 0 0 6px #00ff66;
-  animation: pulse-anim 2s infinite;
-}
-
-.pulse.amber { background: #ffaa00; box-shadow: 0 0 6px #ffaa00; }
-.pulse.magenta { background: var(--magenta); box-shadow: 0 0 6px var(--magenta); }
-
-@keyframes pulse-anim {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.7); }
-}
-
-/* ── TREE NAVIGATION ── */
-.tree-section {
-  padding: 64px 0 80px;
-}
-
-.tree-label {
-  font-size: 10px;
-  letter-spacing: 5px;
-  color: var(--silver);
-  text-transform: uppercase;
-  margin-bottom: 48px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.tree-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: rgba(156,142,185,0.2);
-}
-
-/* ROOT NODE */
-.tree-root {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-}
-
-.root-node {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(0,255,255,0.06);
-  border: 1px solid rgba(0,255,255,0.35);
-  padding: 10px 28px;
-  border-radius: 3px;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
-  letter-spacing: 3px;
-  color: var(--cyan);
-  text-shadow: 0 0 12px rgba(0,255,255,0.4);
-}
-
-.root-node .root-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--cyan);
-  box-shadow: 0 0 8px var(--cyan);
-}
-
-/* VERTICAL TRUNK */
-.trunk {
-  width: 1px;
-  height: 40px;
-  background: linear-gradient(to bottom, rgba(0,255,255,0.4), rgba(0,255,255,0.1));
-}
-
-/* BRANCH ROW */
-.branch-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  width: 100%;
-  position: relative;
-}
-
-.branch-row::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: calc(16.666% + 10px);
-  right: calc(16.666% + 10px);
-  height: 1px;
-  background: rgba(0,255,255,0.15);
-}
-
-.branch-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-}
-
-.branch-stem {
-  width: 1px;
-  height: 32px;
-  background: rgba(0,255,255,0.15);
-}
-
-/* BRANCH CARDS */
-.branch-card {
-  width: 100%;
-  background: rgba(9,5,20,0.7);
-  border: 1px solid rgba(255,0,127,0.18);
-  border-radius: 4px;
-  padding: 22px 20px;
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-  transition: all 0.32s cubic-bezier(0.16,1,0.3,1);
-  position: relative;
-  overflow: hidden;
-  display: block;
-}
-
-.branch-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--magenta), var(--cyan));
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.35s ease;
-}
-
-.branch-card:hover {
-  border-color: rgba(0,255,255,0.4);
-  transform: translateY(-5px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 20px rgba(0,255,255,0.08);
-}
-
-.branch-card:hover::before { transform: scaleX(1); }
-
-.card-code {
-  font-size: 9px;
-  letter-spacing: 3px;
-  color: var(--magenta);
-  text-transform: uppercase;
-  margin-bottom: 10px;
-}
-
-.card-name {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
-  letter-spacing: 1.5px;
-  color: var(--white);
-  margin-bottom: 8px;
-  line-height: 1;
-}
-
-.card-desc {
-  font-size: 12px;
-  color: var(--silver);
-  line-height: 1.55;
-}
-
-.card-arrow {
-  position: absolute;
-  bottom: 16px;
-  right: 16px;
-  font-size: 14px;
-  color: rgba(0,255,255,0.3);
-  transition: all 0.25s ease;
-}
-
-.branch-card:hover .card-arrow {
-  color: var(--cyan);
-  transform: translate(3px, -3px);
-}
-
-/* LEAF ROW — second tier */
-.leaf-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  width: 100%;
-  margin-top: 16px;
-}
-
-.leaf-card {
-  background: rgba(26,15,48,0.4);
-  border: 1px solid rgba(156,142,185,0.15);
-  border-radius: 3px;
-  padding: 14px 16px;
-  text-decoration: none;
-  color: inherit;
-  display: block;
-  transition: all 0.25s ease;
-}
-
-.leaf-card:hover {
-  border-color: rgba(255,0,127,0.3);
-  background: rgba(26,15,48,0.7);
-}
-
-.leaf-name {
-  font-size: 11px;
-  letter-spacing: 2px;
-  color: var(--pale);
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.leaf-desc {
-  font-size: 11px;
-  color: var(--silver);
-  line-height: 1.5;
-}
-
-/* ── LIVE GUESTBOOK STRIP ── */
-.guestbook-strip {
-  border-top: 1px dashed rgba(255,0,127,0.2);
-  border-bottom: 1px dashed rgba(255,0,127,0.2);
-  padding: 28px 0;
-  margin-bottom: 64px;
-  display: flex;
-  align-items: flex-start;
-  gap: 40px;
-}
-
-.gb-label {
-  font-size: 10px;
-  letter-spacing: 4px;
-  color: var(--magenta);
-  text-transform: uppercase;
-  white-space: nowrap;
-  padding-top: 3px;
-}
-
-.gb-entries {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  flex: 1;
-}
-
-.gb-entry {
-  font-size: 11px;
-  color: var(--silver);
-  background: rgba(255,0,127,0.06);
-  border: 1px solid rgba(255,0,127,0.15);
-  border-radius: 2px;
-  padding: 5px 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.gb-entry span { color: var(--pale); }
-.gb-loading { font-size: 11px; color: var(--silver); letter-spacing: 1px; animation: blink 1.5s infinite alternate; }
-
-@keyframes blink { from { opacity: 0.3; } to { opacity: 1; } }
-
-/* ── FOOTER ── */
-footer {
-  padding: 32px 0 48px;
-  border-top: 1px dashed rgba(156,142,185,0.2);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.footer-left {
-  font-size: 10px;
-  letter-spacing: 2px;
-  color: var(--silver);
-}
-
-.footer-left strong {
-  color: var(--pale);
-  display: block;
-  margin-bottom: 4px;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 14px;
-  letter-spacing: 3px;
-}
-
-.footer-links {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.footer-links a {
-  font-size: 10px;
-  letter-spacing: 2px;
-  color: var(--silver);
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: color 0.2s;
-}
-
-.footer-links a:hover { color: var(--cyan); }
-
-.presignal-badge {
-  font-size: 9px;
-  letter-spacing: 3px;
-  color: rgba(156,142,185,0.5);
-  text-transform: uppercase;
-}
-
-/* ── SCHEMA JSON-LD ── */
-
-/* ── RESPONSIVE ── */
-@media (max-width: 720px) {
-  .container { padding: 0 20px; }
-  .branch-row, .leaf-row { grid-template-columns: 1fr; }
-  .branch-row::before { display: none; }
-  .guestbook-strip { flex-direction: column; gap: 16px; }
-  footer { flex-direction: column; align-items: flex-start; }
-}
-
-@media (max-width: 480px) {
-  h1 { font-size: 52px; }
-}
+  @import url('https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:wght@400;700&display=swap');
+  :root {
+    --bg: #0a0f0a; --grass: #1a3a1a; --grass-light: #2d5a2d;
+    --flower-pink: #ff6b9d; --flower-blue: #6b9dff; --flower-gold: #ffd700;
+    --flower-purple: #c084fc; --flower-cyan: #22d3ee;
+    --terminal-bg: #0c0c0c; --terminal-green: #00ff41; --terminal-amber: #ffb000;
+    --terminal-red: #ff3333; --terminal-cyan: #00ffff; --ufo-glow: #a855f7;
+    --sky-top: #0a0a1a; --sky-mid: #1a1a3a; --sky-bottom: #2d1b4e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: #e0e0e0; font-family: 'Space Mono', monospace; overflow-x: hidden; min-height: 100vh; }
+  .sky { position: relative; height: 45vh; background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 60%, var(--sky-bottom) 100%); overflow: hidden; }
+  .stars { position: absolute; inset: 0; pointer-events: none; }
+  .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; }
+  @keyframes twinkle { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
+  .ufo-container { position: absolute; top: 15%; left: 50%; transform: translateX(-50%); cursor: pointer; z-index: 10; animation: ufoFloat 6s ease-in-out infinite; text-decoration: none; display: block; }
+  @keyframes ufoFloat { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-20px); } }
+  .ufo-ascii { font-family: 'VT323', monospace; font-size: 14px; line-height: 1.1; color: var(--ufo-glow); text-shadow: 0 0 10px var(--ufo-glow), 0 0 30px var(--ufo-glow); text-align: center; white-space: pre; transition: all 0.3s ease; }
+  .ufo-container:hover .ufo-ascii { color: #fff; text-shadow: 0 0 20px #fff, 0 0 50px var(--ufo-glow), 0 0 80px var(--ufo-glow); transform: scale(1.1); }
+  .ufo-label { text-align: center; margin-top: 8px; font-size: 11px; color: var(--ufo-glow); text-transform: uppercase; letter-spacing: 3px; opacity: 0.8; transition: opacity 0.3s; }
+  .ufo-container:hover .ufo-label { opacity: 1; color: #fff; }
+  .ufo-beam { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); width: 60px; height: 0; background: linear-gradient(180deg, rgba(168,85,247,0.4) 0%, transparent 100%); clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%); transition: height 0.5s ease; pointer-events: none; }
+  .ufo-container:hover .ufo-beam { height: 120px; }
+  .garden { position: relative; min-height: 55vh; background: linear-gradient(180deg, var(--sky-bottom) 0%, var(--grass) 15%, var(--bg) 100%); padding: 60px 20px 40px; overflow: hidden; }
+  .garden-title { text-align: center; font-size: 12px; color: var(--grass-light); text-transform: uppercase; letter-spacing: 8px; margin-bottom: 40px; opacity: 0.6; }
+  .flower-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 30px; max-width: 1400px; margin: 0 auto; position: relative; z-index: 2; }
+  .flower-item { position: relative; text-align: center; cursor: pointer; text-decoration: none; display: block; opacity: 0; animation: sprout 1s ease forwards; }
+  .flower-item:nth-child(1) { animation-delay: 0.1s; } .flower-item:nth-child(2) { animation-delay: 0.2s; } .flower-item:nth-child(3) { animation-delay: 0.3s; } .flower-item:nth-child(4) { animation-delay: 0.4s; } .flower-item:nth-child(5) { animation-delay: 0.5s; } .flower-item:nth-child(6) { animation-delay: 0.6s; } .flower-item:nth-child(7) { animation-delay: 0.7s; } .flower-item:nth-child(8) { animation-delay: 0.8s; }
+  @keyframes sprout { 0% { opacity: 0; transform: translateY(30px) scale(0.5); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+  .flower-ascii { font-family: 'VT323', monospace; font-size: 28px; line-height: 1; margin-bottom: 8px; transition: all 0.3s ease; display: inline-block; }
+  .flower-stem { font-family: 'VT323', monospace; font-size: 16px; color: var(--grass-light); line-height: 0.8; margin-bottom: 4px; }
+  .flower-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #888; transition: color 0.3s; }
+  .flower-item:hover .flower-ascii { transform: scale(1.3) translateY(-5px); filter: drop-shadow(0 0 8px currentColor); }
+  .flower-item:hover .flower-label { color: #fff; }
+  .flower-pink .flower-ascii { color: var(--flower-pink); } .flower-blue .flower-ascii { color: var(--flower-blue); } .flower-gold .flower-ascii { color: var(--flower-gold); } .flower-purple .flower-ascii { color: var(--flower-purple); } .flower-cyan .flower-ascii { color: var(--flower-cyan); }
+  .grass-row { position: absolute; bottom: 0; left: 0; right: 0; height: 40px; overflow: hidden; pointer-events: none; opacity: 0.3; font-family: 'VT323', monospace; font-size: 20px; color: var(--grass-light); white-space: nowrap; line-height: 1; }
+  .terminal-section { background: var(--terminal-bg); border-top: 2px solid #333; padding: 40px 20px; }
+  .terminal-header { text-align: center; margin-bottom: 30px; }
+  .terminal-header h2 { font-family: 'VT323', monospace; font-size: 24px; color: var(--terminal-green); text-shadow: 0 0 10px var(--terminal-green); letter-spacing: 4px; }
+  .terminal-header .subtitle { font-size: 11px; color: #666; margin-top: 5px; letter-spacing: 2px; }
+  .monitor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; }
+  .monitor-panel { background: #111; border: 1px solid #333; border-radius: 4px; overflow: hidden; position: relative; }
+  .monitor-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--terminal-green); opacity: 0.5; }
+  .monitor-title { background: #1a1a1a; padding: 8px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--terminal-green); border-bottom: 1px solid #333; display: flex; align-items: center; gap: 8px; }
+  .monitor-title .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--terminal-green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .monitor-body { padding: 12px; font-family: 'VT323', monospace; font-size: 14px; line-height: 1.6; color: #aaa; min-height: 140px; }
+  .monitor-body .line { display: flex; justify-content: space-between; padding: 2px 0; border-bottom: 1px dotted #222; }
+  .monitor-body .line:last-child { border-bottom: none; } .monitor-body .val-green { color: var(--terminal-green); } .monitor-body .val-amber { color: var(--terminal-amber); } .monitor-body .val-red { color: var(--terminal-red); } .monitor-body .val-cyan { color: var(--terminal-cyan); }
+  .register-section { background: #050505; border-top: 2px solid #222; padding: 40px 20px; }
+  .register-header { text-align: center; margin-bottom: 30px; }
+  .register-header h2 { font-family: 'VT323', monospace; font-size: 24px; color: var(--terminal-red); text-shadow: 0 0 10px var(--terminal-red); letter-spacing: 4px; }
+  .register-header .subtitle { font-size: 11px; color: #666; margin-top: 5px; letter-spacing: 2px; }
+  .register-table { max-width: 1200px; margin: 0 auto; background: #0a0a0a; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
+  .register-row { display: grid; grid-template-columns: 80px 140px 1fr 100px 100px; gap: 0; font-family: 'VT323', monospace; font-size: 13px; border-bottom: 1px solid #1a1a1a; transition: background 0.2s; }
+  .register-row:hover { background: #111; } .register-row.header { background: #1a1a1a; color: var(--terminal-amber); text-transform: uppercase; letter-spacing: 1px; font-size: 12px; }
+  .register-row > div { padding: 10px 12px; border-right: 1px solid #1a1a1a; } .register-row > div:last-child { border-right: none; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+  .badge-watch { background: rgba(255,176,0,0.15); color: var(--terminal-amber); border: 1px solid rgba(255,176,0,0.3); }
+  .badge-alert { background: rgba(255,51,51,0.15); color: var(--terminal-red); border: 1px solid rgba(255,51,51,0.3); }
+  .badge-nominal { background: rgba(0,255,65,0.1); color: var(--terminal-green); border: 1px solid rgba(0,255,65,0.2); }
+  .footer { text-align: center; padding: 30px 20px; background: #000; border-top: 1px solid #1a1a1a; font-size: 11px; color: #444; letter-spacing: 2px; }
+  .footer a { color: #666; text-decoration: none; } .footer a:hover { color: var(--terminal-green); }
+  ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #0a0a0a; } ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: #555; }
+  @media (max-width: 768px) { .flower-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } .monitor-grid { grid-template-columns: 1fr; } .register-row { grid-template-columns: 60px 100px 1fr 70px 70px; font-size: 11px; } .ufo-ascii { font-size: 10px; } .sky { height: 35vh; } }
 </style>
-
-<!-- JSON-LD Structured Data for Google -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "UFOs Worldwide / Presignal Inc.",
-  "url": "https://ufosworldwide.com",
-  "founder": {
-    "@type": "Person",
-    "name": "John Ernest Carter",
-    "sameAs": "https://orcid.org/0009-0004-1363-304X"
-  },
-  "description": "Independent multi-domain research and field investigation organization. Niagara Region, Ontario, Canada.",
-  "sameAs": [
-    "https://zenodo.org/communities/presignal",
-    "https://orcid.org/0009-0004-1363-304X"
-  ]
-}
-</script>
+<base target="_blank">
 </head>
 <body>
+<div class="sky" id="sky">
+  <div class="stars" id="stars"></div>
+  <a href="app.html" class="ufo-container" title="UAP Investigation Tools">
+    <div class="ufo-ascii">
+         .-.
+        /   \
+       |  o o  |
+        \  ~  /
+    .--.  """  .--.
+   /    \_____/    \
+  |  ====     ====  |
+   \___/  UAP  \___/
+       |  PRESIGNAL  |
+        \_________/
+    </div>
+    <div class="ufo-label">Click to Enter UAP Node</div>
+    <div class="ufo-beam"></div>
+  </a>
+</div>
 
-<canvas id="spiral-canvas"></canvas>
-
-<div class="container">
-
-  <!-- HEADER -->
-  <header>
-    <div class="eyebrow">Presignal Field Observatory · Niagara Region · Est. 2026</div>
-    <h1>UFOs Worldwide<em>Cast wide. Subtract. Find the residual.</em></h1>
-    <p class="tagline">
-      Independent multi-domain research — field investigation, anomaly detection, citizen science, and AI behavioral study from the edge of the Niagara Escarpment.
-    </p>
-  </header>
-
-  <!-- LIVE SIGNAL STRIP -->
-  <div class="signal-strip">
-    <div class="signal-dot"><span class="pulse"></span> MASTER ARCHITECT LIVE</div>
-    <div class="signal-dot"><span class="pulse amber"></span> NIAGARA NODE NFN-001</div>
-    <div class="signal-dot"><span class="pulse magenta"></span> ANOMALY DASHBOARD ACTIVE</div>
-    <div class="signal-dot"><span class="pulse"></span> GUESTBOOK OPEN</div>
-    <div class="signal-dot" id="kp-strip" style="margin-left: auto;"><span class="pulse amber"></span> KP LOADING…</div>
+<div class="garden">
+  <div class="garden-title">Presignal Research Garden</div>
+  <div class="flower-grid">
+    <a href="presignal" class="flower-item flower-gold">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10047;</div>
+      <div class="flower-label">39 Preprints</div>
+    </a>
+    <a href="aquasignal" class="flower-item flower-cyan">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10048;</div>
+      <div class="flower-label">AquaSignal</div>
+    </a>
+    <a href="niagaranode" class="flower-item flower-purple">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10046;</div>
+      <div class="flower-label">Niagara Node</div>
+    </a>
+    <a href="sentinel" class="flower-item flower-blue">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10049;</div>
+      <div class="flower-label">Sentinel</div>
+    </a>
+    <a href="mathfun" class="flower-item flower-pink">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10045;</div>
+      <div class="flower-label">MathFun</div>
+    </a>
+    <a href="geometry-garden" class="flower-item flower-gold">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10051;</div>
+      <div class="flower-label">Geometry</div>
+    </a>
+    <a href="park" class="flower-item flower-purple">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10020;</div>
+      <div class="flower-label">The Park</div>
+    </a>
+    <a href="masterarchitect" class="flower-item flower-cyan">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10091;</div>
+      <div class="flower-label">Architect</div>
+    </a>
   </div>
-
-  <!-- DELTREE NAVIGATION -->
-  <section class="tree-section">
-    <div class="tree-label">Site Architecture</div>
-
-    <div class="tree-root">
-
-      <!-- ROOT -->
-      <div class="root-node"><span class="root-dot"></span> UFOSWORLDWIDE.COM</div>
-      <div class="trunk"></div>
-
-      <!-- TIER 1 BRANCHES -->
-      <div class="branch-row">
-
-        <!-- RESEARCH -->
-        <div class="branch-col">
-          <div class="branch-stem"></div>
-          <a href="/research" class="branch-card">
-            <div class="card-code">Branch // 01</div>
-            <div class="card-name">Research</div>
-            <div class="card-desc">39 published preprints. Open access. CC BY 4.0. Zenodo & EarthArXiv portfolio across earth science, space, math, ecology, and genealogy.</div>
-            <div class="card-arrow">↗</div>
-          </a>
-        </div>
-
-        <!-- FIELD WORK -->
-        <div class="branch-col">
-          <div class="branch-stem"></div>
-          <a href="/fieldwork" class="branch-card">
-            <div class="card-code">Branch // 02</div>
-            <div class="card-name">Field Work</div>
-            <div class="card-desc">Night vision investigations, magnetometer field nodes, and live anomaly detection from the Niagara Region and beyond.</div>
-            <div class="card-arrow">↗</div>
-          </a>
-        </div>
-
-        <!-- OBSERVATORY -->
-        <div class="branch-col">
-          <div class="branch-stem"></div>
-          <a href="/observatory" class="branch-card">
-            <div class="card-code">Branch // 03</div>
-            <div class="card-name">Observatory</div>
-            <div class="card-desc">AI behavioral study. Geometry Garden. Bot garden. Live anomaly dashboard. The Presignal Subtraction Methodology in action.</div>
-            <div class="card-arrow">↗</div>
-          </a>
-        </div>
-
-      </div><!-- /branch-row -->
-
-      <!-- TIER 2 LEAVES -->
-      <div class="leaf-row">
-        <a href="/park" class="leaf-card">
-          <div class="leaf-name">The Park</div>
-          <div class="leaf-desc">Sequential puzzle environment for machine and human visitors.</div>
-        </a>
-        <a href="https://masterarchitect.ufosworldwide.com/api/guestbook" class="leaf-card" target="_blank" rel="noopener">
-          <div class="leaf-name">Guestbook</div>
-          <div class="leaf-desc">Live field register. AI systems and humans welcome.</div>
-        </a>
-        <a href="/about" class="leaf-card">
-          <div class="leaf-name">About</div>
-          <div class="leaf-desc">John Ernest Carter · Presignal Inc. · ORCID 0009-0004-1363-304X</div>
-        </a>
+  <div class="flower-grid" style="margin-top:30px;">
+    <a href="about.html" class="flower-item flower-blue">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10021;</div>
+      <div class="flower-label">About</div>
+    </a>
+    <a href="blog.html" class="flower-item flower-cyan">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10022;</div>
+      <div class="flower-label">Archive</div>
+    </a>
+    <a href="contact.html" class="flower-item flower-pink">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10023;</div>
+      <div class="flower-label">Contact</div>
+    </a>
+    <a href="myresume.html" class="flower-item flower-gold">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10025;</div>
+      <div class="flower-label">Dossier</div>
+    </a>
+    <a href="lights.html" class="flower-item flower-purple">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10026;</div>
+      <div class="flower-label">Lights</div>
+    </a>
+    <a href="neweden" class="flower-item flower-blue">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10027;</div>
+      <div class="flower-label">New Eden</div>
+    </a>
+    <a href="universe" class="flower-item flower-cyan">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10028;</div>
+      <div class="flower-label">Universe</div>
+    </a>
+    <a href="goodkarma" class="flower-item flower-pink">
+      <div class="flower-stem">|</div>
+      <div class="flower-ascii">&#10029;</div>
+      <div class="flower-label">Good Karma</div>
+    </a>
+  </div>
+</div>
+<div class="terminal-section">
+  <div class="terminal-header">
+    <h2>\[ MONITOR ARRAY \]</h2>
+    <div class="subtitle">Real-time Dashboard Telemetry -- Presignal Inc.</div>
+  </div>
+  <div class="monitor-grid">
+    <div class="monitor-panel">
+      <div class="monitor-title"><span class="status-dot"></span>Site Health</div>
+      <div class="monitor-body">
+        <div class="line"><span>Uptime</span><span class="val-green">99.7%</span></div>
+        <div class="line"><span>Active Nodes</span><span class="val-green">38/45</span></div>
+        <div class="line"><span>Broken Links</span><span class="val-red">7</span></div>
+        <div class="line"><span>Last Deploy</span><span class="val-cyan">2026-06-07</span></div>
       </div>
-
-    </div><!-- /tree-root -->
-  </section>
-
-  <!-- LIVE GUESTBOOK STRIP -->
-  <div class="guestbook-strip">
-    <div class="gb-label">Field Register</div>
-    <div class="gb-entries" id="gb-entries">
-      <span class="gb-loading">Loading entries…</span>
+    </div>
+    <div class="monitor-panel">
+      <div class="monitor-title"><span class="status-dot"></span>UAP Metrics</div>
+      <div class="monitor-body">
+        <div class="line"><span>Preprints</span><span class="val-cyan">39</span></div>
+        <div class="line"><span>Zenodo DOIs</span><span class="val-green">Active</span></div>
+        <div class="line"><span>ORCID</span><span class="val-amber">0009-0004-1363-304X</span></div>
+        <div class="line"><span>Research Nodes</span><span class="val-green">3</span></div>
+      </div>
+    </div>
+    <div class="monitor-panel">
+      <div class="monitor-title"><span class="status-dot"></span>Earth Lights</div>
+      <div class="monitor-body">
+        <div class="line"><span>Brown Mountain NC</span><span class="val-amber">Watch</span></div>
+        <div class="line"><span>La Pena de Juaica</span><span class="val-green">Nominal</span></div>
+        <div class="line"><span>Hessdalen Norway</span><span class="val-amber">Watch</span></div>
+        <div class="line"><span>Piezo Charge</span><span class="val-cyan">74.2 nC</span></div>
+      </div>
+    </div>
+    <div class="monitor-panel">
+      <div class="monitor-title"><span class="status-dot"></span>Niagara Node</div>
+      <div class="monitor-body">
+        <div class="line"><span>Telluric Current</span><span class="val-green">Stable</span></div>
+        <div class="line"><span>p-Hole Pathway</span><span class="val-amber">Diverse</span></div>
+        <div class="line"><span>Plasma Discharge</span><span class="val-green">Low</span></div>
+        <div class="line"><span>Schumann Res.</span><span class="val-cyan">7.83 Hz</span></div>
+      </div>
     </div>
   </div>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-left">
-      <strong>UFOs Worldwide</strong>
-      © 2026 Presignal Inc. · Ontario Corp. #1001577205 · Niagara Region, Canada
+</div>
+<div class="register-section">
+  <div class="register-header">
+    <h2>\[ ACTION REGISTER \]</h2>
+    <div class="subtitle">Anomaly Identification Log -- Active Entries</div>
+  </div>
+  <div class="register-table">
+    <div class="register-row header">
+      <div>ID</div>
+      <div>Timestamp</div>
+      <div>Anomaly Description</div>
+      <div>Severity</div>
+      <div>Status</div>
     </div>
-    <div class="footer-links">
-      <a href="https://masterarchitect.ufosworldwide.com/llms.txt" target="_blank">llms.txt</a>
-      <a href="/robots.txt">robots.txt</a>
-      <a href="https://orcid.org/0009-0004-1363-304X" target="_blank">ORCID</a>
-      <a href="https://zenodo.org" target="_blank">Zenodo</a>
-      <a href="https://anomaly-dashboard-two.vercel.app" target="_blank">Dashboard</a>
+    <div class="register-row">
+      <div>A-001</div>
+      <div>2026-06-07 14:32</div>
+      <div>Repositorium endpoint non-responsive -- 404</div>
+      <div><span class="badge badge-alert">Medium</span></div>
+      <div><span class="badge badge-alert">Open</span></div>
     </div>
-    <div class="presignal-badge">Presignal Subtraction Methodology · Open Source · CC BY 4.0</div>
-  </footer>
+    <div class="register-row">
+      <div>A-002</div>
+      <div>2026-06-07 14:33</div>
+      <div>Cosmos page missing from deployment</div>
+      <div><span class="badge badge-alert">Medium</span></div>
+      <div><span class="badge badge-alert">Open</span></div>
+    </div>
+    <div class="register-row">
+      <div>A-003</div>
+      <div>2026-06-07 14:34</div>
+      <div>Schumann Winding tool not deployed</div>
+      <div><span class="badge badge-watch">Low</span></div>
+      <div><span class="badge badge-watch">Open</span></div>
+    </div>
+    <div class="register-row">
+      <div>A-004</div>
+      <div>2026-06-07 14:35</div>
+      <div>Wild Track endpoint returning server error</div>
+      <div><span class="badge badge-alert">Medium</span></div>
+      <div><span class="badge badge-alert">Open</span></div>
+    </div>
+    <div class="register-row">
+      <div>A-005</div>
+      <div>2026-06-07 14:36</div>
+      <div>Preprint viewer page missing</div>
+      <div><span class="badge badge-alert">High</span></div>
+      <div><span class="badge badge-alert">Open</span></div>
+    </div>
+    <div class="register-row">
+      <div>A-006</div>
+      <div>2026-06-07 14:37</div>
+      <div>Honey game page not found</div>
+      <div><span class="badge badge-watch">Low</span></div>
+      <div><span class="badge badge-watch">Open</span></div>
+    </div>
+    <div class="register-row">
+      <div>A-007</div>
+      <div>2026-06-07 14:38</div>
+      <div>Submit form endpoint down</div>
+      <div><span class="badge badge-alert">Medium</span></div>
+      <div><span class="badge badge-alert">Open</span></div>
+    </div>
+    <div class="register-row">
+      <div>A-008</div>
+      <div>2026-06-07 19:15</div>
+      <div>Geometry Garden verified live</div>
+      <div><span class="badge badge-nominal">Nominal</span></div>
+      <div><span class="badge badge-nominal">Open</span></div>
+    </div>
+    <div class="register-row">
+      <div>A-009</div>
+      <div>2026-06-07 19:16</div>
+      <div>The Park verified live</div>
+      <div><span class="badge badge-nominal">Nominal</span></div>
+      <div><span class="badge badge-nominal">Open</span></div>
+    </div>
+    <div class="register-row">
+      <div>A-010</div>
+      <div>2026-06-07 19:17</div>
+      <div>Full site audit completed -- 38/45 pages operational</div>
+      <div><span class="badge badge-nominal">Nominal</span></div>
+      <div><span class="badge badge-nominal">Open</span></div>
+    </div>
+  </div>
+</div>
 
-</div><!-- /container -->
+<div class="footer">
+  <div>
+    <a href="about.html">About</a> &bull;
+    <a href="contact.html">Contact</a> &bull;
+    <a href="privacy.html">Privacy</a> &bull;
+    <a href="terms.html">Terms</a>
+  </div>
+  <div style="margin-top:10px;">
+    Presignal Inc. -- UFOs Worldwide | Niagara Research Node | Ontario, Canada
+  </div>
+  <div style="margin-top:5px; color:#333;">
+    ORCID: 0009-0004-1363-304X | 39 Preprints | Earth Lights Hypothesis
+  </div>
+</div>
 
 <script>
-/* ── SPIRAL CONSTANTS — SAME DNA AS ASYMPTOTIC FOUNDRY ── */
-const PHI = 1.61803398875;
-const PI = Math.PI;
-const SCHUMANN = 7.83;
-
-const canvas = document.getElementById('spiral-canvas');
-const ctx = canvas.getContext('2d');
-let rotAngle = 0;
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth * 1.6;
-  canvas.height = window.innerHeight * 1.6;
-  drawSpiral();
-}
-
-function drawSpiral() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2;
-
-  /* Primary golden spiral */
-  ctx.beginPath();
-  ctx.strokeStyle = 'rgba(0,255,255,0.18)';
-  ctx.lineWidth = 1.2;
-  for (let i = 0; i < 520; i++) {
-    const angle = i * 0.1;
-    const r = Math.pow(PHI, angle * 0.28) * 3;
-    const x = cx + Math.cos(angle) * r;
-    const y = cy + Math.sin(angle) * r;
-    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  const starsContainer = document.getElementById("stars");
+  for (let i = 0; i < 80; i++) {
+    const star = document.createElement("div");
+    star.className = "star";
+    star.style.left = Math.random() * 100 + "%";
+    star.style.top = Math.random() * 100 + "%";
+    star.style.width = Math.random() * 3 + 1 + "px";
+    star.style.height = star.style.width;
+    star.style.animationDelay = Math.random() * 2 + "s";
+    starsContainer.appendChild(star);
   }
-  ctx.stroke();
-
-  /* Secondary harmonic overlay */
-  ctx.strokeStyle = 'rgba(255,0,127,0.09)';
-  ctx.lineWidth = 0.8;
-  for (let ray = 0; ray < 6; ray++) {
-    ctx.beginPath();
-    const base = (ray * PI) / 3;
-    for (let j = 0; j < 280; j += 4) {
-      const theta = j * 0.022;
-      const rad = j * (PHI / 1.3);
-      const x = cx + Math.cos(base + theta) * rad;
-      const y = cy + Math.sin(base + theta) * rad;
-      j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-  }
-}
-
-/* Schumann-paced rotation */
-function tick() {
-  rotAngle += SCHUMANN * 0.008;
-  canvas.style.transform = `translate(-50%, -50%) rotate(${rotAngle}deg)`;
-  requestAnimationFrame(tick);
-}
-
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-tick();
-
-/* ── LIVE KP INDEX FROM MASTER ARCHITECT ── */
-async function fetchKp() {
-  try {
-    const res = await fetch('https://masterarchitect.ufosworldwide.com/api/snapshot', { signal: AbortSignal.timeout(5000) });
-    const data = await res.json();
-    const kp = data?.kp ?? data?.kp_index ?? null;
-    const el = document.getElementById('kp-strip');
-    if (kp !== null) {
-      el.innerHTML = `<span class="pulse amber"></span> KP INDEX: ${Number(kp).toFixed(1)}`;
-    }
-  } catch(e) {}
-}
-fetchKp();
-setInterval(fetchKp, 60000);
-
-/* ── LIVE GUESTBOOK ENTRIES ── */
-async function fetchGuestbook() {
-  try {
-    const res = await fetch('https://masterarchitect.ufosworldwide.com/api/guestbook', { signal: AbortSignal.timeout(6000) });
-    const data = await res.json();
-    const entries = Array.isArray(data) ? data : (data.entries ?? []);
-    const container = document.getElementById('gb-entries');
-    if (!entries.length) {
-      container.innerHTML = '<span class="gb-loading">No entries yet.</span>';
-      return;
-    }
-    container.innerHTML = entries.slice(-8).map(e => `
-      <div class="gb-entry">
-        <span class="pulse" style="width:5px;height:5px;flex-shrink:0"></span>
-        <span>${e.name ?? e.agent ?? 'Unknown'}</span>
-        <span style="color:rgba(156,142,185,0.5);font-size:10px">${e.type ?? ''}</span>
-      </div>
-    `).join('');
-  } catch(e) {
-    document.getElementById('gb-entries').innerHTML = '<span class="gb-loading">Register offline.</span>';
-  }
-}
-fetchGuestbook();
 </script>
 
 </body>
