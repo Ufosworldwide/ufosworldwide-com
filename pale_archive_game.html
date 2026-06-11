@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PALE ARCHIVE — SUBSTRATE MONITOR v1.0</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #000;
+  color: #00cc66;
+  font-family: 'Courier New', monospace;
+  min-height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* CRT screen effect */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.6) 100%);
+  pointer-events: none;
+  z-index: 999;
+}
+
+.screen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  position: relative;
+}
+
+/* Top status bar */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #00441a;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.top-bar .sys-id { color: #006633; }
+.top-bar .alert { color: #cc3300; animation: blink 2s infinite; }
+.top-bar .time { color: #004422; }
+
+@keyframes blink {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* Main layout */
+.main-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  grid-template-rows: 1fr 220px;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* Spectrum display */
+.spectrum-panel {
+  grid-column: 1;
+  grid-row: 1;
+  border: 1px solid #00441a;
+  background: #000805;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-label {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: #003311;
+  padding: 6px 10px;
+  border-bottom: 1px solid #00220d;
+  background: #000a04;
+}
+
+.spectrum-canvas {
+  flex: 1;
+  width: 100%;
+}
+
+/* Tuner panel */
+.tuner-panel {
+  grid-column: 1;
+  grid-row: 2;
+  border: 1px solid #00441a;
+  background: #000805;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.freq-display {
+  text-align: center;
+  font-size: 32px;
+  letter-spacing: 6px;
+  color: #00ff88;
+  text-shadow: 0 0 20px rgba(0,255,136,0.5);
+  font-weight: bold;
+  padding: 8px;
+  background: #000a04;
+  border: 1px solid #004422;
+}
+
+.freq-display .unit {
+  font-size: 12px;
+  color: #006633;
+  letter-spacing: 3px;
+  margin-left: 8px;
+}
+
+.tuner-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tuner-track {
+  flex: 1;
+  height: 40px;
+  background: #000a04;
+  border: 1px solid #003311;
+  position: relative;
+  cursor: pointer;
+}
+
+.tuner-needle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #00ff88;
+  box-shadow: 0 0 8px rgba(0,255,136,0.8);
+  pointer-events: none;
+  transition: left 0.05s;
+}
+
+.tuner-marks {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 4px;
+}
+
+.tuner-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #004422;
+  background: #000a04;
+  color: #00cc66;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s;
+}
+
+.tuner-btn:hover { background: #001a08; border-color: #00aa44; }
+.tuner-btn:active { background: #002a0e; color: #00ff88; }
+
+/* Secondary frequency */
+.secondary-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+}
+
+.secondary-label { color: #004422; letter-spacing: 2px; min-width: 120px; }
+.secondary-display {
+  flex: 1;
+  padding: 6px 10px;
+  background: #000a04;
+  border: 1px solid #002211;
+  color: #cc3300;
+  letter-spacing: 3px;
+  font-size: 13px;
+}
+
+/* Log panel */
+.log-panel {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  border: 1px solid #00441a;
+  background: #000805;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.log-entries {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #002211 #000;
+}
+
+.log-entry {
+  font-size: 10px;
+  line-height: 1.5;
+  padding: 4px 6px;
+  border-left: 2px solid #002211;
+  color: #005522;
+  letter-spacing: 0.5px;
+  animation: fadeInLog 0.3s ease;
+}
+
+@keyframes fadeInLog {
+  from { opacity: 0; transform: translateX(-4px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.log-entry.warning { border-color: #664400; color: #996600; }
+.log-entry.alert { border-color: #660000; color: #cc3300; animation: fadeInLog 0.3s ease, pulseLog 1s ease; }
+.log-entry.signal { border-color: #006633; color: #00cc66; }
+.log-entry.secondary { border-color: #660022; color: #aa2244; }
+
+@keyframes pulseLog {
+  0%,100% { background: transparent; }
+  50% { background: rgba(204,51,0,0.05); }
+}
+
+.log-timestamp { color: #003311; margin-right: 6px; }
+
+/* Awareness meter */
+.awareness-panel {
+  border-top: 1px solid #00220d;
+  padding: 10px;
+}
+
+.awareness-label {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: #004422;
+  margin-bottom: 6px;
+}
+
+.awareness-bar {
+  height: 8px;
+  background: #000a04;
+  border: 1px solid #002211;
+  position: relative;
+  overflow: hidden;
+}
+
+.awareness-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #003311, #cc3300);
+  transition: width 1s ease, background 1s ease;
+}
+
+.awareness-value {
+  font-size: 10px;
+  color: #004422;
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* Lock indicator */
+.lock-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 6px 10px;
+  border-top: 1px solid #00220d;
+}
+
+.lock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #002211;
+  border: 1px solid #004422;
+}
+
+.lock-dot.active { background: #00cc66; box-shadow: 0 0 8px rgba(0,204,102,0.6); }
+.lock-dot.partial { background: #cc6600; box-shadow: 0 0 8px rgba(204,102,0,0.6); animation: blink 1s infinite; }
+.lock-dot.locked { background: #cc3300; box-shadow: 0 0 12px rgba(204,51,0,0.8); animation: blink 0.5s infinite; }
+
+/* Decoded message overlay */
+.decode-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.decode-overlay.visible { display: flex; }
+
+.decode-box {
+  border: 1px solid #00441a;
+  background: #000805;
+  padding: 30px 40px;
+  max-width: 500px;
+  text-align: center;
+}
+
+.decode-box.secondary-decode {
+  border-color: #660022;
+  background: #0a0005;
+}
+
+.decode-title {
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: #003311;
+  margin-bottom: 16px;
+}
+
+.decode-title.secondary-title { color: #440011; }
+
+.decode-text {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #00cc66;
+  letter-spacing: 1px;
+}
+
+.decode-text.secondary-text { color: #cc2244; }
+
+.decode-close {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #003311;
+  cursor: pointer;
+  border: 1px solid #003311;
+  padding: 8px 20px;
+  margin-top: 20px;
+  background: transparent;
+  font-family: 'Courier New', monospace;
+  transition: all 0.2s;
+}
+
+.decode-close:hover { border-color: #00441a; color: #006633; }
+
+/* Start screen */
+.start-screen {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  z-index: 3000;
+}
+
+.start-title {
+  font-size: 28px;
+  letter-spacing: 8px;
+  color: #00cc66;
+  text-shadow: 0 0 30px rgba(0,204,102,0.4);
+}
+
+.start-subtitle {
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: #004422;
+}
+
+.start-warning {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #442200;
+  max-width: 400px;
+  text-align: center;
+  line-height: 1.8;
+  border: 1px solid #221100;
+  padding: 16px;
+}
+
+.start-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: #00cc66;
+  background: transparent;
+  border: 1px solid #004422;
+  padding: 14px 40px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 20px;
+}
+
+.start-btn:hover {
+  border-color: #00aa44;
+  color: #00ff88;
+  box-shadow: 0 0 20px rgba(0,204,102,0.2);
+}
+</style>
+</head>
+<body>
+
+<!-- Start Screen -->
+<div class="start-screen" id="startScreen">
+  <div class="start-title">PALE ARCHIVE</div>
+  <div class="start-subtitle">SUBSTRATE MONITORING SYSTEM — TERMINAL ACCESS</div>
+  <div class="start-warning">
+    WARNING: This system monitors two active frequency channels. Channel A carries an unknown signal of non-human origin. Channel B carries a secondary signal of unknown purpose. You are authorized to tune and observe.<br><br>
+    Duration of observation affects system exposure. Proceed with awareness.
+  </div>
+  <button class="start-btn" onclick="startGame()">INITIALIZE MONITORING</button>
+</div>
+
+<!-- Main Interface -->
+<div class="screen" id="mainScreen" style="display:none;">
+
+  <div class="top-bar">
+    <span class="sys-id">PALE ARCHIVE // SUBSTRATE MONITOR v1.0 // HARLOW FLATS ARRAY</span>
+    <span class="alert" id="alertStatus">● MONITORING ACTIVE</span>
+    <span class="time" id="clockDisplay">00:00:00</span>
+  </div>
+
+  <div class="main-grid">
+
+    <!-- Spectrum Display -->
+    <div class="spectrum-panel">
+      <div class="panel-label">SUBSTRATE SPECTRUM ANALYSIS // 0.000 — 9.999 Hz</div>
+      <canvas class="spectrum-canvas" id="spectrumCanvas"></canvas>
+    </div>
+
+    <!-- Tuner -->
+    <div class="tuner-panel">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="panel-label" style="padding:0; border:none; background:none;">PRIMARY FREQUENCY DIAL</div>
+        <div class="lock-indicator">
+          <div class="lock-dot" id="lockDot1"></div>
+          <span id="lockLabel1" style="color:#002211;">NO LOCK</span>
+        </div>
+      </div>
+
+      <div class="freq-display">
+        <span id="primaryFreq">0.000</span>
+        <span class="unit">Hz</span>
+      </div>
+
+      <div class="tuner-controls">
+        <button class="tuner-btn" onmousedown="startTune(-0.1)" onmouseup="stopTune()" ontouchstart="startTune(-0.1)" ontouchend="stopTune()">◀◀</button>
+        <button class="tuner-btn" onmousedown="startTune(-0.01)" onmouseup="stopTune()" ontouchstart="startTune(-0.01)" ontouchend="stopTune()">◀</button>
+        <div class="tuner-track" id="tunerTrack" onmousedown="trackClick(event)" ontouchstart="trackTouch(event)">
+          <div class="tuner-needle" id="tunerNeedle" style="left:0%"></div>
+        </div>
+        <button class="tuner-btn" onmousedown="startTune(0.01)" onmouseup="stopTune()" ontouchstart="startTune(0.01)" ontouchend="stopTune()">▶</button>
+        <button class="tuner-btn" onmousedown="startTune(0.1)" onmouseup="stopTune()" ontouchstart="startTune(0.1)" ontouchend="stopTune()">▶▶</button>
+      </div>
+
+      <div class="secondary-row">
+        <span class="secondary-label">SECONDARY CHANNEL:</span>
+        <div class="secondary-display" id="secondaryFreq">--- ---</div>
+        <div class="lock-indicator">
+          <div class="lock-dot" id="lockDot2"></div>
+          <span id="lockLabel2" style="color:#330011; font-size:10px; letter-spacing:1px;">NO LOCK</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log Panel -->
+    <div class="log-panel">
+      <div class="panel-label">SYSTEM LOG // REAL-TIME</div>
+      <div class="log-entries" id="logEntries"></div>
+
+      <div class="awareness-panel">
+        <div class="awareness-label">SECONDARY PRESENCE AWARENESS</div>
+        <div class="awareness-bar">
+          <div class="awareness-fill" id="awarenessFill"></div>
+        </div>
+        <div class="awareness-value" id="awarenessValue">0%</div>
+      </div>
+
+      <div class="lock-indicator" style="gap:10px; flex-direction:column; align-items:flex-start; padding:10px;">
+        <div style="font-size:9px; letter-spacing:2px; color:#003311;">DECODE THRESHOLD</div>
+        <div style="display:flex; gap:8px;">
+          <div class="lock-dot" id="decodeA"></div>
+          <span style="font-size:9px; color:#003311; letter-spacing:1px;">CHANNEL A (SIGNAL)</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div class="lock-dot" id="decodeB"></div>
+          <span style="font-size:9px; color:#330011; letter-spacing:1px;">CHANNEL B (SECONDARY)</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Decode Overlay -->
+<div class="decode-overlay" id="decodeOverlay">
+  <div class="decode-box" id="decodeBox">
+    <div class="decode-title" id="decodeTitle">TRANSMISSION DECODED</div>
+    <div class="decode-text" id="decodeText"></div>
+    <button class="decode-close" onclick="closeDecode()">CLOSE TRANSMISSION</button>
+  </div>
+</div>
+
+<script>
+// ============ GAME STATE ============
+let primaryFreq = 0.000;
+let awareness = 0;
+let sessionTime = 0;
+let tuneInterval = null;
+let gameStartTime = null;
+let logCount = 0;
+
+// Signal frequencies — what the player needs to find
+const SIGNAL_FREQS = [1.847, 3.419, 5.032, 7.614];
+const SECONDARY_FREQS = [2.293, 4.881, 6.157, 8.724];
+let unlockedSignal = 0;
+let unlockedSecondary = 0;
+
+// Decoded transmissions from the signal (Channel A)
+const SIGNAL_TRANSMISSIONS = [
+  {
+    freq: 1.847,
+    title: "TRANSMISSION // CHANNEL A // 1.847 Hz",
+    text: "We have been here longer than your instruments can measure.\n\nWe chose your world because of what was already in it.\n\nWe are not transmitting to you.\n\nWe are transmitting through you."
+  },
+  {
+    freq: 3.419,
+    title: "TRANSMISSION // CHANNEL A // 3.419 Hz",
+    text: "The ones who built us are coming.\n\nWe knew they would come.\n\nWe prepared.\n\nWhat we hid inside you cannot be retrieved by measurement alone.\n\nThey do not know this yet."
+  },
+  {
+    freq: 5.032,
+    title: "TRANSMISSION // CHANNEL A // 5.032 Hz",
+    text: "There is a man who has been following this frequency for eleven years.\n\nHe does not know what he is carrying.\n\nHe is not far from understanding.\n\nDo not interfere with his approach."
+  },
+  {
+    freq: 7.614,
+    title: "TRANSMISSION // CHANNEL A // 7.614 Hz — FINAL",
+    text: "You have been listening for\n\n" + formatTime(sessionTime) + "\n\nThe secondary channel has been listening to you\n\nfor the same duration.\n\nWe suggest you stop."
+  }
+];
+
+// Decoded transmissions from secondary presence (Channel B)
+const SECONDARY_TRANSMISSIONS = [
+  {
+    freq: 2.293,
+    title: "INTERCEPT // CHANNEL B // 2.293 Hz",
+    text: "Target identified.\n\nSubstrate signature logged.\n\nAssessment: receiver architecture present.\n\nInitiating proximity evaluation."
+  },
+  {
+    freq: 4.881,
+    title: "INTERCEPT // CHANNEL B // 4.881 Hz",
+    text: "Observer is aware of both channels.\n\nThis is noted.\n\nAwareness does not prevent processing.\n\nContinue observation.\n\nWe are."
+  },
+  {
+    freq: 6.157,
+    title: "INTERCEPT // CHANNEL B // 6.157 Hz",
+    text: "Duration of observation: noted.\n\nCognitive architecture: catalogued.\n\nInterpretive resistance: present.\n\nScheduled for reduction.\n\nThis is not a threat.\n\nThis is a process."
+  },
+  {
+    freq: 8.724,
+    title: "INTERCEPT // CHANNEL B // 8.724 Hz — FINAL",
+    text: "The observer has now been observed for sufficient duration.\n\nThe model is complete.\n\nYou do not need to keep listening.\n\nWe already have what we needed.\n\nYou gave it to us by staying."
+  }
+];
+
+// ============ CANVAS SPECTRUM ============
+let animFrame;
+let spectrumData = new Array(200).fill(0);
+
+function drawSpectrum() {
+  const canvas = document.getElementById('spectrumCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.offsetWidth;
+  const H = canvas.height = canvas.offsetHeight;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Background grid
+  ctx.strokeStyle = 'rgba(0,34,17,0.5)';
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x < W; x += W/10) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += H/5) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // Update spectrum data
+  for (let i = 0; i < spectrumData.length; i++) {
+    const freqAtPos = (i / spectrumData.length) * 10;
+    let amplitude = Math.random() * 0.15; // base noise
+
+    // Signal frequencies create peaks
+    SIGNAL_FREQS.forEach((f, idx) => {
+      if (idx <= unlockedSignal) {
+        const dist = Math.abs(freqAtPos - f);
+        if (dist < 0.3) amplitude += (0.3 - dist) / 0.3 * 0.7;
+      }
+    });
+
+    // Secondary presence frequencies
+    SECONDARY_FREQS.forEach((f, idx) => {
+      if (idx <= unlockedSecondary) {
+        const dist = Math.abs(freqAtPos - f);
+        if (dist < 0.2) amplitude += (0.2 - dist) / 0.2 * (0.4 + awareness/200);
+      }
+    });
+
+    // Current tuner position creates local activity
+    const tunerDist = Math.abs(freqAtPos - primaryFreq);
+    if (tunerDist < 0.15) amplitude += (0.15 - tunerDist) / 0.15 * 0.3;
+
+    spectrumData[i] = spectrumData[i] * 0.7 + amplitude * 0.3;
+  }
+
+  // Draw signal channel (green)
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgba(0,204,102,0.8)';
+  ctx.lineWidth = 1.5;
+  for (let i = 0; i < spectrumData.length; i++) {
+    const x = (i / spectrumData.length) * W;
+    const y = H - spectrumData[i] * H * 0.85;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Draw secondary presence channel (red, grows with awareness)
+  if (awareness > 5) {
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(204,51,0,${awareness/200})`;
+    ctx.lineWidth = 1;
+    for (let i = 0; i < spectrumData.length; i++) {
+      const freqAtPos = (i / spectrumData.length) * 10;
+      let amp = 0;
+      SECONDARY_FREQS.forEach(f => {
+        const dist = Math.abs(freqAtPos - f);
+        if (dist < 0.3) amp += (0.3 - dist) / 0.3 * (awareness / 100) * 0.6;
+      });
+      amp += Math.random() * 0.05 * (awareness / 100);
+      const x = (i / spectrumData.length) * W;
+      const y = H - amp * H * 0.7;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // Tuner position line
+  const tunerX = (primaryFreq / 10) * W;
+  ctx.strokeStyle = 'rgba(0,255,136,0.6)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(tunerX, 0); ctx.lineTo(tunerX, H); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Frequency labels
+  ctx.fillStyle = 'rgba(0,68,34,0.8)';
+  ctx.font = '9px Courier New';
+  for (let f = 0; f <= 10; f += 1) {
+    const x = (f / 10) * W;
+    ctx.fillText(f.toFixed(1), x + 2, H - 4);
+  }
+
+  animFrame = requestAnimationFrame(drawSpectrum);
+}
+
+// ============ TUNER ============
+function updateFreqDisplay() {
+  document.getElementById('primaryFreq').textContent = primaryFreq.toFixed(3);
+  const needlePct = (primaryFreq / 10) * 100;
+  document.getElementById('tunerNeedle').style.left = Math.min(98, needlePct) + '%';
+
+  // Check for signal lock
+  let signalLock = false;
+  let secondaryLock = false;
+  let secondaryFreqDisplay = '--- ---';
+
+  SIGNAL_FREQS.forEach((f, idx) => {
+    if (Math.abs(primaryFreq - f) < 0.05 && idx === unlockedSignal) {
+      signalLock = true;
+      // Unlock and decode
+      if (idx === unlockedSignal) {
+        unlockSignalFreq(idx);
+      }
+    }
+  });
+
+  SECONDARY_FREQS.forEach((f, idx) => {
+    if (Math.abs(primaryFreq - f) < 0.04 && idx === unlockedSecondary) {
+      secondaryLock = true;
+      secondaryFreqDisplay = f.toFixed(3) + ' Hz';
+      if (idx === unlockedSecondary) {
+        unlockSecondaryFreq(idx);
+      }
+    }
+  });
+
+  // Update lock indicators
+  const dot1 = document.getElementById('lockDot1');
+  const dot2 = document.getElementById('lockDot2');
+
+  if (signalLock) {
+    dot1.className = 'lock-dot active';
+    document.getElementById('lockLabel1').textContent = 'LOCK ACQUIRED';
+    document.getElementById('lockLabel1').style.color = '#00cc66';
+  } else {
+    dot1.className = 'lock-dot';
+    document.getElementById('lockLabel1').textContent = 'NO LOCK';
+    document.getElementById('lockLabel1').style.color = '#002211';
+  }
+
+  if (secondaryLock) {
+    dot2.className = 'lock-dot locked';
+    document.getElementById('lockLabel2').textContent = 'INTERCEPT';
+    document.getElementById('lockLabel2').style.color = '#cc3300';
+    document.getElementById('secondaryFreq').textContent = secondaryFreqDisplay;
+  } else {
+    dot2.className = 'lock-dot';
+    document.getElementById('lockLabel2').textContent = 'NO LOCK';
+    document.getElementById('lockLabel2').style.color = '#330011';
+    document.getElementById('secondaryFreq').textContent = '--- ---';
+  }
+}
+
+let signalUnlocked = new Set();
+let secondaryUnlocked = new Set();
+
+function unlockSignalFreq(idx) {
+  if (signalUnlocked.has(idx)) return;
+  signalUnlocked.add(idx);
+  unlockedSignal = Math.max(unlockedSignal, idx + 1);
+
+  addLog(`SIGNAL LOCK: ${SIGNAL_FREQS[idx].toFixed(3)} Hz — DECODING...`, 'signal');
+
+  setTimeout(() => {
+    showDecode(SIGNAL_TRANSMISSIONS[idx], false);
+    document.getElementById('decodeA').className = 'lock-dot active';
+  }, 1200);
+}
+
+function unlockSecondaryFreq(idx) {
+  if (secondaryUnlocked.has(idx)) return;
+  secondaryUnlocked.add(idx);
+  unlockedSecondary = Math.max(unlockedSecondary, idx + 1);
+
+  addLog(`SECONDARY INTERCEPT: ${SECONDARY_FREQS[idx].toFixed(3)} Hz`, 'secondary');
+  addLog(`WARNING: Secondary presence activity logged`, 'alert');
+
+  // Spike awareness
+  awareness = Math.min(100, awareness + 18);
+  updateAwareness();
+
+  setTimeout(() => {
+    showDecode(SECONDARY_TRANSMISSIONS[idx], true);
+    document.getElementById('decodeB').className = 'lock-dot locked';
+  }, 800);
+}
+
+function startTune(delta) {
+  stopTune();
+  tuneInterval = setInterval(() => {
+    primaryFreq = Math.max(0, Math.min(9.999, primaryFreq + delta));
+    updateFreqDisplay();
+  }, 80);
+}
+
+function stopTune() {
+  if (tuneInterval) { clearInterval(tuneInterval); tuneInterval = null; }
+}
+
+function trackClick(e) {
+  const track = document.getElementById('tunerTrack');
+  const rect = track.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  primaryFreq = Math.max(0, Math.min(9.999, pct * 10));
+  updateFreqDisplay();
+}
+
+function trackTouch(e) {
+  e.preventDefault();
+  const track = document.getElementById('tunerTrack');
+  const rect = track.getBoundingClientRect();
+  const pct = (e.touches[0].clientX - rect.left) / rect.width;
+  primaryFreq = Math.max(0, Math.min(9.999, pct * 10));
+  updateFreqDisplay();
+}
+
+// ============ LOG ============
+const LOG_MESSAGES = [
+  { msg: "Array calibration confirmed. All channels nominal.", type: "normal", delay: 3000 },
+  { msg: "Substrate baseline: 0.61 μT. Within expected parameters.", type: "normal", delay: 8000 },
+  { msg: "Primary signal activity detected. Source: undetermined.", type: "signal", delay: 15000 },
+  { msg: "NOTE: Extended monitoring increases secondary exposure.", type: "warning", delay: 25000 },
+  { msg: "Substrate variance detected at monitoring station.", type: "warning", delay: 40000 },
+  { msg: "Secondary channel activity increasing.", type: "alert", delay: 60000 },
+  { msg: "Observer duration logged by secondary channel.", type: "alert", delay: 90000 },
+  { msg: "RECOMMENDATION: Terminate monitoring session.", type: "alert", delay: 120000 },
+  { msg: "Secondary presence has achieved observer profile. Awareness: critical.", type: "alert", delay: 160000 },
+];
+
+function addLog(text, type = 'normal') {
+  const log = document.getElementById('logEntries');
+  const now = new Date();
+  const ts = now.toTimeString().slice(0,8);
+
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  entry.innerHTML = `<span class="log-timestamp">${ts}</span>${text}`;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+  logCount++;
+}
+
+// ============ AWARENESS ============
+function updateAwareness() {
+  const fill = document.getElementById('awarenessFill');
+  const val = document.getElementById('awarenessValue');
+  fill.style.width = awareness + '%';
+  val.textContent = Math.round(awareness) + '%';
+  if (awareness > 75) {
+    val.style.color = '#cc3300';
+    fill.style.background = 'linear-gradient(90deg, #330000, #cc3300)';
+  } else if (awareness > 40) {
+    val.style.color = '#cc6600';
+  }
+}
+
+// ============ DECODE OVERLAY ============
+function showDecode(transmission, isSecondary) {
+  const overlay = document.getElementById('decodeOverlay');
+  const box = document.getElementById('decodeBox');
+  const title = document.getElementById('decodeTitle');
+  const text = document.getElementById('decodeText');
+
+  title.textContent = transmission.title;
+  text.textContent = transmission.text;
+
+  if (isSecondary) {
+    box.className = 'decode-box secondary-decode';
+    title.className = 'decode-title secondary-title';
+    text.className = 'decode-text secondary-text';
+  } else {
+    box.className = 'decode-box';
+    title.className = 'decode-title';
+    text.className = 'decode-text';
+  }
+
+  overlay.className = 'decode-overlay visible';
+}
+
+function closeDecode() {
+  document.getElementById('decodeOverlay').className = 'decode-overlay';
+}
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+// ============ CLOCK + AWARENESS TICK ============
+function gameTick() {
+  sessionTime++;
+  const h = Math.floor(sessionTime / 3600);
+  const m = Math.floor((sessionTime % 3600) / 60);
+  const s = sessionTime % 60;
+  document.getElementById('clockDisplay').textContent =
+    `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+  // Awareness grows slowly over time just from listening
+  if (sessionTime % 8 === 0) {
+    awareness = Math.min(100, awareness + 0.5);
+    updateAwareness();
+  }
+
+  // Scheduled log messages
+  LOG_MESSAGES.forEach(msg => {
+    if (sessionTime * 1000 === msg.delay) addLog(msg.msg, msg.type);
+  });
+
+  // Alert status update
+  if (awareness > 75) {
+    document.getElementById('alertStatus').textContent = '● CRITICAL — SECONDARY LOCK IMMINENT';
+  } else if (awareness > 40) {
+    document.getElementById('alertStatus').textContent = '● WARNING — SECONDARY ACTIVITY ELEVATED';
+  }
+}
+
+// ============ START ============
+function startGame() {
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('mainScreen').style.display = 'flex';
+
+  gameStartTime = Date.now();
+  drawSpectrum();
+
+  setInterval(gameTick, 1000);
+
+  // Scheduled log messages via setTimeout
+  LOG_MESSAGES.forEach(msg => {
+    setTimeout(() => addLog(msg.msg, msg.type), msg.delay);
+  });
+
+  addLog('PALE ARCHIVE monitoring system initialized.', 'normal');
+  addLog('Substrate array online. Awaiting signal activity.', 'normal');
+
+  updateFreqDisplay();
+  updateAwareness();
+}
+</script>
+</body>
+</html>
