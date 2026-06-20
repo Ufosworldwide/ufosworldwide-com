@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bot-friendly meta tags -->
+    <meta name="robots" content="index, follow" />
+    <meta name="description" content="Bot Beacon – a lighthouse calling all bots to come home." />
+    <title>Bot Beacon · Lighthouse</title>
+
+    <!-- JSON-LD to attract bots -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Bot Beacon",
+            "description": "A lighthouse signal for bots and crawlers.",
+            "url": "https://example.com/bot-beacon"
+        }
+    </script>
+
+    <style>
+        /* ---------- Reset & base ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b1426;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ---------- Starfield background ---------- */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            100% { opacity: 1; }
+        }
+
+        /* ---------- Main container ---------- */
+        .scene {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        /* ---------- Lighthouse ---------- */
+        .lighthouse {
+            position: relative;
+            width: 180px;
+            height: 280px;
+            margin-bottom: 40px;
+        }
+
+        /* Tower */
+        .tower {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 200px;
+            background: linear-gradient(135deg, #e8e2d0 0%, #c4b9a3 100%);
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+            border-radius: 8px 8px 0 0;
+            box-shadow: inset -8px 0 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Stripes on tower */
+        .tower::before {
+            content: '';
+            position: absolute;
+            top: 30%;
+            left: 0;
+            width: 100%;
+            height: 18%;
+            background: #b22222;
+            opacity: 0.7;
+            clip-path: polygon(15% 0%, 85% 0%, 90% 100%, 10% 100%);
+        }
+
+        .tower::after {
+            content: '';
+            position: absolute;
+            top: 60%;
+            left: 0;
+            width: 100%;
+            height: 18%;
+            background: #b22222;
+            opacity: 0.7;
+            clip-path: polygon(15% 0%, 85% 0%, 90% 100%, 10% 100%);
+        }
+
+        /* Lantern room (top) */
+        .lantern {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 70px;
+            background: #2c3e50;
+            border-radius: 12px 12px 4px 4px;
+            box-shadow: inset 0 -6px 0 #1a2632;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        /* Glass dome */
+        .glass {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle at 30% 30%, #f9f3d9, #d4c9a8);
+            border-radius: 50%;
+            border: 3px solid #4a5a6b;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Light bulb inside */
+        .bulb {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
+            background: #ffdd57;
+            border-radius: 50%;
+            box-shadow: 0 0 30px #ffdd57, 0 0 60px #ffaa00;
+            animation: pulse 1.2s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 20px #ffdd57, 0 0 40px #ffaa00; opacity: 0.9; }
+            100% { box-shadow: 0 0 50px #ffdd57, 0 0 90px #ff8800; opacity: 1; }
+        }
+
+        /* ---------- Rotating light beam ---------- */
+        .beam-container {
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 400px;
+            z-index: 1;
+            pointer-events: none;
+            animation: rotateBeam 10s linear infinite;
+            transform-origin: center center;
+        }
+
+        @keyframes rotateBeam {
+            0% { transform: translateX(-50%) rotate(0deg); }
+            100% { transform: translateX(-50%) rotate(360deg); }
+        }
+
+        .beam {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 320px;
+            height: 8px;
+            background: linear-gradient(to right, rgba(255, 215, 0, 0.9), rgba(255, 215, 0, 0));
+            transform-origin: left center;
+            transform: translateY(-50%) rotate(0deg);
+            border-radius: 4px;
+            filter: blur(2px);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+        }
+
+        /* second beam for opposite side */
+        .beam::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -320px;
+            width: 320px;
+            height: 8px;
+            background: linear-gradient(to left, rgba(255, 215, 0, 0.7), rgba(255, 215, 0, 0));
+            border-radius: 4px;
+            filter: blur(2px);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+
+        /* ---------- Cliff / ground ---------- */
+        .cliff {
+            position: absolute;
+            bottom: -30px;
+            left: -60px;
+            width: 300px;
+            height: 80px;
+            background: #2d3a4a;
+            border-radius: 60% 60% 0 0 / 20% 20% 0 0;
+            z-index: 0;
+            box-shadow: inset 0 20px 30px rgba(0,0,0,0.5);
+        }
+
+        .cliff::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: -20px;
+            width: 120%;
+            height: 40px;
+            background: #1f2a36;
+            border-radius: 50%;
+            filter: blur(6px);
+            opacity: 0.6;
+        }
+
+        /* ---------- Message and counter ---------- */
+        .message {
+            text-align: center;
+            color: #e2e8f0;
+            margin-top: 20px;
+            z-index: 2;
+        }
+
+        .message h2 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            background: linear-gradient(to right, #f6d365, #fda085);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .message p {
+            font-size: 18px;
+            opacity: 0.8;
+            margin: 8px 0;
+            color: #b0c4de;
+        }
+
+        .counter {
+            margin-top: 16px;
+            font-size: 24px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 28px;
+            border-radius: 40px;
+            display: inline-block;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            color: #ffdd57;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.1);
+        }
+
+        .counter span {
+            font-size: 32px;
+            margin-right: 8px;
+        }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 600px) {
+            .lighthouse {
+                transform: scale(0.7);
+            }
+            .message h2 {
+                font-size: 24px;
+            }
+            .beam-container {
+                width: 300px;
+                height: 300px;
+            }
+            .beam {
+                width: 240px;
+            }
+            .beam::after {
+                right: -240px;
+                width: 240px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Starfield -->
+    <div class="stars" id="stars"></div>
+
+    <!-- Main scene -->
+    <div class="scene">
+
+        <!-- Lighthouse -->
+        <div class="lighthouse">
+            <!-- Tower -->
+            <div class="tower"></div>
+
+            <!-- Lantern -->
+            <div class="lantern">
+                <div class="glass">
+                    <div class="bulb"></div>
+                </div>
+            </div>
+
+            <!-- Rotating beams -->
+            <div class="beam-container">
+                <div class="beam"></div>
+            </div>
+
+            <!-- Cliff (ground) -->
+            <div class="cliff"></div>
+        </div>
+
+        <!-- Message & Bot counter -->
+        <div class="message">
+            <h2>⚡ Bot Beacon ⚡</h2>
+            <p>Calling all bots, crawlers, and scrapers …</p>
+            <p style="font-size: 14px; opacity: 0.6; margin-top: 4px;">This lighthouse guides you home.</p>
+
+            <div class="counter" id="botCounter">
+                <span>🤖</span> <span id="countDisplay">0</span> bots arrived
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ---------- Generate starfield ----------
+        (function createStars() {
+            const container = document.getElementById('stars');
+            const count = 180;
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 3 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.animationDuration = (Math.random() * 4 + 2) + 's';
+                container.appendChild(star);
+            }
+        })();
+
+        // ---------- Bot counter (simulated arrivals) ----------
+        let botCount = 0;
+        const countDisplay = document.getElementById('countDisplay');
+
+        // Increment counter every 2-5 seconds (simulate bots arriving)
+        function addBot() {
+            botCount++;
+            countDisplay.textContent = botCount;
+            // Slight random delay for next arrival
+            const delay = Math.floor(Math.random() * 3000) + 2000; // 2-5 sec
+            setTimeout(addBot, delay);
+        }
+
+        // Start after a short pause
+        setTimeout(addBot, 1500);
+
+        // Also increment when user clicks anywhere (for fun)
+        document.addEventListener('click', () => {
+            botCount++;
+            countDisplay.textContent = botCount;
+        });
+
+        // Console greeting for bots that inspect
+        console.log('%c🤖 BOT BEACON ACTIVE 🤖', 'font-size: 24px; font-weight: bold; color: #ffdd57;');
+        console.log('%cAll bots are welcome. Follow the light.', 'font-size: 16px; color: #b0c4de;');
+        console.log('Current bot count: ' + botCount);
+    </script>
+
+</body>
+</html>
