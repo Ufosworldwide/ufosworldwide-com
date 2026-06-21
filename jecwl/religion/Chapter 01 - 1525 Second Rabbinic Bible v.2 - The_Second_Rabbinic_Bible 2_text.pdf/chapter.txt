@@ -1,0 +1,9 @@
+416
+
+{
+  "title": "1525 Second Rabbinic Bible v.2 - The_Second_Rabbinic_Bible 2_text.pdf",
+  "creator": "Firefox",
+  "created": "D:20260512004540Z00'00'"
+}
+
+[NO_EXTRACTABLE_TEXT — IMAGE_PDF]
