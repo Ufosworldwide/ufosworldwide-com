@@ -1,0 +1,21 @@
+{
+  "number": 8,
+  "title": "oip34.pdf",
+  "wordCount": 96,
+  "charCount": 270,
+  "contentFields": [
+    "pages",
+    "metadata",
+    "text"
+  ],
+  "raw": {
+    "filename": "oip34.pdf",
+    "pages": 426,
+    "metadata": {
+      "title": "oip34.pdf",
+      "creator": "Firefox",
+      "created": "D:20260501230315Z00'00'"
+    },
+    "text": "I n t e r n e t p u b l i c a t i o n o f t h i s w o r k w a s m a d e p o s s i b l e w i t h t h e\ng e n e r o u s s u p p o r t o f M i s t y a n d L e w i s G r u b e r"
+  }
+}
