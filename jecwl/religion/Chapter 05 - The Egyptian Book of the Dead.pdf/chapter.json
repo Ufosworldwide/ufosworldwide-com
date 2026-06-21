@@ -1,0 +1,21 @@
+{
+  "number": 5,
+  "title": "The Egyptian Book of the Dead.pdf",
+  "wordCount": 17,
+  "charCount": 154,
+  "contentFields": [
+    "pages",
+    "metadata",
+    "text"
+  ],
+  "raw": {
+    "filename": "The Egyptian Book of the Dead.pdf",
+    "pages": 573,
+    "metadata": {
+      "title": "The Egyptian Book of the Dead.pdf",
+      "creator": "Firefox",
+      "created": "D:20260501230429Z00'00'"
+    },
+    "text": "[NO_EXTRACTABLE_TEXT — IMAGE_PDF]"
+  }
+}
