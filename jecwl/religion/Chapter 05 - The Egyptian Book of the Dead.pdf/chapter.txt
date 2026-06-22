@@ -1,9 +1,0 @@
-573
-
-{
-  "title": "The Egyptian Book of the Dead.pdf",
-  "creator": "Firefox",
-  "created": "D:20260501230429Z00'00'"
-}
-
-[NO_EXTRACTABLE_TEXT — IMAGE_PDF]
