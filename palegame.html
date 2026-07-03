@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>PALE ARCHIVE :: The Misidentified — A Thorn Palamos Signal Investigation</title>
+<style>
+/* ============================================================
+   PALE ARCHIVE — ANSI BBS door game
+   16-color CGA/ANSI palette. Phosphor CRT treatment.
+   All animation timing quantized to 7.83 Hz (127.7ms cycles)
+   — the tower's synthetic Schumann pulse. Diegetic.
+   ============================================================ */
+:root{
+  --blk:#000000; --blu:#0000AA; --grn:#00AA00; --cyn:#00AAAA;
+  --red:#AA0000; --mag:#AA00AA; --brn:#AA5500; --lgy:#AAAAAA;
+  --dgy:#555555; --lbl:#5555FF; --lgr:#55FF55; --lcy:#55FFFF;
+  --lrd:#FF5555; --lmg:#FF55FF; --yel:#FFFF55; --wht:#FFFFFF;
+  --schumann: 0.1277s; /* 1/7.83 Hz */
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#050505;overflow:hidden}
+body{
+  font-family:"IBM Plex Mono","Cascadia Mono","Consolas","Menlo","Courier New",monospace;
+  color:var(--lgy);
+  display:flex;justify-content:center;align-items:stretch;
+}
+#crt{
+  position:relative;width:100%;max-width:860px;height:100%;
+  background:#000;display:flex;flex-direction:column;
+  box-shadow:0 0 60px rgba(0,60,0,.25) inset;
+}
+/* scanlines + faint phosphor glow */
+#crt::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:50;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);
+  mix-blend-mode:multiply;
+}
+#crt::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:51;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.45) 100%);
+}
+#screen{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:6px 10px 90px 10px;
+  font-size:clamp(10.5px, 2.6vw, 15px);
+  line-height:1.32;
+  text-shadow:0 0 3px currentColor;
+  scrollbar-width:thin;scrollbar-color:#0a0 #000;
+}
+#screen::-webkit-scrollbar{width:6px}
+#screen::-webkit-scrollbar-thumb{background:#063}
+pre{font-family:inherit;white-space:pre;overflow-x:auto;line-height:1.15}
+/* colors */
+.k{color:var(--blk)}.b{color:var(--blu)}.g{color:var(--grn)}.c{color:var(--cyn)}
+.r{color:var(--red)}.m{color:var(--mag)}.n{color:var(--brn)}.w{color:var(--lgy)}
+.K{color:var(--dgy)}.B{color:var(--lbl)}.G{color:var(--lgr)}.C{color:var(--lcy)}
+.R{color:var(--lrd)}.M{color:var(--lmg)}.Y{color:var(--yel)}.W{color:var(--wht)}
+.bgb{background:var(--blu);color:var(--wht);text-shadow:none}
+.bgr{background:var(--red);color:var(--wht);text-shadow:none}
+.bgg{background:var(--grn);color:var(--blk);text-shadow:none}
+.bgc{background:var(--cyn);color:var(--blk);text-shadow:none}
+.inv{background:var(--lgy);color:var(--blk);text-shadow:none}
+/* status bar */
+#statbar{
+  position:sticky;top:0;z-index:40;
+  background:var(--blu);color:var(--wht);text-shadow:none;
+  font-size:clamp(9.5px,2.4vw,13px);
+  padding:2px 6px;white-space:nowrap;overflow-x:auto;
+  border-bottom:1px solid #003;
+  display:flex;gap:10px;
+}
+#statbar span{flex:0 0 auto}
+#statbar .hot{color:var(--yel)}
+#statbar .warn{color:var(--lrd)}
+/* the tower light — pulses every 6 seconds, like the ridge at Harlow Flats */
+#towerlight{
+  display:inline-block;width:.7em;height:.7em;border-radius:50%;
+  background:var(--red);vertical-align:middle;
+  animation:tower 6s steps(1) infinite;
+}
+@keyframes tower{0%,88%{opacity:.15;box-shadow:none}
+  88.1%,100%{opacity:1;box-shadow:0 0 8px var(--lrd),0 0 16px var(--red)}}
+/* blinking cursor & pulse text — 4x Schumann cycle = 510.8ms */
+.blink{animation:blk calc(var(--schumann)*8) steps(2,start) infinite}
+@keyframes blk{to{visibility:hidden}}
+.pulse{animation:pul calc(var(--schumann)*16) ease-in-out infinite}
+@keyframes pul{0%,100%{opacity:1}50%{opacity:.35}}
+/* panels drawn like ANSI boxes */
+.box{
+  border:1px solid var(--dgy);margin:6px 0;position:relative;
+  padding:6px 8px;
+}
+.box.cy{border-color:var(--cyn)}.box.gr{border-color:var(--grn)}
+.box.rd{border-color:var(--red)}.box.ye{border-color:var(--brn)}
+.box .tab{
+  position:absolute;top:-0.72em;left:8px;background:#000;padding:0 6px;
+  font-weight:bold;letter-spacing:1px;
+}
+/* tappable menu rows (mobile-first) */
+.mi{
+  display:block;width:100%;padding:5px 8px;margin:2px 0;
+  background:transparent;border:none;text-align:left;cursor:pointer;
+  font:inherit;color:var(--lgy);text-shadow:inherit;
+  border-left:2px solid transparent;
+}
+.mi:hover,.mi:focus{background:rgba(0,80,160,.35);border-left-color:var(--lcy);outline:none}
+.mi .key{color:var(--yel);font-weight:bold}
+.mi .lab{color:var(--lcy)}
+.mi .sub{color:var(--dgy)}
+.mi:disabled{opacity:.38;cursor:default}
+.mi.danger .lab{color:var(--lrd)}
+.mi.good .lab{color:var(--lgr)}
+/* narrative text */
+.story{color:var(--lgy);margin:4px 0;white-space:pre-wrap}
+.story em{color:var(--lcy);font-style:normal}
+.hr{color:var(--dgy);overflow:hidden;white-space:nowrap}
+/* input line */
+#inbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  max-width:860px;margin:0 auto;
+  background:#000;border-top:1px solid var(--dgy);
+  display:flex;align-items:center;padding:6px 8px;gap:6px;
+  font-size:clamp(11px,2.7vw,15px);
+}
+#prompt{color:var(--lgr);text-shadow:0 0 3px currentColor;white-space:nowrap}
+#cmd{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--wht);font:inherit;text-shadow:0 0 3px currentColor;
+  caret-color:var(--lgr);min-width:40px;
+}
+#sndbtn{background:none;border:1px solid var(--dgy);color:var(--dgy);
+  font:inherit;font-size:.8em;padding:2px 7px;cursor:pointer}
+#sndbtn.on{color:var(--lgr);border-color:var(--grn)}
+.tag{display:inline-block;padding:0 6px;margin-right:4px;font-weight:bold;text-shadow:none}
+.c1{background:var(--grn);color:#000}.c2{background:var(--brn);color:#000}
+.c3{background:var(--mag);color:#fff}.c4{background:var(--red);color:#fff}
+.cu{background:var(--dgy);color:#fff}
+.gauge{display:inline-block;letter-spacing:0}
+.small{font-size:.85em}
+.center{text-align:center}
+@media (max-width:520px){ pre.wide{font-size:2.05vw} }
+</style>
+</head>
+<body>
+<div id="crt">
+  <div id="statbar"></div>
+  <div id="screen" aria-live="polite"></div>
+</div>
+<div id="inbar">
+  <span id="prompt">&gt;</span>
+  <input id="cmd" autocomplete="off" autocapitalize="off" spellcheck="false"
+         placeholder="key or command…" aria-label="command input">
+  <button id="sndbtn" title="toggle terminal beeps">SND</button>
+</div>
+<script>
+"use strict";
+/* ================================================================
+   PALE ARCHIVE — engine
+   ================================================================ */
+const $screen = document.getElementById('screen');
+const $stat   = document.getElementById('statbar');
+const $cmd    = document.getElementById('cmd');
+const $snd    = document.getElementById('sndbtn');
+
+/* ---------- audio: tiny square-wave beeps, off by default ---------- */
+let AC=null, sndOn=false;
+function beep(f=880,d=0.045,v=0.04){
+  if(!sndOn) return;
+  try{
+    AC = AC || new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(), g=AC.createGain();
+    o.type='square'; o.frequency.value=f; g.gain.value=v;
+    o.connect(g); g.connect(AC.destination);
+    o.start(); o.stop(AC.currentTime+d);
+  }catch(e){}
+}
+$snd.onclick=()=>{sndOn=!sndOn;$snd.classList.toggle('on',sndOn);if(sndOn)beep(660,.06);};
+
+/* ---------- render helpers ---------- */
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+/* mini-markup: `text` cyan-em, ^X...^  color codes */
+function mk(s){
+  return esc(s)
+    .replace(/\^([kbgcrmnwKBGCRMNYW])\{([^}]*)\}/g,(m,c,t)=>`<span class="${c}">${t}</span>`)
+    .replace(/\*\*([^*]+)\*\*/g,'<span class="W">$1</span>')
+    .replace(/`([^`]+)`/g,'<span class="C">$1</span>');
+}
+let OUT=[];
+function clear(){OUT=[];}
+function line(html){OUT.push(`<div class="story">${html}</div>`);}
+function txt(s){line(mk(s));}
+function raw(html){OUT.push(html);}
+function hr(ch='─'){OUT.push(`<div class="hr">${ch.repeat(200)}</div>`);}
+function boxOpen(title,cls=''){OUT.push(`<div class="box ${cls}"><div class="tab ${cls==='rd'?'R':cls==='gr'?'G':cls==='ye'?'Y':'C'}">${esc(title)}</div>`);}
+function boxClose(){OUT.push(`</div>`);}
+function menu(items){
+  /* items: [key,label,sub,handler,opts] */
+  for(const it of items){
+    const [key,label,sub,fn,opts={}]=it;
+    const dis = opts.disabled?'disabled':'';
+    const cls = opts.cls||'';
+    const id  = 'mi_'+Math.random().toString(36).slice(2);
+    OUT.push(`<button class="mi ${cls}" ${dis} data-key="${esc(key)}" id="${id}">`+
+      `<span class="key">[${esc(key)}]</span> <span class="lab">${esc(label)}</span>`+
+      (sub?` <span class="sub">— ${esc(sub)}</span>`:'')+`</button>`);
+    pendingHandlers.push([id,fn,!!opts.disabled]);
+  }
+}
+let pendingHandlers=[];
+let keyMap={};
+function flush(scrollTop=true){
+  $screen.innerHTML=OUT.join('');
+  keyMap={};
+  for(const [id,fn,dis] of pendingHandlers){
+    const el=document.getElementById(id);
+    if(el&&!dis){ el.onclick=()=>{beep(740);fn();}; keyMap[el.dataset.key.toUpperCase()]=fn; }
+  }
+  pendingHandlers=[];
+  if(scrollTop)$screen.scrollTop=0;
+}
+function gauge(v,max,n=10,onCls,offCh='░',onCh='█'){
+  const f=Math.round(Math.max(0,Math.min(1,v/max))*n);
+  return `<span class="gauge"><span class="${onCls}">${onCh.repeat(f)}</span><span class="K">${offCh.repeat(n-f)}</span></span>`;
+}
+
+/* ---------- persistent storage ---------- */
+const SAVEKEY='palearchive:save1';
+async function saveGame(silent=false){
+  try{
+    const r=await window.storage.set(SAVEKEY,JSON.stringify(G));
+    if(!silent) toastMsg(r? '^G{ CARRIER HELD — game saved to node. }':'^R{ SAVE FAILED. }');
+    return !!r;
+  }catch(e){ if(!silent) toastMsg('^R{ SAVE FAILED — storage unavailable. }'); return false; }
+}
+async function loadGame(){
+  try{
+    const r=await window.storage.get(SAVEKEY);
+    if(r&&r.value){ G=JSON.parse(r.value); return true; }
+  }catch(e){}
+  return false;
+}
+async function wipeSave(){ try{ await window.storage.delete(SAVEKEY);}catch(e){} }
+let toast=null;
+function toastMsg(s){ toast=s; }
+
+/* ---------- game state ---------- */
+function freshState(){
+  return {
+    ver:1, day:1, ap:4, apMax:4,
+    power:100, cash:220, cred:10, heat:0,
+    act:0,                 /* 0 boot-story, 1,2,3, 4=post-ending */
+    loc:'KINGMAN',
+    skill:0,               /* raised by Curriculum — reveals bonus evidence */
+    flags:{},              /* story flags */
+    cases:{},              /* id -> {opened,revealed:[],classified,correct,tries} */
+    curr:{},               /* curriculum results id->{done,correct} */
+    npcMet:{}, boardsRead:{}, upgrades:{},
+    log:[], ending:null,
+    stats:{classified:0,correct:0,cat4found:0}
+  };
+}
+let G=freshState();
+function flag(f){return !!G.flags[f];}
+function setFlag(f){G.flags[f]=true;}
+function addLog(s){G.log.unshift(`D${G.day}: ${s}`); if(G.log.length>40)G.log.length=40;}
+function spendAP(n=1){ if(G.ap<n) return false; G.ap-=n; return true; }
+function adj(o){ /* {cred,heat,cash,power} clamped */
+  if(o.cred){G.cred=Math.max(0,Math.min(100,G.cred+o.cred));}
+  if(o.heat){G.heat=Math.max(0,Math.min(100,G.heat+o.heat));}
+  if(o.cash){G.cash=Math.max(0,G.cash+o.cash);}
+  if(o.power){G.power=Math.max(0,Math.min(100,G.power+o.power));}
+}
+
+/* ---------- status bar ---------- */
+function statbar(){
+  const L=LOCS[G.loc]||{name:G.loc};
+  const heatCls=G.heat>=70?'warn':(G.heat>=40?'hot':'');
+  $stat.innerHTML=
+    `<span><span id="towerlight"></span> PALE ARCHIVE</span>`+
+    `<span>DAY <span class="hot">${G.day}</span></span>`+
+    `<span>AP <span class="hot">${G.ap}/${G.apMax}</span></span>`+
+    `<span>PWR ${gauge(G.power,100,6,'G')}</span>`+
+    `<span>HEAT <span class="${heatCls}">${gauge(G.heat,100,6,G.heat>=70?'R':'Y')}</span></span>`+
+    `<span>CRED ${G.cred}</span>`+
+    `<span>$${G.cash}</span>`+
+    `<span>${esc(L.name)}</span>`+
+    (G.act?`<span>ACT ${'I'.repeat(Math.min(G.act,3))}</span>`:'');
+}
+</script>
+<script>
+"use strict";
+/* ================================================================
+   DATA — merged from THE MISIDENTIFIED and the THORN PALAMOS omnibus
+   ================================================================ */
+
+const CATS = {
+  1:{tag:'c1',name:'CAT ONE — PROSAIC',desc:'Natural phenomena, known aircraft, drones, astronomy, optics. ~60–65% of all reports.'},
+  2:{tag:'c2',name:'CAT TWO — CLASSIFIED HUMAN',desc:'Military/government programs beyond public knowledge. Requires knowledge of the classified inventory.'},
+  3:{tag:'c3',name:'CAT THREE — INDUSTRY ARTIFACT',desc:'Cases inflated by economic or ideological incentive. Regression-contaminated testimony. Manufactured mystery.'},
+  4:{tag:'c4',name:'CAT FOUR — GENUINELY ANOMALOUS',desc:'The residual. Dozens worldwide over 75 years, not thousands. Warrants everything science has.'},
+  5:{tag:'cu',name:'UNRESOLVED / INSUFFICIENT',desc:'The honest position when the evidence will not carry a classification. Step Seven: distrust certainty.'}
+};
+
+const CHECKLIST=[
+ ['ONE','Strip the retelling.','The retelling is not the evidence. Find the witness statement closest to the event, the report before the explanation was applied.'],
+ ['TWO','Apply the taxonomy in order.','Cat One, then Two, then Three, then Four. Don\'t skip to Four.'],
+ ['THREE','Weight physical evidence above testimonial.','Memory is reconstructive. Radiation readings, EM effects, trace evidence and sensor data are not subject to suggestion.'],
+ ['FOUR','Ask who benefits from each explanation.','The prosaic answer may shield a program. The spectacular answer may feed a market. Neither motive settles it — but it tells you what\'s missing.'],
+ ['FIVE','Separate the craft from the context.','A sighting near a base may be the base. Context shapes the probability distribution.'],
+ ['SIX','Respect the residual.','Don\'t inflate it into a grand theory. Don\'t deflate it into dismissal. The unknown is where the work lives.'],
+ ['SEVEN','Distrust certainty.','Anyone who tells you they know what all of them are is selling something.']
+];
+
+const ARCHETYPES=[
+ ['THE TRUE BELIEVER','An experience organized their reality. Not stupid — often brilliant. The belief is doing work evidence can\'t undo. The experience is real even if the interpretation isn\'t.'],
+ ['THE PROFESSIONAL RESEARCHER','Career built on the field. Book deal, speaking circuit. Has learned what the market rewards. Judge the methodology, not the sincerity.'],
+ ['THE GOVERNMENT ADJACENT','May not know they are. Funding buried three steps deep. Watch what they discourage.'],
+ ['THE INSIDER','Genuine knowledge, genuine constraints. Telling the truth as cleared to know it. What they don\'t know matters as much.'],
+ ['THE PARIAH','Did the rigorous work, paid the price. Isolated, maybe bitter, maybe wrong in places — but has nothing left to lose by telling you what the evidence shows.'],
+ ['THE WITNESS','Saw something. Not invested in the mythology. The most neglected figure in the field. Ask what they SAW, not what they think it means.']
+];
+
+/* ---------- locations ---------- */
+const LOCS={
+ KINGMAN:{name:'Kingman, AZ',desc:'Truck stop. Long-haul rigs, gas-station sandwiches, a grey Ford that never leaves.',fuel:0},
+ HARLOW:{name:'Harlow Flats, NV',desc:'One diner, one grain elevator, one decommissioned relay tower pulsing red on the ridge every six seconds.',fuel:35,req:'act1'},
+ VEGAS:{name:'Las Vegas, NV',desc:'Conventions, cameras, and the industry in its purest concentration.',fuel:25,req:'act1'},
+ PAIUTE:{name:'Paiute Wells, NV',desc:'PALE ARCHIVE Site 09. Wind, wire, and a subscription to silence.',fuel:30,req:'act2'},
+ SANTAFE:{name:'Santa Fe, NM',desc:'Where journalists still return calls. Yael Marsh\'s beat.',fuel:45,req:'act2'},
+ CRALE:{name:'Crale, MT',desc:'Population 612. No tower. Never surveilled, never selected, never touched. And yet.',fuel:60,req:'act3'},
+ RELAY:{name:'High-lat Relay, YT',desc:'The last listening post before the map runs out of names.',fuel:80,req:'act3final'}
+};
+
+/* ================================================================
+   THE CURRICULUM — historical training cases.
+   Grading key = the classifications in THE MISIDENTIFIED, Appendix B.
+   ans: accepted answers (array). first = "book answer".
+   ================================================================ */
+const CURR=[
+ {id:'LEVELLAND',title:'Levelland, Texas — Nov 1957',ans:[2],
+  brief:'Multiple independent drivers across a county report glowing objects; vehicle ignitions and headlights die in proximity, restore on departure. Blue Book files it as ball lightning.',
+  ev:{retell:'Original sheriff\'s log: at least seven separate calls in under three hours, geographically consistent, before any radio coverage could contaminate accounts.',
+      registry:'Weather record: clear conditions. Ball lightning is not meteorologically supportable that night.',
+      inventory:'Location sits within an 85-mile corridor of Reese AFB during a period of experimental plasma-propulsion testing.',
+      money:'No promoter shaped the record; witnesses gained nothing and mostly stopped talking.'},
+  verdict:'CAT TWO probable. EM ignition effects consistent with experimental propulsion testing near a classified corridor. The official explanation fails the weather record.'},
+ {id:'BELGIUM',title:'The Belgian Wave — 1989–90',ans:[2,5],
+  brief:'Thousands report a silent black triangle over Belgium. F-16s scrambled; radar lock-ons show impossible acceleration. Air Force General De Brouwer confirms the events publicly.',
+  ev:{retell:'The famous triangle photo later admitted as a hoax — strip it. The gendarmerie reports remain.',
+      registry:'No public platform matches. But triangular planform is exactly what a classified flying-wing program looks like from below.',
+      inventory:'Radar "impossible" maneuvers are potentially low-RCS tracking error, a known artifact against stealth geometry.',
+      money:'A national wave is a publishing economy. Later accounts inflate steadily.'},
+  verdict:'CAT TWO probable, CAT FOUR possible. Official confirmation of the sightings does not determine the origin of the object.'},
+ {id:'NIMITZ',title:'USS Nimitz / "Tic Tac" — Nov 2004',ans:[4],
+  brief:'USS Princeton tracks objects for days descending from 80,000 ft to sea level in seconds. Cmdr. Fravor\'s flight makes visual merge with a white object that mirrors, then vanishes; reacquired 60 miles away.',
+  ev:{retell:'Contemporaneous radar tracks and pilot debriefs exist — this is not a decades-later reconstruction.',
+      registry:'No natural phenomenon produces coordinated multi-sensor track-and-visual with intelligent repositioning.',
+      inventory:'Altitude ceiling and velocity profile exceed the documented classified program inventory. Testing an asset against your own carrier group\'s live weapons systems is doctrinally incoherent.',
+      money:'The industry amplified it later — but the underlying sensor record predates the market.'},
+  verdict:'CAT FOUR possible — the most significant single case in the modern record for Category Four probability.'},
+ {id:'PHOENIX',title:'Phoenix Lights, Event One — Mar 13 1997',ans:[5,2,4],
+  brief:'A structured V-shaped object occludes stars along a 300-mile corridor, witnessed by thousands. (Distinct from the later flare drop, Event Two.)',
+  ev:{retell:'Separate the two events. Event Two is flares — solved. Event One is the occlusion corridor.',
+      registry:'Star occlusion confirms a solid body, not lights in formation.',
+      inventory:'Scale estimates possibly exceed any documented classified platform parameter.',
+      money:'Conflation of the two events is the industry\'s favorite move here — and the debunkers\' too.'},
+  verdict:'CAT TWO or FOUR — unresolved. Evidence insufficient for confident classification. Saying so is the correct answer.'},
+ {id:'ROSWELL',title:'Roswell — July 1947',ans:[2],
+  brief:'Debris field on a ranch; Army announces a "flying disc," retracts within a day. Thirty years later, testimony blossoms into bodies and craft.',
+  ev:{retell:'1947 witness descriptions: foil, balsa, tape with floral print. Consistent with balloon-train debris.',
+      registry:'Project Mogul — classified acoustic balloon arrays for detecting Soviet tests — matches the debris and the secrecy.',
+      inventory:'The coverup was real. It was covering a Category Two program, not a saucer.',
+      money:'Post-1978 testimony is uninterpretable — mythological contamination after the industry arrived.'},
+  verdict:'CAT TWO probable. The most instructive case in the file: a genuine government lie that fed a genuine industry myth.'},
+ {id:'RENDLESHAM',title:'Rendlesham Forest — Dec 1980',ans:[4],
+  brief:'USAF security personnel at RAF Woodbridge encounter a lit object in the forest on successive nights. Radiation readings taken at indentation sites. Deputy base commander records audio in real time.',
+  ev:{retell:'Halt\'s contemporaneous tape and memo exist — evidence closest to the event.',
+      registry:'Lighthouse theory fails azimuth and the multi-night pattern.',
+      inventory:'Witness medical records were CLASSIFIED — implying an emission profile unknown to the classifying authority. You don\'t classify exposure to your own asset that way.',
+      money:'Later embellishments exist; strip them and the physical record stands.'},
+  verdict:'CAT FOUR probable. Contemporaneous physical trace + radiation + the anomalous classification behavior.'},
+ {id:'HILL',title:'Betty & Barney Hill — Sep 1961',ans:[5],
+  brief:'A couple experiences missing time on a New Hampshire highway; under later hypnotic regression, an abduction narrative emerges.',
+  ev:{retell:'Original record: a time gap and physical symptoms, documented before regression.',
+      registry:'The original stimulus is unidentified; the narrative is not the stimulus.',
+      inventory:'No program fits; no program is needed to explain testimony produced under regression.',
+      money:'Hypnotic regression is not a reliable memory recovery method. Everything downstream of it is contaminated.'},
+  verdict:'UNCLASSIFIABLE. Original experience confirmed anomalous; the famous narrative cannot be evaluated. Honest answer: unknown.'},
+ {id:'DC52',title:'Washington D.C. Radar Incursions — Jul 1952',ans:[5,2,4],
+  brief:'Two weekends running, three independent radar systems track unknowns over the White House and Capitol. Interceptors scrambled. Truman personally demands answers. The Air Force blames temperature inversions.',
+  ev:{retell:'Operators present rejected the inversion explanation: inversions were near-daily and never produced targets like this.',
+      registry:'Same-scope speed estimates from 100 to 7,000+ mph — either extraordinary propulsion variance or 1952 radar at its resolution edge.',
+      inventory:'No 1952 program flies over the Capitol for fun. But the tracking-artifact hypothesis is live.',
+      money:'The real consequence: the Robertson Panel (1953), whose stated goal was to REDUCE public interest. Debunking became policy here. Every later case lives inside that architecture.'},
+  verdict:'CAT TWO or FOUR — unresolved. The case that built the machine every other case was fed through.'},
+ {id:'SKINNYBOB',title:'"SkinnyBob" — posted 2011, ivan0135',ans:[3],
+  brief:'Purported leaked KGB footage (1942–69) of a grey being. Millions of views. Cited for a decade as the most convincing alien footage online.',
+  ev:{retell:'Provenance claim: anonymous account, zero chain of custody.',
+      registry:'The film grain and scratches match a specific purchasable stock-damage clip, frame for frame. The aging was composited in After Effects.',
+      inventory:'The KGB insignia frame traces to a 1998 commercial TV hoax documentary. Fonts are modern digital typefaces.',
+      money:'Production value is the community\'s quality threshold — not evidentiary custody. Looking compelling is not evidence. It is the thing evidence is supposed to survive.'},
+  verdict:'CAT THREE. Skilled fabrication. Its persistence after complete debunking is itself a data point about the ecosystem.'},
+ {id:'VEGAS23',title:'Las Vegas Backyard "Alien" — Apr 30 2023',ans:[1,3],
+  brief:'A real bolide meteor crosses the sky; minutes later a family films a "creature" in their backyard. Cable television sustains the story for a year.',
+  ev:{retell:'The 911 call, the bodycam, the meteor, the fear — all genuine. The interpretation is the manufactured part.',
+      registry:'American Meteor Society identified the bolide within hours. Category One, stamped.',
+      inventory:'The "alien" is a flashlight shadow of the cameraman projected onto the fence — its motion tracks the light source exactly.',
+      money:'A crime-scene analyst with no optics background declared it proof, coined "cloaking device" for a shadow, and inverted the burden of proof on national TV. Category Three in its purest form.'},
+  verdict:'CAT ONE + THREE. A complete, documented specimen of how a real stimulus becomes alien contact in 48 hours.'},
+ {id:'LAKECOTE',title:'Lake Cote Aerial Photograph — Costa Rica 1971',ans:[4,5],
+  brief:'A government survey aircraft photographing terrain at 13-second intervals captures a sharply defined metallic disc in exactly one frame. The negative has never left state custody.',
+  ev:{retell:'Frames before and after are clean — not a film defect, not a double exposure.',
+      registry:'No 1971 aircraft or drone matches the ~160 ft profile.',
+      inventory:'A 100-lb cartographic instrument, not a shaking human hand. The chain-of-custody argument that kills most photos is absent here.',
+      money:'The photographer was told not to discuss it. Haines & Vallée analysis leaves residual anomalies unresolved.'},
+  verdict:'CAT FOUR possible. Significant for what it eliminates, not what it proves.'},
+ {id:'CALVINE',title:'Calvine Photograph — Scotland 1990',ans:[2,4],
+  brief:'A large silent diamond hovers over the moors while a Harrier makes passes. Six photos taken. The MoD takes the negatives; they vanish. Files sealed until 2076.',
+  ev:{retell:'One surviving print (Sheffield Hallam, 2022): no manipulation found, sharp structural definition.',
+      registry:'Not atmospheric. The geometry is fabricated metal or nothing.',
+      inventory:'1990 is peak classified diamond/triangle planform development; an escorting Harrier fits a military observation of a classified asset.',
+      money:'A 56-year extension past the standard secrecy threshold is the single most anomalous fact in the case.'},
+  verdict:'CAT TWO probable, FOUR possible. Institutional handling of evidence became the evidence.'}
+];
+</script>
+<script>
+"use strict";
+/* ================================================================
+   STORY CASES — the Thorn Palamos campaign
+   Each: evidence unlocked per analysis action. truth = correct cat.
+   onCorrect fires story progression.
+   ================================================================ */
+const STORY={
+ HF01:{act:1,loc:'HARLOW',title:'HF-01 :: The Tower on the Ridge',truth:2,ap:1,
+  brief:'A decommissioned relay tower pulses red every six seconds. Beneath the light, your array reads an engineered 7.8 Hz carrier — a synthetic Schumann pulse — washing over the whole valley. Three townspeople broke inside four months.',
+  ev:{retell:'Bella\'s account, firsthand: Carla Pruit losing time, found barefoot on the service road, calm, unable to explain why walking to the tower had seemed reasonable. Marcus Webb, nineteen, eleven days without sleep, drawing the tower "lit from within."',
+      registry:'No natural source produces a phase-locked 7.8 Hz carrier. The natural Schumann resonance is broadband and weak; this is engineered, stable, and aimed.',
+      inventory:'Voss\'s trace: program cryptonym PALE ARCHIVE — frequency-based neurological transmission experiments on unwitting civilian populations. Seventeen sites, nine states. Privatized 2017 to a contractor: Meridian Signal Group. No oversight since.',
+      money:'Meridian exists in the space between official and deniable. When PALE ARCHIVE went private it went completely dark — no congressional oversight, no letterhead.',
+      field:'You climb the service road before dawn. The fence is new. The "decommissioned" tower is drawing three-phase power. Someone is walking the switchbacks ahead of you, unhurried, toward the light.',
+      scan:'Deep spectrum decomposition: beneath the engineered 7.8 Hz pulse, nested in the sub-basement of the range, there is a SECOND signal. Older. It is not Meridian\'s. It has no business being there.'},
+  wrongHint:'The pulse is engineered. Engineered means human. Follow the checklist: Category Two before Category Four.',
+  verdict:'CAT TWO. The tower is PALE ARCHIVE Site 04, operated by Meridian Signal Group. But your deep scan found something underneath their signal that their signal is accidentally illuminating…',
+  onCorrect(){ setFlag('hf01done'); if(G.cases.HF01.revealed.includes('scan')) setFlag('subsignal'); }},
+
+ VG02:{act:1,loc:'VEGAS',title:'VG-02 :: The Convention Reel',truth:3,ap:1,
+  brief:'A headliner at the Silver State Disclosure Expo is selling 4K "leaked test-range footage" of a metallic craft. Crowds are electric. He wants your endorsement — on stage, tonight, $500 honorarium.',
+  ev:{retell:'No chain of custody. "A source I protect with my life." The clip surfaced the same week his book dropped.',
+      registry:'Frame-rate cadence and rolling-shutter signature match a consumer mirrorless camera, not range instrumentation.',
+      inventory:'The "test range" skyline geometry matches a state park 40 miles from any restricted airspace.',
+      money:'His last three "world-first" reels each preceded a book launch. The market rewards mystery inventory. He is restocking.',
+      field:'Backstage, his laptop is open: a compositing timeline, a purchased stock lens-flare pack, and a folder named FINAL_FINAL_v7.'},
+  wrongHint:'Step Four: who benefits? Follow the money before you follow the object.',
+  verdict:'CAT THREE. Manufactured inventory for the mystery market. Endorsing it would have bought you $500 and cost you the only currency that matters out here.',
+  onCorrect(){ setFlag('vg02done'); }},
+
+ NV03:{act:1,loc:'HARLOW',title:'NV-03 :: Lights Over the Elevator',truth:1,ap:1,
+  brief:'Half of Harlow Flats saw a string of silent white lights cross the sky in perfect formation at 21:40. The diner is unanimous: "That was them."',
+  ev:{retell:'Original accounts agree: steady points, even spacing, no maneuvering, ~4 minutes horizon to horizon.',
+      registry:'Orbital elements check: a satellite train pass matching that track and time to the minute, freshly deployed, still in low stack formation.',
+      inventory:'Nothing classified needed. Nothing classified fits better than the public catalog does.',
+      money:'By morning a regional podcast had it as "the Harlow Armada." Retellings added maneuvers no one reported on night one.'},
+  wrongHint:'Step Two: Category One first. The boring explanation gets first refusal.',
+  verdict:'CAT ONE. A satellite train. Filing it correctly matters: the residual only means something if the subtraction is honest.',
+  onCorrect(){ setFlag('nv03done'); }},
+
+ PW04:{act:2,loc:'PAIUTE',title:'PW-04 :: Site 09, Paiute Wells',truth:2,ap:1,
+  brief:'Second site on Voss\'s list. The town has a cancer cluster, a shuttered clinic, and a water tower with brand-new antenna hardware nobody ordered.',
+  ev:{retell:'Clinic nurse (relocated, speaks on condition): sleep clinic referrals tripled 2018–2021, then the clinic\'s funding vanished in one quarter.',
+      registry:'Same engineered 7.8 Hz carrier signature as Harlow Flats. Same phase discipline. Same hand.',
+      inventory:'Shell company on the water tower lease resolves, two layers up, to a Meridian Signal Group subsidiary.',
+      money:'The consulting firm that "studied" the health complaints and found nothing — also a Meridian subsidiary. They audit themselves.',
+      field:'Fresh tire tracks at the tower base. A padlock with the factory sticker still on it. They were here this week.',
+      scan:'The sub-signal is here too — fainter, but phase-coherent with what you recorded at Harlow. Two sites, one deep source. It is not local.'},
+  wrongHint:'The signature matches Harlow Flats. You already know whose hand this is.',
+  verdict:'CAT TWO. Site 09 confirmed. Your documentation set now traces money and chain of command. This is what Yael Marsh needs.',
+  onCorrect(){ setFlag('pw04done'); if(G.cases.PW04.revealed.includes('scan')) setFlag('subsignal2'); }},
+
+ SF05:{act:2,loc:'SANTAFE',title:'SF-05 :: The Vasquez Walk-in',truth:5,ap:1,
+  brief:'Elena Vasquez, retired air traffic controller, waits by your van for two hours to tell you about a 1994 radar track she was ordered to strike from the log. She has nothing but her memory. She has never told anyone.',
+  ev:{retell:'Her account is specific, unembellished, and thirty years old. She asks what it was. She does not tell you what it meant.',
+      registry:'The facility\'s tapes from that era were destroyed on schedule decades ago.',
+      inventory:'No surviving record to check against any inventory, public or classified.',
+      money:'She wants nothing. Not money, not attention. Just to have said it once to someone who would write it down.'},
+  wrongHint:'Step Seven. What does the evidence actually carry? Sometimes the honest classification is the hardest key to press.',
+  verdict:'UNRESOLVED. You wrote it down. Original experience noted; evidence insufficient for any classification. She thanks you — for not telling her what it meant.',
+  onCorrect(){ setFlag('sf05done'); adj({cred:4}); }},
+
+ CR06:{act:3,loc:'CRALE',title:'CR-06 :: Crale, Montana',truth:4,ap:2,
+  brief:'Population 612. No tower. Never on Voss\'s list, never surveilled, never selected — no Meridian contractor has ever driven these roads. And the whole valley is humming with the sub-signal at full resolution.',
+  ev:{retell:'Residents report the same phenomenology as PALE ARCHIVE towns — the pull, the dreams, the tower none of them have ever seen — with no transmitter within two hundred miles.',
+      registry:'Every natural source eliminated: no seismic coupling, no geomagnetic storm, no ducting. The subtraction is clean.',
+      inventory:'Meridian\'s own intercepted traffic shows them scrambling to explain Crale. They are as blind as you were. It is not theirs, and they are afraid of it.',
+      money:'No market touched this place. No researcher, no podcast, no book. The signal predates the industry. It predates radio.',
+      field:'By the river, a kid named Caleb Marsh skips stones and tells you, unprompted, what the valley is saying. He is not frightened. He has been listening his whole life.',
+      scan:'Full decomposition, all channels: the source vector resolves high-latitude, deep geology. Bedrock dating on the propagation medium: the emission structure is ~400 million years old. Older than trees. Older than the Kazakh root. It was here first.'},
+  wrongHint:'You spent two acts subtracting. What subtracts here? Nothing does. Step Six: respect the residual.',
+  verdict:'CAT FOUR. After every category that subtracts cleanly has been subtracted, Crale remains. The residual is real — and it is aware you finished the arithmetic.',
+  onCorrect(){ setFlag('cr06done'); G.stats.cat4found++; }}
+};
+
+/* ================================================================
+   NPCs — the field guide, made flesh
+   ================================================================ */
+const NPCS={
+ MOBIUS:{name:'MOBIUS',arch:'THE PARIAH',loc:null,
+  lines:[ 'Most UFOs are not UFOs. That is not a dismissal. It is the prerequisite for finding the ones that are.',
+    'The noise is not keeping people from the truth. The noise is the strategy — designed or emergent, the effect is the same.',
+    'Teach yourself to subtract. When everything that subtracts cleanly is gone, what is left is real. And it is worth every bit of what it costs to find it.',
+    'Strip out Category One and Two and the industry\'s inflation, and you have maybe thirty genuine anomalies in seventy-five years. Thirty is not nothing. Thirty is the most significant discovery in human history, hiding inside a rounding error.'],
+  gift:'Completing his Curriculum sharpens your eye. (+1 SKILL per 4 cases mastered — reveals bonus evidence automatically.)'},
+ BELLA:{name:'BELLA',arch:'THE WITNESS',loc:'HARLOW',
+  lines:['She poured without ceremony and told you about Carla Pruit and Marcus Webb like a woman reading a weather report she\'d written herself.',
+    '"Nobody else heard music. There was nothing up there except the tower and the dark and forty degrees."',
+    '"You\'re the first person who asked what they saw instead of what it means. That buys you the good coffee."'],
+  gift:'Reduces HEAT by 5 when visited (the diner sees every car in town — including grey Fords).'},
+ VOSS:{name:'GARRETT VOSS',arch:'THE INSIDER',loc:null,
+  lines:['Dead fourteen months, according to a government-written obituary. His voice on the dead-drop is eight months old: coordinates, read twice, and one sentence — "They\'re using the tower again."',
+    'The cryptographic identifier in the carrier wave is one you built yourself, and gave to exactly one person.'],
+  gift:'His site list unlocks the classified inventory checks (Action 3) on story cases.'},
+ YAEL:{name:'YAEL MARSH',arch:'THE PROFESSIONAL DONE RIGHT',loc:'SANTAFE',
+  lines:['"Every claim sourced three times before my name goes on it. Bring me documents, not vibes."',
+    '"Meridian\'s denial contained six factual claims. Four contradict your documents. The two that are technically true are the most damning."'],
+  gift:'Deliver the PALE ARCHIVE documentation to her (needs HF-01 + PW-04 solved, CRED ≥ 35) to trigger the exposé.'},
+ VANN:{name:'DR. IRIS VANN',arch:'THE GOVERNMENT ADJACENT',loc:'VEGAS',
+  lines:['"The Harlow business is well understood — infrasound from wind turbines. I\'d hate to see a serious analyst waste credibility on it."',
+    '"The Crale rumors are not credible. No serious person is looking at Crale. I\'d let that one go."',
+    'Her foundation\'s grants resolve, three steps up, to a Meridian Signal Group cultural-affairs budget line.'],
+  gift:'Watch what she discourages. It is a map.'},
+ DRANYAM:{name:'TREVOR DRANYAM',arch:'THE PROFESSIONAL RESEARCHER',loc:'VEGAS',
+  lines:['"Endorse the reel, do twenty minutes on stage, and I can put you in front of two million subscribers."',
+    '"The audience doesn\'t want taxonomy, friend. The audience wants inventory."'],
+  gift:'Offers $500 to misclassify VG-02 as CAT FOUR on stage. Taking it: +$500, −15 CRED, and Yael will hear about it.'},
+ CALEB:{name:'CALEB MARSH',arch:'THE ONE WHO HEARS',loc:'CRALE',
+  lines:['Thirteen years old, skipping stones. Seven skips. "It\'s not saying words. It\'s more like… it\'s holding the door and watching to see what we do."',
+    '"It\'s not scary. It\'s patient. It\'s been patient longer than there\'s been anybody to be patient with."'],
+  gift:'Talking with Caleb after solving CR-06 opens the road to the Relay — and the Question.'}
+};
+
+/* ================================================================
+   MESSAGE BOARDS — the BBS inside the BBS
+   Lore, clues, and in-world Category Three disinfo.
+   ================================================================ */
+const BOARDS=[
+ {id:'B1',area:'GEN',from:'SYSOP//NIGHTWATCH',subj:'Welcome to the node',
+  body:'This board carries traffic official channels decline to monitor. House rules: post what you SAW, not what it means. Chain of custody or it didn\'t happen. The taxonomy is pinned in the DOSSIER. Subtract first, wonder second.'},
+ {id:'B2',area:'SIG',from:'K7-LISTENER',subj:'7.8 Hz carrier, NV/UT — anyone else?',
+  body:'Phase-locked synthetic Schumann carrier, rock stable, on for years. Natural resonance doesn\'t do this. Whoever is transmitting has three-phase power and a budget. Bearing solutions welcome. Bring receipts.'},
+ {id:'B3',area:'GEN',from:'TRUTHTIDE_88',subj:'THEY WALK AMONG US (must read!!)',
+  body:'My source (can\'t say, very high up) confirms 40,000 craft in our skies NIGHTLY. The lists are real. Wake up!! Buy my report ($29.95) before it gets taken down!!',
+  note:'Category Three, live specimen. Note the volume economics: the market needs thousands of mysteries. Thirty wouldn\'t pay for the booth.'},
+ {id:'B4',area:'SIG',from:'EX-CONTRACTOR (verified)',subj:'re: privatized programs',
+  body:'When a program privatizes it doesn\'t end. It goes dark. No IG, no FOIA, no letterhead. If you\'re mapping towers, map the SHELL COMPANIES on the leases. The metal is deniable. The paperwork never is.'},
+ {id:'B5',area:'RES',from:'MOBIUS',subj:'The arithmetic',
+  body:'A hundred thousand reports. Sixty-plus percent prosaic on inspection. A thick stratum of classified human activity. An industry inflating the remainder because inventory is revenue. And underneath all of it: a residual of maybe a few dozen, worldwide, in seventy-five years. Dozens is extraordinary. Dozens implies we are not alone. But dozens disappears into a database of a hundred thousand — which is why the volume is the strategy. Subtract. Then respect what is left.'},
+ {id:'B6',area:'RES',from:'HIGHLAT_RX',subj:'[act3] sub-basement coherence',
+  body:'To whoever posted the nested-signal decomposition: I have the same structure at 61°N, phase-coherent with your NV capture. Propagation medium dating says this thing was transmitting before there were forests. It is not answering us. I think it is asking.',req:'subsignal'}
+];
+
+/* ================================================================
+   RANDOM EVENTS — between days
+   ================================================================ */
+const EVENTS=[
+ {id:'FORD',w:3,min:1,cond:()=>G.heat>=30,
+  run(){ return {title:'THE GREY FORD',
+   body:'Rental plates. Engine idling at irregular intervals. The driver never goes inside. It was there when you arrived. It is there now.',
+   opts:[['R','Relocate quietly before dawn',()=>{adj({heat:-18,power:-8});addLog('Shook a tail.');txt('^G{You are gone before the sun confirms it. The Ford idles on, watching a van that isn\'t there.}');}],
+         ['W','Walk past and photograph the plates',()=>{adj({heat:+10,cred:+3});addLog('Photographed the tail.');txt('^Y{The driver does not look at you, which is its own kind of confirmation. The plates trace to a Meridian fleet account.}');setFlag('fordplates');}],
+         ['I','Ignore it',()=>{adj({heat:+6});txt('^K{You sleep in four-hour intervals. The Ford is still there in the morning.}');}]]};}},
+ {id:'SWEEP',w:2,min:2,cond:()=>G.heat>=60,
+  run(){ return {title:'MERIDIAN SWEEP',
+   body:'Two utility trucks that no utility owns are working the streets with direction-finding gear. They are looking for a receiver. You are the receiver.',
+   opts:[['D','Go dark — antenna down, 24 hours lost',()=>{adj({heat:-30});G.ap=0;addLog('Went dark under a sweep.');txt('^G{A day of silence. The trucks move on. Patience is also a signal discipline.}');}],
+         ['B','Burst-transmit your files to the dead-drop first',()=>{adj({heat:+15,cred:+5});addLog('Burst transmission under sweep.');txt('^R{Forty seconds of exposure.} ^w{The files are safe on the node. Somewhere a direction-finder swings toward the truck stop.}');}]]};}},
+ {id:'WALKIN',w:2,min:1,cond:()=>true,
+  run(){ return {title:'WALK-IN WITNESS',
+   body:'A man in work clothes waits by the van. "You\'re the one who listens?" He saw something over the interstate in 2019. He tells it plainly and asks for nothing.',
+   opts:[['L','Take the report properly',()=>{if(spendAP()){adj({cred:+4});addLog('Documented a walk-in report.');txt('^G{You write down what he SAW, not what it means. He shakes your hand like a man putting something down.}');}else{txt('^K{No time left today. You take his number.}');}}],
+         ['P','Politely decline',()=>{txt('^K{He nods, unsurprised. The most neglected figure in the field walks back to his truck.}');adj({cred:-1});}]]};}},
+ {id:'POWER',w:2,min:1,cond:()=>G.power<50,
+  run(){ return {title:'BATTERY BANK FAILING',
+   body:'The roof array is browning out mid-capture. The inverter smells like a decision you postponed.',
+   opts:[['F','Fix it ($60)',()=>{if(G.cash>=60){adj({cash:-60,power:+45});addLog('Repaired inverter.');txt('^G{Clean current. The waterfall display steadies.}');}else{txt('^R{Not enough cash. The array limps on.}');}}],
+         ['N','Nurse it along',()=>{adj({power:-10});txt('^K{You reroute around the failing cell. It will hold. Probably.}');}]]};}},
+ {id:'GIG',w:2,min:1,cond:()=>true,
+  run(){ return {title:'RF CONSULTING GIG',
+   body:'A rancher two exits down will pay cash to find what\'s jamming his gate remotes. It\'s a day of honest, boring work.',
+   opts:[['T','Take it (costs 2 AP)',()=>{if(G.ap>=2){G.ap-=2;adj({cash:+120});addLog('RF consulting gig: +$120.');txt('^G{A corroded baby monitor. $120, and the rancher now waves at the strange van. Cover is made of small things.}');adj({heat:-4});}else{txt('^K{Not enough hours left today.}');}}],
+         ['S','Skip it',()=>{txt('^K{The signal work comes first.}');}]]};}}
+];
+</script>
+<script>
+"use strict";
+/* ================================================================
+   SCREENS & GAME LOGIC
+   ================================================================ */
+let SCREEN='boot';
+async function go(fn){ clear(); await fn(); if(toast){raw(`<div class="story">${mk(toast)}</div>`);toast=null;} flush(); statbar(); }
+
+/* ---------- BOOT ---------- */
+const BOOTLINES=[
+ ['w','ATDT 1-702-555-0117 . . .'],['K','CONNECT 2400/ARQ'],
+ ['g','────────────────────────────────────────────'],
+ ['G','  NIGHTWATCH NODE  ::  est. 1994  ::  no logs kept'],
+ ['g','────────────────────────────────────────────'],
+ ['w','verifying carrier .......... OK'],
+ ['w','loading taxonomy ........... OK'],
+ ['w','loading case archive ....... OK'],
+ ['Y','1 message waiting in DEAD-DROP'],
+ ['K',' '],
+ ['C','PRESS [ENTER] OR TAP TO CONTINUE']
+];
+function scrBoot(){
+  SCREEN='boot';
+  raw('<div style="height:8vh"></div>');
+  let d=0;
+  for(const [c,t] of BOOTLINES){ raw(`<div class="story ${c}" style="opacity:0" data-bd="${d}">${esc(t)}</div>`); d+=1; }
+  menu([['ENTER','CONNECT','tap or press Enter',()=>go(scrTitle)]]);
+  setTimeout(()=>{
+    const rows=[...$screen.querySelectorAll('[data-bd]')];
+    rows.forEach((el,i)=>setTimeout(()=>{el.style.opacity=1;beep(300+i*40,.03,.02);},i*255));
+  },0);
+}
+
+/* ---------- TITLE ---------- */
+const LOGO=
+` ██████╗  █████╗ ██╗     ███████╗
+ ██╔══██╗██╔══██╗██║     ██╔════╝
+ ██████╔╝███████║██║     █████╗
+ ██╔═══╝ ██╔══██║██║     ██╔══╝
+ ██║     ██║  ██║███████╗███████╗
+ ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝
+  █████╗ ██████╗  ██████╗██╗  ██╗██╗██╗   ██╗███████╗
+ ██╔══██╗██╔══██╗██╔════╝██║  ██║██║██║   ██║██╔════╝
+ ███████║██████╔╝██║     ███████║██║██║   ██║█████╗
+ ██╔══██║██╔══██╗██║     ██╔══██║██║╚██╗ ██╔╝██╔══╝
+ ██║  ██║██║  ██║╚██████╗██║  ██║██║ ╚████╔╝ ███████╗
+ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝  ╚══════╝`;
+async function scrTitle(){
+  SCREEN='title';
+  raw(`<pre class="wide C center" style="text-align:left;display:inline-block">${esc(LOGO)}</pre>`);
+  raw(`<div class="story center W">T H E   M I S I D E N T I F I E D</div>`);
+  raw(`<div class="story center K small">a Thorn Palamos signal investigation · a door game for the Nightwatch node</div>`);
+  raw(`<div class="story center K small">from the books of John Carter</div>`);
+  hr();
+  raw(`<div class="story center"><span class="R">The truth isn't buried.</span> <span class="Y">It's broadcasting.</span> <span class="C">You just have to know how to listen.</span><span class="blink W">▮</span></div>`);
+  hr();
+  const hasSave=await (async()=>{try{const r=await window.storage.get(SAVEKEY);return !!(r&&r.value);}catch(e){return false;}})();
+  clearMenuAndShow(()=>{ menu([
+    ['N','NEW INVESTIGATION','begin at the Kingman truck stop',()=>{G=freshState();go(scrIntro);}],
+    ['L','RESUME','load your saved investigation',async()=>{ if(await loadGame()){toastMsg('^G{ Carrier reacquired. Welcome back. }');go(scrMain);} else {toastMsg('^R{ No save found on this node. }');go(scrTitle);} },{disabled:!hasSave}],
+    ['D','THE DOSSIER','taxonomy, checklist, field guide',()=>go(scrDossier)],
+    ['X','WIPE SAVE','erase and start clean',async()=>{await wipeSave();toastMsg('^K{ Node wiped. }');go(scrTitle);},{disabled:!hasSave,cls:'danger'}]
+  ]); });
+}
+function clearMenuAndShow(f){ f(); }
+
+/* ---------- INTRO ---------- */
+function scrIntro(){
+  SCREEN='intro'; G.act=0;
+  boxOpen('KINGMAN, ARIZONA — DAY 1','cy');
+  txt('The object on the antenna display wasn\'t moving. But the signal behind it was.');
+  txt('Three days parked outside a truck stop. Gas-station sandwiches. Four-hour sleep intervals the military wired into you and never unwired. A grey Ford with rental plates that has not moved since you arrived.');
+  txt('The dead-drop check is habit. Forty minutes to access, zero trace. You built the channel yourself in 2019 and shared it with exactly four people. Two you no longer trust. One is dead.');
+  txt('The file is thirty-eight seconds of audio, sitting untouched for eight months. The access log shows one failed intrusion attempt, fourteen weeks ago, routed through a VPN popular with government contractors.');
+  txt('Seven seconds in, a voice moves through the static like a hand through smoke. Coordinates. Nevada. Read twice. Then one sentence, flat, from the far side of fear:');
+  raw(`<div class="story center R pulse">"They're using the tower again."</div>`);
+  txt('The cryptographic identifier in the carrier wave is one you built and gave to one person: **Garrett Voss**. Garrett Voss has been dead for fourteen months.');
+  boxClose();
+  boxOpen('HOW THIS WORKS','gr');
+  txt('You are a signal analyst. Cases come to you as noise. Your job is the arithmetic nobody else will do:');
+  txt('^G{[1]} strip the retelling  ^G{[2]} check the prosaic  ^G{[3]} check the classified inventory  ^G{[4]} follow the money  ^G{[5]} go look  ^G{[6]} deep-scan the spectrum — then **CLASSIFY** the case, Category One through Four, or file it honestly as UNRESOLVED.');
+  txt('Each analysis action costs ^Y{AP} (you get 4 a day). Field work raises ^R{HEAT} — Meridian Signal Group is listening for listeners. Correct classifications build ^C{CRED}. CRED opens doors. HEAT closes them.');
+  txt('Train on Mobius\'s ^W{CURRICULUM} of historical cases to raise your ^G{SKILL} — a sharper eye reveals evidence for free.');
+  boxClose();
+  menu([['ENTER','Drive to the coordinates','Harlow Flats, Nevada',()=>{G.act=1;setFlag('act1');G.loc='HARLOW';addLog('Answered Voss\'s dead-drop. Arrived Harlow Flats.');go(scrHarlowArrival);}]]);
+}
+function scrHarlowArrival(){
+  boxOpen('HARLOW FLATS, NEVADA','cy');
+  txt('One diner. One grain elevator. One decommissioned relay tower on the eastern ridge, pulsing red against the dark in a six-second rhythm.');
+  txt('Bella runs the diner. She pours without ceremony and tells you about **Carla Pruit**, the schoolteacher who lost time and was found barefoot on the service road; about **Marcus Webb**, nineteen, who stopped sleeping for eleven days and drew the tower "lit from within."');
+  txt('"Nobody else heard music," she says. "There was nothing up there except the tower and the dark and forty degrees."');
+  txt('That\'s when you notice the tower isn\'t just pulsing.');
+  boxClose();
+  menu([['ENTER','Open the case file',null,()=>go(scrMain)]]);
+}
+
+/* ---------- MAIN MENU ---------- */
+function actCases(){ return Object.entries(STORY).filter(([id,c])=>c.act<=G.act && !(caseState(id).correct)); }
+function caseState(id){ if(!G.cases[id])G.cases[id]={opened:false,revealed:[],classified:null,correct:false,tries:0}; return G.cases[id]; }
+function currDone(){ return Object.values(G.curr).filter(x=>x&&x.correct).length; }
+function scrMain(){
+  SCREEN='main';
+  const L=LOCS[G.loc];
+  boxOpen(`${L.name.toUpperCase()} — MAIN MENU`,'cy');
+  txt(`^K{${L.desc}}`);
+  boxClose();
+  const openHere=actCases().filter(([id,c])=>c.loc===G.loc);
+  const items=[
+   ['A','ANALYZE SIGNALS',openHere.length?`${openHere.length} case(s) live at this location`:'no live cases here — travel',()=>go(scrCaseList),{disabled:false}],
+   ['C','THE CURRICULUM',`Mobius's training archive · ${currDone()}/${CURR.length} mastered · SKILL ${G.skill}`,()=>go(scrCurrList)],
+   ['T','TRAVEL','move the van (costs power & 1 AP)',()=>go(scrTravel)],
+   ['M','MESSAGE BOARDS','the node\'s traffic',()=>go(scrBoards)],
+   ['P','PEOPLE','contacts & field guide encounters',()=>go(scrPeople)],
+   ['D','THE DOSSIER','taxonomy · checklist · archetypes',()=>go(scrDossier)],
+   ['V','THE VAN','status, log & upgrades',()=>go(scrVan)],
+   ['R','REST','end the day (events roll; AP restored)',()=>endDay()],
+   ['S','SAVE','hold the carrier',async()=>{await saveGame();go(scrMain);}]
+  ];
+  /* story gates */
+  if(G.act>=2 && flag('hf01done') && flag('pw04done') && !flag('expose')){
+    items.splice(1,0,['Y','DELIVER TO YAEL MARSH',G.cred>=35?'the documentation set is ready':'requires CRED ≥ 35 (she sources everything three times)',
+      ()=>go(scrExpose),{disabled:!(G.loc==='SANTAFE'&&G.cred>=35),cls:'good'}]);
+  }
+  if(G.act>=3 && flag('cr06done') && flag('calebTalk') && !G.ending){
+    items.splice(1,0,['Q','DRIVE TO THE RELAY','the road past the last named place',()=>go(scrFinale),{cls:'good'}]);
+  }
+  menu(items);
+  hr();
+  raw(`<div class="story small K">step seven: distrust certainty · type a key or tap a line</div>`);
+}
+
+/* ---------- CASE ENGINE ---------- */
+function scrCaseList(){
+  SCREEN='cases';
+  boxOpen('LIVE CASES','gr');
+  const here=actCases().filter(([id,c])=>c.loc===G.loc);
+  const elsewhere=actCases().filter(([id,c])=>c.loc!==G.loc);
+  if(!here.length) txt('^K{Nothing live at this location.}');
+  boxClose();
+  let n=1; const mi=[];
+  for(const [id,c] of here){ mi.push([String(n++),c.title,`${c.ap} AP per action`,()=>openCase(id)]); }
+  if(elsewhere.length){ for(const [id,c] of elsewhere){ mi.push([String(n++),c.title,`at ${LOCS[c.loc].name} — travel there`,()=>{},{disabled:true}]); } }
+  mi.push(['B','BACK',null,()=>go(scrMain)]);
+  menu(mi);
+}
+const ACTIONS=[
+ ['1','retell','STRIP THE RETELLING','witness statements closest to the event'],
+ ['2','registry','REGISTRY CHECK','natural phenomena & the public catalog (Cat 1 screen)'],
+ ['3','inventory','CLASSIFIED INVENTORY','Voss\'s program lists (Cat 2 screen)'],
+ ['4','money','FOLLOW THE MONEY','who benefits from each explanation (Cat 3 screen)'],
+ ['5','field','FIELD VISIT','physical evidence · +HEAT',],
+ ['6','scan','DEEP SPECTRUM SCAN','full decomposition · −POWER']
+];
+let curCase=null;
+function openCase(id){ curCase=id; const st=caseState(id); st.opened=true; go(scrCase); }
+function scrCase(){
+  SCREEN='case';
+  const c=STORY[curCase], st=caseState(curCase);
+  boxOpen(c.title,'cy'); txt(c.brief); boxClose();
+  /* skill perk: auto-reveal retelling at skill>=1, registry at >=2 */
+  if(G.skill>=1 && c.ev.retell && !st.revealed.includes('retell')){st.revealed.push('retell');}
+  if(G.skill>=2 && c.ev.registry && !st.revealed.includes('registry')){st.revealed.push('registry');}
+  if(st.revealed.length){
+    boxOpen('EVIDENCE ON FILE','gr');
+    for(const k of st.revealed){ const a=ACTIONS.find(x=>x[1]===k); txt(`^Y{▸ ${a?a[2]:k}} — ${c.ev[k]}`); }
+    boxClose();
+  }
+  const mi=[];
+  for(const [key,k,name,sub] of ACTIONS){
+    if(!c.ev[k]) continue;
+    if(st.revealed.includes(k)) continue;
+    mi.push([key,name,sub+` · ${c.ap} AP`,()=>{
+      if(!spendAP(c.ap)){toastMsg('^R{ Out of hours. REST to start a new day. }');return go(scrCase);}
+      st.revealed.push(k);
+      if(k==='field') adj({heat:+8});
+      if(k==='scan') adj({power:-12});
+      addLog(`${c.title}: ${name.toLowerCase()}.`);
+      beep(520,.05);
+      go(scrCase);
+    }]);
+  }
+  mi.push(['K','CLASSIFY THE CASE',st.revealed.length<2?'gather at least 2 lines of evidence first':'apply the taxonomy',()=>go(scrClassify),{disabled:st.revealed.length<2,cls:'good'}]);
+  mi.push(['B','BACK',null,()=>go(scrCaseList)]);
+  menu(mi);
+  hr();
+  raw(`<div class="story small K">the taxonomy in order · one two three four · don't skip to four</div>`);
+}
+function scrClassify(){
+  SCREEN='classify';
+  const c=STORY[curCase], st=caseState(curCase);
+  boxOpen('CLASSIFICATION — '+c.title,'ye');
+  txt('Apply the categories **in order**. Weight physical over testimonial. Ask who benefits. Then commit.');
+  boxClose();
+  const mi=[];
+  for(const n of [1,2,3,4,5]){
+    mi.push([n===5?'U':String(n),CATS[n].name,CATS[n].desc,()=>resolveCase(n)]);
+  }
+  mi.push(['B','BACK — not ready',null,()=>go(scrCase)]);
+  menu(mi);
+}
+function resolveCase(n){
+  const c=STORY[curCase], st=caseState(curCase);
+  st.tries++; st.classified=n;
+  clear();
+  if(n===c.truth){
+    st.correct=true; G.stats.classified++; G.stats.correct++;
+    const evBonus=st.revealed.length;
+    const credGain= (st.tries===1? 10:5) + Math.min(4,evBonus);
+    adj({cred:+credGain});
+    raw(`<div class="story"><span class="tag ${CATS[c.truth].tag}">${CATS[c.truth].name}</span> <span class="G">CORRECT.</span> <span class="K">(+${credGain} CRED)</span></div>`);
+    boxOpen('VERDICT','gr'); txt(c.verdict); boxClose();
+    addLog(`${c.title} closed correctly (Cat ${c.truth===5?'U':c.truth}).`);
+    if(c.onCorrect)c.onCorrect();
+    storyProgress();
+  } else {
+    G.stats.classified++;
+    adj({cred:-6,heat:+5});
+    raw(`<div class="story"><span class="R">MISFILED.</span> <span class="K">(−6 CRED, +5 HEAT — a wrong stamp echoes)</span></div>`);
+    boxOpen('THE CHECKLIST PUSHES BACK','rd'); txt(c.wrongHint); boxClose();
+    addLog(`${c.title}: misclassified. Retrying.`);
+  }
+  menu([['ENTER','CONTINUE',null,()=>go(st.correct?scrMain:scrCase)]]);
+  flush(); statbar(); beep(n===c.truth?880:180,.12);
+}
+function storyProgress(){
+  /* Act 1 -> 2 */
+  if(G.act===1 && flag('hf01done') && flag('vg02done') && flag('nv03done') && !flag('act2')){
+    setFlag('act2'); G.act=2;
+    boxOpen('ACT II — THE ARCHIVE','rd');
+    txt('Voss\'s trace resolves in full: **PALE ARCHIVE**. Seventeen sites. Nine states. Frequency-based neurological transmission run on unwitting civilian populations — privatized in 2017 to **Meridian Signal Group** and dark ever since.');
+    txt('Harlow Flats is Site 04. The list gives you Site 09: ^C{Paiute Wells}. And a name in Santa Fe who sources everything three times before she prints it: ^C{Yael Marsh}.');
+    if(flag('subsignal')) txt('^Y{And underneath Meridian\'s pulse — the second signal. Older. Patient. You keep that page to yourself, for now.}');
+    boxClose();
+    addLog('ACT II unlocked: PALE ARCHIVE revealed.');
+  }
+  /* Act 2 -> 3 handled by exposé */
+}
+
+/* ---------- EXPOSÉ ---------- */
+function scrExpose(){
+  SCREEN='expose';
+  boxOpen('SANTA FE — YAEL MARSH','cy');
+  txt('She reads for three hours without speaking. Site 04. Site 09. The shell companies on the leases. The self-auditing subsidiaries. The chain of command with original signatures.');
+  txt('"Every claim documented three times over," she says finally. "This is everything Garrett promised it would be."');
+  txt('Six weeks later it runs. Seventeen sites. Nine states. PALE ARCHIVE, by name. Meridian\'s denial contains six factual claims — four your documents contradict, and two that are technically true and therefore the most damning.');
+  txt('**Meridian Signal Group is in front of a congressional committee. You are no longer a ghost.**');
+  boxClose();
+  menu([['ENTER','CONTINUE',null,()=>{
+    setFlag('expose'); adj({cred:+20,heat:-35,cash:+150});
+    addLog('The exposé ran. Meridian before Congress.');
+    G.act=3; setFlag('act3');
+    toastMsg('^G{ +20 CRED · HEAT collapses — hard to disappear a name in the paper. }');
+    go(scrAct3);
+  }]]);
+}
+function scrAct3(){
+  boxOpen('ACT III — THE RESIDUAL','rd');
+  txt('The towers go quiet one by one as the committee subpoenas roll. The story should be over.');
+  txt('Then a name that was never on any list: ^C{Crale, Montana}. Population 612. No tower. Never surveilled, never selected, never touched by Meridian or anyone. And the valley is humming.');
+  txt('The signal you thought you\'d answered is transmitting something new.');
+  boxClose();
+  menu([['ENTER','CONTINUE',null,()=>go(scrMain)]]);
+}
+
+/* ---------- FINALE ---------- */
+function scrFinale(){
+  SCREEN='finale';
+  boxOpen('THE RELAY — PAST THE LAST NAMED PLACE','rd');
+  txt('The propagation vector ends here. Deep geology, high latitude. The emission structure is four hundred million years old — older than forests, older than anything with a spine. It was transmitting before there was anyone to transmit to.');
+  txt('The display flattens. Not silence — attention. Everything you have subtracted for three acts has led to the one thing that would not subtract, and it has been waiting for someone to finish the arithmetic.');
+  txt('It shows you both doors. The closed one: the tide withdrawing, the sensitivity receding, Caleb\'s children unable to hear the valley, the universe moving on to its next candidate. The open one: the particular human frequency joining something vast without being consumed by it — the choir, not the replacement.');
+  txt('Then, in a register you can now receive at full resolution, the first honest question it has asked in four hundred million years:');
+  raw(`<div class="story center W pulse">"WHAT DOES YOUR SPECIES INTEND TO DO WITH WHAT IT HAS LEARNED?"</div>`);
+  boxClose();
+  menu([
+   ['1','"I don\'t know. But I\'ll tell them what you showed me. Both doors. The choice is theirs."','the honest answer',()=>ending('honest')],
+   ['2','"We accept. Open the door. I\'ll answer for all of us."','certainty — the thing the checklist warned you about',()=>ending('certain')],
+   ['3','Say nothing. Pack the array. Drive south.','walk away',()=>ending('walk')]
+  ]);
+}
+function ending(which){
+  G.ending=which; clear();
+  if(which==='honest'){
+    boxOpen('ENDING — SHOW US','gr');
+    txt('The quiet that follows is not the eight months of silence. It is the quiet of a question asked and honestly answered — the most significant shift in the signal\'s behavior in four hundred million years.');
+    raw(`<div class="story center C">"We know you are both things. The question was whether the best of you understood what it was choosing. You understand. The threshold remains open."</div>`);
+    raw(`<div class="story center W pulse">"SHOW US."</div>`);
+    txt('You say your goodbyes. Seven skips at the river — the word that covers everything. Then the van on the empty highway south, the antenna display flat and clean for the first time since Kingman.');
+    txt('The series ends where it began. A van. A display. Someone listening.');
+    txt('**The difference is what the silence says.**');
+    boxClose();
+  } else if(which==='certain'){
+    boxOpen('ENDING — THE SEVENTH STEP','rd');
+    txt('The display spikes once — and withdraws. Not anger. Correction.');
+    txt('Anyone who tells you they know — definitively, for everyone — is selling something. You knew that. You wrote it on the wall of the van. The signal spent four hundred million years learning to distrust exactly the certainty you just offered it on behalf of eight billion people who were not asked.');
+    txt('The threshold does not close. It simply stops being addressed to you. Somewhere, someday, it will ask someone else.');
+    txt('^K{You drive south with a clean display and an answer you will spend the rest of your life wishing you could unsay.}');
+    boxClose();
+  } else {
+    boxOpen('ENDING — THE LONG STATIC','ye');
+    txt('You pack the array. You drive. The valley hum fades out of range somewhere past the county line, patient as ever.');
+    txt('It has waited four hundred million years. It is not offended by one more analyst who looked at both doors and chose the highway. The question stays open — for Caleb, maybe. For Caleb\'s children.');
+    txt('^K{You did the arithmetic. You just declined to sign it. Some nights, at 3 AM on empty interstate, the display flickers — six seconds on, six seconds off — and you do not slow down.}');
+    boxClose();
+  }
+  hr();
+  boxOpen('INVESTIGATION RECORD','cy');
+  txt(`Days elapsed: **${G.day}** · Classifications: **${G.stats.correct}/${G.stats.classified}** correct · Curriculum mastered: **${currDone()}/${CURR.length}** · Final CRED: **${G.cred}** · Cat-4 residuals confirmed: **${G.stats.cat4found}**`);
+  txt('^K{The truth isn\'t buried. It isn\'t broadcasting. It\'s here. It always has been. Now it\'s your turn.}');
+  boxClose();
+  menu([['N','NEW GAME +','keep your SKILL, start over',()=>{const s=G.skill,c=G.curr;G=freshState();G.skill=s;G.curr=c;go(scrIntro);}],
+        ['T','TITLE',null,()=>go(scrTitle)]]);
+  flush(); statbar(); saveGame(true);
+}
+
+/* ---------- CURRICULUM ---------- */
+let curCurr=null;
+function scrCurrList(){
+  SCREEN='curr';
+  boxOpen('THE CURRICULUM — 847 pages, thirty-one events, one USB drive','gr');
+  txt('^K{"You wrote it right. Here\'s the part I couldn\'t say on record." — postmarked Reno, no return address.}');
+  txt(`Master cases to raise SKILL (currently **${G.skill}** — every 4 mastered = +1; SKILL auto-reveals evidence on live cases). Grading follows Mobius\'s taxonomy. ^Y{No AP cost — study is free. Getting it wrong only costs pride.}`);
+  boxClose();
+  const mi=[];
+  CURR.forEach((k,i)=>{
+    const st=G.curr[k.id];
+    const mark=st? (st.correct?'✓ mastered':'✗ review') : ' ';
+    mi.push([String.fromCharCode(65+i),k.title,mark,()=>{curCurr=k.id;go(scrCurrCase);},{cls:st&&st.correct?'good':''}]);
+  });
+  mi.push(['B','BACK',null,()=>go(scrMain)]);
+  menu(mi);
+}
+function scrCurrCase(){
+  const k=CURR.find(x=>x.id===curCurr);
+  boxOpen(k.title,'cy'); txt(k.brief); boxClose();
+  boxOpen('THE FILE','gr');
+  txt(`^Y{▸ STRIP THE RETELLING} — ${k.ev.retell}`);
+  txt(`^Y{▸ REGISTRY} — ${k.ev.registry}`);
+  txt(`^Y{▸ CLASSIFIED INVENTORY} — ${k.ev.inventory}`);
+  txt(`^Y{▸ WHO BENEFITS} — ${k.ev.money}`);
+  boxClose();
+  const mi=[];
+  for(const n of [1,2,3,4,5]) mi.push([n===5?'U':String(n),CATS[n].name,null,()=>{
+    const ok=k.ans.includes(n);
+    G.curr[k.id]={done:true,correct:ok||(G.curr[k.id]&&G.curr[k.id].correct)};
+    const newSkill=Math.floor(currDone()/4);
+    if(newSkill>G.skill){G.skill=newSkill;toastMsg(`^G{ SKILL rises to ${G.skill}. The eye sharpens. }`);}
+    clear();
+    raw(`<div class="story">${ok?'<span class="G">CORRECT.</span>':'<span class="R">NOT WHAT THE FILE SUPPORTS.</span>'} <span class="K">book answer: ${k.ans.map(a=>a===5?'UNRESOLVED':'CAT '+a).join(' / ')}</span></div>`);
+    boxOpen('MOBIUS\'S VERDICT',ok?'gr':'rd'); txt(k.verdict); boxClose();
+    menu([['ENTER','CONTINUE',null,()=>go(scrCurrList)]]);
+    flush();statbar();beep(ok?880:180,.1);
+  }]);
+  mi.push(['B','BACK',null,()=>go(scrCurrList)]);
+  menu(mi);
+}
+
+/* ---------- TRAVEL ---------- */
+function scrTravel(){
+  SCREEN='travel';
+  boxOpen('TRAVEL — THE VAN MOVES AT NIGHT','cy');
+  txt('^K{Travel costs 1 AP and power proportional to distance. New towns mean new cases — and new eyes.}');
+  boxClose();
+  const mi=[]; let n=1;
+  for(const [id,L] of Object.entries(LOCS)){
+    const locked = L.req && !flag(L.req);
+    if(id==='RELAY' && !(flag('cr06done')&&flag('calebTalk'))) continue;
+    if(locked && id!=='RELAY') { continue; }
+    const here=id===G.loc;
+    mi.push([String(n++),L.name,here?'(you are here)':`${L.fuel||10}% power · ${L.desc}`,()=>{
+      if(here)return;
+      if(!spendAP()){toastMsg('^R{ Out of hours. }');return go(scrTravel);}
+      const cost=Math.max(6,Math.round((L.fuel||10)/3));
+      adj({power:-cost,heat:-3});
+      G.loc=id; addLog(`Relocated to ${L.name}.`);
+      toastMsg(`^K{ Night miles. −${cost}% power. The mirrors stay empty. }`);
+      go(scrMain);
+    },{disabled:here}]);
+  }
+  mi.push(['B','BACK',null,()=>go(scrMain)]);
+  menu(mi);
+}
+
+/* ---------- BOARDS ---------- */
+function scrBoards(){
+  SCREEN='boards';
+  boxOpen('MESSAGE BASES — NIGHTWATCH NODE','gr');
+  txt('^K{GEN=general · SIG=signals · RES=the residual. Post what you SAW.}');
+  boxClose();
+  const mi=[];
+  BOARDS.forEach((b,i)=>{
+    if(b.req && !flag(b.req)) return;
+    const read=G.boardsRead[b.id]?'':'● ';
+    mi.push([String(i+1),`[${b.area}] ${b.subj}`,`${read}from ${b.from}`,()=>{
+      G.boardsRead[b.id]=true;
+      clear();
+      boxOpen(`[${b.area}] ${b.subj} — ${b.from}`,'cy'); txt(b.body);
+      if(b.note){hr();txt(`^M{ANALYST NOTE:} ^K{${b.note}}`);}
+      boxClose();
+      menu([['B','BACK',null,()=>go(scrBoards)]]); flush();statbar();
+    }]);
+  });
+  mi.push(['B','BACK',null,()=>go(scrMain)]);
+  menu(mi);
+}
+
+/* ---------- PEOPLE ---------- */
+function scrPeople(){
+  SCREEN='people';
+  boxOpen('PEOPLE — the field guide, made flesh','gr');
+  txt('^K{Talking costs 1 AP. Every archetype gives something — a lead, a warning, or a trap shaped like help.}');
+  boxClose();
+  const mi=[]; let n=1;
+  for(const [id,p] of Object.entries(NPCS)){
+    if(id==='CALEB' && G.act<3) continue;
+    if(id==='YAEL' && G.act<2) continue;
+    const here = p.loc===null || p.loc===G.loc;
+    mi.push([String(n++),`${p.name} — ${p.arch}`, here?(p.loc?`at ${LOCS[p.loc].name}`:'reachable via the node'):`at ${LOCS[p.loc].name} — travel there`, ()=>talk(id), {disabled:!here}]);
+  }
+  mi.push(['B','BACK',null,()=>go(scrMain)]);
+  menu(mi);
+}
+function talk(id){
+  const p=NPCS[id];
+  if(!spendAP()){toastMsg('^R{ Out of hours. }');return go(scrPeople);}
+  const met=G.npcMet[id]||0; G.npcMet[id]=met+1;
+  clear();
+  boxOpen(`${p.name} — ${p.arch}`,'cy');
+  txt(p.lines[Math.min(met,p.lines.length-1)]);
+  hr(); txt(`^K{${p.gift}}`);
+  boxClose();
+  if(id==='BELLA'){adj({heat:-5});addLog('Coffee at Bella\'s. The diner watches the road for you.');}
+  if(id==='MOBIUS'&&met===0){addLog('Made contact with Mobius.');}
+  if(id==='VANN'){adj({heat:-2});setFlag('vannMap');}
+  if(id==='CALEB'&&flag('cr06done')){setFlag('calebTalk');txt('^G{Caleb skips a stone. Seven skips. "It\'s ready when you are," he says. The road to the Relay is open.}');addLog('Caleb opened the road to the Relay.');}
+  const mi=[];
+  if(id==='DRANYAM' && !flag('vg02done') && !flag('dranyamDeal')){
+    mi.push(['$','Take the stage deal (+$500, −15 CRED)','the audience wants inventory',()=>{
+      setFlag('dranyamDeal');adj({cash:+500,cred:-15,heat:-3});
+      addLog('Took Dranyam\'s stage money. Yael will hear.');
+      toastMsg('^R{ Two million subscribers watched you stamp CAT FOUR on a stock-footage composite. The money spends. The name doesn\'t, anymore. }');
+      go(scrMain);
+    },{cls:'danger'}]);
+  }
+  mi.push(['B','BACK',null,()=>go(scrPeople)]);
+  menu(mi); flush(); statbar();
+}
+
+/* ---------- DOSSIER ---------- */
+function scrDossier(){
+  SCREEN='dossier';
+  boxOpen('THE TAXONOMY IN BRIEF','cy');
+  for(const n of [1,2,3,4,5]) raw(`<div class="story"><span class="tag ${CATS[n].tag}">${CATS[n].name}</span> <span class="w">${esc(CATS[n].desc)}</span></div>`);
+  boxClose();
+  boxOpen('THE CHECKLIST','gr');
+  for(const [n,t,d] of CHECKLIST) txt(`^Y{STEP ${n}: ${t}} ${d}`);
+  boxClose();
+  boxOpen('THE PEOPLE YOU\'LL MEET','ye');
+  for(const [t,d] of ARCHETYPES) txt(`^C{${t}} — ${d}`);
+  boxClose();
+  menu([['B','BACK',null,()=>go(SCREEN_BACK())]]);
+}
+function SCREEN_BACK(){ return G.act===0?scrTitle:scrMain; }
+
+/* ---------- VAN ---------- */
+function scrVan(){
+  SCREEN='van';
+  boxOpen('THE VAN — rolling listening post','cy');
+  raw(`<div class="story">POWER ${gauge(G.power,100,20,'G')} ${G.power}%   HEAT ${gauge(G.heat,100,20,G.heat>=70?'R':'Y')} ${G.heat}%</div>`);
+  txt(`CASH **$${G.cash}** · CRED **${G.cred}** · SKILL **${G.skill}** · Correct files **${G.stats.correct}/${G.stats.classified}**`);
+  boxClose();
+  boxOpen('UPGRADES','gr');
+  boxClose();
+  const mi=[
+   ['1','Solar trickle array — $180','+15 power every rest',()=>buy('solar',180,'Solar panels bolted flat. Free electrons, every dawn.')],
+   ['2','Low-noise preamp — $220','deep scans cost no power',()=>buy('preamp',220,'The waterfall goes glass-smooth. The sub-basement of the spectrum opens like a book.')],
+   ['3','Plate-reader camera kit — $150','−10 HEAT immediately, tails easier to shake',()=>buy('cams',150,'Now the van watches back.')],
+  ].map(([k,l,s,f])=>{
+    const id=l.split(' — ')[0];
+    return [k,l,G.upgrades[k]?'INSTALLED':s,f,{disabled:!!G.upgrades[k]}];
+  });
+  mi.push(['L','THE LOG','recent entries',()=>{clear();boxOpen('LOG','gr');(G.log.length?G.log:['(empty)']).forEach(s=>txt('^K{'+s+'}'));boxClose();menu([['B','BACK',null,()=>go(scrVan)]]);flush();statbar();}]);
+  mi.push(['B','BACK',null,()=>go(scrMain)]);
+  menu(mi);
+}
+function buy(key,cost,flavor){
+  if(G.cash<cost){toastMsg('^R{ Not enough cash. }');return go(scrVan);}
+  const kmap={solar:'1',preamp:'2',cams:'3'};
+  adj({cash:-cost}); G.upgrades[kmap[key]]=true; G.upgrades[key]=true;
+  if(key==='cams')adj({heat:-10});
+  addLog(`Installed: ${key}.`);
+  toastMsg('^G{ '+flavor+' }');
+  go(scrVan);
+}
+
+/* ---------- DAY CYCLE ---------- */
+function endDay(){
+  G.day++; G.ap=G.apMax;
+  adj({power:G.upgrades.solar?+15:+5});
+  if(G.power<=0){ adj({power:+20,cash:-40}); toastMsg('^R{ Dead batteries. An emergency charge at the truck stop costs $40 and dignity. }'); }
+  /* heat consequence */
+  if(G.heat>=100){
+    G.heat=70; adj({cred:-8});
+    clear();
+    boxOpen('RAID','rd');
+    txt('They come at 3 AM with bolt cutters and a warrant that isn\'t one. You lose a day, a drive of captures, and the comfortable illusion that the grey Ford was ever just watching.');
+    txt('^K{−8 CRED (seized files) · HEAT resets to 70 · You keep the van. They want you mobile. Mobile is trackable.}');
+    boxClose();
+    addLog('MERIDIAN RAID survived.');
+    menu([['ENTER','CONTINUE',null,()=>go(scrMain)]]);
+    flush();statbar();beep(140,.3,.06);
+    saveGame(true);
+    return;
+  }
+  /* roll event */
+  const pool=EVENTS.filter(e=>G.act>=e.min && e.cond());
+  const bag=[]; pool.forEach(e=>{for(let i=0;i<e.w;i++)bag.push(e);});
+  const ev=bag.length?bag[Math.floor(Math.random()*bag.length)]:null;
+  clear();
+  boxOpen(`DAY ${G.day}`,'cy');
+  txt('^K{Four-hour sleep intervals. Coffee. The waterfall display, first thing, like checking a pulse.}');
+  boxClose();
+  if(ev){
+    const e=ev.run();
+    boxOpen(e.title,'ye'); txt(e.body); boxClose();
+    menu(e.opts.map(([k,l,f])=>[k,l,null,()=>{clear();f();menu([['ENTER','CONTINUE',null,()=>go(scrMain)]]);flush();statbar();saveGame(true);}]));
+  } else {
+    txt('^K{A quiet morning. Out here, quiet is either safety or the thing right before it isn\'t.}');
+    menu([['ENTER','CONTINUE',null,()=>go(scrMain)]]);
+  }
+  flush(); statbar(); saveGame(true);
+}
+
+/* ---------- INPUT ---------- */
+$cmd.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const v=$cmd.value.trim().toUpperCase(); $cmd.value='';
+    const k=v||'ENTER';
+    if(keyMap[k]){beep(740);keyMap[k]();}
+    else if(keyMap['ENTER']&&v===''){beep(740);keyMap['ENTER']();}
+    else beep(160,.08);
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(e.target===$cmd) return;
+  const k=e.key.length===1?e.key.toUpperCase():(e.key==='Enter'?'ENTER':null);
+  if(k&&keyMap[k]){e.preventDefault();beep(740);keyMap[k]();}
+});
+
+/* ---------- INIT ---------- */
+go(scrBoot);
+</script>
+</body>
+</html>
