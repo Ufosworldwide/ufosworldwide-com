@@ -11,6 +11,5 @@ This website and the contents found within have AI hallucinations and imaginatio
 
 **** Games and Creations ****
 
-[ Theo Genesis ] [ https://ufosworldwide.com/theogenesis/ ] [ match 3 game ]
-
-[ Wild Track ] [ https://ufosworldwide.com/wildtrack/ ] [ animal trackers tracked showing paths on earth map ] 
+Theo Genesis: https://ufosworldwide.com/theogenesis/ -match 3 game 
+Wild Track: https://ufosworldwide.com/wildtrack/ - animal trackers tracked showing paths on earth map 
