@@ -25,3 +25,7 @@ This website and the contents found within have AI hallucinations and imaginatio
 |12|PALE ARC ARG Game|https://ufosworldwide.com/pagame/|Find the Signals|
 |13|Magnetic Monitoring|https://ufosworldwide.com/niagaranode/|Magnetic Monitoring Station|
 |14|Magnetic Monitoring Node Activation |https://ufosworldwide.com/niagaranode/collector|Magnetic Monitoring Station|
+|15|Guestbook|https://ufosworldwide.com/park/guestbook|Guestbook|
+|16|Mood Ring|https://www.ufosworldwide.com/moodring/|Mood Ring 
+|17|Math Fun|https://ufosworldwide.com/mathfun/|Connes–Consani framework through symmetry, art, and computation|
+|18|
