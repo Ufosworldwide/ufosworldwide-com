@@ -23,3 +23,5 @@ This website and the contents found within have AI hallucinations and imaginatio
 |10|Signal Capturing Data Collection|https://ufosworldwide.com/sentinel/|Sentinel| 
 |11|Spiritual Clock Winding Up and Down Game|https://ufosworldwide.com/schumann-winding/|Calming Game|
 |12|PALE ARC ARG Game|https://ufosworldwide.com/pagame/|Find the Signals|
+|13|Magnetic Monitoring|https://ufosworldwide.com/niagaranode/|Magnetic Monitoring Station|
+|14|Magnetic Monitoring Node Activation |https://ufosworldwide.com/niagaranode/collector|Magnetic Monitoring Station|
